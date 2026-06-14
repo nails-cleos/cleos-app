@@ -3,7 +3,7 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { OverviewComponent } from '../user/overview/overview.component';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
-import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
+import { PaymentRedirectGuard } from './payment/payment-redirect.guard';
 import { MePaymentComponent } from './payment/me/me-payment.component';
 import { OptionComponent } from './payment/option/option.component';
 import { PaymentComponent } from './payment/payment.component';
@@ -47,8 +47,7 @@ const children: Routes = [
   { path: 'reservation', component: MeReservationCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'reservation/:id', component: MeReservationDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'reservation/:id/payment/option', component: OptionComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: ':path/:id/payment/:status', component: PaymentCompleteComponent },
+  { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard, PaymentRedirectGuard], data: { roles: [Role.customer] } },
   { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'referrals', component: ReferralsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'discounts', component: MeDiscountComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },

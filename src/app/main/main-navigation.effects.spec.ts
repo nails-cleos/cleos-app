@@ -10,6 +10,7 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { MainContentComponent } from './main-content/main-content.component';
 import { MainNavigationEffects } from './main-navigation.effects';
 import { PrivacyComponent } from './privacy/privacy.component';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('MainNavigationEffects', () => {
   let actions$: ReplaySubject<Action>;
@@ -41,7 +42,7 @@ describe('MainNavigationEffects', () => {
     }) as RouterNavigatedAction<any>;
 
   it('should configure and load the home page state', async () => {
-    actions$.next(routerNavigated('/en-GB/home', MainContentComponent));
+    actions$.next(routerNavigated(`/${DEFAULT_LOCALE}/home`, MainContentComponent));
 
     const result = await firstValueFrom(
       effects.loadHomePage$.pipe(take(3), toArray()),
@@ -49,7 +50,7 @@ describe('MainNavigationEffects', () => {
 
     expect(result).toEqual([
       cleanMain(),
-      setCurrentLang({ lang: 'en-GB' }),
+      setCurrentLang({ lang: DEFAULT_LOCALE }),
       getAllCatalogue(),
     ]);
     expect(mainContentSpy.configure).toHaveBeenCalledWith(false, 'close', true);

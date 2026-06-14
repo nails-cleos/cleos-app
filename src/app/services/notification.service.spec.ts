@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { INotification } from '../notification/notification';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -14,7 +15,7 @@ describe('NotificationService', () => {
   const mockNotification: INotification = {
     id: '1',
     message: 'message',
-    navigation: '/en-GB/test',
+    navigation: `/${DEFAULT_LOCALE}/test`,
     date: 1716800000,
     notDate: new Date(),
     read: false,

@@ -16,7 +16,7 @@ import { INotification } from '../notification/notification';
 import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { signal } from '@angular/core';
-import { getNowTimeZone } from '../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { IResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
 import { UserStore } from '../store/user.store';
@@ -54,7 +54,7 @@ describe('NavComponent', () => {
       isAdmin: true,
       hasAdminRole: true,
       isAuthenticated: true,
-      locale: 'en-GB',
+      locale: DEFAULT_LOCALE,
       referralMax: 5,
     });
 
@@ -63,7 +63,7 @@ describe('NavComponent', () => {
     id: '1',
     message: 'This is a test notification',
     read: true,
-    navigation: '/en-GB/reservation/r-1',
+    navigation: `/${DEFAULT_LOCALE}/reservation/r-1`,
     date: date.getTime() / 1000,
     notDate: date,
     deleted: false,
@@ -115,7 +115,7 @@ describe('NavComponent', () => {
     });
 
     paramMapSpy.get.and.returnValue(null);
-    navigationServiceSpy.attachLang.and.returnValue('en-GB');
+    navigationServiceSpy.attachLang.and.returnValue(DEFAULT_LOCALE);
 
     let selectCallIndex = 0;
     storeSpy.select.and.callFake(() => {
@@ -169,11 +169,11 @@ describe('NavComponent', () => {
     }).compileComponents();
 
     const router = TestBed.inject(Router);
-    spyOnProperty(router, 'url', 'get').and.returnValue('/en-GB');
+    spyOnProperty(router, 'url', 'get').and.returnValue(`/${DEFAULT_LOCALE}`);
     navigateSpy = spyOn(router, 'navigate');
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NavComponent);
 
@@ -207,13 +207,13 @@ describe('NavComponent', () => {
 
     expect(component.isDarkMode()).toBeTrue();
     expect(component['cssClass']).toBe('dark-theme');
-    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, '/en-GB', message);
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, `/${DEFAULT_LOCALE}`, message);
   });
 
   it('should go to home when goHome is called', () => {
     component.goToHome();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home']);
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'home']);
   });
 
   it('should toggle and close menus', () => {
@@ -248,7 +248,7 @@ describe('NavComponent', () => {
   it('should navigate to the notification navigation when it is read', () => {
     component.notification(mockNotification);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/en-GB/reservation/r-1']);
+    expect(navigateSpy).toHaveBeenCalledWith([`/${DEFAULT_LOCALE}/reservation/r-1`]);
   });
 
   it('should mark notification as read and navigate', () => {
@@ -315,7 +315,7 @@ describe('NavComponent', () => {
     const mockMessage = {
       id: '4',
       message: 'This is a message notification',
-      navigation: '/en-GB/reservation/r-2',
+      navigation: `/${DEFAULT_LOCALE}/reservation/r-2`,
       date: getNowTimeZone().getTime() / 1000,
     } as INotification;
 
@@ -350,7 +350,7 @@ describe('NavComponent', () => {
     redirect$.next(false);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);
   });
 
   it('should navigate to home when redirect', () => {
@@ -359,7 +359,7 @@ describe('NavComponent', () => {
     redirect$.next(true);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'home']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);
   });
 
   it('should handle notifications', () => {
@@ -557,10 +557,10 @@ describe('NavComponent', () => {
     response$.next(response);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith([`/en-GB/${response.redirect}`]);
+    expect(navigateSpy).toHaveBeenCalledWith([`/${DEFAULT_LOCALE}/${response.redirect}`]);
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
-      { actionType: 'link', action: `/en-GB/${response.path}` });
+      { actionType: 'link', action: `/${DEFAULT_LOCALE}/${response.path}` });
   });
 
   it('should create response with blob', () => {

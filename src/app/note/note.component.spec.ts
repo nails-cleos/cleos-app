@@ -6,7 +6,7 @@ import { IUser, IUserAll } from '../user/user';
 import { INoteAll } from './note';
 import { FrequencyEnum } from '../util/helper';
 import { ICommon, IError } from '../interfaces/common';
-import { backendFormatDate, getNowTimeZone } from '../util/dates';
+import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { addDays } from 'date-fns';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { NavigationService } from '../services/navigation.service';
@@ -83,7 +83,7 @@ describe('NoteComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NoteComponent);
     component = fixture.componentInstance;

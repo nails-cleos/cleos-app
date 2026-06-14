@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../room/room';
 import { IOfficeAll } from '../office/office';
 import { ICurrency, ICurrencyAll } from '../currency/currency';
-import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
+import { DEFAULT_LOCALE, getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
@@ -71,7 +71,7 @@ class Locale implements ILocale {
 }
 
 export const getLocale = (userLang?: string | null): ILocale => {
-  let language = 'en-GB';
+  let language = DEFAULT_LOCALE;
   let flag;
   const lang = userLang?.replace('_', '-');
   if (lang?.startsWith('es')) {
@@ -81,7 +81,7 @@ export const getLocale = (userLang?: string | null): ILocale => {
     language = 'nl';
     flag = 'nl';
   } else if (lang?.startsWith('en')) {
-    language = 'en-GB';
+    language = DEFAULT_LOCALE;
     flag = 'en_GB';
   }
 

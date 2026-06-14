@@ -8,7 +8,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-us
 import { signal } from '@angular/core';
 import { IDashboard } from './dashboard';
 import { ICurrencyAll } from '../currency/currency';
-import { getNowTimeZone } from '../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { endOfMonth, startOfMonth } from 'date-fns';
 import { States } from '../reservation/reservation';
 import { FrequencyEnum } from '../util/helper';
@@ -100,7 +100,7 @@ describe('DashComponent', () => {
     component = fixture.componentInstance;
 
     const translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

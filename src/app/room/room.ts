@@ -4,7 +4,7 @@ import { ITreatmentAll } from '../treatment/treatment';
 import { IAdditionalAll } from '../additional/additional';
 import { IOffice, IOfficeAll } from '../office/office';
 import { AvailabilityForm, RoomForm } from './room-form.types';
-import { createDate, createNewDate, getTimeNumber, API_LOCALE } from '../util/dates';
+import { createDate, createNewDate, getTimeNumber, DEFAULT_LOCALE } from '../util/dates';
 import { createAddress, areEquals } from '../util/helper';
 import { isString } from '../interfaces/common';
 import { valueChange } from '../util/validators';
@@ -193,7 +193,7 @@ export class Room {
         roomForm.addressForm.controls.addressDescription.value,
       ),
       ...(roomForm.closeDate.value && {
-        closeDateString: createNewDate(roomForm.closeDate.value).toLocaleString(API_LOCALE),
+        closeDateString: createNewDate(roomForm.closeDate.value).toLocaleString(DEFAULT_LOCALE),
       }),
     };
 

@@ -7,7 +7,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { API_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { DEFAULT_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
@@ -65,10 +65,10 @@ export class UpdateTrackingDialogComponent {
     let started;
     let completed;
     if (this.startedDateTime.getTime() !== this.getForm.startedDate.value?.getTime()) {
-      started = this.getForm.startedDate.value?.toLocaleString(API_LOCALE);
+      started = this.getForm.startedDate.value?.toLocaleString(DEFAULT_LOCALE);
     }
     if (this.completedDateTime.getTime() !== this.getForm.completedDate.value?.getTime()) {
-      completed = this.getForm.completedDate.value?.toLocaleString(API_LOCALE);
+      completed = this.getForm.completedDate.value?.toLocaleString(DEFAULT_LOCALE);
     }
     if (started || completed) {
       return this.dialogRef.close({ started, completed });

@@ -11,6 +11,7 @@ import { AppComponent } from './app.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from './services/auth-user.service';
 import { SeoService } from './services/seo.service';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from './util/dates';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -51,8 +52,8 @@ describe('AppComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', { META: { CONTENT: 'desc', TITLE: 'title' } });
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, { META: { CONTENT: 'desc', TITLE: 'title' } });
 
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;

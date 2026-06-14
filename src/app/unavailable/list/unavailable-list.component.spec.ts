@@ -8,7 +8,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { IUserAll } from '../../user/user';
-import { getNowTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { FrequencyEnum } from '../../util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { UnavailableStore } from '../../store/unavailable.store';
@@ -113,8 +113,8 @@ describe('UnavailableListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
-    translate.setTranslation('en-GB', {
+    translate.use(DEFAULT_LOCALE);
+    translate.setTranslation(DEFAULT_LOCALE, {
       COMMON: {
         TIME_ZONE: {
           TITLE: 'Time Zone',
@@ -215,13 +215,13 @@ describe('UnavailableListComponent', () => {
   it('should navigate to the unavailable detail page when edit is called', () => {
     component.edit(mockUnavailable[0]);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable', mockUnavailable[0].id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'unavailable', mockUnavailable[0].id]);
   });
 
   it('should navigate to the block agenda detail page when edit is called for block agenda', () => {
     component.edit(mockUnavailable[1]);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'unavailable', 'block-agenda', mockUnavailable[1].id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'unavailable', 'block-agenda', mockUnavailable[1].id]);
   });
 
   it('should delete when dialog returns a result', () => {

@@ -19,6 +19,7 @@ import { IPaymentOption } from '../interfaces/payment';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { ICommon } from '../interfaces/common';
 import { RoomStore } from '../store/room.store';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -173,7 +174,7 @@ describe('RoomComponent', () => {
       .compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(RoomComponent);
     component = fixture.componentInstance;

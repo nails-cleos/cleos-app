@@ -11,7 +11,7 @@ import { FrequencyEnum } from '../../util/helper';
 import { IAvailability, IRoomAll } from '../../room/room';
 import { IUnavailableAll } from '../unavailable';
 import { IUserAll } from '../../user/user';
-import { API_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
+import { DEFAULT_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';
 
@@ -116,7 +116,7 @@ describe('BlockAgendaComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(BlockAgendaComponent);
     component = fixture.componentInstance;
@@ -203,7 +203,7 @@ describe('BlockAgendaComponent', () => {
     expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
       professionalId: mockProfessionals[0].id,
       time: '00:30',
-      start: createNewDate(nextMonday, 10, 30).toLocaleString(API_LOCALE),
+      start: createNewDate(nextMonday, 10, 30).toLocaleString(DEFAULT_LOCALE),
       timeZone: 'Europe/Amsterdam',
     }));
   });

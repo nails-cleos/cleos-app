@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+
 declare namespace Cypress {
   interface Chainable {
     randomUUID(): Chainable<string>;
@@ -135,7 +137,7 @@ Cypress.Commands.add('logout', () => {
   });
 
   cy.clearCookies({ log: false });
-  cy.visit('en-GB/home');
+  cy.visit(`${DEFAULT_LOCALE}/home`);
   cy.url({ timeout: 20000 }).should('include', 'home');
 });
 
@@ -1090,7 +1092,7 @@ Cypress.Commands.add('mockCreateReservation', (
             {
               statusCode: 200,
               body: {
-                createdAt: new Date().toLocaleDateString('en-GB'),
+                createdAt: new Date().toLocaleDateString(DEFAULT_LOCALE),
                 createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
                 deleted: false,
                 id: reservationId,

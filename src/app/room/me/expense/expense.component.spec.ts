@@ -4,7 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ExpenseComponent } from './expense.component';
 import { IExpenseAll, ISupplyStore } from './expense';
 import { ICommon } from '../../../interfaces/common';
-import { getNowTimeZone } from '../../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
 import { computed, signal } from '@angular/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
@@ -130,8 +130,8 @@ describe('ExpenseComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', {
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       EXPENSE: {
         GROSS: {
           MIN: 'Gross is below minimum',
@@ -196,7 +196,7 @@ describe('ExpenseComponent', () => {
     responseSignal.set(true);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'rooms', 'room-1', 'expenses']);
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', 'room-1', 'expenses']);
   });
 
   it('should not emit submitData when form invalid on submit', () => {

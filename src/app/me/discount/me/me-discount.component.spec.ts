@@ -8,6 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { MeDiscountComponent } from './me-discount.component';
 import { DiscountStore } from '../../../store/discount.store';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('MeDiscountComponent', () => {
   let component: MeDiscountComponent;
@@ -100,7 +101,7 @@ describe('MeDiscountComponent', () => {
     navigateSpy = spyOn(router, 'navigate');
 
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MeDiscountComponent);
     component = fixture.componentInstance;
@@ -197,6 +198,6 @@ describe('MeDiscountComponent', () => {
     const item = mockDiscount[0];
     component.useDiscount(item);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation'], { state: { discountId: item.id } });
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation'], { state: { discountId: item.id } });
   });
 });

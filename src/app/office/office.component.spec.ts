@@ -10,6 +10,7 @@ import { NavigationService } from '../services/navigation.service';
 import { OfficeStore } from '../store/office.store';
 import { OfficeComponent } from './office.component';
 import { ICommon } from '../interfaces/common';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
@@ -54,7 +55,7 @@ describe('OfficeComponent', () => {
     navigateSpy = spyOn(router, 'navigate');
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(OfficeComponent);
     component = fixture.componentInstance;
@@ -152,6 +153,6 @@ describe('OfficeComponent', () => {
 
   it('should navigate to add manager page', () => {
     component.addManager();
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: Role.manager } });
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'add'], { state: { role: Role.manager } });
   });
 });

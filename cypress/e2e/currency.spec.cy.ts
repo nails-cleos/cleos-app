@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Currency with ${ name }`, () => {
@@ -12,7 +13,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 

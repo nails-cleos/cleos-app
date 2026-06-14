@@ -10,6 +10,7 @@ import { notifyPayment, paymentSend } from '../../../store/actions/payment.actio
 import { NavigationService } from '../../../services/navigation.service';
 import { AccountStore } from '../../../store/account.store';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
@@ -76,7 +77,7 @@ describe('TransactionDetailComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TransactionDetailComponent);
     component = fixture.componentInstance;
@@ -130,14 +131,14 @@ describe('TransactionDetailComponent', () => {
     response$.next({ path: 'some/path' });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/some/path']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([`${DEFAULT_LOCALE}/some/path`]);
   });
 
   it('should navigate to payment page when payment subErrors emit', () => {
     subErrors$.next([{ message: 'Payment failed' }]);
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'transaction', 'transaction-123', 'payment']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'transaction', 'transaction-123', 'payment']);
   });
 
   it('should handle undefined selectedTransaction gracefully', () => {

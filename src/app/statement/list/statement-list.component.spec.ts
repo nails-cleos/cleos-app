@@ -10,6 +10,7 @@ import { NavigationService } from '../../services/navigation.service';
 import { StatementStore } from '../../store/statement.store';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('StatementListComponent', () => {
   let component: StatementListComponent;
@@ -91,7 +92,7 @@ describe('StatementListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

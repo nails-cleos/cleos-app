@@ -26,7 +26,7 @@ import { IAddress, IRoomAll, ServiceType } from '../room/room';
 import { ICurrency, ICurrencyAll } from '../currency/currency';
 import { GroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
 import { IExtras, IReservationAll } from '../reservation/reservation';
-import { getCurrentTimeZone } from './dates';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from './dates';
 import { IPayment } from '../interfaces/payment';
 import { DiscountType, IDiscount } from '../discount/discount';
 import { IAdditionalAll } from '../additional/additional';
@@ -141,14 +141,14 @@ describe('Helper Utils', () => {
 
     it('should return default locale object for invalid locale string', () => {
       const locale = getLocale('invalid-locale');
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
     it('should return default locale object for invalid locale string', () => {
       const locale = getLocale('en-US');
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
@@ -169,14 +169,14 @@ describe('Helper Utils', () => {
 
     it('should return default locale object when no locale string is provided', () => {
       const locale = getLocale();
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
     it('should return default locale object when locale is null', () => {
       const locale = getLocale(null);
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });

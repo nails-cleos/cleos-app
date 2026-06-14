@@ -8,6 +8,7 @@ import { ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { AdditionalStore } from '../store/additional.store';
 import { AdditionalComponent } from './additional.component';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
@@ -63,7 +64,7 @@ describe('AdditionalComponent', () => {
     component = fixture.componentInstance;
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
     fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });

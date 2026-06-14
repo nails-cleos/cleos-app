@@ -7,7 +7,13 @@ import { BehaviorSubject, of } from 'rxjs';
 import { ExpenseListComponent } from './expense-list.component';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
 import { IExpenseAll } from '../expense';
-import { dateToTimestamp, getCurrentTimeZone, getDateFormat, getNowTimeZone } from '../../../../util/dates';
+import {
+  dateToTimestamp,
+  DEFAULT_LOCALE,
+  getCurrentTimeZone,
+  getDateFormat,
+  getNowTimeZone,
+} from '../../../../util/dates';
 import { IRoomAll } from '../../../room';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { signal } from '@angular/core';
@@ -166,7 +172,7 @@ describe('ExpenseListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ExpenseListComponent);
     component = fixture.componentInstance;
@@ -273,7 +279,7 @@ describe('ExpenseListComponent', () => {
     const item = mockExpenses[0];
     component.edit(item);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'rooms', room.id, 'expenses', item.id]);
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', room.id, 'expenses', item.id]);
   });
 
   it('should call delete method without errors', () => {

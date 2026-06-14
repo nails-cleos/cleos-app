@@ -9,7 +9,7 @@ import { DocumentListComponent } from './document-list.component';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { IOfficeAll } from '../../office/office';
 import { DocumentTypeEnum, IDocument } from '../document';
-import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { DEFAULT_LOCALE, getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DocumentStore } from '../../store/document.store';
 import { OfficeStore } from '../../store/office.store';
@@ -104,7 +104,7 @@ describe('DocumentListComponent', () => {
     component = fixture.componentInstance;
 
     const translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

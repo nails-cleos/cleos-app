@@ -10,6 +10,7 @@ import { IAdditional } from '../additional';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { AdditionalStore } from '../../store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
@@ -83,7 +84,7 @@ describe('AdditionalListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(AdditionalListComponent);
     component = fixture.componentInstance;
@@ -183,7 +184,7 @@ describe('AdditionalListComponent', () => {
     const item = mockAdditional[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'additional', item.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'additional', item.id]);
   });
 
   it('should call delete when dialog returns a result', () => {

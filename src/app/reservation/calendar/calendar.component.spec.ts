@@ -18,7 +18,7 @@ import { IRoomAll } from '../../room/room';
 import { ICurrencyAll } from '../../currency/currency';
 import { IUserAll } from '../../user/user';
 import { States } from '../reservation';
-import { createNewDate } from '../../util/dates';
+import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 
@@ -180,7 +180,7 @@ describe('CalendarComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
@@ -221,8 +221,8 @@ describe('CalendarComponent', () => {
     });
 
     it('should set locale from translate service', () => {
-      expect(component.locale).toBe('en-GB');
-      expect(component.language).toBe('en-GB');
+      expect(component.locale).toBe(DEFAULT_LOCALE);
+      expect(component.language).toBe(DEFAULT_LOCALE);
     });
   });
 

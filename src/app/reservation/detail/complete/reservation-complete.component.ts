@@ -22,7 +22,7 @@ import {
   newExtra,
   newPrice,
 } from '../../../util/helper';
-import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { DEFAULT_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { IAdditionalAll } from '../../../additional/additional';
@@ -433,8 +433,8 @@ export class ReservationCompleteComponent {
           additionalIds: this.additionalSelected().map(additional => additional.id),
           transfer: this.getForm.transfer.value,
           color: this.getForm.color.value?.id,
-          startDateTime: this.startDate.toLocaleString(API_LOCALE),
-          endDateTime: this.endDate.toLocaleString(API_LOCALE),
+          startDateTime: this.startDate.toLocaleString(DEFAULT_LOCALE),
+          endDateTime: this.endDate.toLocaleString(DEFAULT_LOCALE),
           extras: this.currentExtraData,
           split: splitData,
           pointOfSale: true,

@@ -16,7 +16,7 @@ import { IPaymentOption } from '../interfaces/payment';
 import { IGroupService, ITreatment, ITreatmentAll, Price } from '../treatment/treatment';
 import { DiscountType, IUserDiscount } from '../discount/discount';
 import { DataEvent } from '../util/event';
-import { Duration, getTime, newDateTimestamp } from '../util/dates';
+import { DEFAULT_LOCALE, Duration, getTime, newDateTimestamp } from '../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from './reservation';
 import { provideHttpClient } from '@angular/common/http';
@@ -228,7 +228,7 @@ describe('ReservationComponent', () => {
     storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ReservationComponent);
     component = fixture.componentInstance;
@@ -448,7 +448,7 @@ describe('ReservationComponent', () => {
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
     });
   });
 

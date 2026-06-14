@@ -3,7 +3,7 @@ import { IRoomAll } from '../../room';
 import { IDocument } from '../../../document/document';
 import { fieldChange } from '../../../util/validators';
 import { FormArray, FormControl } from '@angular/forms';
-import { API_LOCALE, createNewDateZonedTime } from '../../../util/dates';
+import { DEFAULT_LOCALE, createNewDateZonedTime } from '../../../util/dates';
 
 export type ExpenseForm = {
   invoice: FormControl<string>;
@@ -79,7 +79,7 @@ export class Expense {
       invoice: fieldChange(expenseForm.invoice, currentExpense?.invoice),
       supplyStoreString: supplyStore?.id ? supplyStore.id : supplyStore.name,
       expenseTotals,
-      date: createNewDateZonedTime(date, currentExpense?.room?.timeZone).toLocaleString(API_LOCALE),
+      date: createNewDateZonedTime(date, currentExpense?.room?.timeZone).toLocaleString(DEFAULT_LOCALE),
     };
   }
 }

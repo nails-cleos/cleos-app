@@ -4,7 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ITreatmentAll } from '../treatment';
 import { ServiceType } from '../../room/room';
-import { convertDuration } from '../../util/dates';
+import { convertDuration, DEFAULT_LOCALE } from '../../util/dates';
 
 describe('TreatmentTableComponent', () => {
   let component: TreatmentTableComponent;
@@ -16,7 +16,7 @@ describe('TreatmentTableComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TreatmentTableComponent);
     component = fixture.componentInstance;

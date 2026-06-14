@@ -19,6 +19,7 @@ import {
 import { goTo } from '../util/animation';
 import { getLocale } from '../util/helper';
 import { EnvService } from '../services/env.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 export interface LegalPageConfig {
   routeSegment: string;
@@ -46,7 +47,7 @@ export abstract class LegalPageBase {
     distinctUntilChanged(),
   );
 
-  private readonly language = toSignal(this.language$, { initialValue: 'en-GB' });
+  private readonly language = toSignal(this.language$, { initialValue: DEFAULT_LOCALE });
 
   protected constructor(private readonly config: LegalPageConfig) {
     effect((onCleanup) => {
@@ -105,7 +106,7 @@ export abstract class LegalPageBase {
     const files = Array.from(new Set([
       `assets/legal/${this.config.fileName}.${locale}.html`,
       `assets/legal/${this.config.fileName}.${languageOnly}.html`,
-      `assets/legal/${this.config.fileName}.en-GB.html`,
+      `assets/legal/${this.config.fileName}.${DEFAULT_LOCALE}.html`,
     ]));
 
     return from(files).pipe(

@@ -49,6 +49,7 @@ import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppDateAdapter, provideAppCalendar } from './app/util/adapter/app-date.provider';
 import { AppRouterStateSerializer } from './app/util/router-state.serializer';
+import { DEFAULT_LOCALE } from './app/util/dates';
 
 export interface ISendMessage {
   name: string;
@@ -84,7 +85,7 @@ const cookieConfig: NgcCookieConsentConfig = {
 const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
   { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
 
-registerLocaleData(localeEnGB, 'en-GB');
+registerLocaleData(localeEnGB, DEFAULT_LOCALE);
 registerLocaleData(localeNl, 'nl');
 registerLocaleData(localeEs, 'es');
 
@@ -144,7 +145,7 @@ const providers = [
   AuthUserService,
   {
     provide: LOCALE_ID,
-    useValue: 'en-GB',
+    useValue: DEFAULT_LOCALE,
   },
   {
     provide: MAT_ICON_DEFAULT_OPTIONS,

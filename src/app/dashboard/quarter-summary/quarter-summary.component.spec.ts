@@ -20,6 +20,7 @@ import {
 import { ICurrencyAll } from '../../currency/currency';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
@@ -159,7 +160,7 @@ describe('QuarterSummaryComponent', () => {
     fixture = TestBed.createComponent(QuarterSummaryComponent);
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
     component = fixture.componentInstance;
   });
 

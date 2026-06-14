@@ -15,6 +15,7 @@ import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { ICommon } from '../interfaces/common';
 import { UserStore } from '../store/user.store';
 import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('UserComponent', () => {
   let component: UserComponent;
@@ -72,7 +73,7 @@ describe('UserComponent', () => {
       .compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(UserComponent);
     component = fixture.componentInstance;

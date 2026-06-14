@@ -10,7 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
 import { IUserAll } from '../../user/user';
-import { getNowTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { ICurrencyAll } from '../../currency/currency';
 import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
@@ -151,7 +151,7 @@ describe('SearchComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -7,7 +7,7 @@ import { NavigationService } from '../../services/navigation.service';
 import { BehaviorSubject } from 'rxjs';
 import { INotification } from '../notification';
 import { deleteNotification, getNotificationsPage, readNotification } from '../../store/actions/notification.actions';
-import { getNowTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 
 describe('NotificationListComponent', () => {
   let component: NotificationListComponent;
@@ -41,7 +41,7 @@ describe('NotificationListComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NotificationListComponent);
     component = fixture.componentInstance;

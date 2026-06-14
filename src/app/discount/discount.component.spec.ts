@@ -9,6 +9,7 @@ import { NavigationService } from '../services/navigation.service';
 import { signal } from '@angular/core';
 import { DiscountStore } from '../store/discount.store';
 import { ICommon } from '../interfaces/common';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
@@ -61,7 +62,7 @@ describe('DiscountComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;

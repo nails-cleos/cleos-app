@@ -49,7 +49,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
-  API_LOCALE,
+  DEFAULT_LOCALE,
   createDate,
   createFullDate,
   createNewDate,
@@ -1071,7 +1071,7 @@ export class ReservationComponent {
 
   create(): void {
     const dates: string[] = this.events.value?.map(
-      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(API_LOCALE)) ?? [];
+      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(DEFAULT_LOCALE)) ?? [];
     if (dates.length) {
       const amount = this.getConfigurationForm.amount.value;
       const type = this.getConfigurationForm.option.value?.type;
@@ -1456,11 +1456,11 @@ export class ReservationComponent {
       } else {
         if (!selectedEvent && !id) {
           title = this.translate.instant('RESERVATION.EVENT.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(API_LOCALE) });
+          content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(DEFAULT_LOCALE) });
         } else {
           title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
           content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
-            { date: start.toLocaleString(API_LOCALE) });
+            { date: start.toLocaleString(DEFAULT_LOCALE) });
         }
       }
       this.createSelectEvent(title, content, event, eventData);
@@ -1569,7 +1569,7 @@ export class ReservationComponent {
     value: Date,
     options: Intl.DateTimeFormatOptions,
     timeZone?: string,
-  ): string => value.toLocaleString(API_LOCALE, { ...options, ...(timeZone ? { timeZone } : {}) });
+  ): string => value.toLocaleString(DEFAULT_LOCALE, { ...options, ...(timeZone ? { timeZone } : {}) });
 
   private stripHtml = (value: string): string => value.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 

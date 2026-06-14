@@ -3,6 +3,7 @@ import { MonthComponent } from './month.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IMonthSummary, ISummaryTotal } from '../../dashboard';
 import { Router } from '@angular/router';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('MonthComponent', () => {
   let component: MonthComponent;
@@ -36,7 +37,7 @@ describe('MonthComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MonthComponent);
     component = fixture.componentInstance;
@@ -80,7 +81,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'INCOME');
 
       expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+        [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 0 } },
       );
     });
@@ -89,7 +90,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'EXPENSE');
 
       expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+        [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 1 } },
       );
     });
@@ -98,7 +99,7 @@ describe('MonthComponent', () => {
       component.goToMonth(5, 'CASH');
 
       expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+        [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 2 } },
       );
     });
@@ -107,7 +108,7 @@ describe('MonthComponent', () => {
       component.goToMonth(7);
 
       expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+        [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
         { state: { date: '7-2025', step: 0 } },
       );
     });

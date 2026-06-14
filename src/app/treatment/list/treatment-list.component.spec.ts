@@ -9,6 +9,7 @@ import { ITreatmentGroupAll } from '../treatment';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;
@@ -72,7 +73,7 @@ describe('TreatmentListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -7,7 +7,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   addPeriod,
-  API_LOCALE,
+  DEFAULT_LOCALE,
   CalendarPeriod,
   createNewDate,
   formatDateTime,
@@ -447,7 +447,7 @@ export class CalendarComponent {
         this.store.dispatch(
           updateReservationTimestamp({
             id: event.meta.id,
-            start: event.start.toLocaleString(API_LOCALE),
+            start: event.start.toLocaleString(DEFAULT_LOCALE),
             role: this.isRoomAdmin() ? Role.roomAdmin : Role.professional,
             timeZone: event.meta.timeZone,
           }),

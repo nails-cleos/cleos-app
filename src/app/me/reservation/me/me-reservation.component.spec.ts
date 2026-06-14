@@ -15,6 +15,7 @@ import { IGroupService, ITreatmentAll, Price } from '../../../treatment/treatmen
 import { IRoomAll, ServiceType } from '../../../room/room';
 import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { ToastService } from '../../../services/toast.service';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
@@ -214,7 +215,7 @@ describe('MeReservationComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
@@ -952,7 +953,7 @@ describe('MeReservationComponent', () => {
 
   describe('labels (computed)', () => {
     it('should map translation values correctly', () => {
-      translate.setTranslation('en-GB', {
+      translate.setTranslation(DEFAULT_LOCALE, {
         COMMON: {
           USER: {
             PHONE: {
@@ -983,7 +984,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should fallback to empty string when keys are missing', () => {
-      translate.setTranslation('en-GB', {});
+      translate.setTranslation(DEFAULT_LOCALE, {});
 
       const result = component.labels();
 

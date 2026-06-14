@@ -8,6 +8,7 @@ import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/
 import { IPaymentAll } from '../../interfaces/payment';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { cleanPayment } from '../../store/actions/payment.actions';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
@@ -56,7 +57,7 @@ describe('PaymentComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(PaymentComponent);
     component = fixture.componentInstance;
@@ -92,7 +93,7 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'accounts', 'account-1', 'transactions', '123']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'accounts', 'account-1', 'transactions', '123']);
   });
 
   it('should navigate back to the resource page when accountId is missing', () => {
@@ -102,7 +103,7 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', '123']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'reservation', '123']);
   });
 
   it('should hide footer when paymentList has items', () => {
@@ -136,7 +137,7 @@ describe('PaymentComponent', () => {
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanPayment());
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/dashboard']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([`${DEFAULT_LOCALE}/dashboard`]);
   });
 
   it('should call store.dispatch(paymentSend) when pay() is called', () => {

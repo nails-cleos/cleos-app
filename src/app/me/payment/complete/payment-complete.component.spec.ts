@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { paymentNotComplete } from '../../../store/actions/payment.actions';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('PaymentCompleteComponent', () => {
   let fixture: ComponentFixture<PaymentCompleteComponent>;
@@ -49,7 +50,7 @@ describe('PaymentCompleteComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(PaymentCompleteComponent);
   });
@@ -142,7 +143,7 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', '123', 'payment'], {
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', '123', 'payment'], {
       queryParams: { accountId: 'account-1' },
     });
   });
@@ -176,7 +177,7 @@ describe('PaymentCompleteComponent', () => {
     fixture.detectChanges();
 
     expect(routerSpy.navigate).toHaveBeenCalledWith([
-      'en-GB',
+      DEFAULT_LOCALE,
       'me',
       'reservation',
       '123',
@@ -189,6 +190,6 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/dashboard']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([`${DEFAULT_LOCALE}/dashboard`]);
   });
 });

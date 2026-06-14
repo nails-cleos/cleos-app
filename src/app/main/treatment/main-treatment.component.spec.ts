@@ -5,6 +5,7 @@ import { MainState } from '../../store/reducers/main.reducers';
 import { MainTreatmentComponent } from './main-treatment.component';
 import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
@@ -96,7 +97,7 @@ describe('MainTreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    lang$ = new BehaviorSubject<string | undefined>('en-GB');
+    lang$ = new BehaviorSubject<string | undefined>(DEFAULT_LOCALE);
 
     storeSpy = jasmine.createSpyObj<Store<MainState>>('Store', ['pipe', 'dispatch']);
     (storeSpy.pipe as any).and.returnValue(lang$.asObservable());
@@ -118,7 +119,7 @@ describe('MainTreatmentComponent', () => {
 
     expect(component).toBeTruthy();
     expect(storeSpy.pipe).toHaveBeenCalled();
-    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'en-GB');
+    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', DEFAULT_LOCALE);
   });
 
   it('should return sections when treatment id exists in translations', () => {

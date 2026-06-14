@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { EnvService } from '../../services/env.service';
 import { PrivacyComponent } from './privacy.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('PrivacyComponent', () => {
   let component: PrivacyComponent;
@@ -45,7 +46,7 @@ describe('PrivacyComponent', () => {
 
     routerMock = {
       events: routerEvents,
-      url: '/en-GB/home/privacy',
+      url: `/${DEFAULT_LOCALE}/home/privacy`,
       navigate: jasmine.createSpy('navigate').and.resolveTo(true),
       parseUrl: jasmine.createSpy('parseUrl').and.callFake((url: string) => {
         const hashIndex = url.indexOf('#');
@@ -74,7 +75,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="intro">Content</section></main></div>',
     );
 
@@ -85,7 +86,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <main class="content">
@@ -99,7 +100,7 @@ describe('PrivacyComponent', () => {
     expect(html).toContain('Nails Cleos DEV');
     expect(html).toContain('www.nailscleos.test');
     expect(html).toContain('https://www.nailscleos.test');
-    expect(html).toContain('en-GB');
+    expect(html).toContain(DEFAULT_LOCALE);
   }));
 
   it('should load spanish legal file for /es route and not fallback when present', fakeAsync(() => {
@@ -112,7 +113,7 @@ describe('PrivacyComponent', () => {
     );
 
     expect(privacyContainer().innerHTML).toContain('Contenido es');
-    httpMock.expectNone('assets/legal/privacy.en-GB.html');
+    httpMock.expectNone(`assets/legal/privacy.${DEFAULT_LOCALE}.html`);
   }));
 
   it('should fallback to english legal file when locale file is missing', fakeAsync(() => {
@@ -124,7 +125,7 @@ describe('PrivacyComponent', () => {
       statusText: 'Not Found',
     });
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="intro">Fallback {{LANGUAGE}}</section></main></div>',
     );
 
@@ -136,7 +137,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="go-rights" href="#rights">Rights</a></nav></aside>
@@ -153,7 +154,7 @@ describe('PrivacyComponent', () => {
     tick();
 
     expect(routerMock.navigate).toHaveBeenCalledWith(
-      ['/', 'en-GB', 'home', 'privacy'],
+      ['/', DEFAULT_LOCALE, 'home', 'privacy'],
       { fragment: 'rights', replaceUrl: true },
     );
     expect(scrollSpy).toHaveBeenCalled();
@@ -163,7 +164,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="unsafe-link" href="javascript:void(0)">Unsafe</a></nav></aside>
@@ -183,26 +184,26 @@ describe('PrivacyComponent', () => {
   }));
 
   it('should scroll to URL fragment after dynamic html render', fakeAsync(() => {
-    routerMock.url = '/en-GB/home/privacy#rights';
+    routerMock.url = `/${DEFAULT_LOCALE}/home/privacy#rights`;
     const scrollSpy = spyOn(Element.prototype as unknown as { scrollIntoView: () => void }, 'scrollIntoView');
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="rights">Rights section</section></main></div>',
     );
 
     tick(1);
 
     expect(scrollSpy).toHaveBeenCalled();
-    expect(routerMock.parseUrl).toHaveBeenCalledWith('/en-GB/home/privacy#rights');
+    expect(routerMock.parseUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/home/privacy#rights`);
   }));
 
   it('should decode URL-encoded anchor ids before navigating', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar">
@@ -221,7 +222,7 @@ describe('PrivacyComponent', () => {
     tick();
 
     expect(routerMock.navigate).toHaveBeenCalledWith(
-      ['/', 'en-GB', 'home', 'privacy'],
+      ['/', DEFAULT_LOCALE, 'home', 'privacy'],
       { fragment: 'your rights', replaceUrl: true },
     );
   }));
@@ -230,7 +231,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="empty-anchor" href="#">Empty</a></nav></aside>
@@ -253,7 +254,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -282,7 +283,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      'assets/legal/privacy.en-GB.html',
+      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">

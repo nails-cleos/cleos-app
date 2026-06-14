@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CatalogueStore } from '../../store/catalogue.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('CatalogueListComponent', () => {
   let component: CatalogueListComponent;
@@ -84,7 +85,7 @@ describe('CatalogueListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CatalogueListComponent);
     component = fixture.componentInstance;
@@ -116,7 +117,7 @@ describe('CatalogueListComponent', () => {
   it('should navigate when edit is called', () => {
     const catalogue = mockCatalogues[0];
     component.edit(catalogue);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'catalogues', catalogue.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'catalogues', catalogue.id]);
   });
 
   it('should update catalogue order when finish is called', () => {

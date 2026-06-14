@@ -7,6 +7,7 @@ import { ICurrencyAll } from './currency';
 import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
@@ -46,7 +47,7 @@ describe('CurrencyComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;

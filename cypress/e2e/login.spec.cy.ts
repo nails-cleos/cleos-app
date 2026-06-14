@@ -1,6 +1,6 @@
 import '../support/commands';
 import { Role } from '../../src/app/interfaces/token';
-import { dayViewTitle, monthViewTitle } from '../../src/app/util/dates';
+import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '../../src/app/util/dates';
 import { devices } from '../support/utils';
 
 const displayName = 'Customer 1';
@@ -29,7 +29,7 @@ devices.forEach(({ name, width, height }) => {
       });
 
       it(`should register a new user in ${name}`, () => {
-        cy.visit('en-GB/auth');
+        cy.visit(`${DEFAULT_LOCALE}/auth`);
         cy.mockFirebaseAppCheck();
         cy.get('button').contains('Sign in with Email').click({ force: true });
 
@@ -61,7 +61,7 @@ devices.forEach(({ name, width, height }) => {
       mapRole.forEach((value, role) => {
         const email = value.email;
         it(`Login with existing user with role: ${role}`, () => {
-          cy.visit('en-GB/auth');
+          cy.visit(`${DEFAULT_LOCALE}/auth`);
           cy.mockFirebaseAppCheck();
           cy.mockCreateAuthUri(true, ['password']);
           cy.mockFirebase(email);
@@ -89,10 +89,10 @@ devices.forEach(({ name, width, height }) => {
               cy.get('tr').contains('No reservations');
               break;
             case Role.admin:
-              cy.get('h3').contains(monthViewTitle(today, 'en-GB'));
+              cy.get('h3').contains(monthViewTitle(today, DEFAULT_LOCALE));
               break;
             case Role.roomAdmin:
-              const date = dayViewTitle(today, 'en-GB');
+              const date = dayViewTitle(today, DEFAULT_LOCALE);
               cy.get('h2').contains(date);
               cy.get('h2').contains(`Room is not open ${date}`);
               break;

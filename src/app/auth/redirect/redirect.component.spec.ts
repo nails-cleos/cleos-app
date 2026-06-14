@@ -8,6 +8,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Role } from '../../interfaces/token';
 import { AuthState } from '../../store/reducers/auth.reducers';
 import { computed, signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('RedirectComponent', () => {
   let fixture: ComponentFixture<RedirectComponent>;
@@ -71,7 +72,7 @@ describe('RedirectComponent', () => {
     fixture = TestBed.createComponent(RedirectComponent);
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
@@ -89,7 +90,7 @@ describe('RedirectComponent', () => {
     redirect$.next(false);
     isAuthenticated$.next(false);
 
-    expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'home']);
+    expect(navigateServiceSpy.reload).toHaveBeenCalledWith([DEFAULT_LOCALE, 'home']);
   });
 
   it('should navigate to /en/dashboard if user has admin role', () => {
@@ -99,7 +100,7 @@ describe('RedirectComponent', () => {
     fixture.detectChanges();
 
     expect(tokenServiceMock.token()).toBe('abc');
-    expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'dashboard']);
+    expect(navigateServiceSpy.reload).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard']);
   });
 
   it('should navigate to /en/events if user has room admin role', () => {
@@ -108,7 +109,7 @@ describe('RedirectComponent', () => {
     user$.next({ authorities: [{ authority: Role.roomAdmin }] });
     fixture.detectChanges();
 
-    expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'dashboard', 'events']);
+    expect(navigateServiceSpy.reload).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'events']);
   });
 
   it('should navigate to /en/me/reservations for other roles', () => {
@@ -117,6 +118,6 @@ describe('RedirectComponent', () => {
     user$.next({ authorities: [{ authority: 'USER' }] });
     fixture.detectChanges();
 
-    expect(navigateServiceSpy.reload).toHaveBeenCalledWith(['en-GB', 'me', 'reservations']);
+    expect(navigateServiceSpy.reload).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservations']);
   });
 });

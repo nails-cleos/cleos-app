@@ -10,6 +10,7 @@ import { IOverview, IUser, IUserAll } from '../user/user';
 import { Role, Token } from '../interfaces/token';
 import { loginSuccess } from './actions/auth.actions';
 import { UserStore } from './user.store';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('UserStore', () => {
   let store: InstanceType<typeof UserStore>;
@@ -22,7 +23,7 @@ describe('UserStore', () => {
     id: 'user-1',
     displayName: 'User One',
     email: 'user@test.com',
-    locale: 'en-GB',
+    locale: DEFAULT_LOCALE,
     authorities: [{ authority: Role.customer }],
     timeZone: 'Europe/Amsterdam',
   } as IUserAll;
@@ -58,7 +59,7 @@ describe('UserStore', () => {
       params?.['role'] ? `${ key }:${ params['role'] }`
         : params?.['displayName'] ? `${ key }:${ params['displayName'] }`
           : key);
-    translateSpy.getCurrentLang.and.returnValue('en-GB');
+    translateSpy.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
 
     TestBed.configureTestingModule({
       providers: [
@@ -105,7 +106,7 @@ describe('UserStore', () => {
 
     expect(store.userNavigationParams()).toEqual({ role: Role.manager });
     expect(store.selected()).toEqual(user);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', user.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', user.id]);
   });
 
   it('should expose response metadata for user mutations', () => {
@@ -188,7 +189,7 @@ describe('UserStore', () => {
     expect(ngrxStoreSpy.dispatch).toHaveBeenCalledWith(loginSuccess({
       token,
       queryParams: {
-        state: btoa(JSON.stringify({ returnUrl: '/en/auth/profile', lang: 'en' })),
+        state: btoa(JSON.stringify({ returnUrl: `/${DEFAULT_LOCALE}/auth/profile`, lang: DEFAULT_LOCALE })),
       },
     }));
   });

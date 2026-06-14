@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 const mapRole = new Map([
   ['Customer', { url: 'customers', displayName: 'Customer 1', otherButtons: [] }],
@@ -37,7 +38,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -120,7 +121,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           if (user.dob) {
             const dob = new Date(user.dob);
-            const formattedDob = dob.toLocaleDateString('en-GB');
+            const formattedDob = dob.toLocaleDateString(DEFAULT_LOCALE);
             cy.get('[data-cy="dob-picker"]').should('have.value', formattedDob);
           }
 

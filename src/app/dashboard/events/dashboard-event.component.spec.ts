@@ -10,7 +10,7 @@ import { IProfessionalEvent, IRoomEvents } from '../dashboard';
 import { addDays, addHours } from 'date-fns';
 import { States } from '../../reservation/reservation';
 import { FrequencyEnum } from '../../util/helper';
-import { daysOfWeek } from '../../util/dates';
+import { daysOfWeek, DEFAULT_LOCALE } from '../../util/dates';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
 import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
@@ -65,7 +65,7 @@ describe('DashboardEventComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(DashboardEventComponent);
     component = fixture.componentInstance;
@@ -423,7 +423,7 @@ describe('DashboardEventComponent', () => {
       jasmine.objectContaining({ data: null }));
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(
-      ['en-GB', 'unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
+      [DEFAULT_LOCALE, 'unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
   });
 
   it('should calculate reservation duration seconds from started and finished timestamps', () => {

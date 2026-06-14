@@ -17,6 +17,7 @@ import { signal } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
 import { updateMyUser } from '../store/actions/main.actions';
 import { provideAppIcons } from '../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('MainComponent', () => {
   let component: MainComponent;
@@ -93,7 +94,7 @@ describe('MainComponent', () => {
     navigateSpy = spyOn(router, 'navigate');
 
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MainComponent);
     component = fixture.componentInstance;
@@ -156,6 +157,6 @@ describe('MainComponent', () => {
   it('should call treatment and navigate to biab-treatment/treatment', () => {
     component.treatment();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'home', 'biab-treatment', 'treatment']);
+    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'home', 'biab-treatment', 'treatment']);
   });
 });

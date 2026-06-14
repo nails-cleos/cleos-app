@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Price } from '../../../treatment/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { DiscountStore } from '../../../store/discount.store';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
@@ -78,7 +79,7 @@ describe('ReservationListComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ReservationListComponent);
     component = fixture.componentInstance;
@@ -340,7 +341,7 @@ describe('ReservationListComponent', () => {
   });
 
   it('should have correct language from TranslateService', () => {
-    expect(component.language).toBe('en-GB');
-    expect(component.dateFormat).toBe('en-GB');
+    expect(component.language).toBe(DEFAULT_LOCALE);
+    expect(component.dateFormat).toBe(DEFAULT_LOCALE);
   });
 });

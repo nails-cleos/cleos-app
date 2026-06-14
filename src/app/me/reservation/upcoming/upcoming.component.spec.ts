@@ -7,6 +7,7 @@ import { Price } from '../../../treatment/treatment';
 import { ServiceType } from '../../../room/room';
 import { Role } from '../../../interfaces/token';
 import { ICurrencyAll } from '../../../currency/currency';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
@@ -75,7 +76,7 @@ describe('UpcomingComponent', () => {
       displayName: 'Customer 1',
       email: 'customer@test.com',
       authorities: [{ authority: Role.customer }],
-      locale: 'en-GB',
+      locale: DEFAULT_LOCALE,
       timeZone: 'UTC',
     },
     professional: {
@@ -83,7 +84,7 @@ describe('UpcomingComponent', () => {
       displayName: 'Professional 1',
       email: 'professional@test.com',
       authorities: [{ authority: Role.professional }],
-      locale: 'en-GB',
+      locale: DEFAULT_LOCALE,
       timeZone: 'UTC',
     },
     treatment: {
@@ -108,7 +109,7 @@ describe('UpcomingComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(UpcomingComponent);
     component = fixture.componentInstance;
@@ -138,7 +139,7 @@ describe('UpcomingComponent', () => {
     fixture.componentRef.setInput('upcoming', upcoming);
 
     component.edit();
-    expect(routerSpyObj.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', '1']);
+    expect(routerSpyObj.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', '1']);
   });
 
   it('should handle openDialog call when upcoming is defined', () => {

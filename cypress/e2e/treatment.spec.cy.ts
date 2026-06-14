@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, convertSecondsToTime, devices, zeroPad } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 const getAddTreatmentInput = () =>
   cy.get('#add-treatment').scrollIntoView().should('exist').and('not.be.disabled');
@@ -16,7 +17,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdminDashboard(new Date(), 'CLEOS');
       cy.mockColors(false);
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 

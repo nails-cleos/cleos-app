@@ -5,6 +5,7 @@ import { TreatmentComponent } from './treatment.component';
 import { IColorAll } from '../color/color';
 import { ITreatmentGroupAll } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
@@ -53,7 +54,7 @@ describe('TreatmentComponent', () => {
     component = fixture.componentInstance;
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.componentRef.setInput('config', config);
     fixture.detectChanges();

@@ -23,7 +23,7 @@ import {
 import { notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { ServiceType } from '../../room/room';
 import { IUserAll } from '../../user/user';
-import { getNowTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { ICurrencyAll } from '../../currency/currency';
 import { IAdditionalAll } from '../../additional/additional';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
@@ -201,7 +201,7 @@ describe('ReservationDetailComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     const router = TestBed.inject(Router);
     navigateSpy = spyOn(router, 'navigate');
@@ -477,7 +477,7 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('edit');
 
       expect(navigateSpy).toHaveBeenCalledWith(
-        ['en-GB', 'reservation', 'reservation-123', 'edit'],
+        [DEFAULT_LOCALE, 'reservation', 'reservation-123', 'edit'],
         { state: { roomId: 'room-123' } },
       );
     });
@@ -495,7 +495,7 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('complete');
 
       expect(navigateSpy).toHaveBeenCalledWith(
-        ['en-GB', 'reservation', 'reservation-123', 'rooms', 'room-123', 'customer', 'customer-123', 'complete'],
+        [DEFAULT_LOCALE, 'reservation', 'reservation-123', 'rooms', 'room-123', 'customer', 'customer-123', 'complete'],
       );
     });
 
@@ -507,7 +507,7 @@ describe('ReservationDetailComponent', () => {
 
       component.overview();
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'overview']);
+      expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'me', 'overview']);
     });
 
     it('should navigate to customer overview for non-customer users', () => {
@@ -517,7 +517,7 @@ describe('ReservationDetailComponent', () => {
 
       component.overview();
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'users', mockReservation.customer.id, 'overview']);
+      expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'users', mockReservation.customer.id, 'overview']);
     });
 
     it('should allow clone from completed state', () => {
@@ -541,7 +541,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('clone');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation'], jasmine.objectContaining({
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'reservation'], jasmine.objectContaining({
         state: jasmine.objectContaining({
           date: nextMonday,
           customerId: mockReservation.customer.id,
@@ -622,7 +622,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('more');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation', 'reservation-123', 'more-info']);
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'reservation', 'reservation-123', 'more-info']);
     });
 
     it('should transition from partiallyCompleted to completed', () => {
@@ -654,7 +654,7 @@ describe('ReservationDetailComponent', () => {
       const professionalId = mockReservation.professional.id;
       const data = { customerId, roomId, treatmentId, professionalId };
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation'], { state: data });
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'reservation'], { state: data });
     });
   });
 
@@ -698,7 +698,7 @@ describe('ReservationDetailComponent', () => {
       const professionalId = mockReservation.professional.id;
       const data = { roomId, treatmentId, professionalId };
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation'], { state: data });
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation'], { state: data });
     });
 
     it('should allow edit a reservation', () => {
@@ -712,7 +712,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('edit');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', mockReservation.id]);
     });
 
     it('should allow notify when it has pending payments', () => {
@@ -758,7 +758,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('pay');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'payment', createdPayment.id]);
+      expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'me', 'payment', createdPayment.id]);
     });
 
 
@@ -770,7 +770,7 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('pay');
 
       expect(navigateSpy)
-        .toHaveBeenCalledWith(['/', 'en-GB', 'me', 'reservation', mockReservation.id, 'payment', 'option']);
+        .toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'me', 'reservation', mockReservation.id, 'payment', 'option']);
     });
 
     it('should allow cancel and edit a reservation', () => {
@@ -796,7 +796,7 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', mockReservation.id]);
     });
 
     it('should allow canceling when is edit mode and no payments', () => {

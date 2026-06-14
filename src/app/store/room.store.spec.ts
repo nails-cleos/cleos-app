@@ -5,6 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { RoomService } from '../services/room.service';
 import { RoomStore } from './room.store';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('RoomStore', () => {
   let store: InstanceType<typeof RoomStore>;
@@ -26,7 +27,7 @@ describe('RoomStore', () => {
     ]);
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
     translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
-    translateSpy.getCurrentLang.and.returnValue('en-GB');
+    translateSpy.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
     routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -110,7 +111,7 @@ describe('RoomStore', () => {
     store.selectAndNavigate(room);
 
     expect(store.selected()).toBe(room);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'rooms', 'room-1']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', 'room-1']);
   });
 
   it('should clear response and error state', () => {

@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CurrencyStore } from '../../store/currency.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
@@ -85,7 +86,7 @@ describe('CurrencyListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CurrencyListComponent);
     component = fixture.componentInstance;
@@ -182,7 +183,7 @@ describe('CurrencyListComponent', () => {
     const item = mockCurrencyList[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'currency', item.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'currency', item.id]);
   });
 
   it('should dispatch deleteCurrency when dialog returns a result', () => {

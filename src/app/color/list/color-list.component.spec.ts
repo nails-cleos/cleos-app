@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ColorStore } from '../../store/color.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
@@ -80,7 +81,7 @@ describe('ColorListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ColorListComponent);
     component = fixture.componentInstance;
@@ -176,7 +177,7 @@ describe('ColorListComponent', () => {
     const item = mockColor[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'colors', item.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'colors', item.id]);
   });
 
   it('should dispatch deleteColor when dialog returns a result', () => {

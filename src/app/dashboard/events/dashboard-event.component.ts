@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, v
 import { CalendarDatePipe, CalendarEvent } from 'angular-calendar';
 import {
   addPeriod,
-  API_LOCALE,
+  DEFAULT_LOCALE,
   createNewDate,
   dateToTimestamp,
   endOfPeriod,
@@ -608,7 +608,7 @@ export class DashboardEventComponent {
   private updateEvent = (id: string, dateStart?: Date, professionalId?: string): void => {
     const reservation: IReservation = { id };
     if (dateStart) {
-      const start = dateStart.toLocaleString(API_LOCALE);
+      const start = dateStart.toLocaleString(DEFAULT_LOCALE);
       const timeZone = getCurrentTimeZone();
       reservation.start = start;
       reservation.timeZone = timeZone;

@@ -10,6 +10,7 @@ import { IOffice } from '../office';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { OfficeStore } from '../../store/office.store';
 import { OfficeListComponent } from './office-list.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('OfficeListComponent', () => {
   let component: OfficeListComponent;
@@ -83,7 +84,7 @@ describe('OfficeListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(OfficeListComponent);
     component = fixture.componentInstance;
@@ -181,7 +182,7 @@ describe('OfficeListComponent', () => {
     const item = mockOffice[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'offices', item.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'offices', item.id]);
   });
 
   it('should call delete when dialog returns a result', () => {

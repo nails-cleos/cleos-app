@@ -13,6 +13,7 @@ import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
 import { provideAppIcons } from '../../util/app-icons.provider';
 import { AccountStore } from '../../store/account.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -114,7 +115,7 @@ describe('TransactionComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
@@ -132,7 +133,7 @@ describe('TransactionComponent', () => {
 
   it('should initialize with default values', () => {
     expect(component.amountMin).toBe(100);
-    expect(component.language).toBe('en-GB');
+    expect(component.language).toBe(DEFAULT_LOCALE);
     expect(component.types().map(option => option.type)).toEqual(['CASH', 'TRANSFER']);
     expect(component.errors()).toEqual({});
   });
@@ -217,7 +218,7 @@ describe('TransactionComponent', () => {
     responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'customer-123', 'overview']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'customer-123', 'overview']);
   });
 
   it('should navigate to me overview when response arrives (not admin)', () => {
@@ -226,7 +227,7 @@ describe('TransactionComponent', () => {
     responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'overview']);
   });
 
   it('should not submit when form is invalid', () => {

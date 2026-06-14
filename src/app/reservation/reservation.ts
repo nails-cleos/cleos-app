@@ -8,7 +8,7 @@ import { IPayment, PaymentPercentage } from '../interfaces/payment';
 import { IReview } from '../me/reservation/list/review';
 import { IAdditionalAll } from '../additional/additional';
 import { addHours, isSameDay } from 'date-fns';
-import { API_LOCALE, createNewDate, getCurrentTimeZone, getNowTimeZone } from '../util/dates';
+import { DEFAULT_LOCALE, createNewDate, getCurrentTimeZone, getNowTimeZone } from '../util/dates';
 import { INoteAll } from '../note/note';
 import { valueChange } from '../util/validators';
 import { MeReservationForms, ReservationForms } from './reservation-form.types';
@@ -299,7 +299,7 @@ export class Reservation {
       professionalId: officeForm.professional.value?.id,
       ...(!currentReservation && { discountId: treatmentForm.discount.value }),
       ...(date && {
-        start: date.toLocaleString(API_LOCALE),
+        start: date.toLocaleString(DEFAULT_LOCALE),
         timeZone: getCurrentTimeZone(),
       }),
       additionalIds,

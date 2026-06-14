@@ -8,7 +8,7 @@ import { IInvoice, IRoomInvoice } from '../invoice';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IOfficeAll } from '../../office/office';
-import { backendFormatDate, getNowTimeZone } from '../../util/dates';
+import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { IUserAll } from '../../user/user';
 import { addDays } from 'date-fns';
 import { IPaymentOption } from '../../interfaces/payment';
@@ -58,7 +58,7 @@ describe('InvoiceListComponent', () => {
     displayName: 'customer 1',
     email: 'customer@1.comn',
     id: '1',
-    locale: 'en-GB',
+    locale: DEFAULT_LOCALE,
     timeZone: 'Europe/Amsterdam',
   };
 
@@ -228,7 +228,7 @@ describe('InvoiceListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     spyOn(globalThis, 'fetch').and.callFake(() =>
       Promise.resolve({

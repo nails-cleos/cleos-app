@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterComponent } from './quarter.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
@@ -20,7 +21,7 @@ describe('QuarterComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(QuarterComponent);
     component = fixture.componentInstance;
@@ -45,7 +46,7 @@ describe('QuarterComponent', () => {
     fixture.componentRef.setInput('quarter', 2);
     component.goToQuarter();
     expect(routerSpy.navigate).toHaveBeenCalledWith(
-      ['en-GB', 'dashboard', 'quarter', 'summary'],
+      [DEFAULT_LOCALE, 'dashboard', 'quarter', 'summary'],
       { state: { year: 2025, quarter: 2 } },
     );
   });
@@ -53,7 +54,7 @@ describe('QuarterComponent', () => {
   it('should navigate to month with correct step for income', () => {
     component.goToMonth(1, 'INCOME');
     expect(routerSpy.navigate).toHaveBeenCalledWith(
-      ['en-GB', 'dashboard', 'monthly', 'summary'],
+      [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
       { state: { date: '1-2025', step: 0 } },
     );
   });
@@ -61,7 +62,7 @@ describe('QuarterComponent', () => {
   it('should navigate to month with correct step for expense', () => {
     component.goToMonth(3, 'EXPENSE');
     expect(routerSpy.navigate).toHaveBeenCalledWith(
-      ['en-GB', 'dashboard', 'monthly', 'summary'],
+      [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
       { state: { date: '3-2025', step: 1 } },
     );
   });
@@ -69,7 +70,7 @@ describe('QuarterComponent', () => {
   it('should navigate to month with correct step for cash', () => {
     component.goToMonth(4, 'CASH');
     expect(routerSpy.navigate).toHaveBeenCalledWith(
-      ['en-GB', 'dashboard', 'monthly', 'summary'],
+      [DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'],
       { state: { date: '4-2025', step: 2 } },
     );
   });

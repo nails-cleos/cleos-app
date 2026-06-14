@@ -1,6 +1,6 @@
 import { closest, numberFormat } from './numbers';
 import { ICurrency } from '../currency/currency';
-import { API_LOCALE } from './dates';
+import { DEFAULT_LOCALE } from './dates';
 
 describe('Number Utils', () => {
 
@@ -8,18 +8,18 @@ describe('Number Utils', () => {
 
     it('should format a number without currency', () => {
       expect(numberFormat(1234.567))
-        .toBe(new Intl.NumberFormat(API_LOCALE, { maximumFractionDigits: 2 }).format(1234.567));
+        .toBe(new Intl.NumberFormat(DEFAULT_LOCALE, { maximumFractionDigits: 2 }).format(1234.567));
     });
 
     it('should format a string number without currency', () => {
       expect(numberFormat('9876.543'))
-        .toBe(new Intl.NumberFormat(API_LOCALE, { maximumFractionDigits: 2 }).format(9876.543));
+        .toBe(new Intl.NumberFormat(DEFAULT_LOCALE, { maximumFractionDigits: 2 }).format(9876.543));
     });
 
     it('should format a number with currency', () => {
       const currency: ICurrency = { code: 'USD' };
       const formatted = numberFormat(1234.567, currency);
-      const expected = new Intl.NumberFormat(API_LOCALE,
+      const expected = new Intl.NumberFormat(DEFAULT_LOCALE,
         { maximumFractionDigits: 2, currency: 'USD', style: 'currency' }).format(1234.567);
       expect(formatted).toBe(expected);
     });

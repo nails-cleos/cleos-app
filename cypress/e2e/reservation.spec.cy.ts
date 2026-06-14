@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToDays, devices, zeroPad } from '../support/utils';
-import { API_LOCALE } from '../../src/app/util/dates';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
@@ -34,7 +34,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockRoomData(customerId);
       cy.mockSearch(customerId, roomId, groupId, professionalId, reservationDate, days);
 
-      cy.visit('en-GB/reservation');
+      cy.visit(`${DEFAULT_LOCALE}/reservation`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -55,7 +55,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('button[name="toStepThree"]').click({ force: true });
 
       // Select treatment and date time
-      const formattedDate = reservationDate.toLocaleDateString('en-GB');
+      const formattedDate = reservationDate.toLocaleDateString(DEFAULT_LOCALE);
 
       cy.get('[data-cy="date-picker"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
@@ -151,7 +151,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           expect(reservationData.response?.statusCode).to.eq(201);
           const body = reservationData.request.body;
           expect(body.customerId).to.eq(customerId);
-          expect(body.start).to.eq(reservationDate.toLocaleString(API_LOCALE));
+          expect(body.start).to.eq(reservationDate.toLocaleString(DEFAULT_LOCALE));
           expect(body.timeZone).to.eq('Europe/Amsterdam');
           expect(body.additionalIds).to.have
             .members(['557c6520-035a-4b0a-9bd4-f2f1dce27f6d', '397bce4b-27ba-459f-801a-dcceea330b8d']);

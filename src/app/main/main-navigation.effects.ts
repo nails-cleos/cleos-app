@@ -9,6 +9,7 @@ import { MainContentComponent } from './main-content/main-content.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { MainTreatmentComponent } from './treatment/main-treatment.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 @Injectable()
 export class MainNavigationEffects {
@@ -75,6 +76,6 @@ export class MainNavigationEffects {
     ));
 
   private getLangFromUrl(url: string): string {
-    return url.split('?')[0].split('#')[0].split('/')[1] || 'en-GB';
+    return url.split('?')[0].split('#')[0].split('/')[1] || DEFAULT_LOCALE;
   }
 }

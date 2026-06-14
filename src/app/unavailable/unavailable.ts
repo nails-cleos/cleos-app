@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 import { IUser, IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
-import { API_LOCALE, createNewDate, getTimeNumber } from '../util/dates';
+import { DEFAULT_LOCALE, createNewDate, getTimeNumber } from '../util/dates';
 import { fieldChange, valueChange } from '../util/validators';
 
 export type UnavailableForm = {
@@ -87,13 +87,13 @@ export class Unavailable {
         unavailableForm.repeat,
         currentUnavailable?.repeat,
       ),
-      start: start.toLocaleString(API_LOCALE),
+      start: start.toLocaleString(DEFAULT_LOCALE),
       timeZone,
       allDay: unavailableForm.allDay.value,
       ...(unavailableForm.endDate.value && {
         endString: createNewDate(
           unavailableForm.endDate.value,
-        ).toLocaleString(API_LOCALE),
+        ).toLocaleString(DEFAULT_LOCALE),
       }),
     };
   }
@@ -113,7 +113,7 @@ export class Unavailable {
         blockAgendaForm.professional.value,
         currentUnavailable?.professional,
       )?.id,
-      start: start.toLocaleString(API_LOCALE),
+      start: start.toLocaleString(DEFAULT_LOCALE),
       timeZone,
       time: fieldChange(
         blockAgendaForm.duration,

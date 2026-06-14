@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { EnvService } from '../../services/env.service';
 import { SeoService } from '../../services/seo.service';
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('TermsAndConditionsComponent', () => {
   let component: TermsAndConditionsComponent;
@@ -58,7 +59,7 @@ describe('TermsAndConditionsComponent', () => {
 
     routerMock = {
       events: routerEvents,
-      url: '/en-GB/home/term-and-conditions',
+      url: `/${DEFAULT_LOCALE}/home/term-and-conditions`,
       navigate: jasmine.createSpy('navigate').and.resolveTo(true),
       parseUrl: jasmine.createSpy('parseUrl').and.callFake((url: string) => {
         const hashIndex = url.indexOf('#');
@@ -89,7 +90,7 @@ describe('TermsAndConditionsComponent', () => {
     createComponent();
 
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="general">General</section></main></div>',
     );
 
@@ -108,7 +109,7 @@ describe('TermsAndConditionsComponent', () => {
     );
 
     expect(termsContainer().innerHTML).toContain('Contenido es');
-    httpMock.expectNone('assets/legal/terms.en-GB.html');
+    httpMock.expectNone(`assets/legal/terms.${DEFAULT_LOCALE}.html`);
   }));
 
   it('should fallback to english terms file when locale file is missing', fakeAsync(() => {
@@ -120,7 +121,7 @@ describe('TermsAndConditionsComponent', () => {
       statusText: 'Not Found',
     });
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="general">Fallback {{LANGUAGE}}</section></main></div>',
     );
 
@@ -132,7 +133,7 @@ describe('TermsAndConditionsComponent', () => {
     createComponent();
 
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="go-general" href="#general">General</a></nav></aside>
@@ -149,7 +150,7 @@ describe('TermsAndConditionsComponent', () => {
     tick();
 
     expect(routerMock.navigate).toHaveBeenCalledWith(
-      ['/', 'en-GB', 'home', 'term-and-conditions'],
+      ['/', DEFAULT_LOCALE, 'home', 'term-and-conditions'],
       { fragment: 'general', replaceUrl: true },
     );
     expect(scrollSpy).toHaveBeenCalled();
@@ -159,7 +160,7 @@ describe('TermsAndConditionsComponent', () => {
     createComponent();
 
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="unsafe-link" href="javascript:void(0)">Unsafe</a></nav></aside>
@@ -182,7 +183,7 @@ describe('TermsAndConditionsComponent', () => {
     createComponent();
 
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -211,7 +212,7 @@ describe('TermsAndConditionsComponent', () => {
     createComponent();
 
     flushTermsFile(
-      'assets/legal/terms.en-GB.html',
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">

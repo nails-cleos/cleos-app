@@ -16,6 +16,7 @@ import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { provideAppIcons } from '../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
@@ -81,8 +82,8 @@ describe('MainContentComponent', () => {
     }).compileComponents();
 
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', {
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       TREATMENTS: [{
         TITLE: 'Treatment Title',
         CONTENT: 'Treatment Content',

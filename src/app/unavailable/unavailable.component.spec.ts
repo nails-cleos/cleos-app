@@ -11,7 +11,7 @@ import { FrequencyEnum } from '../util/helper';
 import { IAvailability, IRoomAll } from '../room/room';
 import { IUnavailableAll } from './unavailable';
 import { IUserAll } from '../user/user';
-import { API_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
+import { DEFAULT_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
 import { UnavailableStore } from '../store/unavailable.store';
 import { UnavailableComponent } from './unavailable.component';
 
@@ -116,7 +116,7 @@ describe('UnavailableComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(UnavailableComponent);
     component = fixture.componentInstance;
@@ -230,10 +230,10 @@ describe('UnavailableComponent', () => {
       description: 'New Description',
       time: '00:30',
       repeat: 'NONE',
-      start: createNewDate(nextMonday, 10, 30).toLocaleString(API_LOCALE),
+      start: createNewDate(nextMonday, 10, 30).toLocaleString(DEFAULT_LOCALE),
       timeZone: 'Europe/Amsterdam',
       allDay: false,
-      endString: createNewDate(nextMonday).toLocaleString(API_LOCALE),
+      endString: createNewDate(nextMonday).toLocaleString(DEFAULT_LOCALE),
     }));
   });
 
@@ -261,7 +261,7 @@ describe('UnavailableComponent', () => {
       professionalId: mockProfessionals[0].id,
       description: 'New Description',
       repeat: 'NONE',
-      start: createNewDate(nextMonday).toLocaleString(API_LOCALE),
+      start: createNewDate(nextMonday).toLocaleString(DEFAULT_LOCALE),
       timeZone: 'Europe/Amsterdam',
       allDay: true,
     }));

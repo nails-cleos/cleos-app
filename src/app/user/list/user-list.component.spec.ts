@@ -10,6 +10,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagina
 import { signal, WritableSignal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '../../store/user.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
@@ -91,7 +92,7 @@ describe('UserListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 @Component({
   template: `
@@ -55,7 +56,7 @@ describe('BackButtonDirective', () => {
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     // ✅ Spy on dialog AFTER directive is queried
     dialogSpy = spyOn(directive.dialog, 'open');
@@ -86,7 +87,7 @@ describe('BackButtonDirective', () => {
   it('should show dialog when form is dirty', () => {
     hostComp.form?.markAsDirty();
 
-    translateService.setTranslation('en-GB', {
+    translateService.setTranslation(DEFAULT_LOCALE, {
       COMMON: { BACK: { TITLE: 'Back Title', CONTENT: 'Back Content' } },
     });
 

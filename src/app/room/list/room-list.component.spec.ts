@@ -8,7 +8,7 @@ import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { RoomListComponent } from './room-list.component';
 import { ICurrencyAll } from '../../currency/currency';
-import { getCurrentTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from '../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { RoomStore } from '../../store/room.store';
 
@@ -114,7 +114,7 @@ describe('RoomListComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

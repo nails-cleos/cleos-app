@@ -4,6 +4,7 @@ import { FileDropComponent } from './file-drop.component';
 import { ToastService } from '../../services/toast.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('FileDropComponent', () => {
   let component: FileDropComponent;
@@ -30,7 +31,7 @@ describe('FileDropComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(FileDropComponent);
     component = fixture.componentInstance;

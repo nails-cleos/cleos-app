@@ -9,6 +9,7 @@ import { AuthState } from '../../store/reducers/auth.reducers';
 import { IError } from '../../interfaces/common';
 import { FirebaseService } from '../../services/firebase.service';
 import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -65,7 +66,7 @@ describe('ForgotPasswordComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ForgotPasswordComponent);
     component = fixture.componentInstance;
@@ -98,7 +99,7 @@ describe('ForgotPasswordComponent', () => {
     action$.next();
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith('OK', 'success', 5000, { actionType: 'button' });
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'auth']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'auth']);
   });
 
   it('should request a password reset and dispatch signupSuccess', async () => {

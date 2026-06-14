@@ -19,6 +19,7 @@ import { MatDatepicker } from '@angular/material/datepicker';
 import fs from 'file-saver';
 import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
@@ -112,7 +113,7 @@ describe('MonthSummaryComponent', () => {
 
     // Make sure translate has a language so component.language is meaningful
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;
@@ -189,7 +190,7 @@ describe('MonthSummaryComponent', () => {
     it('should navigate to quarter summary without state when date is undefined', () => {
       component.getForm.date.setValue(undefined as any);
       component.goBack();
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard', 'quarter', 'summary']);
+      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'quarter', 'summary']);
     });
   });
 

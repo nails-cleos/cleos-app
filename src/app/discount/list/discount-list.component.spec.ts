@@ -10,6 +10,7 @@ import { DiscountListComponent } from './discount-list.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { DiscountStore } from '../../store/discount.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
@@ -85,7 +86,7 @@ describe('DiscountListComponent', () => {
     }).compileComponents();
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(DiscountListComponent);
     component = fixture.componentInstance;
@@ -182,7 +183,7 @@ describe('DiscountListComponent', () => {
     const item = mockDiscount[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'discounts', item.id]);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'discounts', item.id]);
   });
 
   it('should dispatch deleteDiscount when dialog returns a result', () => {

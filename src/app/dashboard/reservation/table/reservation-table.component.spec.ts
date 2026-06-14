@@ -15,6 +15,7 @@ import { ITreatment } from '../../../treatment/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
@@ -113,7 +114,7 @@ describe('ReservationTableComponent', () => {
     component = fixture.componentInstance;
 
     translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

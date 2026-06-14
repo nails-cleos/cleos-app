@@ -5,6 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAppIcons } from '../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('BottomSheetShareComponent', () => {
   let component: BottomSheetShareComponent;
@@ -23,8 +24,8 @@ describe('BottomSheetShareComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', {
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       ME: {
         REFERRAL: {
           LINK: 'Use my referral link: {{url}} (code: {{code}})',

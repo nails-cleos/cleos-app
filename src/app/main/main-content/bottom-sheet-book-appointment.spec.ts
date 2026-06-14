@@ -4,6 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAppIcons } from '../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('BottomSheetBookAppointmentComponent', () => {
   let component: BottomSheetBookAppointmentComponent;
@@ -26,8 +27,8 @@ describe('BottomSheetBookAppointmentComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', {
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       MAIN: {
         CONTACT: {
           SEND: {

@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentViewComponent } from './treatment-view.component';
 import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('TreatmentViewComponent', () => {
   let component: TreatmentViewComponent;
@@ -41,7 +42,7 @@ describe('TreatmentViewComponent', () => {
 
     fixture = TestBed.createComponent(TreatmentViewComponent);
     component = fixture.componentInstance;
-    component.language = 'en-GB';
+    component.language = DEFAULT_LOCALE;
 
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
@@ -63,7 +64,7 @@ describe('TreatmentViewComponent', () => {
   it('should navigate to edit on edit()', () => {
     component.edit();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'treatments', '123', 'edit']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'treatments', '123', 'edit']);
   });
 
   it('should load treatment history', () => {

@@ -10,6 +10,7 @@ import { IAccountAll, IAccountTransaction, ITransaction } from '../../account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { signal } from '@angular/core';
 import { AccountStore } from '../../../store/account.store';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
@@ -100,7 +101,7 @@ describe('TransactionViewComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TransactionViewComponent);
     component = fixture.componentInstance;
@@ -114,8 +115,8 @@ describe('TransactionViewComponent', () => {
   it('should initialize with default values', () => {
     expect(component.hasAdminRole()).toBeFalse();
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
-    expect(component.dateFormat).toBe('en-GB');
-    expect(component.language).toBe('en-GB');
+    expect(component.dateFormat).toBe(DEFAULT_LOCALE);
+    expect(component.language).toBe(DEFAULT_LOCALE);
     expect(component.displayedColumns).toEqual([
       'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
     ]);

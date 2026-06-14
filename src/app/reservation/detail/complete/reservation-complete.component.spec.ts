@@ -14,7 +14,7 @@ import {
 import { IExtras } from '../../reservation';
 import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../room/room';
-import { getNowTimeZone } from '../../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
@@ -164,7 +164,7 @@ describe('ReservationCompleteComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ReservationCompleteComponent);
     component = fixture.componentInstance;

@@ -6,6 +6,7 @@ import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { BehaviorSubject, of } from 'rxjs';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('authGuard', () => {
   let service: PermissionsService;
@@ -43,7 +44,7 @@ describe('authGuard', () => {
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
   });
 
   it('should allow activation if user has the required role', () => {
@@ -72,7 +73,7 @@ describe('authGuard', () => {
 
     TestBed.runInInjectionContext(() => {
       expect(service.canActivate(route, state)).toBeFalse();
-      expect(router.navigate).toHaveBeenCalledWith(['en-GB', 'auth'], { queryParams: { state: jasmine.any(String) } });
+      expect(router.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'auth'], { queryParams: { state: jasmine.any(String) } });
     });
   });
 });

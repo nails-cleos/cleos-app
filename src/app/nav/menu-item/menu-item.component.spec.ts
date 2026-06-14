@@ -5,6 +5,7 @@ import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/l
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
@@ -31,7 +32,7 @@ describe('MenuItemComponent', () => {
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
@@ -48,7 +49,7 @@ describe('MenuItemComponent', () => {
   });
 
   it('should set language from TranslateService', () => {
-    expect(component.language).toBe('en-GB');
+    expect(component.language).toBe(DEFAULT_LOCALE);
   });
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
@@ -58,13 +59,13 @@ describe('MenuItemComponent', () => {
     component.navigate(menu, drawer);
 
     expect(drawer.toggle).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard', 'home']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'home']);
   });
 
   it('should call router.navigate without drawer when drawer is not provided', () => {
     const menu = { path: 'settings/account' } as any;
     component.navigate(menu);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'settings', 'account']);
+    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'settings', 'account']);
   });
 
   describe('toggleSubMenu', () => {
