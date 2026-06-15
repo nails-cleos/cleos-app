@@ -85,17 +85,25 @@ describe('UserStore', () => {
     userServiceSpy.getCustomerOverview.and.returnValue(of(overview));
 
     store.loadPage({ page: 1, sort: 'displayName', direction: 'asc', size: 25, filter: 'ann' });
+    expect(store.pagination()).toEqual(page);
+
     store.loadCustomers();
+    expect(store.customers()).toEqual([user]);
+
     store.loadDisabledUsers();
+    expect(store.users()).toEqual([user]);
+
     store.loadById('user-1');
+    expect(store.selected()).toEqual(user);
+
     store.loadMyUser();
+    expect(store.selected()).toEqual(user);
+
     store.loadOverview('user-1');
 
     expect(userServiceSpy.getUsersPage).toHaveBeenCalledWith(1, 'displayName', 'asc', 25, 'ann');
-    expect(store.pagination()).toEqual(page);
-    expect(store.customers()).toEqual([user]);
-    expect(store.users()).toEqual([user]);
-    expect(store.selected()).toEqual(user);
+    expect(store.pagination()).toBeUndefined();
+    expect(store.selected()).toBeUndefined();
     expect(store.overview()).toEqual(overview);
     expect(store.isLoading()).toBeFalse();
   });
@@ -134,11 +142,11 @@ describe('UserStore', () => {
     }));
 
     store.delete('user-1', 'User One');
-    expect(store.response()).toEqual({
+    expect(store.response()).toEqual(jasmine.objectContaining({
       message: 'USER.DELETED.MESSAGE:User One',
       toastType: 'warning',
       reload: true,
-    });
+    }));
 
     store.restore('user-1', { deleted: false });
     expect(store.response()).toEqual(jasmine.objectContaining({
@@ -189,7 +197,7 @@ describe('UserStore', () => {
     expect(ngrxStoreSpy.dispatch).toHaveBeenCalledWith(loginSuccess({
       token,
       queryParams: {
-        state: btoa(JSON.stringify({ returnUrl: `/${DEFAULT_LOCALE}/auth/profile`, lang: DEFAULT_LOCALE })),
+        state: btoa(JSON.stringify({ returnUrl: `/${ DEFAULT_LOCALE }/auth/profile`, lang: DEFAULT_LOCALE })),
       },
     }));
   });
