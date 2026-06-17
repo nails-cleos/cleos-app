@@ -59,7 +59,7 @@ describe('CurrencyListComponent', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     currencyStoreSpy = {
       isLoading: signal(false),
-      data: signal(mockPagination),
+      data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
       loadPage: jasmine.createSpy('loadPage'),
       clearResponse: jasmine.createSpy('clearResponse'),
@@ -103,7 +103,7 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    currencyStoreSpy.data.set(mockPagination);
+    currencyStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -111,7 +111,7 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    currencyStoreSpy.data.set(mockPagination);
+    currencyStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(3);

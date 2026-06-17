@@ -2,10 +2,8 @@ import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse, IResponseSuccess, PageRequest } from '../interfaces/common';
-import { IColorAll } from '../color/color';
 import { Pagination } from '../interfaces/pagination';
 import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
-import { ColorService } from '../services/color.service';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
@@ -17,19 +15,20 @@ export type TreatmentData =
 
 type TreatmentStoreState = StoreState<TreatmentData, ITreatmentGroupAll> & {
   history: ITreatmentAll[] | undefined;
-  colors: IColorAll[] | undefined;
 };
 
 const initialState: TreatmentStoreState = {
   ...createStoreInitialState<TreatmentData, ITreatmentGroupAll>(),
   history: undefined,
-  colors: undefined,
 };
 
 export const TreatmentStore = signalStore(
   withState(initialState),
-  withMethods((store, treatmentService = inject(TreatmentService), colorService = inject(ColorService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    treatmentService = inject(TreatmentService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const patchSavingState = (): void => {
@@ -92,24 +91,6 @@ export const TreatmentStore = signalStore(
         treatmentService.getAllTreatmentsGroup().subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'list', value },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
-      },
-
-      loadColors(): void {
-        patchState(store, {
-          colors: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
-
-        colorService.getAllColors().subscribe({
-          next: (colors) => patchState(store, {
-            colors: colors || [],
             isLoading: false,
           }),
           error: patchError,

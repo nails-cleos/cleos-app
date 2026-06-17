@@ -3,6 +3,7 @@ import { OfficeComponent } from './office.component';
 import { OfficeStore } from '../store/office.store';
 import { IOffice } from './office';
 import { ICommon } from '../interfaces/common';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-office-create-page',
@@ -17,11 +18,12 @@ export class OfficeCreatePageComponent {
   };
 
   private readonly officeStore = inject(OfficeStore);
-  managers = computed(() => this.officeStore.managers());
+  private readonly userStore = inject(UserStore);
+  managers = computed(() => this.userStore.managers());
 
   constructor() {
     this.officeStore.clean();
-    this.officeStore.loadManagers();
+    this.userStore.loadManagers();
   }
 
   submit(office: IOffice) {

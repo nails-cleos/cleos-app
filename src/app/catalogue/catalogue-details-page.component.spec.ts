@@ -4,6 +4,7 @@ import { CatalogueStore } from '../store/catalogue.store';
 import { ICatalogueAll } from './catalogue';
 import { signal } from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
+import { TreatmentStore } from '../store/treatment.store';
 
 describe('CatalogueDetailsPageComponent', () => {
   let component: CatalogueDetailsPageComponent;
@@ -11,12 +12,15 @@ describe('CatalogueDetailsPageComponent', () => {
 
   let catalogueStoreSpy: {
     selected: ReturnType<typeof signal>;
-    groups: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
-    loadGroups: jasmine.Spy;
     loadById: jasmine.Spy;
     update: jasmine.Spy;
+  };
+
+  let treatmentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllGroups: jasmine.Spy;
   };
 
   const id = '1';
@@ -36,18 +40,21 @@ describe('CatalogueDetailsPageComponent', () => {
   beforeEach(async () => {
     catalogueStoreSpy = {
       selected: signal<ICatalogueAll | undefined>(undefined),
-      groups: signal<any>([]),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
-      loadGroups: jasmine.createSpy('loadGroups'),
       loadById: jasmine.createSpy('loadById'),
       update: jasmine.createSpy('update'),
+    };
+    treatmentStoreSpy = {
+      data: signal<any>([]),
+      loadAllGroups: jasmine.createSpy('loadAllGroups'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CatalogueDetailsPageComponent],
       providers: [
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
       ],
     }).overrideTemplate(CatalogueComponent, '')
       .overrideTemplate(CatalogueDetailsPageComponent, `

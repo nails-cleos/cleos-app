@@ -63,7 +63,10 @@ export class CurrencyListComponent {
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'code', 'asc');
 
-  private currencyListSignal = this.currencyStore.data;
+  private readonly currencyListSignal = computed(() => {
+    const data = this.currencyStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
   private responseSignal = this.currencyStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {

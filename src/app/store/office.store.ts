@@ -4,29 +4,23 @@ import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IOffice, IOfficeAll } from '../office/office';
 import { Pagination } from '../interfaces/pagination';
-import { IUserAll } from '../user/user';
 import { OfficeService } from '../services/office.service';
-import { UserService } from '../services/user.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type OfficeData =
   | { kind: 'pagination'; value: Pagination<IOfficeAll> }
   | { kind: 'list'; value: IOfficeAll[] };
 
-type OfficeStoreState = StoreState<OfficeData, IOfficeAll> & {
-  managers: IUserAll[] | undefined;
-};
-
-const initialState: OfficeStoreState = {
-  ...createStoreInitialState<OfficeData, IOfficeAll>(),
-  managers: undefined,
-};
+const initialState = createStoreInitialState<OfficeData, IOfficeAll>();
 
 export const OfficeStore = signalStore(
   withState(initialState),
-  withMethods((store, officeService = inject(OfficeService), userService = inject(UserService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    officeService = inject(OfficeService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -55,24 +49,6 @@ export const OfficeStore = signalStore(
         officeService.getOfficesPage(page, sort, direction, size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
-      },
-
-      loadManagers(): void {
-        patchState(store, {
-          managers: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          isLoading: true,
-        });
-
-        userService.getManagers().subscribe({
-          next: (managers) => patchState(store, {
-            managers: managers ?? [],
             isLoading: false,
           }),
           error: patchError,

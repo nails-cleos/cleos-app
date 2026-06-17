@@ -4,30 +4,24 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
-import { ITreatmentGroupAll } from '../treatment/treatment';
 import { AdditionalService } from '../services/additional.service';
-import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type AdditionalData =
   | { kind: 'pagination'; value?: Pagination<IAdditionalAll> }
   | { kind: 'list'; value?: IAdditionalAll[] };
 
-type AdditionalStoreState = StoreState<AdditionalData, IAdditionalAll> & {
-  groups: ITreatmentGroupAll[] | undefined;
-};
-
-const initialState: AdditionalStoreState = {
-  ...createStoreInitialState<AdditionalData, IAdditionalAll>(),
-  groups: undefined,
-};
+const initialState = createStoreInitialState<AdditionalData, IAdditionalAll>();
 
 export const AdditionalStore = signalStore(
   withState(initialState),
-  withMethods((store, additionalService = inject(AdditionalService), treatmentService = inject(TreatmentService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    additionalService = inject(AdditionalService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -89,23 +83,6 @@ export const AdditionalStore = signalStore(
 
         additionalService.getAdditional(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
-          error: patchError,
-        });
-      },
-
-      loadGroups(): void {
-        patchState(store, {
-          groups: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-        });
-
-        treatmentService.getAllTreatmentsGroup().subscribe({
-          next: (groups) => patchState(store, {
-            groups,
-            isLoading: false,
-          }),
           error: patchError,
         });
       },

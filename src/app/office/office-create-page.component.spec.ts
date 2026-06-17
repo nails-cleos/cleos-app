@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OfficeCreatePageComponent } from './office-create-page.component';
 import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
+import { UserStore } from '../store/user.store';
 
 describe('OfficeCreatePageComponent', () => {
   let component: OfficeCreatePageComponent;
@@ -9,8 +10,11 @@ describe('OfficeCreatePageComponent', () => {
 
   let officeStoreSpy: {
     clean: jasmine.Spy;
-    loadManagers: jasmine.Spy;
     create: jasmine.Spy;
+  };
+
+  let userStoreSpy: {
+    loadManagers: jasmine.Spy;
   };
 
   const mockOffice: Partial<IOfficeAll> = {
@@ -20,14 +24,17 @@ describe('OfficeCreatePageComponent', () => {
   beforeEach(async () => {
     officeStoreSpy = {
       clean: jasmine.createSpy('clean'),
-      loadManagers: jasmine.createSpy('loadManagers'),
       create: jasmine.createSpy('create'),
+    };
+    userStoreSpy = {
+      loadManagers: jasmine.createSpy('loadManagers'),
     };
 
     await TestBed.configureTestingModule({
       imports: [OfficeCreatePageComponent],
       providers: [
         { provide: OfficeStore, useValue: officeStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
       ],
     }).overrideTemplate(OfficeCreatePageComponent, '')
       .compileComponents();

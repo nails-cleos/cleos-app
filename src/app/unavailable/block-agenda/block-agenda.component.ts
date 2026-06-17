@@ -33,6 +33,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
 import { UnavailableNavigationParams, UnavailableStore } from '../../store/unavailable.store';
+import { UserStore } from '../../store/user.store';
 
 @Component({
   selector: 'app-block-agenda',
@@ -52,12 +53,13 @@ export class BlockAgendaComponent {
   deleteData = output();
 
   private readonly unavailableStore = inject(UnavailableStore);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private allRoomsSignal = this.unavailableStore.rooms;
+  private allRoomsSignal = this.userStore.rooms;
   private subErrorsSignal = this.unavailableStore.subErrors;
 
-  allProfessionalsSignal = this.unavailableStore.professionals;
+  allProfessionalsSignal = this.userStore.professionals;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<BlockAgendaForm> = this.formBuilder.group<BlockAgendaForm>({
@@ -107,7 +109,7 @@ export class BlockAgendaComponent {
   private readonly timeZone: string = getCurrentTimeZone();
 
   constructor() {
-    this.unavailableStore.loadProfessionals();
+    this.userStore.loadProfessionals();
 
     effect(() => {
       const params = this.params();
@@ -177,7 +179,7 @@ export class BlockAgendaComponent {
     effect(() => {
       const professional = this.selectedProfessional();
       if (professional) {
-        this.unavailableStore.loadRoomsByProfessionalId(professional.id);
+        this.userStore.loadRoomsByProfessionalId(professional.id);
       }
     });
 

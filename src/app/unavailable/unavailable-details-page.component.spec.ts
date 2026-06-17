@@ -7,6 +7,7 @@ import { UnavailableStore } from '../store/unavailable.store';
 import { IUnavailableAll } from './unavailable';
 import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';
+import { UserStore } from '../store/user.store';
 
 describe('UnavailableDetailsPageComponent', () => {
   let component: UnavailableDetailsPageComponent;
@@ -14,14 +15,17 @@ describe('UnavailableDetailsPageComponent', () => {
 
   let unavailableStoreSpy: {
     selected: ReturnType<typeof signal>;
-    professionals: ReturnType<typeof signal>;
-    rooms: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
-    loadProfessionals: jasmine.Spy;
     loadById: jasmine.Spy;
     update: jasmine.Spy;
     delete: jasmine.Spy;
+  };
+
+  let userStoreSpy: {
+    professionals: ReturnType<typeof signal>;
+    rooms: ReturnType<typeof signal>;
+    loadProfessionals: jasmine.Spy;
     loadRoomsByProfessionalId: jasmine.Spy;
   };
 
@@ -37,14 +41,16 @@ describe('UnavailableDetailsPageComponent', () => {
   beforeEach(async () => {
     unavailableStoreSpy = {
       selected: signal<any>(undefined),
-      professionals: signal<any>(undefined),
-      rooms: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
       loadById: jasmine.createSpy('loadById'),
       update: jasmine.createSpy('update'),
       delete: jasmine.createSpy('delete'),
+    };
+    userStoreSpy = {
+      professionals: signal<any>(undefined),
+      rooms: signal<any>(undefined),
+      loadProfessionals: jasmine.createSpy('loadProfessionals'),
       loadRoomsByProfessionalId: jasmine.createSpy('loadRoomsByProfessionalId'),
     };
 
@@ -52,6 +58,7 @@ describe('UnavailableDetailsPageComponent', () => {
       imports: [UnavailableDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
         { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
       ],

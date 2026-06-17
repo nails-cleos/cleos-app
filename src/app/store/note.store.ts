@@ -5,7 +5,6 @@ import { IApiResponse } from '../interfaces/common';
 import { INote, INoteAll } from '../note/note';
 import { IUserAll } from '../user/user';
 import { NoteService } from '../services/note.service';
-import { UserService } from '../services/user.service';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -15,20 +14,21 @@ type NoteNavigationParams = {
 };
 
 type NoteStoreState = StoreState<INote, INoteAll> & {
-  professionals: IUserAll[] | undefined;
   navigationParams: NoteNavigationParams | undefined;
 };
 
 const initialState: NoteStoreState = {
   ...createStoreInitialState<INote, INoteAll>(),
-  professionals: undefined,
   navigationParams: undefined,
 };
 
 export const NoteStore = signalStore(
   withState(initialState),
-  withMethods((store, noteService = inject(NoteService), userService = inject(UserService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    noteService = inject(NoteService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -46,24 +46,6 @@ export const NoteStore = signalStore(
 
       setNavigationParams(params: NoteNavigationParams | undefined): void {
         patchState(store, { navigationParams: params });
-      },
-
-      loadProfessionals(): void {
-        patchState(store, {
-          professionals: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          error: undefined,
-        });
-
-        userService.getProfessionals().subscribe({
-          next: (professionals) => patchState(store, {
-            professionals,
-            isLoading: false,
-          }),
-          error: patchError,
-        });
       },
 
       loadById(id: string): void {

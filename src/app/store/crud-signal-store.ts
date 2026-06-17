@@ -60,6 +60,7 @@ type CrudStoreConfig<TEntity, TCreateResponse, TUpdateResponse, TDeleteArgs> = {
   delete?: (args: TDeleteArgs) => Observable<unknown>;
   deleteResponse?: (args: TDeleteArgs) => IResponseSuccess;
   loadById?: (id: string) => Observable<TEntity | undefined>;
+  loadAll?: () => Observable<TEntity[] | undefined>;
   loadPage?: (request: PageRequest) => Observable<Pagination<TEntity>>;
   update?: (id: string, entity: TEntity) => Observable<TUpdateResponse>;
   updateResponse?: (response: TUpdateResponse, id: string, entity: TEntity) => IResponseSuccess;
@@ -75,6 +76,7 @@ export const withCrudStoreMethods =
       const config = configFactory();
       let loadPageSubscription: Subscription | undefined;
       let loadByIdSubscription: Subscription | undefined;
+      let loadAllSubscription: Subscription | undefined;
       let createSubscription: Subscription | undefined;
       let updateSubscription: Subscription | undefined;
       let deleteSubscription: Subscription | undefined;
@@ -83,6 +85,7 @@ export const withCrudStoreMethods =
       const cancelAllRequests = (): void => {
         loadPageSubscription?.unsubscribe();
         loadByIdSubscription?.unsubscribe();
+        loadAllSubscription?.unsubscribe();
         createSubscription?.unsubscribe();
         updateSubscription?.unsubscribe();
         deleteSubscription?.unsubscribe();
@@ -160,6 +163,28 @@ export const withCrudStoreMethods =
           loadByIdSubscription = config.loadById(id).subscribe({
             next: (selected) => {
               patchState(store, { selected, isLoading: false });
+            },
+            error: patchError,
+          });
+        },
+
+        loadAll(): void {
+          if (!config.loadAll) {
+            return;
+          }
+
+          loadAllSubscription?.unsubscribe();
+
+          patchState(store, {
+            subErrors: undefined,
+            selected: undefined,
+            response: undefined,
+            isLoading: true,
+          });
+
+          loadAllSubscription = config.loadAll().subscribe({
+            next: (data) => {
+              patchState(store, { data, isLoading: false });
             },
             error: patchError,
           });

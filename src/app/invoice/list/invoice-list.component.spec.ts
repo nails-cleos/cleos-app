@@ -36,13 +36,13 @@ describe('InvoiceListComponent', () => {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
+    update: jasmine.Spy;
   };
   let invoiceStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     clean: jasmine.Spy;
     loadOfficeToInvoice: jasmine.Spy;
-    updateOffice: jasmine.Spy;
     uploadInvoices: jasmine.Spy;
   };
   let translate: TranslateService;
@@ -187,13 +187,13 @@ describe('InvoiceListComponent', () => {
       isLoading: signal(false),
       data: signal<any>(undefined),
       loadMyOffices: jasmine.createSpy('loadMyOffices'),
+      update: jasmine.createSpy('update'),
     };
     invoiceStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
       loadOfficeToInvoice: jasmine.createSpy('loadOfficeToInvoice'),
-      updateOffice: jasmine.createSpy('updateOffice'),
       uploadInvoices: jasmine.createSpy('uploadInvoices'),
     };
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -553,7 +553,7 @@ describe('InvoiceListComponent', () => {
     // Act
     await component.print();
 
-    expect(invoiceStoreSpy.updateOffice).toHaveBeenCalledWith(
+    expect(officeStoreSpy.update).toHaveBeenCalledWith(
       mockOffice.id,
       jasmine.objectContaining({
         lastInvoiceNumber: 12,
@@ -577,7 +577,7 @@ describe('InvoiceListComponent', () => {
     await component.print();
 
     expect(pdfMake.createPdf).not.toHaveBeenCalled();
-    expect(invoiceStoreSpy.updateOffice).not.toHaveBeenCalled();
+    expect(officeStoreSpy.update).not.toHaveBeenCalled();
     expect(invoiceStoreSpy.uploadInvoices).not.toHaveBeenCalled();
   });
 
@@ -593,7 +593,7 @@ describe('InvoiceListComponent', () => {
 
     await component.print();
 
-    expect(invoiceStoreSpy.updateOffice).not.toHaveBeenCalled();
+    expect(officeStoreSpy.update).not.toHaveBeenCalled();
     expect(invoiceStoreSpy.uploadInvoices).toHaveBeenCalledWith(
       mockOffice.id,
       fakeBlob,

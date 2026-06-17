@@ -36,7 +36,10 @@ export type DocumentZipRequest = {
 
 export const DocumentStore = signalStore(
   withState(initialState),
-  withMethods((store, documentService = inject(DocumentService)) => {
+  withMethods((
+    store,
+    documentService = inject(DocumentService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {

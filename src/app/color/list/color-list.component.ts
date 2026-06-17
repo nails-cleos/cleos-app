@@ -57,7 +57,10 @@ export class ColorListComponent {
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'name', 'asc');
 
-  private colorListSignal = this.colorStore.data;
+  private readonly colorListSignal = computed(() => {
+    const data = this.colorStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
   private responseSignal = this.colorStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {

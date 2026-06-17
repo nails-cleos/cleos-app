@@ -7,6 +7,7 @@ import { ICommon } from '../interfaces/common';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { CatalogueStore } from '../store/catalogue.store';
+import { TreatmentStore } from '../store/treatment.store';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
@@ -14,8 +15,11 @@ describe('CatalogueComponent', () => {
 
   let catalogueStoreSpy: {
     subErrors: ReturnType<typeof signal>;
-    groups: ReturnType<typeof signal>;
-    loadGroups: jasmine.Spy;
+  };
+
+  let treatmentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllGroups: jasmine.Spy;
   };
 
   const mockCatalogue: ICatalogueAll = {
@@ -39,8 +43,10 @@ describe('CatalogueComponent', () => {
   beforeEach(async () => {
     catalogueStoreSpy = {
       subErrors: signal<any>(undefined),
-      groups: signal<ITreatmentGroupAll[] | undefined>([]),
-      loadGroups: jasmine.createSpy('loadGroups'),
+    };
+    treatmentStoreSpy = {
+      data: signal<any>([]),
+      loadAllGroups: jasmine.createSpy('loadGroups'),
     };
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
@@ -49,6 +55,7 @@ describe('CatalogueComponent', () => {
       imports: [CatalogueComponent, TranslateModule.forRoot()],
       providers: [
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -87,7 +94,10 @@ describe('CatalogueComponent', () => {
   });
 
   it('should filter groups correctly using filteredGroupSignal', () => {
-    catalogueStoreSpy.groups.set([mockGroup, { id: '2', name: 'Another Group' }]);
+    treatmentStoreSpy.data.set({
+      kind: 'list',
+      value: [mockGroup, { id: '2', name: 'Another Group' }],
+    });
     (component.getForm.group as any).setValue('A');
     fixture.detectChanges();
 

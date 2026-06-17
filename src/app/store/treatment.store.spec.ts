@@ -62,12 +62,10 @@ describe('TreatmentStore', () => {
     treatmentServiceSpy.getAllTreatmentsHistory.and.returnValue(of(history));
 
     store.loadAllGroups();
-    store.loadColors();
     store.loadById('group-1');
     store.loadHistory('group-1', 'treatment-1');
 
     expect(store.data()).toEqual({ kind: 'list', value: groups });
-    expect(store.colors()).toEqual(colors);
     expect(store.selected()).toEqual(selected);
     expect(store.history()).toEqual(history);
   });

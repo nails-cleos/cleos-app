@@ -11,9 +11,10 @@ import { FrequencyEnum } from '../util/helper';
 import { IAvailability, IRoomAll } from '../room/room';
 import { IUnavailableAll } from './unavailable';
 import { IUserAll } from '../user/user';
-import { DEFAULT_LOCALE, createEndDate, createNewDate, formatDuration, getTime, zoneDateToDate } from '../util/dates';
+import { createEndDate, createNewDate, DEFAULT_LOCALE, formatDuration, getTime, zoneDateToDate } from '../util/dates';
 import { UnavailableStore } from '../store/unavailable.store';
 import { UnavailableComponent } from './unavailable.component';
+import { UserStore } from '../store/user.store';
 
 describe('UnavailableComponent', () => {
   let component: UnavailableComponent;
@@ -28,9 +29,12 @@ describe('UnavailableComponent', () => {
 
   const unavailableStoreSpy = {
     navigationParams: signal<any>(undefined),
+    subErrors: signal<any>(undefined),
+  };
+
+  const userStoreSpy = {
     professionals: signal<IUserAll[] | undefined>(undefined),
     rooms: signal<IRoomAll[] | undefined>(undefined),
-    subErrors: signal<any>(undefined),
     loadProfessionals: jasmine.createSpy('loadProfessionals'),
     loadRoomsByProfessionalId: jasmine.createSpy('loadRoomsByProfessionalId'),
   };
@@ -97,17 +101,18 @@ describe('UnavailableComponent', () => {
   beforeEach(async () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     unavailableStoreSpy.navigationParams.set(undefined);
-    unavailableStoreSpy.professionals.set(undefined);
-    unavailableStoreSpy.rooms.set(undefined);
+    userStoreSpy.professionals.set(undefined);
+    userStoreSpy.rooms.set(undefined);
     unavailableStoreSpy.subErrors.set(undefined);
-    unavailableStoreSpy.loadProfessionals.calls.reset();
-    unavailableStoreSpy.loadRoomsByProfessionalId.calls.reset();
+    userStoreSpy.loadProfessionals.calls.reset();
+    userStoreSpy.loadRoomsByProfessionalId.calls.reset();
     authUserSignal.set(initialAuthUser);
 
     await TestBed.configureTestingModule({
       imports: [UnavailableComponent, TranslateModule.forRoot()],
       providers: [
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: authUserSignal.asReadonly() } },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
@@ -129,7 +134,7 @@ describe('UnavailableComponent', () => {
   });
 
   it('should load professionals on init', () => {
-    expect(unavailableStoreSpy.loadProfessionals).toHaveBeenCalled();
+    expect(userStoreSpy.loadProfessionals).toHaveBeenCalled();
   });
 
   it('should patch form when selectedUnavailable emits', () => {
@@ -146,7 +151,7 @@ describe('UnavailableComponent', () => {
   });
 
   it('should patch form when unavailable input is set', () => {
-    unavailableStoreSpy.professionals.set(mockProfessionals);
+    userStoreSpy.professionals.set(mockProfessionals);
     fixture.componentRef.setInput('unavailable', mockUnavailable);
     fixture.detectChanges();
 
@@ -175,7 +180,7 @@ describe('UnavailableComponent', () => {
   });
 
   it('should set min and max when room is available', () => {
-    unavailableStoreSpy.rooms.set([mockRoom]);
+    userStoreSpy.rooms.set([mockRoom]);
     component.getForm.startDate.setValue(nextMonday);
     fixture.detectChanges();
 
@@ -189,7 +194,7 @@ describe('UnavailableComponent', () => {
     component.getForm.professional.setValue(mockProfessionals[0]);
     fixture.detectChanges();
 
-    expect(unavailableStoreSpy.loadRoomsByProfessionalId).toHaveBeenCalledWith(mockProfessionals[0].id);
+    expect(userStoreSpy.loadRoomsByProfessionalId).toHaveBeenCalledWith(mockProfessionals[0].id);
   });
 
   it('should not emit submitData when form is invalid', () => {

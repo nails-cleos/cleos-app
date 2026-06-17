@@ -38,6 +38,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { UnavailableNavigationParams, UnavailableStore } from '../store/unavailable.store';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-unavailable',
@@ -58,12 +59,13 @@ export class UnavailableComponent {
   deleteData = output();
 
   private readonly unavailableStore = inject(UnavailableStore);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private allRoomsSignal = this.unavailableStore.rooms;
+  private allRoomsSignal = this.userStore.rooms;
   private subErrorsSignal = this.unavailableStore.subErrors;
 
-  allProfessionalsSignal = this.unavailableStore.professionals;
+  allProfessionalsSignal = this.userStore.professionals;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<UnavailableForm> = this.formBuilder.group<UnavailableForm>({
@@ -124,7 +126,7 @@ export class UnavailableComponent {
   private readonly timeZone: string = getCurrentTimeZone();
 
   constructor() {
-    this.unavailableStore.loadProfessionals();
+    this.userStore.loadProfessionals();
 
     effect(() => {
       const params = this.params();
@@ -222,7 +224,7 @@ export class UnavailableComponent {
     effect(() => {
       const professional = this.selectedProfessional();
       if (professional) {
-        this.unavailableStore.loadRoomsByProfessionalId(professional.id);
+        this.userStore.loadRoomsByProfessionalId(professional.id);
       }
     });
 

@@ -3,10 +3,8 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { Pagination } from '../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../discount/discount';
-import { ICurrency } from '../currency/currency';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
-import { CurrencyService } from '../services/currency.service';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -17,19 +15,20 @@ export type DiscountData =
 
 type DiscountStoreState = StoreState<DiscountData, IDiscountAll> & {
   referrals: IReferral[] | undefined;
-  currencies: ICurrency[] | undefined;
 };
 
 const initialState: DiscountStoreState = {
   ...createStoreInitialState<DiscountData, IDiscountAll>(),
   referrals: undefined,
-  currencies: undefined,
 };
 
 export const DiscountStore = signalStore(
   withState(initialState),
-  withMethods((store, discountService = inject(DiscountService), currencyService = inject(CurrencyService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    discountService = inject(DiscountService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -97,23 +96,6 @@ export const DiscountStore = signalStore(
         discountService.getMyReferrals().subscribe({
           next: (referrals) => patchState(store, {
             referrals,
-            subErrors: undefined,
-            response: undefined,
-          }),
-          error: patchError,
-        });
-      },
-
-      loadCurrencies(): void {
-        patchState(store, {
-          currencies: [],
-          subErrors: undefined,
-          response: undefined,
-        });
-
-        currencyService.getAllCurrency().subscribe({
-          next: (currencies) => patchState(store, {
-            currencies,
             subErrors: undefined,
             response: undefined,
           }),

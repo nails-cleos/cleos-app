@@ -19,6 +19,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
+import { TreatmentStore } from '../store/treatment.store';
 
 @Component({
   selector: 'app-catalogue',
@@ -39,8 +40,12 @@ export class CatalogueComponent {
   }>();
 
   private readonly catalogueStore = inject(CatalogueStore);
+  private readonly treatmentStore = inject(TreatmentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly allGroups$ = toObservable(this.catalogueStore.groups);
+  private readonly allGroupsSignal = computed(() => {
+    const data = this.treatmentStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   private readonly subErrorsSignal = this.catalogueStore.subErrors;
 
   form: FormGroup<CatalogueForm> = this.formBuilder.group<CatalogueForm>({
@@ -61,7 +66,7 @@ export class CatalogueComponent {
     this.getForm.group.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allGroups$),
+      combineLatestWith(toObservable(this.allGroupsSignal)),
       map(([name, groups]) => {
         if (name) {
           return groups ? this.filterGroup(name, groups) : groups;
@@ -78,7 +83,7 @@ export class CatalogueComponent {
   private selectedHome = toSignal(this.getForm.home.valueChanges);
 
   constructor() {
-    this.catalogueStore.loadGroups();
+    this.treatmentStore.loadAllGroups();
 
     effect(() => {
       const subErrors = this.subErrorsSignal();

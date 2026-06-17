@@ -288,7 +288,7 @@ export class InvoiceListComponent {
     }
     const allSelected = this.selectionSignal().selected.length === this.resultsLengthSignal();
     if (allSelected) {
-      this.invoiceStore.updateOffice(
+      this.officeStore.update(
         selectedOffice.id,
         { lastInvoiceNumber: start + this.selectionSignal().selected.length },
       );

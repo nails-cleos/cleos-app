@@ -3,25 +3,19 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { IApiResponse } from '../interfaces/common';
-import { ITreatmentGroupAll } from '../treatment/treatment';
 import { CatalogueService } from '../services/catalogue.service';
-import { TreatmentService } from '../services/treatment.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type CatalogueStoreState = StoreState<ICatalogueAll[], ICatalogueAll> & {
-  groups: ITreatmentGroupAll[] | undefined;
-};
-
-const initialState: CatalogueStoreState = {
-  ...createStoreInitialState<ICatalogueAll[], ICatalogueAll>(),
-  groups: undefined,
-};
+const initialState = createStoreInitialState<ICatalogueAll[], ICatalogueAll>();
 
 export const CatalogueStore = signalStore(
   withState(initialState),
-  withMethods((store, catalogueService = inject(CatalogueService), treatmentService = inject(TreatmentService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    catalogueService = inject(CatalogueService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -85,23 +79,6 @@ export const CatalogueStore = signalStore(
 
         catalogueService.getCatalogue(id).subscribe({
           next: (selected) => patchState(store, { selected }),
-          error: patchError,
-        });
-      },
-
-      loadGroups(): void {
-        patchState(store, {
-          response: undefined,
-          groups: undefined,
-          subErrors: undefined,
-        });
-
-        treatmentService.getAllTreatmentsGroup().subscribe({
-          next: (groups) => patchState(store, {
-            groups,
-            response: undefined,
-            subErrors: undefined,
-          }),
           error: patchError,
         });
       },

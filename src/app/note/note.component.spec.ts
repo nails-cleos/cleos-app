@@ -12,6 +12,7 @@ import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { NavigationService } from '../services/navigation.service';
 import { NoteStore } from '../store/note.store';
 import { signal } from '@angular/core';
+import { UserStore } from '../store/user.store';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
@@ -19,10 +20,12 @@ describe('NoteComponent', () => {
   let routerSpy: jasmine.SpyObj<Router>;
   let noteStoreSpy: {
     navigationParams: ReturnType<typeof navigationParamsSignal.asReadonly>;
-    professionals: ReturnType<typeof allProfessionalsSignal.asReadonly>;
     subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
     clearError: jasmine.Spy;
     setNavigationParams: jasmine.Spy;
+  };
+  let userStoreSpy: {
+    professionals: ReturnType<typeof allProfessionalsSignal.asReadonly>;
     loadProfessionals: jasmine.Spy;
   };
 
@@ -61,10 +64,12 @@ describe('NoteComponent', () => {
 
     noteStoreSpy = {
       navigationParams: navigationParamsSignal.asReadonly(),
-      professionals: allProfessionalsSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
       clearError: jasmine.createSpy('clearError'),
       setNavigationParams: jasmine.createSpy('setNavigationParams'),
+    };
+    userStoreSpy = {
+      professionals: allProfessionalsSignal.asReadonly(),
       loadProfessionals: jasmine.createSpy('loadProfessionals'),
     };
 
@@ -76,6 +81,7 @@ describe('NoteComponent', () => {
       imports: [NoteComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NoteStore, useValue: noteStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         provideAppDateAdapter(),

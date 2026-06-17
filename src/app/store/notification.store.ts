@@ -20,7 +20,11 @@ const initialState: NotificationStoreState = {
 
 export const NotificationStore = signalStore(
   withState(initialState),
-  withMethods((store, notificationService = inject(NotificationService), router = inject(Router)) => {
+  withMethods((
+    store,
+    notificationService = inject(NotificationService),
+    router = inject(Router),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {

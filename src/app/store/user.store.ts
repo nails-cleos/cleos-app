@@ -13,9 +13,13 @@ import { UserService } from '../services/user.service';
 import { loginSuccess } from './actions/auth.actions';
 import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 import { getLocale } from '../util/helper';
+import { IRoomAll } from '../room/room';
 
 type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
+  professionals: IUserAll[] | undefined;
+  managers: IUserAll[] | undefined;
+  rooms: IRoomAll[] | undefined;
   users: IUserAll[] | undefined;
   overview: IOverview | undefined;
 };
@@ -23,6 +27,9 @@ type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
 const initialState: UserStoreState = {
   ...createStoreInitialState<Pagination<IUserAll>, IUserAll>(),
   customers: undefined,
+  professionals: undefined,
+  managers: undefined,
+  rooms: undefined,
   users: undefined,
   overview: undefined,
 };
@@ -39,6 +46,9 @@ export const UserStore = signalStore(
   ) => {
     let loadPageSubscription: Subscription | undefined;
     let loadCustomersSubscription: Subscription | undefined;
+    let loadProfessionalsSubscription: Subscription | undefined;
+    let loadManagersSubscription: Subscription | undefined;
+    let loadRoomsByProfessionalIdSubscription: Subscription | undefined;
     let loadDisabledUsersSubscription: Subscription | undefined;
     let loadByIdSubscription: Subscription | undefined;
     let loadOverviewSubscription: Subscription | undefined;
@@ -54,6 +64,9 @@ export const UserStore = signalStore(
     const cancelAll = (): void => {
       loadPageSubscription?.unsubscribe();
       loadCustomersSubscription?.unsubscribe();
+      loadProfessionalsSubscription?.unsubscribe();
+      loadManagersSubscription?.unsubscribe();
+      loadRoomsByProfessionalIdSubscription?.unsubscribe();
       loadDisabledUsersSubscription?.unsubscribe();
       loadByIdSubscription?.unsubscribe();
       loadOverviewSubscription?.unsubscribe();
@@ -171,6 +184,63 @@ export const UserStore = signalStore(
         loadCustomersSubscription = userService.getCustomers().subscribe({
           next: (customers) => patchState(store, {
             customers,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadProfessionals(): void {
+        loadProfessionalsSubscription?.unsubscribe();
+        patchState(store, {
+          professionals: undefined,
+          subErrors: undefined,
+          response: undefined,
+          isLoading: true,
+          error: undefined,
+        });
+
+        loadProfessionalsSubscription = userService.getProfessionals().subscribe({
+          next: (professionals) => patchState(store, {
+            professionals,
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadManagers(): void {
+        loadManagersSubscription?.unsubscribe();
+        patchState(store, {
+          managers: undefined,
+          subErrors: undefined,
+          selected: undefined,
+          response: undefined,
+          isLoading: true,
+        });
+
+        loadManagersSubscription = userService.getManagers().subscribe({
+          next: (managers) => patchState(store, {
+            managers: managers ?? [],
+            isLoading: false,
+          }),
+          error: patchError,
+        });
+      },
+
+      loadRoomsByProfessionalId(professionalId: string): void {
+        loadRoomsByProfessionalIdSubscription?.unsubscribe();
+        patchState(store, {
+          rooms: undefined,
+          subErrors: undefined,
+          response: undefined,
+          error: undefined,
+          isLoading: true,
+        });
+
+        loadRoomsByProfessionalIdSubscription = userService.getAllRoomsByProfessionalId(professionalId).subscribe({
+          next: (rooms) => patchState(store, {
+            rooms,
             isLoading: false,
           }),
           error: patchError,

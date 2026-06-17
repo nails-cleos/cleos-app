@@ -3,10 +3,8 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IInvoice, IInvoiceData } from '../invoice/invoice';
-import { IOffice } from '../office/office';
 import { Pagination } from '../interfaces/pagination';
 import { InvoiceService } from '../services/invoice.service';
-import { OfficeService } from '../services/office.service';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -21,8 +19,11 @@ const initialState: InvoiceStoreState = {
 
 export const InvoiceStore = signalStore(
   withState(initialState),
-  withMethods((store, invoiceService = inject(InvoiceService), officeService = inject(OfficeService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    invoiceService = inject(InvoiceService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
@@ -73,22 +74,6 @@ export const InvoiceStore = signalStore(
         invoiceService.getOfficeToInvoice(officeId, start, end, types).subscribe({
           next: (data) => patchState(store, {
             data: data ?? [],
-            response: undefined,
-            subErrors: undefined,
-            isLoading: false,
-          }),
-          error: patchError,
-        });
-      },
-
-      updateOffice(id: string, office: IOffice): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-        });
-
-        officeService.updateOffice(id, office).subscribe({
-          next: () => patchState(store, {
             response: undefined,
             subErrors: undefined,
             isLoading: false,

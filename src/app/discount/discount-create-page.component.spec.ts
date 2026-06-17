@@ -3,6 +3,7 @@ import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { TranslateModule } from '@ngx-translate/core';
+import { CurrencyStore } from '../store/currency.store';
 
 describe('DiscountCreatePageComponent', () => {
   let component: DiscountCreatePageComponent;
@@ -10,8 +11,11 @@ describe('DiscountCreatePageComponent', () => {
 
   let discountStoreSpy: {
     clean: jasmine.Spy;
-    loadCurrencies: jasmine.Spy;
     create: jasmine.Spy;
+  };
+
+  let currencyStoreSpy: {
+    loadAll: jasmine.Spy;
   };
 
   const mockDiscount: Partial<IDiscountAll> = {
@@ -22,14 +26,17 @@ describe('DiscountCreatePageComponent', () => {
   beforeEach(async () => {
     discountStoreSpy = {
       clean: jasmine.createSpy('clean'),
-      loadCurrencies: jasmine.createSpy('loadCurrencies'),
       create: jasmine.createSpy('create'),
+    };
+    currencyStoreSpy = {
+      loadAll: jasmine.createSpy('loadAll'),
     };
 
     await TestBed.configureTestingModule({
       imports: [DiscountCreatePageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: DiscountStore, useValue: discountStoreSpy },
+        { provide: CurrencyStore, useValue: currencyStoreSpy },
       ],
     }).overrideTemplate(DiscountCreatePageComponent, '')
       .compileComponents();

@@ -5,9 +5,14 @@ import { IApiResponse } from '../interfaces/common';
 import { IColor, IColorAll } from '../color/color';
 import { ColorService } from '../services/color.service';
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
+import { Pagination } from '../interfaces/pagination';
+
+type ColorData =
+  | { kind: 'pagination'; value?: Pagination<IColorAll> }
+  | { kind: 'list'; value?: IColorAll[] };
 
 export const ColorStore = signalStore(
-  withCrudStoreState<IColorAll>(),
+  withCrudStoreState<IColorAll, ColorData, IColorAll>(),
   withCrudStoreMethods<IColor, IApiResponse, IApiResponse, { id: string; name: string }>(() => {
     const colorService = inject(ColorService);
     const translate = inject(TranslateService);
@@ -15,6 +20,7 @@ export const ColorStore = signalStore(
     return {
       loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
       loadById: (id) => colorService.getColor(id),
+      loadAll: () => colorService.getAllColors(),
       create: (color) => colorService.createColor(color),
       update: (id, color) => colorService.updateColor(id, color),
       delete: ({ id }) => colorService.deleteColor(id),

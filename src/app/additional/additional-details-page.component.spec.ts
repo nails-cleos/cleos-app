@@ -5,6 +5,7 @@ import { AdditionalDetailsPageComponent } from './additional-details-page.compon
 import { AdditionalStore } from '../store/additional.store';
 import { IAdditionalAll } from './additional';
 import { AdditionalComponent } from './additional.component';
+import { TreatmentStore } from '../store/treatment.store';
 
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;
@@ -12,12 +13,15 @@ describe('AdditionalDetailsPageComponent', () => {
 
   let additionalStoreSpy: {
     selected: ReturnType<typeof signal>;
-    groups: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
-    loadGroups: jasmine.Spy;
     loadById: jasmine.Spy;
     update: jasmine.Spy;
+  };
+
+  let treatmentStoreStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllGroups: jasmine.Spy;
   };
 
   const id = '123';
@@ -32,18 +36,21 @@ describe('AdditionalDetailsPageComponent', () => {
   beforeEach(async () => {
     additionalStoreSpy = {
       selected: signal<any>(undefined),
-      groups: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
-      loadGroups: jasmine.createSpy('loadGroups'),
       loadById: jasmine.createSpy('loadById'),
       update: jasmine.createSpy('update'),
+    };
+    treatmentStoreStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllGroups: jasmine.createSpy('loadAllGroups'),
     };
 
     await TestBed.configureTestingModule({
       imports: [AdditionalDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
       ],
     }).overrideTemplate(AdditionalComponent, '<input #groupInput />')
       .overrideTemplate(AdditionalDetailsPageComponent, `

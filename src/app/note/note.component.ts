@@ -20,6 +20,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { NoteStore } from '../store/note.store';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-note',
@@ -38,13 +39,14 @@ export class NoteComponent {
   deleteData = output();
 
   private readonly noteStore = inject(NoteStore);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private navigationParams: Signal<{ professional?: IUserAll; date?: Date } | undefined> =
     this.noteStore.navigationParams;
   private subErrorsSignal: Signal<IError[] | undefined> = this.noteStore.subErrors;
 
-  allProfessionalsSignal: Signal<IUserAll[] | undefined> = this.noteStore.professionals;
+  allProfessionalsSignal: Signal<IUserAll[] | undefined> = this.userStore.professionals;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<NoteForm> = this.formBuilder.group<NoteForm>({
@@ -79,7 +81,7 @@ export class NoteComponent {
   repeats = [FrequencyEnum.none, FrequencyEnum.onceAWeek, FrequencyEnum.onceAMonth, FrequencyEnum.onceAYear];
 
   constructor() {
-    this.noteStore.loadProfessionals();
+    this.userStore.loadProfessionals();
     effect(() => {
       const params = this.navigationParams();
       if (params) {

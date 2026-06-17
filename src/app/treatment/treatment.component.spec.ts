@@ -6,15 +6,19 @@ import { IColorAll } from '../color/color';
 import { ITreatmentGroupAll } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { ColorStore } from '../store/color.store';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
   let fixture: ComponentFixture<TreatmentComponent>;
 
   let treatmentStoreSpy: {
-    colors: ReturnType<typeof signal<any>>;
     subErrors: ReturnType<typeof signal<any>>;
-    loadColors: jasmine.Spy;
+  };
+
+  let colorStoreSpy: {
+    data: ReturnType<typeof signal<any>>;
+    loadAll: jasmine.Spy;
   };
 
   const mockColor = {
@@ -36,15 +40,18 @@ describe('TreatmentComponent', () => {
 
   beforeEach(async () => {
     treatmentStoreSpy = {
-      colors: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      loadColors: jasmine.createSpy('loadColors'),
+    };
+    colorStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadAll'),
     };
 
     await TestBed.configureTestingModule({
       imports: [TreatmentComponent, TranslateModule.forRoot()],
       providers: [
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: ColorStore, useValue: colorStoreSpy },
       ],
     }).compileComponents();
 
@@ -65,10 +72,13 @@ describe('TreatmentComponent', () => {
   });
 
   it('should patch form when treatment input emits', () => {
-    treatmentStoreSpy.colors.set([
-      mockColor,
-      { id: 'g2', name: 'Color 2' },
-    ] as IColorAll[]);
+    colorStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        mockColor,
+        { id: 'g2', name: 'Color 2' },
+      ] as IColorAll[],
+    });
     fixture.componentRef.setInput('treatment', mockTreatment as ITreatmentGroupAll);
     fixture.detectChanges();
     expect(component.colorsSignal().length).toBe(1);
@@ -150,7 +160,7 @@ describe('TreatmentComponent', () => {
       { id: '2', name: 'Another Color' },
       { id: '3', name: 'Test Color 2' },
     ] as IColorAll[];
-    treatmentStoreSpy.colors.set(colors);
+    colorStoreSpy.data.set({ kind: 'list', value: colors });
     fixture.detectChanges();
 
     component.getForm.color.setValue(undefined);
@@ -166,11 +176,14 @@ describe('TreatmentComponent', () => {
   });
 
   it('remove should remove color and put it back to allColorsWritableSignal', () => {
-    treatmentStoreSpy.colors.set([
-      { id: 'g1', name: 'G1' },
-      { id: 'g2', name: 'G2' },
-      { id: 'g3', name: 'G3' },
-    ] as any);
+    colorStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        { id: 'g1', name: 'G1' },
+        { id: 'g2', name: 'G2' },
+        { id: 'g3', name: 'G3' },
+      ] as any,
+    });
     component.colorsSignal.set([
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
@@ -190,7 +203,7 @@ describe('TreatmentComponent', () => {
 
   it('selectedColor should add selected color, remove it from allColorsWritableSignal and clear input', () => {
     const g1 = { id: 'g1', name: 'G1' } as any;
-    treatmentStoreSpy.colors.set([g1, { id: 'g2', name: 'G2' } as any]);
+    colorStoreSpy.data.set({ kind: 'list', value: [g1, { id: 'g2', name: 'G2' } as any] });
     component.colorsSignal.set([]);
     component.allColorsWritableSignal.set([g1, { id: 'g2', name: 'G2' } as any]);
 
@@ -211,7 +224,7 @@ describe('TreatmentComponent', () => {
       { id: 'g2', name: 'Black' },
       { id: 'g3', name: 'White' },
     ] as IColorAll[];
-    treatmentStoreSpy.colors.set(colors);
+    colorStoreSpy.data.set({ kind: 'list', value: colors });
     component.colorsSignal.set([colors[0]]);
     fixture.detectChanges();
 
@@ -225,7 +238,7 @@ describe('TreatmentComponent', () => {
 
   it('selectedColor should ignore duplicate selected events', () => {
     const color = { id: 'g1', name: 'Blue' } as any;
-    treatmentStoreSpy.colors.set([color]);
+    colorStoreSpy.data.set({ kind: 'list', value: [color] });
     component.colorsSignal.set([color]);
     component.allColorsWritableSignal.set([]);
 

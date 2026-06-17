@@ -53,7 +53,7 @@ describe('ColorListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     colorStoreSpy = {
-      data: signal(mockPagination),
+      data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
       isLoading: signal(false),
       loadPage: jasmine.createSpy('loadPage'),
@@ -98,7 +98,7 @@ describe('ColorListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    colorStoreSpy.data.set(mockPagination);
+    colorStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -106,7 +106,7 @@ describe('ColorListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    colorStoreSpy.data.set(mockPagination);
+    colorStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);

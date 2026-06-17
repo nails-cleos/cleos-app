@@ -39,17 +39,6 @@ describe('CatalogueStore', () => {
     store = TestBed.inject(CatalogueStore);
   });
 
-  it('should load treatment groups into store state', () => {
-    const groups = [{ id: 'group-1', name: 'Body' }];
-    treatmentServiceSpy.getAllTreatmentsGroup.and.returnValue(of(groups as any));
-
-    store.loadGroups();
-
-    expect(treatmentServiceSpy.getAllTreatmentsGroup).toHaveBeenCalled();
-    expect(store.groups()).toEqual(groups as any);
-    expect(store.error()).toBeUndefined();
-  });
-
   it('should expose a bulk update response after sort succeeds', () => {
     const catalogues = [{ id: '1', name: 'A', order: 0 }, { id: '2', name: 'B', order: 1 }] as any;
     catalogueServiceSpy.updateCatalogueOrder.and.returnValue(of(void 0));

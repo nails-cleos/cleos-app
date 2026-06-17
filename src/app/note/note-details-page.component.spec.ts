@@ -9,6 +9,7 @@ import { FrequencyEnum } from '../util/helper';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
+import { UserStore } from '../store/user.store';
 
 describe('NoteDetailsPageComponent', () => {
   let component: NoteDetailsPageComponent;
@@ -18,13 +19,16 @@ describe('NoteDetailsPageComponent', () => {
   let noteStoreSpy: {
     navigationParams: ReturnType<typeof signal>;
     selected: ReturnType<typeof signal>;
-    professionals: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     delete: jasmine.Spy;
     clean: jasmine.Spy;
     loadById: jasmine.Spy;
-    loadProfessionals: jasmine.Spy;
     update: jasmine.Spy;
+  };
+
+  let userStoreSpy: {
+    professionals: ReturnType<typeof signal>;
+    loadProfessionals: jasmine.Spy;
   };
 
   const id = '123';
@@ -50,13 +54,15 @@ describe('NoteDetailsPageComponent', () => {
     noteStoreSpy = {
       navigationParams: signal<any>(undefined),
       selected: signal<any>(undefined),
-      professionals: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       delete: jasmine.createSpy('delete'),
       clean: jasmine.createSpy('clean'),
       loadById: jasmine.createSpy('loadById'),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
       update: jasmine.createSpy('update'),
+    };
+    userStoreSpy = {
+      professionals: signal<any>(undefined),
+      loadProfessionals: jasmine.createSpy('loadProfessionals'),
     };
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
@@ -64,6 +70,7 @@ describe('NoteDetailsPageComponent', () => {
       imports: [NoteDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NoteStore, useValue: noteStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
     }).overrideTemplate(NoteComponent, '')

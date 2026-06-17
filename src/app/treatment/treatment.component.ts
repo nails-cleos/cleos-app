@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
-  Component, computed,
+  Component,
+  computed,
   effect,
   ElementRef,
   inject,
@@ -39,6 +40,7 @@ import { BackButtonDirective } from '../directives/back-button.directive';
 import { TreatmentStore } from '../store/treatment.store';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { ColorStore } from '../store/color.store';
 
 @Component({
   selector: 'app-treatment',
@@ -57,6 +59,7 @@ export class TreatmentComponent {
   submitData = output<ITreatmentGroup>();
 
   private readonly treatmentStore = inject(TreatmentStore);
+  private readonly colorStore = inject(ColorStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
@@ -71,7 +74,10 @@ export class TreatmentComponent {
     color: this.formBuilder.control(undefined),
   });
 
-  colors = computed(() => this.treatmentStore.colors());
+  colors = computed(() => {
+    const data = this.colorStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   colorsSignal = signal<IColorAll[]>([]);
   allColorsWritableSignal = signal<IColorAll[] | undefined>(undefined);
   filteredColorSignal: Signal<IColorAll[] | undefined> = toSignal(
@@ -101,7 +107,7 @@ export class TreatmentComponent {
   private currentColorIds: string[] = [];
 
   constructor() {
-    this.treatmentStore.loadColors();
+    this.colorStore.loadAll();
 
     effect(() => {
       const treatment = this.treatment();

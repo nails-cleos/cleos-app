@@ -9,16 +9,20 @@ import { NavigationService } from '../services/navigation.service';
 import { AdditionalStore } from '../store/additional.store';
 import { AdditionalComponent } from './additional.component';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { TreatmentStore } from '../store/treatment.store';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
   let fixture: ComponentFixture<AdditionalComponent>;
 
   let additionalStoreSpy: {
-    groups: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     clean: jasmine.Spy;
-    loadGroups: jasmine.Spy;
+  };
+
+  let treatmentStoreStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllGroups: jasmine.Spy;
   };
 
   const mockGroup = {
@@ -43,10 +47,12 @@ describe('AdditionalComponent', () => {
 
   beforeEach(async () => {
     additionalStoreSpy = {
-      groups: signal<any>(undefined),
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
-      loadGroups: jasmine.createSpy('loadGroups'),
+    };
+    treatmentStoreStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllGroups: jasmine.createSpy('loadAllGroups'),
     };
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
@@ -54,6 +60,7 @@ describe('AdditionalComponent', () => {
       imports: [AdditionalComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -75,10 +82,13 @@ describe('AdditionalComponent', () => {
 
   it('should patch form when selectedAdditional emits', () => {
     fixture.componentRef.setInput('additional', mockAdditional);
-    additionalStoreSpy.groups.set([
-      mockGroup,
-      { id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] },
-    ]);
+    treatmentStoreStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        mockGroup,
+        { id: 'g2', name: 'Group 2', treatments: [], selectedTreatments: [] },
+      ],
+    });
     fixture.detectChanges();
 
     expect(component.additional()?.id).toBe('1');
@@ -166,7 +176,7 @@ describe('AdditionalComponent', () => {
       { id: '2', name: 'Another Group' },
       { id: '3', name: 'Test Group 2' },
     ];
-    additionalStoreSpy.groups.set(groups);
+    treatmentStoreStoreSpy.data.set({ kind: 'list', value: groups });
     fixture.detectChanges();
 
     component.getForm.group.setValue(undefined);

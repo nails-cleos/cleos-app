@@ -1,9 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   ElementRef,
-  inject, input,
+  inject,
+  input,
   output,
   signal,
   Signal,
@@ -17,7 +19,7 @@ import { map, startWith } from 'rxjs/operators';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError, isString } from '../interfaces/common';
+import { ICommon, IError, isString } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -28,8 +30,8 @@ import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.compo
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
+import { TreatmentStore } from '../store/treatment.store';
 
 @Component({
   selector: 'app-additional',
@@ -47,10 +49,14 @@ export class AdditionalComponent {
   submitData = output<IAdditional>();
 
   private readonly additionalStore = inject(AdditionalStore);
+  private readonly treatmentStore = inject(TreatmentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
 
-  private allGroupsSignal = this.additionalStore.groups;
+  private readonly allGroupsSignal = computed(() => {
+    const data = this.treatmentStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   private subErrorsSignal = this.additionalStore.subErrors;
 
   form: FormGroup<AdditionalForm> = this.formBuilder.group<AdditionalForm>({
@@ -89,7 +95,7 @@ export class AdditionalComponent {
   private currentGroupIds: string[] = [];
 
   constructor() {
-    this.additionalStore.loadGroups();
+    this.treatmentStore.loadAllGroups();
 
     effect(() => {
       const selected = this.additional();

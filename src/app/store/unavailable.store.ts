@@ -5,11 +5,9 @@ import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IRoomAll } from '../room/room';
 import { IUnavailable, IUnavailableAll } from '../unavailable/unavailable';
-import { IUserAll } from '../user/user';
 import { UnavailableService } from '../services/unavailable.service';
-import { UserService } from '../services/user.service';
 import { newDateTimestamp } from '../util/dates';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type UnavailableNavigationParams = {
@@ -17,11 +15,6 @@ export type UnavailableNavigationParams = {
   room?: IRoomAll;
   startTime?: string;
   showDuration: boolean;
-};
-
-type UnavailableStoreState = StoreState<Pagination<IUnavailableAll>, IUnavailableAll> & {
-  professionals: IUserAll[] | undefined;
-  rooms: IRoomAll[] | undefined;
 };
 
 type UpdateUnavailableArgs = {
@@ -36,16 +29,15 @@ type DeleteUnavailableArgs = {
   timeZone?: string;
 };
 
-const initialState: UnavailableStoreState = {
-  ...createStoreInitialState<Pagination<IUnavailableAll>, IUnavailableAll>(),
-  professionals: undefined,
-  rooms: undefined,
-};
+const initialState = createStoreInitialState<Pagination<IUnavailableAll>, IUnavailableAll>();
 
 export const UnavailableStore = signalStore(
   withState(initialState),
-  withMethods((store, unavailableService = inject(UnavailableService), userService = inject(UserService),
-    translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    unavailableService = inject(UnavailableService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const patchSavingState = (): void => {
@@ -89,42 +81,6 @@ export const UnavailableStore = signalStore(
         unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (data) => patchState(store, {
             data,
-            isLoading: false,
-          }),
-          error: patchError,
-        });
-      },
-
-      loadProfessionals(): void {
-        patchState(store, {
-          professionals: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
-
-        userService.getProfessionals().subscribe({
-          next: (professionals) => patchState(store, {
-            professionals,
-            isLoading: false,
-          }),
-          error: patchError,
-        });
-      },
-
-      loadRoomsByProfessionalId(professionalId: string): void {
-        patchState(store, {
-          rooms: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
-
-        userService.getAllRoomsByProfessionalId(professionalId).subscribe({
-          next: (rooms) => patchState(store, {
-            rooms,
             isLoading: false,
           }),
           error: patchError,

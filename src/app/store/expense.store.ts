@@ -25,7 +25,11 @@ const initialState: ExpenseStoreState = {
 
 export const ExpenseStore = signalStore(
   withState(initialState),
-  withMethods((store, expenseService = inject(ExpenseService), translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    expenseService = inject(ExpenseService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {

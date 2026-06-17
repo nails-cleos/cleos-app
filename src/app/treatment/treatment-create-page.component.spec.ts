@@ -4,31 +4,37 @@ import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentCreatePageComponent } from './treatment-create-page.component';
+import { ColorStore } from '../store/color.store';
 
 describe('TreatmentCreatePageComponent', () => {
   let component: TreatmentCreatePageComponent;
   let fixture: ComponentFixture<TreatmentCreatePageComponent>;
   let treatmentStoreSpy: {
-    colors: ReturnType<typeof signal<any>>;
     subErrors: ReturnType<typeof signal<any>>;
     clean: jasmine.Spy;
-    loadColors: jasmine.Spy;
     create: jasmine.Spy;
+  };
+  let colorStoreSpy: {
+    data: ReturnType<typeof signal<any>>;
+    loadAll: jasmine.Spy;
   };
 
   beforeEach(async () => {
     treatmentStoreSpy = {
-      colors: signal(undefined),
       subErrors: signal(undefined),
       clean: jasmine.createSpy('clean'),
-      loadColors: jasmine.createSpy('loadColors'),
       create: jasmine.createSpy('create'),
+    };
+    colorStoreSpy = {
+      data: signal(undefined),
+      loadAll: jasmine.createSpy('loadAll'),
     };
 
     await TestBed.configureTestingModule({
       imports: [TreatmentCreatePageComponent, TranslateModule.forRoot()],
       providers: [
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: ColorStore, useValue: colorStoreSpy },
         { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -45,7 +51,7 @@ describe('TreatmentCreatePageComponent', () => {
 
   it('should clean and load colors on init', () => {
     expect(treatmentStoreSpy.clean).toHaveBeenCalled();
-    expect(treatmentStoreSpy.loadColors).toHaveBeenCalled();
+    expect(colorStoreSpy.loadAll).toHaveBeenCalled();
   });
 
   it('should call create when submit receives a treatment group', () => {
