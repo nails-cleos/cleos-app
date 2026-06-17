@@ -13,7 +13,6 @@ export const ColorStore = signalStore(
     const translate = inject(TranslateService);
 
     return {
-      placeholder: undefined,
       loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
       loadById: (id) => colorService.getColor(id),
       create: (color) => colorService.createColor(color),

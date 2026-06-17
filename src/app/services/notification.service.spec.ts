@@ -45,10 +45,10 @@ describe('NotificationService', () => {
   });
 
   it('should fetch notification pages with pagination params', () => {
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.and.returnValue(of({ unread: 5, page: mockPagination, workDay: [] }));
 
     service.getNotificationsPage(0, 'date', 'desc', 10).subscribe(result => {
-      expect(result).toEqual(mockPagination);
+      expect(result).toEqual({ unread: 5, page: mockPagination, workDay: [] });
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/notifications/pages', {

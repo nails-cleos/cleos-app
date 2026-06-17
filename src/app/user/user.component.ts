@@ -37,6 +37,7 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
 export class UserComponent {
   config = input.required<ICommon>();
   user = input<IUserAll>();
+  role = input<Role>();
 
   submitData = output<{ user: IUser; role?: Role }>();
 
@@ -91,10 +92,7 @@ export class UserComponent {
   errors = signal<Record<string, unknown>>({});
 
   constructor() {
-    effect(() => {
-      const params = this.userStore.userNavigationParams();
-      this.getForm.role.setValue(params?.role);
-    });
+    effect(() => this.getForm.role.setValue(this.role()));
 
     effect(() => {
       const user = this.user();

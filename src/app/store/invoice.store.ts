@@ -7,7 +7,8 @@ import { IOffice } from '../office/office';
 import { Pagination } from '../interfaces/pagination';
 import { InvoiceService } from '../services/invoice.service';
 import { OfficeService } from '../services/office.service';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type InvoiceStoreState = StoreState<IInvoice[], never> & {
   page: Pagination<IInvoiceData> | undefined;
@@ -22,15 +23,7 @@ export const InvoiceStore = signalStore(
   withState(initialState),
   withMethods((store, invoiceService = inject(InvoiceService), officeService = inject(OfficeService),
     translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {

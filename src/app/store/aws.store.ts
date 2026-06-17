@@ -31,7 +31,6 @@ export const AwsStore = signalStore(
       awsLambdaService.processPdf(token, file, userId).subscribe({
         next: (data) => patchState(store, {
           data,
-          error: undefined,
           isLoading: false,
         }),
         error: (err) => patchState(store, {

@@ -85,7 +85,7 @@ describe('UserStore', () => {
     userServiceSpy.getCustomerOverview.and.returnValue(of(overview));
 
     store.loadPage({ page: 1, sort: 'displayName', direction: 'asc', size: 25, filter: 'ann' });
-    expect(store.pagination()).toEqual(page);
+    expect(store.data()).toEqual(page);
 
     store.loadCustomers();
     expect(store.customers()).toEqual([user]);
@@ -102,19 +102,10 @@ describe('UserStore', () => {
     store.loadOverview('user-1');
 
     expect(userServiceSpy.getUsersPage).toHaveBeenCalledWith(1, 'displayName', 'asc', 25, 'ann');
-    expect(store.pagination()).toBeUndefined();
+    expect(store.data()).toBeUndefined();
     expect(store.selected()).toBeUndefined();
     expect(store.overview()).toEqual(overview);
     expect(store.isLoading()).toBeFalse();
-  });
-
-  it('should set navigation params and navigate when selecting a user', () => {
-    store.setNavigationParams({ role: Role.manager });
-    store.selectAndNavigate(user);
-
-    expect(store.userNavigationParams()).toEqual({ role: Role.manager });
-    expect(store.selected()).toEqual(user);
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', user.id]);
   });
 
   it('should expose response metadata for user mutations', () => {
@@ -211,13 +202,11 @@ describe('UserStore', () => {
     store.save({ displayName: 'New User' }, undefined, Role.customer);
     store.clearResponse();
     store.clearError();
-    store.setNavigationParams({ role: Role.customer });
     store.clean();
 
     expect(store.response()).toBeUndefined();
     expect(store.error()).toBeUndefined();
     expect(store.subErrors()).toBeUndefined();
-    expect(store.userNavigationParams()).toBeUndefined();
     expect(store.isLoading()).toBeFalse();
   });
 

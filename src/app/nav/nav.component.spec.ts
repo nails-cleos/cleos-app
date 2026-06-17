@@ -13,13 +13,13 @@ import { CookieService } from 'ngx-cookie-service';
 import { IUser, IUserAll, User } from '../user/user';
 import { NavigationService } from '../services/navigation.service';
 import { INotification } from '../notification/notification';
-import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { IResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
 import { UserStore } from '../store/user.store';
+import { NotificationStore } from '../store/notification.store';
 
 describe('NavComponent', () => {
   let component: NavComponent;
@@ -32,10 +32,19 @@ describe('NavComponent', () => {
   let user$: BehaviorSubject<any>;
   let menus$: BehaviorSubject<any>;
   let redirect$: BehaviorSubject<any>;
-  let dataDeleted$: BehaviorSubject<any>;
-  let dataRead$: BehaviorSubject<any>;
-  let notification$: BehaviorSubject<any>;
   let action$: BehaviorSubject<any>;
+  let notificationStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    dataRead: ReturnType<typeof signal>;
+    dataDeleted: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    readNotification: jasmine.Spy;
+    deleteNotification: jasmine.Spy;
+  };
 
   let navigateSpy: jasmine.Spy;
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
@@ -63,7 +72,7 @@ describe('NavComponent', () => {
     id: '1',
     message: 'This is a test notification',
     read: true,
-    navigation: `/${DEFAULT_LOCALE}/reservation/r-1`,
+    navigation: `/${ DEFAULT_LOCALE }/reservation/r-1`,
     date: date.getTime() / 1000,
     notDate: date,
     deleted: false,
@@ -84,14 +93,24 @@ describe('NavComponent', () => {
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
-    notification$ = new BehaviorSubject(undefined);
     isAuthenticated$ = new BehaviorSubject(undefined);
     user$ = new BehaviorSubject(undefined);
     menus$ = new BehaviorSubject(undefined);
     redirect$ = new BehaviorSubject(undefined);
-    dataDeleted$ = new BehaviorSubject(undefined);
-    dataRead$ = new BehaviorSubject(undefined);
     action$ = new BehaviorSubject(undefined);
+
+    notificationStoreSpy = {
+      isLoading: signal(false),
+      data: signal<any>(undefined),
+      dataRead: signal<any>(undefined),
+      dataDeleted: signal<any>(undefined),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      readNotification: jasmine.createSpy('readNotification'),
+      deleteNotification: jasmine.createSpy('deleteNotification'),
+    };
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
@@ -142,12 +161,6 @@ describe('NavComponent', () => {
           return menus$.asObservable();
         case 4:
           return redirect$.asObservable();
-        case 5:
-          return dataDeleted$.asObservable();
-        case 6:
-          return dataRead$.asObservable();
-        case 7:
-          return notification$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -165,11 +178,12 @@ describe('NavComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: NotificationStore, useValue: notificationStoreSpy },
       ],
     }).compileComponents();
 
     const router = TestBed.inject(Router);
-    spyOnProperty(router, 'url', 'get').and.returnValue(`/${DEFAULT_LOCALE}`);
+    spyOnProperty(router, 'url', 'get').and.returnValue(`/${ DEFAULT_LOCALE }`);
     navigateSpy = spyOn(router, 'navigate');
 
     const translateService = TestBed.inject(TranslateService);
@@ -207,7 +221,7 @@ describe('NavComponent', () => {
 
     expect(component.isDarkMode()).toBeTrue();
     expect(component['cssClass']).toBe('dark-theme');
-    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, `/${DEFAULT_LOCALE}`, message);
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, `/${ DEFAULT_LOCALE }`, message);
   });
 
   it('should go to home when goHome is called', () => {
@@ -248,7 +262,7 @@ describe('NavComponent', () => {
   it('should navigate to the notification navigation when it is read', () => {
     component.notification(mockNotification);
 
-    expect(navigateSpy).toHaveBeenCalledWith([`/${DEFAULT_LOCALE}/reservation/r-1`]);
+    expect(navigateSpy).toHaveBeenCalledWith([`/${ DEFAULT_LOCALE }/reservation/r-1`]);
   });
 
   it('should mark notification as read and navigate', () => {
@@ -262,7 +276,7 @@ describe('NavComponent', () => {
 
     expect(component.countNotifications()).toBe(1);
     expect(component.notifications()).toContain({ ...unreadNotification, read: true });
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(readNotification({ id: unreadNotification.id }));
+    expect(notificationStoreSpy.readNotification).toHaveBeenCalledWith(unreadNotification.id);
   });
 
   it('should handle auth state changes', () => {
@@ -284,14 +298,14 @@ describe('NavComponent', () => {
     expect(component.initials).toBe('AU');
     expect(component.image).toBe(mockUser.imageUrl);
 
-    expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
+    expect(notificationStoreSpy.loadPage)
+      .toHaveBeenCalledWith({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
 
     expect(messagingServiceSpy.requestPermission).toHaveBeenCalledWith(mockUser);
   });
 
   it('should receive notifications', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [
           mockNotification,
@@ -315,7 +329,7 @@ describe('NavComponent', () => {
     const mockMessage = {
       id: '4',
       message: 'This is a message notification',
-      navigation: `/${DEFAULT_LOCALE}/reservation/r-2`,
+      navigation: `/${ DEFAULT_LOCALE }/reservation/r-2`,
       date: getNowTimeZone().getTime() / 1000,
     } as INotification;
 
@@ -363,7 +377,7 @@ describe('NavComponent', () => {
   });
 
   it('should handle notifications', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [
           mockNotification,
@@ -389,7 +403,7 @@ describe('NavComponent', () => {
   });
 
   it('should handle delete notifications', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [
           mockNotification,
@@ -415,7 +429,7 @@ describe('NavComponent', () => {
 
     const deleted = { ...mockNotification, id: '3', deleted: true, read: false };
 
-    dataDeleted$.next(deleted);
+    notificationStoreSpy.dataDeleted.set(deleted);
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -426,7 +440,7 @@ describe('NavComponent', () => {
   });
 
   it('should decrease the badge when an unread notification is read outside the dropdown preload', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [
           mockNotification,
@@ -440,7 +454,7 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    dataRead$.next({ ...mockNotification, id: 'external-read', read: true });
+    notificationStoreSpy.dataRead.set({ ...mockNotification, id: 'external-read', read: true });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -448,7 +462,7 @@ describe('NavComponent', () => {
 
   it('should mark a preloaded unread notification as read when the store read success arrives', () => {
     const unreadNotification = { ...mockNotification, id: '2', read: false };
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [mockNotification, unreadNotification],
         number: 0,
@@ -460,34 +474,35 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     component.countNotifications.set(1);
-    dataRead$.next({ ...unreadNotification, read: true });
+    notificationStoreSpy.dataRead.set({ ...unreadNotification, read: true });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(0);
     expect(component.notifications()).toContain(jasmine.objectContaining({ id: '2', read: true }));
   });
 
-  it('should not decrease the badge when the store read success arrives for an already read preloaded notification', () => {
-    notification$.next({
-      page: {
-        content: [mockNotification],
-        number: 0,
-        totalElements: 1,
-      },
-      workDay: [],
-      unread: 1,
+  it('should not decrease the badge when the store read success arrives for an already read preloaded notification',
+    () => {
+      notificationStoreSpy.data.set({
+        page: {
+          content: [mockNotification],
+          number: 0,
+          totalElements: 1,
+        },
+        workDay: [],
+        unread: 1,
+      });
+      fixture.detectChanges();
+
+      component.countNotifications.set(1);
+      notificationStoreSpy.dataRead.set({ ...mockNotification, read: true });
+      fixture.detectChanges();
+
+      expect(component.countNotifications()).toBe(1);
     });
-    fixture.detectChanges();
-
-    component.countNotifications.set(1);
-    dataRead$.next({ ...mockNotification, read: true });
-    fixture.detectChanges();
-
-    expect(component.countNotifications()).toBe(1);
-  });
 
   it('should decrease the badge when an unread notification is deleted outside the dropdown preload', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [
           mockNotification,
@@ -501,14 +516,14 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    dataDeleted$.next({ ...mockNotification, id: 'external-delete', deleted: true, read: false });
+    notificationStoreSpy.dataDeleted.set({ ...mockNotification, id: 'external-delete', deleted: true, read: false });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
   });
 
   it('should remove a preloaded read notification without decreasing the badge', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [mockNotification],
         number: 0,
@@ -520,7 +535,7 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     component.countNotifications.set(1);
-    dataDeleted$.next({ ...mockNotification, deleted: true, read: true });
+    notificationStoreSpy.dataDeleted.set({ ...mockNotification, deleted: true, read: true });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -528,7 +543,7 @@ describe('NavComponent', () => {
   });
 
   it('should ignore deleted notifications that are not marked as deleted', () => {
-    notification$.next({
+    notificationStoreSpy.data.set({
       page: {
         content: [{ ...mockNotification, id: '2', read: false }],
         number: 0,
@@ -539,7 +554,7 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    dataDeleted$.next({ ...mockNotification, id: '2', deleted: false, read: false });
+    notificationStoreSpy.dataDeleted.set({ ...mockNotification, id: '2', deleted: false, read: false });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -557,10 +572,10 @@ describe('NavComponent', () => {
     response$.next(response);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith([`/${DEFAULT_LOCALE}/${response.redirect}`]);
+    expect(navigateSpy).toHaveBeenCalledWith([`/${ DEFAULT_LOCALE }/${ response.redirect }`]);
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
-      { actionType: 'link', action: `/${DEFAULT_LOCALE}/${response.path}` });
+      { actionType: 'link', action: `/${ DEFAULT_LOCALE }/${ response.path }` });
   });
 
   it('should create response with blob', () => {

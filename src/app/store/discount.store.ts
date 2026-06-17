@@ -7,7 +7,8 @@ import { ICurrency } from '../currency/currency';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
 import { CurrencyService } from '../services/currency.service';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export type DiscountData =
   | { kind: 'paginationDiscount'; value: Pagination<IDiscountAll> }
@@ -29,15 +30,7 @@ export const DiscountStore = signalStore(
   withState(initialState),
   withMethods((store, discountService = inject(DiscountService), currencyService = inject(CurrencyService),
     translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -65,9 +58,6 @@ export const DiscountStore = signalStore(
         discountService.getDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'paginationDiscount', value },
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
             isLoading: false,
           }),
           error: patchError,

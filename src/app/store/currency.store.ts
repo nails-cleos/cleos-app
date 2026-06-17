@@ -13,7 +13,6 @@ export const CurrencyStore = signalStore(
     const translate = inject(TranslateService);
 
     return {
-      placeholder: undefined,
       loadPage: ({ page, sort, direction, size }) => currencyService.getCurrenciesPage(page, sort, direction, size),
       loadById: (id) => currencyService.getCurrency(id),
       create: (currency) => currencyService.createCurrency(currency),

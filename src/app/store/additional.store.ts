@@ -8,7 +8,8 @@ import { ITreatmentGroupAll } from '../treatment/treatment';
 import { AdditionalService } from '../services/additional.service';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export type AdditionalData =
   | { kind: 'pagination'; value?: Pagination<IAdditionalAll> }
@@ -27,15 +28,7 @@ export const AdditionalStore = signalStore(
   withState(initialState),
   withMethods((store, additionalService = inject(AdditionalService), treatmentService = inject(TreatmentService),
     translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -63,9 +56,6 @@ export const AdditionalStore = signalStore(
         additionalService.getAdditionalPage(sort, direction, page, size).subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'pagination', value },
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -83,8 +73,6 @@ export const AdditionalStore = signalStore(
         additionalService.getAdditionalList().subscribe({
           next: (value) => patchState(store, {
             data: { kind: 'list', value },
-            subErrors: undefined,
-            response: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -116,8 +104,6 @@ export const AdditionalStore = signalStore(
         treatmentService.getAllTreatmentsGroup().subscribe({
           next: (groups) => patchState(store, {
             groups,
-            subErrors: undefined,
-            response: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -140,8 +126,6 @@ export const AdditionalStore = signalStore(
               path: `additional/${ response.id }`,
               redirect: 'additional',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -164,8 +148,6 @@ export const AdditionalStore = signalStore(
               path: `additional/${ response.id }`,
               redirect: 'additional',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -183,7 +165,6 @@ export const AdditionalStore = signalStore(
         additionalService.sortAdditional(additionalList).subscribe({
           next: () => patchState(store, {
             response: { message: 'ADDITIONAL.SORTED.MESSAGE' },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -205,7 +186,6 @@ export const AdditionalStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

@@ -1,19 +1,15 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { INotification } from '../notification';
 import { Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { zoneDateToDate } from '../../util/dates';
-import { deleteNotification, getNotificationsPage, readNotification } from '../../store/actions/notification.actions';
 import { PAGE_SIZE } from '../../interfaces/pagination';
-import { getNotificationsPipe } from '../../store/selectors/notification.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NotificationState } from '../../store/reducers/notification.reducers';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
+import { NotificationStore } from '../../store/notification.store';
 
 const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
 
@@ -27,13 +23,11 @@ const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
 export class NotificationListComponent {
   readonly skeletonNotificationCards = Array.from({ length: 3 }, (_, index) => index);
   private readonly router: Router = inject(Router);
-  private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
+  private readonly notificationStore = inject(NotificationStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private notifications$ = this.store.pipe(getNotificationsPipe);
-
-  private notificationsSignal = toSignal(this.notifications$);
+  private notificationsSignal = computed(() => this.notificationStore.data());
 
   notifications = signal<INotification[]>([]);
   dateFormat: string = this.translate.getCurrentLang();
@@ -44,10 +38,11 @@ export class NotificationListComponent {
   private page = signal(0);
 
   constructor() {
+    this.notificationStore.clean();
     effect(() => {
       const page = this.page();
       this.pageLoading.set(true);
-      this.store.dispatch(getNotificationsPage({ page: page, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
+      this.notificationStore.loadPage({ page: page, sort: 'date', direction: 'desc', size: PAGE_SIZE });
     });
 
     effect(() => {
@@ -76,7 +71,7 @@ export class NotificationListComponent {
       this.router.navigate([notification.navigation]);
     } else {
       this.navigationService.reload(this.router.url.split('/'));
-      this.store.dispatch(readNotification({ id: notification.id }));
+      this.notificationStore.readNotification(notification.id);
     }
   };
 
@@ -97,8 +92,7 @@ export class NotificationListComponent {
     this.notifications.update(currents => currents.map((current, currentIndex) => currentIndex === index
       ? { ...current, deleted: true }
       : current));
-
-    this.store.dispatch(deleteNotification({ notification: { ...notification, deleted: true } }));
+    this.notificationStore.deleteNotification({ ...notification, deleted: true });
 
     if (!notification.read) {
       --this.badge;

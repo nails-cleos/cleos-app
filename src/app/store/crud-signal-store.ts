@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { patchState, withMethods, withState } from '@ngrx/signals';
+import { patchState, withMethods, withState, WritableStateSource } from '@ngrx/signals';
 import { Observable, type Subscription } from 'rxjs';
 import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
@@ -25,7 +25,21 @@ export const createStoreInitialState = <TData, TSelected>(): StoreState<TData, T
 export type CrudStoreState<TEntity, TData = Pagination<TEntity>, TSelected = TEntity> = StoreState<TData, TSelected>;
 
 export const createCrudInitialState = <TEntity, TData = Pagination<TEntity>, TSelected = TEntity>():
-CrudStoreState<TEntity, TData, TSelected> => createStoreInitialState<TData, TSelected>();
+  CrudStoreState<TEntity, TData, TSelected> => createStoreInitialState<TData, TSelected>();
+
+export const patchCrudError = <TData, TSelected>(
+  store: WritableStateSource<StoreState<TData, TSelected>>,
+  err: HttpErrorResponse,
+): void => {
+  const error = mapCrudHttpError(err);
+
+  patchState(store, {
+    error,
+    subErrors: error.subErrors,
+    response: undefined,
+    isLoading: false,
+  });
+};
 
 export const mapCrudHttpError = (err: HttpErrorResponse): IError => ({
   ...err.error,

@@ -4,7 +4,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { PageRequest } from '../interfaces/common';
 import { AccountService } from '../services/account.service';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type AccountStoreState = StoreState<IAccountTransaction, IAccountAll> & {
   selectedTransaction: ITransaction | undefined;
@@ -18,15 +19,7 @@ const initialState: AccountStoreState = {
 export const AccountStore = signalStore(
   withState(initialState),
   withMethods((store, accountService = inject(AccountService), translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -87,9 +80,6 @@ export const AccountStore = signalStore(
           .subscribe({
             next: (data) => patchState(store, {
               data,
-              response: undefined,
-              subErrors: undefined,
-              error: undefined,
               isLoading: false,
             }),
             error: patchError,
@@ -131,8 +121,6 @@ export const AccountStore = signalStore(
                 message: translate.instant('ACCOUNT.MONEY_ADDED', { id }),
                 path: `accounts/${ id }/transactions/${ response.id }`,
               },
-              selectedTransaction: undefined,
-              subErrors: undefined,
               isLoading: false,
             });
           },
@@ -154,8 +142,6 @@ export const AccountStore = signalStore(
               message: translate.instant('ACCOUNT.UPDATED', { id: response.id }),
               path: `accounts/customers/${ transaction.customerId }`,
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

@@ -1,17 +1,15 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { subscribeNotification } from '../store/actions/notification.actions';
-import { NotificationState } from '../store/reducers/notification.reducers';
 import { EnvService } from './env.service';
 import { FirebaseService } from './firebase.service';
+import { NotificationStore } from '../store/notification.store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessagingService {
   private readonly env: EnvService = inject(EnvService);
-  private readonly store: Store<NotificationState> = inject(Store<NotificationState>);
+  private readonly notificationStore = inject(NotificationStore);
   private readonly firebaseService = inject(FirebaseService);
 
   message$: Observable<any> = this.firebaseService.onMessageReceived();
@@ -25,7 +23,7 @@ export class MessagingService {
 
   updateToken(user: any, token: string) {
     if (this.firebaseService.isAuthenticated()) {
-      this.store.dispatch(subscribeNotification({ token }));
+      this.notificationStore.subscribeNotification(token);
       this.firebaseService.updateToken(user.id, token)
         .then(() => console.warn('DB updated'))
         .catch(console.error);

@@ -8,7 +8,8 @@ import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../treatment
 import { ColorService } from '../services/color.service';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export type TreatmentData =
   | { kind: 'pagination'; value: Pagination<ITreatmentGroupAll> }
@@ -29,15 +30,7 @@ export const TreatmentStore = signalStore(
   withState(initialState),
   withMethods((store, treatmentService = inject(TreatmentService), colorService = inject(ColorService),
     translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const patchSavingState = (): void => {
       patchState(store, {

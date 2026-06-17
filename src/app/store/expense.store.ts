@@ -5,7 +5,8 @@ import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense';
 import { Pagination } from '../interfaces/pagination';
 import { ExpenseService } from '../services/expense.service';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type ExpenseStoreState = StoreState<Pagination<IExpenseAll>, IExpenseAll> & {
   info: IExpenseInfo | undefined;
@@ -25,15 +26,7 @@ const initialState: ExpenseStoreState = {
 export const ExpenseStore = signalStore(
   withState(initialState),
   withMethods((store, expenseService = inject(ExpenseService), translate = inject(TranslateService)) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {

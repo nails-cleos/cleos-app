@@ -1,40 +1,73 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NotificationListComponent } from './notification-list.component';
-import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
-import { BehaviorSubject } from 'rxjs';
-import { INotification } from '../notification';
-import { deleteNotification, getNotificationsPage, readNotification } from '../../store/actions/notification.actions';
+import { INotification, INotificationDTO } from '../notification';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
+import { signal } from '@angular/core';
+import { Pagination } from '../../interfaces/pagination';
+import { NotificationStore } from '../../store/notification.store';
 
 describe('NotificationListComponent', () => {
   let component: NotificationListComponent;
   let fixture: ComponentFixture<NotificationListComponent>;
 
-  let notifications$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<any>>;
   let routerSpy: jasmine.SpyObj<Router>;
   let navigationSpy: jasmine.SpyObj<NavigationService>;
+  let notificationStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    readNotification: jasmine.Spy;
+    deleteNotification: jasmine.Spy;
+  };
 
   const mockNoteDate = getNowTimeZone();
   const mockTimestamp = mockNoteDate.getTime() / 1000;
+  const mockNotification: INotification = {
+    id: '1',
+    read: true,
+    navigation: '/test',
+    date: mockTimestamp,
+    deleted: false,
+    message: 'not 1',
+    notDate: mockNoteDate,
+  };
+  const mockPagination: Pagination<INotification> = {
+    number: 0,
+    totalPages: 1,
+    content: [mockNotification],
+    totalElements: 2,
+  };
+  const mockNotifications: INotificationDTO = {
+    unread: 1,
+    workDay: [],
+    page: mockPagination,
+  };
 
   beforeEach(() => {
-    notifications$ = new BehaviorSubject<any>(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    notificationStoreSpy = {
+      isLoading: signal(false),
+      data: signal<any>(mockNotifications),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      readNotification: jasmine.createSpy('readNotification'),
+      deleteNotification: jasmine.createSpy('deleteNotification'),
+    };
     routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/test/url' });
     navigationSpy = jasmine.createSpyObj('NavigationService', ['reload']);
 
-    storeSpy.pipe.and.returnValue(notifications$.asObservable());
 
     TestBed.configureTestingModule({
       imports: [NotificationListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NotificationStore, useValue: notificationStoreSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationSpy },
       ],
@@ -53,11 +86,10 @@ describe('NotificationListComponent', () => {
   });
 
   it('should dispatch getNotificationsPage on page effect', () => {
+    notificationStoreSpy.loadPage.calls.reset();
     component['page'].set(1);
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getNotificationsPage({ page: 1, sort: 'date', direction: 'desc', size: 10 }),
-    );
+    expect(notificationStoreSpy.loadPage).toHaveBeenCalledWith({ page: 1, sort: 'date', direction: 'desc', size: 10 });
   });
 
   it('should navigate if notification is read', () => {
@@ -72,7 +104,7 @@ describe('NotificationListComponent', () => {
     };
     component.notification(notif);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/test']);
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(readNotification({ id: notif.id }));
+    expect(notificationStoreSpy.readNotification).not.toHaveBeenCalledWith(notif.id);
   });
 
   it('should dispatch readNotification if notification is unread', () => {
@@ -87,7 +119,7 @@ describe('NotificationListComponent', () => {
     };
     component.notification(notif);
     expect(navigationSpy.reload).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(readNotification({ id: notif.id }));
+    expect(notificationStoreSpy.readNotification).toHaveBeenCalledWith(notif.id);
   });
 
   it('should mark notification as deleted and dispatch deleteNotification', fakeAsync(() => {
@@ -107,7 +139,7 @@ describe('NotificationListComponent', () => {
 
     const updated = component.notifications();
     expect(updated[0].deleted).toBeTrue();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteNotification({ notification: updated[0] }));
+    expect(notificationStoreSpy.deleteNotification).toHaveBeenCalledWith(updated[0]);
     expect(component.badge).toBe(0);
 
     tick(260);
@@ -136,34 +168,35 @@ describe('NotificationListComponent', () => {
     component.remove(5);
     tick(260);
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(deleteNotification({ notification: jasmine.anything() as any }));
+    expect(notificationStoreSpy.deleteNotification).not.toHaveBeenCalledWith(jasmine.anything() as any);
     expect(component.notifications()).toEqual([notif]);
     expect(component.badge).toBe(1);
   }));
 
-  it('should keep the badge for read notifications and request the next page when showMore is enabled', fakeAsync(() => {
-    const notif: INotification = {
-      id: '1',
-      read: true,
-      navigation: '/test',
-      date: mockTimestamp,
-      deleted: false,
-      message: 'not 1',
-      notDate: mockNoteDate,
-    };
-    component.notifications.set([notif]);
-    component.badge = 3;
-    component.showMore = true;
-    component['page'].set(2);
+  it('should keep the badge for read notifications and request the next page when showMore is enabled',
+    fakeAsync(() => {
+      const notif: INotification = {
+        id: '1',
+        read: true,
+        navigation: '/test',
+        date: mockTimestamp,
+        deleted: false,
+        message: 'not 1',
+        notDate: mockNoteDate,
+      };
+      component.notifications.set([notif]);
+      component.badge = 3;
+      component.showMore = true;
+      component['page'].set(2);
 
-    component.remove(0);
+      component.remove(0);
 
-    expect(component.badge).toBe(3);
-    expect(component['page']()).toBe(1);
+      expect(component.badge).toBe(3);
+      expect(component['page']()).toBe(1);
 
-    tick(260);
+      tick(260);
 
-    expect(component.notifications()).toEqual([]);
-  }));
+      expect(component.notifications()).toEqual([]);
+    }));
 
 });

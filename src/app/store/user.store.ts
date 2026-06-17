@@ -4,51 +4,39 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { type Subscription } from 'rxjs';
-import { IError, IResponseSuccess, PageRequest } from '../interfaces/common';
+import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { ToastType } from '../shared/toast/toast.model';
 import { Role, Token } from '../interfaces/token';
 import { IOverview, IUser, IUserAll } from '../user/user';
 import { UserService } from '../services/user.service';
 import { loginSuccess } from './actions/auth.actions';
-import { mapCrudHttpError } from './crud-signal-store';
+import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 import { getLocale } from '../util/helper';
 
-type UserNavigationParams = {
-  role?: Role;
-};
-
-type UserStoreState = {
-  response: IResponseSuccess | undefined;
-  pagination: Pagination<IUserAll> | undefined;
+type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
   users: IUserAll[] | undefined;
   overview: IOverview | undefined;
-  error: IError | undefined;
-  subErrors: IError[] | undefined;
-  selected: IUserAll | undefined;
-  userNavigationParams: UserNavigationParams | undefined;
-  isLoading: boolean;
 };
 
 const initialState: UserStoreState = {
-  response: undefined,
-  pagination: undefined,
+  ...createStoreInitialState<Pagination<IUserAll>, IUserAll>(),
   customers: undefined,
   users: undefined,
   overview: undefined,
-  error: undefined,
-  subErrors: undefined,
-  selected: undefined,
-  userNavigationParams: undefined,
-  isLoading: false,
 };
 
 export const UserStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((store, userService = inject(UserService), translate = inject(TranslateService), router = inject(Router),
-    ngrxStore = inject(Store)) => {
+  withMethods((
+    store,
+    userService = inject(UserService),
+    translate = inject(TranslateService),
+    router = inject(Router),
+    ngrxStore = inject(Store),
+  ) => {
     let loadPageSubscription: Subscription | undefined;
     let loadCustomersSubscription: Subscription | undefined;
     let loadDisabledUsersSubscription: Subscription | undefined;
@@ -137,10 +125,6 @@ export const UserStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      setNavigationParams(params: UserNavigationParams | undefined): void {
-        patchState(store, { userNavigationParams: params });
-      },
-
       selectAndNavigate(selected: IUserAll): void {
         patchState(store, {
           selected,
@@ -153,7 +137,7 @@ export const UserStore = signalStore(
       loadPage(request: PageRequest & { filter?: string }): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, {
-          pagination: undefined,
+          data: undefined,
           overview: undefined,
           subErrors: undefined,
           selected: undefined,
@@ -165,8 +149,8 @@ export const UserStore = signalStore(
         loadPageSubscription = userService
           .getUsersPage(request.page, request.sort, request.direction, request.size, request.filter)
           .subscribe({
-            next: (pagination) => patchState(store, {
-              pagination,
+            next: (data) => patchState(store, {
+              data,
               isLoading: false,
             }),
             error: patchError,
@@ -255,7 +239,7 @@ export const UserStore = signalStore(
         loadOverviewSubscription?.unsubscribe();
         patchState(store, {
           overview: undefined,
-          pagination: undefined,
+          data: undefined,
           subErrors: undefined,
           selected: undefined,
           response: undefined,
@@ -278,7 +262,8 @@ export const UserStore = signalStore(
 
         saveSubscription = userService.saveUser(user, id, role).subscribe({
           next: (response) => patchState(store, {
-            response: requestSuccess(response.key, response.response.name, `users/${ response.response.id }`, undefined,
+            response: requestSuccess(response.key, response.response.name, `users/${ response.response.id }`,
+              undefined,
               'success', false, 'users'),
             isLoading: false,
           }),

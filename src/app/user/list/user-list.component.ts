@@ -89,7 +89,7 @@ export class UserListComponent {
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = computed(() => this.userStore.isLoading());
-  dataSourceSignal = computed(() => this.userStore.pagination()?.content?.map((user: IUserAll) => {
+  dataSourceSignal = computed(() => this.userStore.data()?.content?.map((user: IUserAll) => {
     if (user.authorities) {
       const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
       return Object.assign({}, user, { missing });
@@ -97,7 +97,7 @@ export class UserListComponent {
     return user;
   }));
 
-  resultsLengthSignal = computed(() => this.userStore.pagination()?.totalElements || 0);
+  resultsLengthSignal = computed(() => this.userStore.data()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 

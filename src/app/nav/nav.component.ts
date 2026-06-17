@@ -4,7 +4,6 @@ import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, 
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../user/user';
 import { logOut, redirect } from '../store/actions/auth.actions';
-import { getNotificationsPage, readNotification } from '../store/actions/notification.actions';
 import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
@@ -24,7 +23,6 @@ import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
-import { getDataDeletedPipe, getDataReadPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of } from 'rxjs';
 import { selectGlobalError, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
@@ -45,6 +43,7 @@ import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatBadge } from '@angular/material/badge';
 import { UserStore } from '../store/user.store';
+import { NotificationStore } from '../store/notification.store';
 
 @Component({
   selector: 'app-nav',
@@ -63,6 +62,7 @@ export class NavComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly store: Store = inject(Store);
+  private readonly notificationStore = inject(NotificationStore);
   private readonly messagingService: MessagingService = inject(MessagingService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly navigationService: NavigationService = inject(NavigationService);
@@ -82,9 +82,6 @@ export class NavComponent {
   private user$ = this.store.pipe(getUserPipe);
   private menus$ = this.store.pipe(getMenusPipe);
   private redirect$ = this.store.pipe(getRedirectPipe);
-  private dataDeleted$ = this.store.pipe(getDataDeletedPipe);
-  private dataRead$ = this.store.pipe(getDataReadPipe);
-  private notification$ = this.store.pipe(getNotificationsPipe);
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -104,9 +101,9 @@ export class NavComponent {
   private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
   private redirectSignal = toSignal(this.redirect$);
   private menuItemsSignal = toSignal(this.menus$);
-  private dataDeletedSignal = toSignal(this.dataDeleted$);
-  private dataReadSignal = toSignal(this.dataRead$);
-  private notificationSignal = toSignal(this.notification$);
+  private notificationSignal = computed(() => this.notificationStore.data());
+  private dataDeletedSignal = computed(() => this.notificationStore.dataDeleted());
+  private dataReadSignal = computed(() => this.notificationStore.dataRead());
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
   private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
   private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
@@ -284,7 +281,7 @@ export class NavComponent {
       const redirectSignal = this.redirectSignal();
       const language = this.language();
       if (isAuthorized) {
-        this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
+        this.notificationStore.loadPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
       }
       if (this.router.url === `/${ language }`) {
         if (isAuthorized && !redirectSignal) {
@@ -403,7 +400,7 @@ export class NavComponent {
         }
         return value;
       }));
-      this.store.dispatch(readNotification({ id: notification.id }));
+      this.notificationStore.readNotification(notification.id);
     }
   };
 

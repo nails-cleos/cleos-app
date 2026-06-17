@@ -36,7 +36,6 @@ import { localStorageSync } from 'ngrx-store-localstorage';
 import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { userReducer } from './app/store/reducers/user.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
-import { notificationReducer } from './app/store/reducers/notification.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
@@ -47,7 +46,7 @@ import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from 
 import { routes } from './app/app.routes';
 import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
-import { provideAppDateAdapter, provideAppCalendar } from './app/util/adapter/app-date.provider';
+import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
 import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 import { DEFAULT_LOCALE } from './app/util/dates';
 
@@ -101,7 +100,6 @@ const providers = [
     auth: authReducer,
     user: userReducer,
     reservation: reservationReducer,
-    notification: notificationReducer,
     main: mainReducer,
     payment: paymentReducer,
     dashboard: dashboardReducer,

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserComponent } from './user.component';
 import { ICommon } from '../interfaces/common';
@@ -8,7 +8,7 @@ import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-user-create-page',
-  template: '<app-user [config]="config" (submitData)="submit($event)"/>',
+  template: '<app-user [config]="config" [role]="role()" (submitData)="submit($event)"/>',
   imports: [UserComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,10 +21,10 @@ export class UserCreatePageComponent {
   private readonly userStore = inject(UserStore);
   private readonly router = inject(Router);
 
+  role = computed(() => this.router.currentNavigation()?.extras.state?.['role']);
+
   constructor() {
     this.userStore.clean();
-    const role = this.router.currentNavigation()?.extras.state?.['role'];
-    this.userStore.setNavigationParams({ role });
   }
 
   submit(data: { user: IUser; role?: Role }) {

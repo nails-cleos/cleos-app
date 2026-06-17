@@ -63,7 +63,7 @@ describe('UserListComponent', () => {
       'setRole',
     ]);
     Object.assign(userStoreSpy, {
-      pagination: paginationSignal.asReadonly(),
+      data: paginationSignal.asReadonly(),
       response: responseSignal.asReadonly(),
       isLoading: isLoadingSignal.asReadonly(),
     });

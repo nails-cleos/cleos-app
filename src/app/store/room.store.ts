@@ -10,7 +10,8 @@ import { IRoom, IRoomAll, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice 
 import { IUserAll } from '../user/user';
 import { RoomService } from '../services/room.service';
 import { roomName } from '../util/helper';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type RoomStoreState = StoreState<Pagination<IRoom>, IRoomAll> & {
   services: IRoomService | undefined;
@@ -37,15 +38,7 @@ export const RoomStore = signalStore(
     translate = inject(TranslateService),
     router = inject(Router),
   ) => {
-    const patchError = (err: any): void => {
-      const error = mapCrudHttpError(err);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const patchSavingState = (): void => {
       patchState(store, {
