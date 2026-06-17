@@ -3,19 +3,11 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
-import { IRoomAll } from '../room/room';
 import { IUnavailable, IUnavailableAll } from '../unavailable/unavailable';
 import { UnavailableService } from '../services/unavailable.service';
 import { newDateTimestamp } from '../util/dates';
 import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
-
-export type UnavailableNavigationParams = {
-  date?: Date;
-  room?: IRoomAll;
-  startTime?: string;
-  showDuration: boolean;
-};
 
 type UpdateUnavailableArgs = {
   id: string;

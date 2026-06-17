@@ -2,7 +2,13 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, Sign
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUnavailable, IUnavailableAll, Unavailable, UnavailableForm } from './unavailable';
+import {
+  IUnavailable,
+  IUnavailableAll,
+  Unavailable,
+  UnavailableForm,
+  UnavailableNavigationParams,
+} from './unavailable';
 import { IUser, IUserAll } from '../user/user';
 import { map, startWith } from 'rxjs/operators';
 import {
@@ -37,7 +43,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatCheckbox } from '@angular/material/checkbox';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
-import { UnavailableNavigationParams, UnavailableStore } from '../store/unavailable.store';
+import { UnavailableStore } from '../store/unavailable.store';
 import { UserStore } from '../store/user.store';
 
 @Component({

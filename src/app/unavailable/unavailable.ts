@@ -1,8 +1,16 @@
 import { FormControl } from '@angular/forms';
 import { IUser, IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
-import { DEFAULT_LOCALE, createNewDate, getTimeNumber } from '../util/dates';
+import { createNewDate, DEFAULT_LOCALE, getTimeNumber } from '../util/dates';
 import { fieldChange, valueChange } from '../util/validators';
+import { IRoomAll } from '../room/room';
+
+export type UnavailableNavigationParams = {
+  date?: Date;
+  room?: IRoomAll;
+  startTime?: string;
+  showDuration: boolean;
+};
 
 export type UnavailableForm = {
   professional: FormControl<IUserAll | undefined>;

@@ -4,6 +4,11 @@ import { FrequencyEnum } from '../util/helper';
 import { backendFormatDate } from '../util/dates';
 import { fieldChange, valueChange } from '../util/validators';
 
+export type NoteNavigationParams = {
+  professional?: IUserAll;
+  date?: Date;
+};
+
 export type NoteForm = {
   description: FormControl<string>;
   professional: FormControl<IUserAll | undefined>;

@@ -5,7 +5,7 @@ import { combineLatestWith } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
 import { createDateFromString } from '../util/dates';
 import { requireMatch } from '../util/validators';
-import { INote, INoteAll, Note, NoteForm } from './note';
+import { INote, INoteAll, Note, NoteForm, NoteNavigationParams } from './note';
 import { IUser, IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
 import { map, startWith } from 'rxjs/operators';
@@ -34,6 +34,7 @@ import { UserStore } from '../store/user.store';
 export class NoteComponent {
   config = input.required<ICommon>();
   note = input<INoteAll | undefined>();
+  params = input<NoteNavigationParams>();
 
   submitData = output<INote>();
   deleteData = output();
@@ -42,8 +43,6 @@ export class NoteComponent {
   private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private navigationParams: Signal<{ professional?: IUserAll; date?: Date } | undefined> =
-    this.noteStore.navigationParams;
   private subErrorsSignal: Signal<IError[] | undefined> = this.noteStore.subErrors;
 
   allProfessionalsSignal: Signal<IUserAll[] | undefined> = this.userStore.professionals;
@@ -83,7 +82,7 @@ export class NoteComponent {
   constructor() {
     this.userStore.loadProfessionals();
     effect(() => {
-      const params = this.navigationParams();
+      const params = this.params();
       if (params) {
         this.getForm.professional.setValue(params.professional);
         this.getForm.date.setValue(params.date);

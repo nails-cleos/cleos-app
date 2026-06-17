@@ -5,8 +5,8 @@ import { Pagination } from '../interfaces/pagination';
 import { DocumentService } from '../services/document.service';
 import { getDateFormat } from '../util/dates';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
-import { SortDirection } from '@angular/material/sort';
 import { HttpErrorResponse } from '@angular/common/http';
+import { PageRequest } from '../interfaces/common';
 
 type DocumentStoreState = StoreState<Pagination<IDocument>>;
 
@@ -14,13 +14,9 @@ const initialState: DocumentStoreState = {
   ...createStoreInitialState<Pagination<IDocument>, never>(),
 };
 
-export type DocumentPageRequest = {
+export type DocumentPageRequest = PageRequest & {
   officeId: string;
   date: Date;
-  page: number;
-  sort: string;
-  direction: SortDirection;
-  size: number;
 };
 
 export type DocumentDownloadRequest = {

@@ -5,7 +5,13 @@ import { IUser, IUserAll } from '../../user/user';
 import { IRoomAll } from '../../room/room';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
-import { BlockAgendaForm, IUnavailable, IUnavailableAll, Unavailable } from '../unavailable';
+import {
+  BlockAgendaForm,
+  IUnavailable,
+  IUnavailableAll,
+  Unavailable,
+  UnavailableNavigationParams,
+} from '../unavailable';
 import {
   createNewDate,
   diffTime,
@@ -32,7 +38,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
-import { UnavailableNavigationParams, UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '../../store/unavailable.store';
 import { UserStore } from '../../store/user.store';
 
 @Component({

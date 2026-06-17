@@ -3,24 +3,11 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
 import { INote, INoteAll } from '../note/note';
-import { IUserAll } from '../user/user';
 import { NoteService } from '../services/note.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type NoteNavigationParams = {
-  professional?: IUserAll;
-  date?: Date;
-};
-
-type NoteStoreState = StoreState<INote, INoteAll> & {
-  navigationParams: NoteNavigationParams | undefined;
-};
-
-const initialState: NoteStoreState = {
-  ...createStoreInitialState<INote, INoteAll>(),
-  navigationParams: undefined,
-};
+const initialState = createStoreInitialState<INote, INoteAll>();
 
 export const NoteStore = signalStore(
   withState(initialState),
@@ -42,10 +29,6 @@ export const NoteStore = signalStore(
 
       clearError(): void {
         patchState(store, { error: undefined, subErrors: undefined });
-      },
-
-      setNavigationParams(params: NoteNavigationParams | undefined): void {
-        patchState(store, { navigationParams: params });
       },
 
       loadById(id: string): void {
