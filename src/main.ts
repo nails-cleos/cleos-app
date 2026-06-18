@@ -18,7 +18,6 @@ import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { AuthUserService } from './app/services/auth-user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
-import { MessagingService } from './app/services/messaging.service';
 import { TranslationLoaderResolver } from './app/util/translation.resolver';
 import { NavigationService } from './app/services/navigation.service';
 import { TokenService } from './app/services/token.service';
@@ -34,11 +33,9 @@ import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
 import { localStorageSync } from 'ngrx-store-localstorage';
 import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
-import { userReducer } from './app/store/reducers/user.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
-import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
 import { I18NEffects } from './app/store/effects/i18n.effects';
 import { provideEffects } from '@ngrx/effects';
@@ -98,11 +95,9 @@ const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
   provideStore({
     auth: authReducer,
-    user: userReducer,
     reservation: reservationReducer,
     main: mainReducer,
     payment: paymentReducer,
-    dashboard: dashboardReducer,
     i18n: i18nReducer,
   }, { metaReducers }),
   provideRouter(
@@ -136,7 +131,6 @@ const providers = [
   TokenService,
   NavigationService,
   TranslationLoaderResolver,
-  MessagingService,
   AsyncPipe,
   CookieService,
   TranslateService,

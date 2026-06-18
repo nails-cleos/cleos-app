@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { ICommon } from '../interfaces/common';
 import { IUnavailable } from './unavailable';
 import { UnavailableStore } from '../store/unavailable.store';
@@ -17,7 +16,6 @@ import { closest } from '../util/numbers';
 export class UnavailableCreatePageComponent {
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly authUserService = inject(AuthUserService);
-  private readonly router = inject(Router);
 
   config: ICommon = {
     title: 'UNAVAILABLE.TITLE',
@@ -25,7 +23,7 @@ export class UnavailableCreatePageComponent {
   };
 
   params = computed(() => {
-    const navigationState = this.router.currentNavigation()?.extras.state;
+    const navigationState = history.state;
     if (navigationState) {
       let startTime;
       let showDuration = false;

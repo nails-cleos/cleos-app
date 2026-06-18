@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ICommon } from '../../interfaces/common';
 import { IUnavailable } from '../unavailable';
@@ -17,7 +16,6 @@ import { closest } from '../../util/numbers';
 export class BlockAgendaCreatePageComponent {
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly authUserService = inject(AuthUserService);
-  private readonly router = inject(Router);
 
   config: ICommon = {
     title: 'UNAVAILABLE.BLOCK_AGENDA.TITLE',
@@ -25,7 +23,7 @@ export class BlockAgendaCreatePageComponent {
   };
 
   params = computed(() => {
-    const navigationState = this.router.currentNavigation()?.extras.state;
+    const navigationState = history.state;
     if (navigationState) {
       let startTime;
       let showDuration = false;

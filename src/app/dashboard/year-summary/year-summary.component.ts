@@ -3,7 +3,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { dateMonthYear, getNowTimeZone } from '../../util/dates';
-import { Store } from '@ngrx/store';
 import {
   IMonthlyExport,
   IQuarterSummary,
@@ -15,7 +14,6 @@ import {
   SummaryTotals,
   Total,
 } from '../dashboard';
-import { exportYearSummary, getYearSummary } from '../../store/actions/dashboard.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   allElementsHaveSameKeyFilterValue,
@@ -29,13 +27,6 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { YearComponent } from './year/year.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getYearExportPipe,
-  getYearNavigationParamsPipe,
-  getYearSummaryMapPipe,
-  isDashboardLoadingPipe,
-} from '../../store/selectors/dashboard.selectors';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { MatOption } from '@angular/material/core';
 import { provideYearDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
@@ -46,6 +37,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { DashboardStore } from '../../store/dashboard.store';
 
 type YearSummaryForm = {
   date: FormControl<Date>;
@@ -65,15 +57,10 @@ type YearSummaryForm = {
 export class YearSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
+  private readonly dashboardStore = inject(DashboardStore);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-
-  private yearSummaryMap$ = this.store.pipe(getYearSummaryMapPipe);
-  private yearExport$ = this.store.pipe(getYearExportPipe);
-  private navigationParams$ = this.store.pipe(getYearNavigationParamsPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
 
   private authUserSignal = this.authUserService.authUser;
 
@@ -81,8 +68,6 @@ export class YearSummaryComponent {
   private quarterSummariesSignal = signal<IQuarterSummary[] | undefined>(undefined);
   private sheetDataSignal = signal<IMonthlyExport[]>([]);
   private readonly exportSignal = signal<boolean>(false);
-  private navigationParams = toSignal(this.navigationParams$);
-  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private userName = computed(() => this.authUserSignal()?.displayName);
 
@@ -96,8 +81,8 @@ export class YearSummaryComponent {
 
   private timeZone = computed(() => getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
 
-  yearSummaryMapSignal = toSignal(this.yearSummaryMap$);
-  yearExportSignal = toSignal(this.yearExport$);
+  yearSummaryMapSignal = this.dashboardStore.yearSummaryMap;
+  yearExportSignal = this.dashboardStore.yearExport;
   private breakpointsSignal = toSignal(
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -157,11 +142,12 @@ export class YearSummaryComponent {
   language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params) {
+      const navigationState = history.state;
+      if (navigationState) {
         const now = getNowTimeZone(this.timeZone());
-        this.getForm.date.setValue(dateMonthYear(now.getMonth(), params.year || now.getFullYear()));
+        this.getForm.date.setValue(dateMonthYear(now.getMonth(), navigationState['year'] || now.getFullYear()));
       }
     });
 
@@ -359,11 +345,11 @@ export class YearSummaryComponent {
     this.quarterSummariesSignal.set(undefined);
     this.primaryRoomSignal.set(undefined);
     this.exportSignal.set(false);
-    this.store.dispatch(getYearSummary({ year }));
+    this.dashboardStore.getYearSummary(year);
   };
 
   private getExportData = (year: number): void => {
     this.isExportLoading.set(true);
-    this.store.dispatch(exportYearSummary({ year }));
+    this.dashboardStore.exportYearSummary(year);
   };
 }

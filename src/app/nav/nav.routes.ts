@@ -30,6 +30,7 @@ import { AwsLambdaService } from '../services/aws-lambda.service';
 import { DocumentService } from '../services/document.service';
 import { StatementService } from '../services/statement.service';
 import { InvoiceService } from '../services/invoice.service';
+import { DashboardService } from '../services/dashboard.service';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ColorStore } from '../store/color.store';
 import { CurrencyStore } from '../store/currency.store';
@@ -47,9 +48,11 @@ import { UnavailableStore } from '../store/unavailable.store';
 import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { UserStore } from '../store/user.store';
+import { DashboardStore } from '../store/dashboard.store';
 import { NotificationStore } from '../store/notification.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
+import { MessagingService } from '../services/messaging.service';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
@@ -70,6 +73,9 @@ const providers = [
   ExpenseService,
   NoteService,
   AccountService,
+  DashboardService,
+  MessagingService,
+  UserStore,
   CatalogueStore,
   ColorStore,
   CurrencyStore,
@@ -87,6 +93,7 @@ const providers = [
   UnavailableStore,
   TreatmentStore,
   RoomStore,
+  DashboardStore,
   provideGlobalFeedbackSource(UserStore),
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),

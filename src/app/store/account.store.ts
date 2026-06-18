@@ -18,7 +18,11 @@ const initialState: AccountStoreState = {
 
 export const AccountStore = signalStore(
   withState(initialState),
-  withMethods((store, accountService = inject(AccountService), translate = inject(TranslateService)) => {
+  withMethods((
+    store,
+    accountService = inject(AccountService),
+    translate = inject(TranslateService),
+  ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {

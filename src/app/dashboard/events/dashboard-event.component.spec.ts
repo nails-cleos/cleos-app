@@ -3,7 +3,7 @@ import { DashboardEventComponent } from './dashboard-event.component';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { DayViewSchedulerCalendarUtils, Professional } from './day-view-scheduler.component';
 import { IProfessionalEvent, IRoomEvents } from '../dashboard';
@@ -11,27 +11,36 @@ import { addDays, addHours } from 'date-fns';
 import { States } from '../../reservation/reservation';
 import { FrequencyEnum } from '../../util/helper';
 import { daysOfWeek, DEFAULT_LOCALE } from '../../util/dates';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
 import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { DashboardStore } from '../../store/dashboard.store';
+import { ReservationState } from '../../store/reducers/reservation.reducers';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
   let component: DashboardEventComponent;
 
-  let eventDashboard$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let dialogSpy: jasmine.Spy<any>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let storeSpy: jasmine.SpyObj<Store<DashboardState>>;
+  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let dashboardStoreSpy: {
+    dashboard: ReturnType<typeof signal>;
+    updateEvent: jasmine.Spy;
+    getMyEvent: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    navigationParams$ = new BehaviorSubject(undefined);
-    eventDashboard$ = new BehaviorSubject(undefined);
+    dashboardStoreSpy = {
+      dashboard: signal<any>(undefined),
+      updateEvent: jasmine.createSpy('updateEvent'),
+      getMyEvent: jasmine.createSpy('getMyEvent'),
+      clean: jasmine.createSpy('clean'),
+    };
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -39,22 +48,10 @@ describe('DashboardEventComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return eventDashboard$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     await TestBed.configureTestingModule({
       imports: [DashboardEventComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: Router, useValue: routerSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -75,15 +72,11 @@ describe('DashboardEventComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    fixture.destroy();
-    navigationParams$.complete();
-    eventDashboard$.complete();
-  });
+  afterEach(() => fixture.destroy());
 
   it('should dispatch Clean and GetMyEvent on init', () => {
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.anything()); // Clean
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.anything()); // GetMyEvent
+    expect(dashboardStoreSpy.clean).toHaveBeenCalled(); // Clean
+    expect(dashboardStoreSpy.getMyEvent).toHaveBeenCalledWith(jasmine.anything()); // GetMyEvent
   });
 
   it('should update professional reservations on professionalChanged', () => {
@@ -180,35 +173,36 @@ describe('DashboardEventComponent', () => {
     expect(result.title).toContain('€ 50.00');
   });
 
-  it('should keep expected finish for started reservations and hide finish in when scheduled end is in the past', () => {
-    const startedAt = new Date();
-    startedAt.setHours(10, 20, 0, 0);
-    const scheduledStart = new Date(startedAt);
-    scheduledStart.setHours(10, 0, 0, 0);
-    const scheduledEnd = new Date(startedAt);
-    scheduledEnd.setHours(11, 0, 0, 0);
-    const now = new Date(startedAt);
-    now.setHours(11, 30, 0, 0);
+  it('should keep expected finish for started reservations and hide finish in when scheduled end is in the past',
+    () => {
+      const startedAt = new Date();
+      startedAt.setHours(10, 20, 0, 0);
+      const scheduledStart = new Date(startedAt);
+      scheduledStart.setHours(10, 0, 0, 0);
+      const scheduledEnd = new Date(startedAt);
+      scheduledEnd.setHours(11, 0, 0, 0);
+      const now = new Date(startedAt);
+      now.setHours(11, 30, 0, 0);
 
-    const event: any = {
-      id: '1',
-      title: '<b>Late Customer</b>',
-      start: scheduledStart,
-      end: scheduledEnd,
-      meta: {
-        state: States.started,
-        started: startedAt,
-      },
-    };
+      const event: any = {
+        id: '1',
+        title: '<b>Late Customer</b>',
+        start: scheduledStart,
+        end: scheduledEnd,
+        meta: {
+          state: States.started,
+          started: startedAt,
+        },
+      };
 
-    const result = component['createTitle'](event, now);
+      const result = component['createTitle'](event, now);
 
-    expect(result.title).toContain('id="elapsed">1h 10 min.');
-    expect(result.title).not.toContain('Elapsed +');
-    expect(result.title).toContain('id="projected-finish">11:20');
-    expect(result.title).not.toContain('Finish in');
-    expect(result.title).not.toContain('id="finish"');
-  });
+      expect(result.title).toContain('id="elapsed">1h 10 min.');
+      expect(result.title).not.toContain('Elapsed +');
+      expect(result.title).toContain('id="projected-finish">11:20');
+      expect(result.title).not.toContain('Finish in');
+      expect(result.title).not.toContain('id="finish"');
+    });
 
   it('should show early start and finish-in details for started reservations still in progress', () => {
     const startedAt = new Date();
@@ -381,7 +375,7 @@ describe('DashboardEventComponent', () => {
     end.setHours(23, 59, 59, 999);
     component.beforeMonthViewRender({ period: { start, end } });
 
-    eventDashboard$.next(dashboard);
+    dashboardStoreSpy.dashboard.set(dashboard);
     fixture.detectChanges();
 
     expect(component.calendar.calendarEvents.length).toBe(6);
@@ -440,9 +434,7 @@ describe('DashboardEventComponent', () => {
     const addFrequencySpy = jasmine.createSpy('addFrequency');
     const addEventSpy = spyOn(component.calendar, 'addEvent');
     const start = new Date(2026, 3, 10, 0, 0, 0, 0);
-    const calendarStart = new Date(2026, 3, 15, 0, 0, 0, 0);
-
-    component.calendar.calendarStart = calendarStart;
+    component.calendar.calendarStart = new Date(2026, 3, 15, 0, 0, 0, 0);
     component.calendar.recurringEvent = { addFrequency: addFrequencySpy } as any;
 
     component['addNoteEvent']({
@@ -500,7 +492,8 @@ describe('DashboardEventComponent', () => {
     }
     startAction.onClick({ event, sourceEvent: {} as MouseEvent });
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation('reservation-3', undefined, true, component.viewDate()));
+    expect(storeSpy.dispatch)
+      .toHaveBeenCalledWith(startReservation('reservation-3', undefined, true, component.viewDate()));
   });
 
   it('should return empty status label when no state is provided', () => {

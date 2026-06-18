@@ -3,7 +3,6 @@ import { NoteComponent } from './note.component';
 import { NoteStore } from '../store/note.store';
 import { INote } from './note';
 import { ICommon } from '../interfaces/common';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-note-create-page',
@@ -18,10 +17,9 @@ export class NoteCreatePageComponent {
   };
 
   private readonly noteStore = inject(NoteStore);
-  private readonly router: Router = inject(Router);
 
   params = computed(() => {
-    const navigationState = this.router.currentNavigation()?.extras.state;
+    const navigationState = history.state;
     if (navigationState) {
       return { professional: navigationState['professional'], date: navigationState['date'] };
     }

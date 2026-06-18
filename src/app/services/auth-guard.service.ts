@@ -22,8 +22,6 @@ export class PermissionsService {
 
   private currentUser = toSignal(this.user$);
 
-  private readonly data: any = this.router.currentNavigation()?.extras?.state;
-
   constructor() {
   }
 
@@ -48,7 +46,7 @@ export class PermissionsService {
       }
     }
     // not logged in so redirect to auth page with the return url and extra data
-    const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: this.data }));
+    const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: history.state }));
     this.router.navigate([this.translate.getCurrentLang(), 'auth'], { queryParams: { state: queryParams } });
 
     return false;

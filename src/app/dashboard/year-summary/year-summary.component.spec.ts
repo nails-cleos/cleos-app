@@ -2,17 +2,16 @@
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard';
 import fs from 'file-saver';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { By } from '@angular/platform-browser';
 import { YearComponent } from './year/year.component';
+import { DashboardStore } from '../../store/dashboard.store';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
@@ -20,22 +19,27 @@ describe('YearSummaryComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<DashboardState>>;
+  let dashboardStoreSpy: {
+    yearSummaryMap: ReturnType<typeof signal>;
+    yearExport: ReturnType<typeof signal>;
+    getYearSummary: jasmine.Spy;
+    exportYearSummary: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let saveAsSpy: jasmine.Spy;
-  let yearSummaryMap$: BehaviorSubject<any>;
-  let yearExport$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    yearSummaryMap$ = new BehaviorSubject(undefined);
-    yearExport$ = new BehaviorSubject(undefined);
-    navigationParams$ = new BehaviorSubject(undefined);
-    isLoading$ = new BehaviorSubject(false);
+    dashboardStoreSpy = {
+      yearSummaryMap: signal<any>(undefined),
+      yearExport: signal<any>(undefined),
+      getYearSummary: jasmine.createSpy('getYearSummary'),
+      exportYearSummary: jasmine.createSpy('exportYearSummary'),
+      clean: jasmine.createSpy('clean'),
+    };
     breakpoint$ = new BehaviorSubject({
       matches: false,
       breakpoints: {
@@ -45,7 +49,6 @@ describe('YearSummaryComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
@@ -56,21 +59,12 @@ describe('YearSummaryComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
-    const storeStreams = [
-      yearSummaryMap$,
-      yearExport$,
-      navigationParams$,
-      isLoading$,
-    ];
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(
-      () => storeStreams[pipeCallIndex++]?.asObservable() ?? new BehaviorSubject(undefined).asObservable());
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -85,13 +79,7 @@ describe('YearSummaryComponent', () => {
     });
   });
 
-  afterEach(() => {
-    yearSummaryMap$.complete();
-    yearExport$.complete();
-    navigationParams$.complete();
-    isLoading$.complete();
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -373,7 +361,7 @@ describe('YearSummaryComponent', () => {
         monthSummaries: [{ month: 1, total: [] }],
       }];
 
-      yearSummaryMap$.next(new Map([
+      dashboardStoreSpy.yearSummaryMap.set(new Map([
         [room, { quarterSummaries }],
       ]));
       fixture.detectChanges();

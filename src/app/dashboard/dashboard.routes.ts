@@ -8,7 +8,6 @@ import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.compo
 import { DashboardEventComponent } from './events/dashboard-event.component';
 import { DashboardService } from '../services/dashboard.service';
 import { provideEffects } from '@ngrx/effects';
-import { DashboardEffects } from '../store/effects/dashboard.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
 import { PaymentService } from '../services/payment.service';
@@ -18,9 +17,6 @@ import { UserService } from '../services/user.service';
 import { AdditionalService } from '../services/additional.service';
 import { TrackingService } from '../services/tracking.service';
 import { ColorService } from '../services/color.service';
-import { provideState } from '@ngrx/store';
-import { DASHBOARD_FEATURE_KEY, dashboardReducer } from '../store/reducers/dashboard.reducers';
-import { DashboardNavigationEffects } from './dashboard-navigation.effects';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
@@ -34,8 +30,7 @@ const providers = [
   AdditionalService,
   TrackingService,
   ColorService,
-  provideState(DASHBOARD_FEATURE_KEY, dashboardReducer),
-  provideEffects(DashboardEffects, ReservationEffects, DashboardNavigationEffects),
+  provideEffects(ReservationEffects),
 ];
 
 const children: Routes = [

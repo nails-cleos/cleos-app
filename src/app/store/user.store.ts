@@ -11,9 +11,10 @@ import { Role, Token } from '../interfaces/token';
 import { IOverview, IUser, IUserAll } from '../user/user';
 import { UserService } from '../services/user.service';
 import { loginSuccess } from './actions/auth.actions';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { getLocale } from '../util/helper';
 import { IRoomAll } from '../room/room';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
@@ -79,16 +80,7 @@ export const UserStore = signalStore(
       resendTokenSubscription?.unsubscribe();
       mergeUsersSubscription?.unsubscribe();
     };
-
-    const patchError = (err: unknown): void => {
-      const error = mapCrudHttpError(err as any);
-      patchState(store, {
-        error,
-        subErrors: error.subErrors,
-        response: undefined,
-        isLoading: false,
-      });
-    };
+    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const patchMutationStart = (): void => {
       patchState(store, {

@@ -54,11 +54,7 @@ describe('UnavailableCreatePageComponent', () => {
   it('should expose params from navigation state', () => {
     const date = new Date('2024-01-01T10:10:00Z');
     const room = { id: 'room-1' } as any;
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: { date, room },
-      },
-    } as any);
+    history.pushState({ date, room }, '', '/...');
 
     fixture = TestBed.createComponent(UnavailableCreatePageComponent);
     component = fixture.componentInstance;

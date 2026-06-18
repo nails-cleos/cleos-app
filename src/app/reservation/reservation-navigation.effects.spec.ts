@@ -1,9 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideMockActions } from '@ngrx/effects/testing';
 import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
-import { ReplaySubject, firstValueFrom } from 'rxjs';
+import { firstValueFrom, ReplaySubject } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { getOptions } from '../store/actions/payment.actions';
 import {
@@ -23,18 +22,14 @@ import { ReservationEditPageComponent } from './reservation-edit-page.component'
 describe('ReservationNavigationEffects', () => {
   let actions$: ReplaySubject<Action>;
   let effects: ReservationNavigationEffects;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
     actions$ = new ReplaySubject<Action>(1);
-    routerSpy = jasmine.createSpyObj('Router', ['currentNavigation']);
-    routerSpy.currentNavigation.and.returnValue(null);
 
     TestBed.configureTestingModule({
       providers: [
         ReservationNavigationEffects,
         provideMockActions(() => actions$),
-        { provide: Router, useValue: routerSpy },
       ],
     });
 
@@ -70,13 +65,7 @@ describe('ReservationNavigationEffects', () => {
   });
 
   it('should clean reservation and load payment options for reservation complete route', async () => {
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: {
-          isDashboard: true,
-        },
-      },
-    } as any);
+    history.replaceState({ isDashboard: true }, '', '/...');
 
     actions$.next(routerNavigated(ReservationCompleteComponent, {
       id: 'res-1',
@@ -99,22 +88,18 @@ describe('ReservationNavigationEffects', () => {
 
   it('should restore reservation params from navigation state on base reservation route', async () => {
     const date = new Date('2026-04-24T10:00:00Z');
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: {
-          isDashboard: true,
-          skip: true,
-          customerId: 'customer-1',
-          treatmentId: 'treatment-1',
-          groupId: 'group-1',
-          roomId: 'room-1',
-          professionalId: 'professional-1',
-          additionalIds: ['add-1', 'add-2'],
-          date,
-          discountId: 'discount-1',
-        },
-      },
-    } as any);
+    history.replaceState({
+      isDashboard: true,
+      skip: true,
+      customerId: 'customer-1',
+      treatmentId: 'treatment-1',
+      groupId: 'group-1',
+      roomId: 'room-1',
+      professionalId: 'professional-1',
+      additionalIds: ['add-1', 'add-2'],
+      date,
+      discountId: 'discount-1',
+    }, '', '/...');
 
     actions$.next(routerNavigated(ReservationCreatePageComponent));
 
@@ -142,13 +127,7 @@ describe('ReservationNavigationEffects', () => {
   });
 
   it('should set detail params step on reservation detail route', async () => {
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: {
-          step: 3,
-        },
-      },
-    } as any);
+    history.replaceState({ step: 3 }, '', '/...');
 
     actions$.next(routerNavigated(ReservationDetailComponent, { id: 'res-2' }));
 
@@ -165,21 +144,17 @@ describe('ReservationNavigationEffects', () => {
 
   it('should restore edit params on reservation editor route', async () => {
     const date = new Date('2026-04-24T10:00:00Z');
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: {
-          customerId: 'customer-1',
-          isDashboard: true,
-          treatmentId: 'treatment-1',
-          groupId: 'group-1',
-          roomId: 'room-1',
-          professionalId: 'professional-1',
-          skip: true,
-          date,
-          additionalIds: ['add-1'],
-        },
-      },
-    } as any);
+    history.replaceState({
+      customerId: 'customer-1',
+      isDashboard: true,
+      treatmentId: 'treatment-1',
+      groupId: 'group-1',
+      roomId: 'room-1',
+      professionalId: 'professional-1',
+      skip: true,
+      date,
+      additionalIds: ['add-1'],
+    }, '', '/...');
 
     actions$.next(routerNavigated(ReservationEditPageComponent, { id: 'res-2' }));
 

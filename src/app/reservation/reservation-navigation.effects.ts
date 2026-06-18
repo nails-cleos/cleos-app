@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
@@ -23,7 +22,6 @@ import { SearchComponent } from './search/search.component';
 @Injectable()
 export class ReservationNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
-  private readonly router: Router = inject(Router);
 
   loadCalendarPage$ = createEffect(() =>
     this.actions$.pipe(
@@ -38,7 +36,7 @@ export class ReservationNavigationEffects {
       ofType(ROUTER_NAVIGATED),
       navigation(ReservationCompleteComponent, {
         run: () => {
-          const navigationState = this.router.currentNavigation()?.extras.state;
+          const navigationState = history.state;
 
           return [
             cleanReservation(),
@@ -72,7 +70,7 @@ export class ReservationNavigationEffects {
       ofType(ROUTER_NAVIGATED),
       navigation(ReservationCreatePageComponent, {
         run: () => {
-          const navigationState = this.router.currentNavigation()?.extras.state;
+          const navigationState = history.state;
           const actions: Action[] = [cleanReservation(), getCustomers(), getOptions()];
           if (navigationState) {
             actions.push(this.toReservationParamsAction(navigationState));
@@ -87,7 +85,7 @@ export class ReservationNavigationEffects {
       ofType(ROUTER_NAVIGATED),
       navigation(ReservationEditPageComponent, {
         run: () => {
-          const navigationState = this.router.currentNavigation()?.extras.state;
+          const navigationState = history.state;
 
           const actions: Action[] = [cleanReservation(), getOptions()];
           if (navigationState) {
@@ -104,7 +102,7 @@ export class ReservationNavigationEffects {
       ofType(ROUTER_NAVIGATED),
       navigation(ReservationDetailComponent, {
         run: () => {
-          const navigationState = this.router.currentNavigation()?.extras.state;
+          const navigationState = history.state;
 
           return [
             cleanReservation(),

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { concatMap, delay, filter, map, switchMap, tap } from 'rxjs/operators';
+import { concatMap, delay, filter, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import {
   approveReservation,
@@ -80,9 +80,9 @@ import {
   IReservation,
   IReservationAll,
   IRoomReservation,
-  States,
   ITracking,
   IUpcomingAll,
+  States,
 } from '../../reservation/reservation';
 import { IUserAll } from '../../user/user';
 import { ITreatmentDiscountDTO } from '../../treatment/treatment';
@@ -94,7 +94,7 @@ import { IReview } from '../../me/reservation/list/review';
 import { IColorAll } from '../../color/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
-import { getMyEvent } from '../actions/dashboard.actions';
+import { DashboardStore } from '../dashboard.store';
 
 @Injectable()
 export class ReservationEffects {
@@ -109,6 +109,7 @@ export class ReservationEffects {
   private readonly trackingService: TrackingService = inject(TrackingService);
   private readonly paymentService: PaymentService = inject(PaymentService);
   private readonly colorService: ColorService = inject(ColorService);
+  private readonly dashboardStore = inject(DashboardStore);
 
   getAllPage$ = createEffect(() => this.actions.pipe(
     ofType(getPage),
@@ -318,7 +319,7 @@ export class ReservationEffects {
   dashboardEventsRefresh$ = createEffect(() => this.actions.pipe(
     ofType(stateSuccess),
     filter(({ isDashboard, state }) => !!isDashboard && [States.started, States.completed].includes(state!)),
-    map(({ dashboardDate }) => getMyEvent({ date: dashboardDate ?? new Date() })),
+    tap(({ dashboardDate }) => this.dashboardStore.getMyEvent(dashboardDate ?? new Date())),
   ));
 
   changeCustomer$ = createEffect(() => this.actions.pipe(

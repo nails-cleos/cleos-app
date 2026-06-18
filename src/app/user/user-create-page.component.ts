@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { UserComponent } from './user.component';
 import { ICommon } from '../interfaces/common';
 import { IUser } from './user';
@@ -19,9 +18,8 @@ export class UserCreatePageComponent {
   };
 
   private readonly userStore = inject(UserStore);
-  private readonly router = inject(Router);
 
-  role = computed(() => this.router.currentNavigation()?.extras.state?.['role']);
+  role = computed(() => history.state?.['role']);
 
   constructor() {
     this.userStore.clean();

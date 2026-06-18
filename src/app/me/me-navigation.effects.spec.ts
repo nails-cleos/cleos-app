@@ -1,11 +1,10 @@
 /* eslint-disable camelcase */
 
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { provideMockActions } from '@ngrx/effects/testing';
-import { RouterNavigatedAction, ROUTER_NAVIGATED } from '@ngrx/router-store';
+import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
-import { ReplaySubject, firstValueFrom } from 'rxjs';
+import { firstValueFrom, ReplaySubject } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { OverviewComponent } from '../user/overview/overview.component';
 import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
@@ -29,18 +28,14 @@ import { MeNavigationEffects } from './me-navigation.effects';
 describe('MeNavigationEffects', () => {
   let actions$: ReplaySubject<Action>;
   let effects: MeNavigationEffects;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
     actions$ = new ReplaySubject<Action>(1);
-    routerSpy = jasmine.createSpyObj('Router', ['currentNavigation']);
-    routerSpy.currentNavigation.and.returnValue(null);
 
     TestBed.configureTestingModule({
       providers: [
         MeNavigationEffects,
         provideMockActions(() => actions$),
-        { provide: Router, useValue: routerSpy },
       ],
     });
 
@@ -115,17 +110,13 @@ describe('MeNavigationEffects', () => {
 
   it('should restore reservation params on the me reservation create page', async () => {
     const date = new Date('2026-06-01T10:00:00Z');
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: {
-          treatmentId: 'treat-1',
-          roomId: 'room-1',
-          professionalId: 'pro-1',
-          date,
-          discountId: 'discount-1',
-        },
-      },
-    } as any);
+    history.replaceState({
+      treatmentId: 'treat-1',
+      roomId: 'room-1',
+      professionalId: 'pro-1',
+      date,
+      discountId: 'discount-1',
+    }, '', '/...');
 
     actions$.next(routerNavigated(MeReservationCreatePageComponent));
 

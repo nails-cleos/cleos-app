@@ -47,7 +47,7 @@ export class TransactionDetailComponent {
   });
 
   dateFormat = this.translate.getCurrentLang();
-  step?: number = this.router.currentNavigation()?.extras.state?.step;
+  step?: number = history.state?.step;
   language = this.translate.getCurrentLang();
 
   constructor() {

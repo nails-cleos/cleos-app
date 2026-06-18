@@ -1,5 +1,4 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
@@ -10,11 +9,7 @@ import {
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/actions/reservation.actions';
-import {
-  cleanPayment,
-  getOptions,
-  setPaymentResultParams,
-} from '../store/actions/payment.actions';
+import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
 import { getRouteParams } from '../util/router-state.utils';
 import { navigation } from '../util/router-navigation.operator';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
@@ -30,7 +25,6 @@ import { ReservationListComponent } from './reservation/list/reservation-list.co
 @Injectable()
 export class MeNavigationEffects {
   private readonly actions$: Actions = inject(Actions);
-  private readonly router: Router = inject(Router);
 
   loadDiscountsPage$ = createEffect(() =>
     this.actions$.pipe(
@@ -111,7 +105,7 @@ export class MeNavigationEffects {
       ofType(ROUTER_NAVIGATED),
       navigation(MeReservationCreatePageComponent, {
         run: () => {
-          const navigationState = this.router.currentNavigation()?.extras.state;
+          const navigationState = history.state;
           const actions: Action[] = [cleanReservation(), getOptions()];
 
           if (this.hasReservationParams(navigationState)) {

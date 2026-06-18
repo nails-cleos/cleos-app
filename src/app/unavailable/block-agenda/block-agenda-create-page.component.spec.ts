@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { BlockAgendaCreatePageComponent } from './block-agenda-create-page.component';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { IUnavailableAll } from '../unavailable';
@@ -14,7 +13,6 @@ describe('BlockAgendaCreatePageComponent', () => {
     clean: jasmine.Spy;
     createBlockAgenda: jasmine.Spy;
   };
-  let routerSpy: jasmine.SpyObj<Router>;
 
   const mockUnavailable: Partial<IUnavailableAll> = {
     duration: '00:30',
@@ -25,14 +23,11 @@ describe('BlockAgendaCreatePageComponent', () => {
       clean: jasmine.createSpy('clean'),
       createBlockAgenda: jasmine.createSpy('createBlockAgenda'),
     };
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-    routerSpy.currentNavigation.and.returnValue(undefined as any);
 
     await TestBed.configureTestingModule({
       imports: [BlockAgendaCreatePageComponent],
       providers: [
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
       ],
     }).overrideTemplate(BlockAgendaCreatePageComponent, '')
@@ -53,14 +48,12 @@ describe('BlockAgendaCreatePageComponent', () => {
   it('should expose params from navigation state', () => {
     const date = new Date('2024-01-01T10:10:00Z');
     const room = { id: 'room-1' } as any;
-    routerSpy.currentNavigation.and.returnValue({
-      extras: {
-        state: { date, room },
-      },
-    } as any);
+    history.pushState({ date, room }, '', '/...');
 
     fixture = TestBed.createComponent(BlockAgendaCreatePageComponent);
     component = fixture.componentInstance;
+
+    fixture.detectChanges();
 
     expect(component.params()).toEqual(jasmine.objectContaining({
       date,

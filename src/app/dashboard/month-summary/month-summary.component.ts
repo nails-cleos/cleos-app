@@ -11,14 +11,7 @@ import {
   monthViewTitle,
   newDateTimestamp,
 } from '../../util/dates';
-import { Store } from '@ngrx/store';
-import {
-  getMonthlyNavigationParamsPipe,
-  getMonthlySummaryMapPipe,
-  isDashboardLoadingPipe,
-} from '../../store/selectors/dashboard.selectors';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { getMonthlySummary, updateMonthlySummary } from '../../store/actions/dashboard.actions';
 import {
   AmountFormat,
   ExpenseType,
@@ -47,7 +40,6 @@ import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthl
 import { FilterByPipe } from '../../pipes/filterBy.pipe';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { TwoDigitsDirective } from '../../directives/two-digits.directive';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
@@ -74,6 +66,7 @@ import {
   NgTemplateOutlet,
   SlicePipe,
 } from '@angular/common';
+import { DashboardStore } from '../../store/dashboard.store';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -97,18 +90,12 @@ type MonthlySummaryForm = {
 export class MonthSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
+  private readonly dashboardStore = inject(DashboardStore);
   private readonly router: Router = inject(Router);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private monthlySummaryMap$ = this.store.pipe(getMonthlySummaryMapPipe);
-  private navigationParams$ = this.store.pipe(getMonthlyNavigationParamsPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
-
   private authUserSignal = this.authUserService.authUser;
-  private navigationParams = toSignal(this.navigationParams$);
-  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private selectedRoomSignal = signal<ISummaryRoom | 'All' | undefined>(undefined);
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
@@ -135,7 +122,7 @@ export class MonthSummaryComponent {
   private dateSignal = toSignal(this.getForm.date.valueChanges);
   private amountFormatSignal = toSignal(this.getForm.amountFormat.valueChanges);
 
-  monthlySummaryMapSignal = toSignal(this.monthlySummaryMap$);
+  monthlySummaryMapSignal = this.dashboardStore.monthlySummaryMap;
 
   showCash = computed(() => this.authUserSignal().showCash);
   stepSignal = signal<number>(0);
@@ -162,11 +149,12 @@ export class MonthSummaryComponent {
   readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params) {
-        this.stepSignal.set(params?.step || 0);
-        const dateTime = params.date;
+      const dateTime = history.state?.date;
+      const step = history.state?.step || 0;
+      if (dateTime) {
+        this.stepSignal.set(step);
         let month;
         let year;
         if (dateTime instanceof Date) {
@@ -591,15 +579,13 @@ export class MonthSummaryComponent {
         }));
         break;
     }
-    return this.store.dispatch(
-      updateMonthlySummary({
-        date: getDateFormat(this.getForm.date.value),
-        summaryType: totalTypes.type,
-        totals: totals,
-        summaries: summaries,
-        roomId: this.roomId()!,
-        step: this.stepSignal(),
-      }),
+    return this.dashboardStore.updateMonthlySummary(
+      getDateFormat(this.getForm.date.value),
+      totalTypes.type,
+      totals,
+      summaries,
+      this.roomId(),
+      this.stepSignal(),
     );
   };
 
@@ -643,7 +629,7 @@ export class MonthSummaryComponent {
     this.reservationMonth = new TotalType(SummaryType.payment);
     this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
     this.cashMonth = new TotalType(SummaryType.cash);
-    this.store.dispatch(getMonthlySummary({ date }));
+    this.dashboardStore.getMonthlySummary(date);
   };
 
   private calculateReservationSummary = (): void => {

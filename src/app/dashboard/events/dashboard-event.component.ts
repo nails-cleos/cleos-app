@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, v
 import { CalendarDatePipe, CalendarEvent } from 'angular-calendar';
 import {
   addPeriod,
-  DEFAULT_LOCALE,
   createNewDate,
   dateToTimestamp,
+  DEFAULT_LOCALE,
   endOfPeriod,
   getCurrentTimeZone,
   getDurationOrUndefined,
@@ -22,7 +22,6 @@ import {
 import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../dashboard';
-import { getMyEvent, updateEvent } from '../../store/actions/dashboard.actions';
 import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import {
   DayViewSchedulerCalendarUtils,
@@ -43,13 +42,11 @@ import { CounterComponent } from '../../util/counter/counter.component';
 import { findStateColor } from '../../util/theme';
 import { DataEvent, IDataEvent } from '../../util/event';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
-import { getDashboardNavigationParamsPipe, getEventDashboardPipe } from '../../store/selectors/dashboard.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatInput } from '@angular/material/input';
+import { DashboardStore } from '../../store/dashboard.store';
 
 @Component({
   selector: 'app-dashboard',
@@ -62,18 +59,15 @@ import { MatInput } from '@angular/material/input';
 })
 export class DashboardEventComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<DashboardState | ReservationState> = inject(Store<DashboardState | ReservationState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly dashboardStore = inject(DashboardStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly router: Router = inject(Router);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   picker = viewChild(MatDatepicker);
 
-  private navigationParams$ = this.store.pipe(getDashboardNavigationParamsPipe);
-  private eventDashboard$ = this.store.pipe(getEventDashboardPipe);
-
-  private navigationParams = toSignal(this.navigationParams$);
-  private dashboardSignal = toSignal(this.eventDashboard$);
+  private dashboardSignal = this.dashboardStore.dashboard;
   private authUserSignal = this.authUserService.authUser;
 
   private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
@@ -101,17 +95,18 @@ export class DashboardEventComponent {
   private calendarReady = signal(false);
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params?.date) {
-        this.viewDate.set(params.date);
+      const date = history.state?.date;
+      if (date) {
+        this.viewDate.set(date);
       }
     });
 
     effect(() => {
       const date = this.viewDate();
       this.calendar.resetEvents();
-      this.store.dispatch(getMyEvent({ date }));
+      this.dashboardStore.getMyEvent(date);
     });
 
     effect(() => {
@@ -616,7 +611,7 @@ export class DashboardEventComponent {
     if (professionalId) {
       reservation.professionalId = professionalId;
     }
-    this.store.dispatch(updateEvent({ reservationId: id, reservation }));
+    this.dashboardStore.updateEvent(id, reservation);
   };
 
   private changeDate = (date: Date): void => {
