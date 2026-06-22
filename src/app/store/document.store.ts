@@ -4,7 +4,7 @@ import { IDocument } from '../document/document';
 import { Pagination } from '../interfaces/pagination';
 import { DocumentService } from '../services/document.service';
 import { getDateFormat } from '../util/dates';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { cleanCrudCreate, createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageRequest } from '../interfaces/common';
 
@@ -52,13 +52,7 @@ export const DocumentStore = signalStore(
       },
 
       loadPage({ officeId, date, page, sort, direction, size }: DocumentPageRequest): void {
-        patchState(store, {
-          data: undefined,
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         documentService.getDocumentsPage(officeId, getDateFormat(date), page, sort, direction, size).subscribe({
           next: (data) => patchState(store, { data, isLoading: false }),
@@ -67,35 +61,19 @@ export const DocumentStore = signalStore(
       },
 
       download({ id, fileName }: DocumentDownloadRequest): void {
-        patchState(store, {
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         documentService.view(id).subscribe({
-          next: (blob) => patchState(store, {
-            response: { blob, fileName },
-            isLoading: false,
-          }),
+          next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
           error: patchError,
         });
       },
 
       downloadZip({ officeId, date, fileName }: DocumentZipRequest): void {
-        patchState(store, {
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         documentService.documentDownloadZip(officeId, getDateFormat(date)).subscribe({
-          next: (blob) => patchState(store, {
-            response: { blob, fileName },
-            isLoading: false,
-          }),
+          next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
           error: patchError,
         });
       },

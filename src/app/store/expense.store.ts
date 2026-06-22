@@ -5,7 +5,14 @@ import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense';
 import { Pagination } from '../interfaces/pagination';
 import { ExpenseService } from '../services/expense.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type ExpenseStoreState = StoreState<Pagination<IExpenseAll>, IExpenseAll> & {
@@ -46,50 +53,25 @@ export const ExpenseStore = signalStore(
       },
 
       loadPage({ roomId, sort, direction, page, size, filter, dateFilter }: ExpensePageRequest): void {
-        patchState(store, {
-          data: undefined,
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter).subscribe({
-          next: (data) => patchState(store, {
-            data,
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadInfo(roomId: string): void {
-        patchState(store, {
-          info: undefined,
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        patchState(store, { info: undefined, isLoading: true });
 
         expenseService.getAllExpensesInfo(roomId).subscribe({
-          next: (info) => patchState(store, {
-            info,
-            isLoading: false,
-          }),
+          next: (info) => patchState(store, { info, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(roomId: string, id: string): void {
-        patchState(store, {
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: false,
-        });
+        patchState(store, { selected: undefined, isLoading: false });
 
         expenseService.getExpense(roomId, id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -98,34 +80,24 @@ export const ExpenseStore = signalStore(
       },
 
       create(roomId: string, expense: IExpense, file: File): void {
-        patchState(store, {
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudCreate(store);
 
         expenseService.createExpense(roomId, expense, file).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translate.instant('EXPENSE.CREATED', { invoice: response.name }),
-              path: `rooms/${ roomId }/expenses/${ response.id }`,
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) => {
+            patchState(store, {
+              response: {
+                message: translate.instant('EXPENSE.CREATED', { invoice: response.name }),
+                path: `rooms/${ roomId }/expenses/${ response.id }`,
+              },
+              isLoading: false,
+            });
+          },
           error: patchError,
         });
       },
 
       update(id: string, roomId: string, expense: IExpense, file?: File): void {
-        patchState(store, {
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudUpdate(store);
 
         expenseService.updateExpense(id, roomId, expense, file).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -140,13 +112,7 @@ export const ExpenseStore = signalStore(
       },
 
       delete(roomId: string, id: string, invoice: string): void {
-        patchState(store, {
-          response: undefined,
-          error: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudDelete(store);
 
         expenseService.deleteExpense(roomId, id).subscribe({
           next: () => patchState(store, {

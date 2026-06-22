@@ -22,21 +22,11 @@ export const AwsStore = signalStore(
     },
 
     processPdf(token: string, file: File, userId?: string): void {
-      patchState(store, {
-        data: undefined,
-        error: undefined,
-        isLoading: true,
-      });
+      patchState(store, { data: undefined, isLoading: true });
 
       awsLambdaService.processPdf(token, file, userId).subscribe({
-        next: (data) => patchState(store, {
-          data,
-          isLoading: false,
-        }),
-        error: (err) => patchState(store, {
-          error: mapCrudHttpError(err),
-          isLoading: false,
-        }),
+        next: (data) => patchState(store, { data, isLoading: false }),
+        error: (err) => patchState(store, { error: mapCrudHttpError(err), isLoading: false }),
       });
     },
   })),

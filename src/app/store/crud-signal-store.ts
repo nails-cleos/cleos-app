@@ -27,6 +27,18 @@ export type CrudStoreState<TEntity, TData = Pagination<TEntity>, TSelected = TEn
 export const createCrudInitialState = <TEntity, TData = Pagination<TEntity>, TSelected = TEntity>():
   CrudStoreState<TEntity, TData, TSelected> => createStoreInitialState<TData, TSelected>();
 
+export const cleanCrudCreate = <TData, TSelected>(
+  store: WritableStateSource<StoreState<TData, TSelected>>,
+): void => patchState(store, { response: undefined, isLoading: true });
+
+export const cleanCrudUpdate = <TData, TSelected>(
+  store: WritableStateSource<StoreState<TData, TSelected>>,
+): void => patchState(store, { selected: undefined, response: undefined, isLoading: true });
+
+export const cleanCrudDelete = <TData, TSelected>(
+  store: WritableStateSource<StoreState<TData, TSelected>>,
+): void => patchState(store, { selected: undefined, data: undefined, response: undefined, isLoading: true });
+
 export const patchCrudError = <TData, TSelected>(
   store: WritableStateSource<StoreState<TData, TSelected>>,
   err: HttpErrorResponse,
@@ -125,20 +137,13 @@ export const withCrudStoreMethods =
 
           patchState(store, {
             data: undefined,
-            subErrors: undefined,
-            selected: undefined,
-            response: undefined,
-            error: undefined,
             isLoading: true,
           });
 
           loadPageSubscription = config.loadPage(request).subscribe({
-            next: (data) => {
+            next: (value) => {
               patchState(store, {
-                data,
-                error: undefined,
-                subErrors: undefined,
-                response: undefined,
+                data: { kind: 'pagination', value },
                 isLoading: false,
               });
             },
@@ -154,9 +159,7 @@ export const withCrudStoreMethods =
           loadByIdSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
             selected: undefined,
-            response: undefined,
             isLoading: true,
           });
 
@@ -176,15 +179,13 @@ export const withCrudStoreMethods =
           loadAllSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
-            selected: undefined,
-            response: undefined,
+            data: undefined,
             isLoading: true,
           });
 
           loadAllSubscription = config.loadAll().subscribe({
-            next: (data) => {
-              patchState(store, { data, isLoading: false });
+            next: (value) => {
+              patchState(store, { data: { kind: 'list', value }, isLoading: false });
             },
             error: patchError,
           });
@@ -199,18 +200,14 @@ export const withCrudStoreMethods =
           createSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
             response: undefined,
             isLoading: true,
-            selected: undefined,
           });
 
           createSubscription = create(entity).subscribe({
             next: (response) => {
               patchState(store, {
                 response: createResponse(response, entity),
-                selected: undefined,
-                subErrors: undefined,
                 isLoading: false,
               });
             },
@@ -227,18 +224,15 @@ export const withCrudStoreMethods =
           updateSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
             response: undefined,
-            isLoading: true,
             selected: undefined,
+            isLoading: true,
           });
 
           updateSubscription = update(id, entity).subscribe({
             next: (response) => {
               patchState(store, {
                 response: updateResponse(response, id, entity),
-                selected: undefined,
-                subErrors: undefined,
                 isLoading: false,
               });
             },
@@ -255,18 +249,16 @@ export const withCrudStoreMethods =
           deleteSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
             response: undefined,
-            isLoading: true,
+            data: undefined,
             selected: undefined,
+            isLoading: true,
           });
 
           deleteSubscription = remove(args).subscribe({
             next: () => {
               patchState(store, {
                 response: deleteResponse(args),
-                selected: undefined,
-                subErrors: undefined,
                 isLoading: false,
               });
             },
@@ -283,17 +275,15 @@ export const withCrudStoreMethods =
           sortSubscription?.unsubscribe();
 
           patchState(store, {
-            subErrors: undefined,
+            data: undefined,
             response: undefined,
             isLoading: true,
-            selected: undefined,
           });
 
           sortSubscription = sort(items).subscribe({
             next: () => {
               patchState(store, {
                 response: sortResponse(items),
-                subErrors: undefined,
                 isLoading: false,
               });
             },

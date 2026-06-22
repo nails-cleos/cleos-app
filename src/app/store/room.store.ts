@@ -10,7 +10,13 @@ import { IRoom, IRoomAll, IRoomCustomer, IRoomInfo, IRoomService, IServicePrice 
 import { IUserAll } from '../user/user';
 import { RoomService } from '../services/room.service';
 import { roomName } from '../util/helper';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate, cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type RoomStoreState = StoreState<Pagination<IRoom>, IRoomAll> & {
@@ -40,16 +46,6 @@ export const RoomStore = signalStore(
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
-    const patchSavingState = (): void => {
-      patchState(store, {
-        selected: undefined,
-        subErrors: undefined,
-        response: undefined,
-        error: undefined,
-        isLoading: true,
-      });
-    };
-
     const createSaveResponse = (message: string, response: IApiResponse): IResponseSuccess => ({
       message,
       path: `rooms/${ response.id }`,
@@ -70,37 +66,16 @@ export const RoomStore = signalStore(
       },
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         roomService.getRoomsPage(page, sort, direction, size).subscribe({
-          next: (data) => patchState(store, {
-            data,
-            subErrors: undefined,
-            response: undefined,
-            error: undefined,
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadInfo(): void {
-        patchState(store, {
-          professionals: undefined,
-          currencies: undefined,
-          offices: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { professionals: undefined, offices: undefined, currencies: undefined, isLoading: true });
 
         roomService.getAllRoomsInfo().subscribe({
           next: (roomInfo: IRoomInfo) => patchState(store, {
@@ -114,13 +89,7 @@ export const RoomStore = signalStore(
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         roomService.getRoom(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -129,12 +98,11 @@ export const RoomStore = signalStore(
       },
 
       create(room: IRoom): void {
-        patchSavingState();
+        cleanCrudCreate(store);
 
         roomService.createRoom(room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: createSaveResponse(translate.instant('ROOM.CREATED', { name: response.name }), response),
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -142,12 +110,11 @@ export const RoomStore = signalStore(
       },
 
       update(id: string, room: IRoom): void {
-        patchSavingState();
+        cleanCrudUpdate(store);
 
         roomService.updateRoom(id, room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: createSaveResponse(translate.instant('ROOM.UPDATED.MESSAGE', { name: response.name }), response),
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -155,7 +122,7 @@ export const RoomStore = signalStore(
       },
 
       delete(room: IRoom): void {
-        patchSavingState();
+        cleanCrudDelete(store);
 
         roomService.deleteRoom(room.id!).subscribe({
           next: () => patchState(store, {
@@ -164,7 +131,6 @@ export const RoomStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -172,23 +138,16 @@ export const RoomStore = signalStore(
       },
 
       loadServices(id: string): void {
-        patchState(store, {
-          services: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { services: undefined, isLoading: true });
 
         roomService.getServices(id).subscribe({
-          next: (services) => patchState(store,
-            { services, isLoading: false }),
+          next: (services) => patchState(store, { services, isLoading: false }),
           error: patchError,
         });
       },
 
       updateServices(id: string, prices: IServicePrice[]): void {
-        patchSavingState();
+        patchState(store, { services: undefined, response: undefined, isLoading: true });
 
         roomService.updateServices(id, prices).subscribe({
           next: () => patchState(store, {
@@ -200,17 +159,10 @@ export const RoomStore = signalStore(
       },
 
       loadCustomers(id: string): void {
-        patchState(store, {
-          customers: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { customers: undefined, isLoading: true });
 
         roomService.getAllCustomersInfo(id).subscribe({
-          next: (customers) => patchState(store,
-            { customers, isLoading: false }),
+          next: (customers) => patchState(store, { customers, isLoading: false }),
           error: patchError,
         });
       },

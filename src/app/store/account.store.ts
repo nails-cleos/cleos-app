@@ -4,7 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { PageRequest } from '../interfaces/common';
 import { AccountService } from '../services/account.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type AccountStoreState = StoreState<IAccountTransaction, IAccountAll> & {
@@ -39,14 +45,7 @@ export const AccountStore = signalStore(
       },
 
       loadAccount(id: string): void {
-        patchState(store, {
-          selected: undefined,
-          selectedTransaction: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         accountService.getAccount(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -55,14 +54,7 @@ export const AccountStore = signalStore(
       },
 
       loadAccountByCustomerId(customerId: string): void {
-        patchState(store, {
-          selected: undefined,
-          selectedTransaction: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         accountService.getAccountByCustomerId(customerId).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -73,44 +65,27 @@ export const AccountStore = signalStore(
       loadTransactions(id: string, request: PageRequest): void {
         patchState(store, {
           data: undefined,
-          selectedTransaction: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
           isLoading: true,
         });
 
         accountService.getTransactionsByAccountId(id, request.page, request.sort, request.direction, request.size)
           .subscribe({
-            next: (data) => patchState(store, {
-              data,
-              isLoading: false,
-            }),
+            next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
           });
       },
 
       loadTransaction(id: string, transactionId: string): void {
-        patchState(store, {
-          selectedTransaction: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-        });
+        patchState(store, { selectedTransaction: undefined, isLoading: true });
 
         accountService.getTransaction(id, transactionId).subscribe({
-          next: (selectedTransaction) => patchState(store, { selectedTransaction }),
+          next: (selectedTransaction) => patchState(store, { selectedTransaction, isLoading: false }),
           error: patchError,
         });
       },
 
       createTransaction(id: string, transaction: ITransaction): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         accountService.createTransaction(id, transaction).subscribe({
           next: (response) => {
@@ -133,12 +108,7 @@ export const AccountStore = signalStore(
       },
 
       updateAccount(id: string, transaction: ITransaction): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudUpdate(store);
 
         accountService.updateAccount(id, transaction).subscribe({
           next: (response) => patchState(store, {

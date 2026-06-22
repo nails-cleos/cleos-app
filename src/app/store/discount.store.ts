@@ -5,7 +5,13 @@ import { Pagination } from '../interfaces/pagination';
 import { DiscountType, IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../discount/discount';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete, cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type DiscountData =
@@ -45,71 +51,34 @@ export const DiscountStore = signalStore(
       },
 
       loadPage(request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         discountService.getDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'paginationDiscount', value },
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'paginationDiscount', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadMyPage(request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         discountService.getMyDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'pagination', value },
-            error: undefined,
-            subErrors: undefined,
-            response: undefined,
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadReferrals(): void {
-        patchState(store, {
-          referrals: [],
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-        });
+        patchState(store, { referrals: undefined, isLoading: true });
 
         discountService.getMyReferrals().subscribe({
-          next: (referrals) => patchState(store, {
-            referrals,
-            subErrors: undefined,
-            response: undefined,
-          }),
+          next: (referrals) => patchState(store, { referrals, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         discountService.getDiscount(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -118,30 +87,16 @@ export const DiscountStore = signalStore(
       },
 
       loadUserDiscounts(customerId: string): void {
-        patchState(store, {
-          data: { kind: 'list', value: [] },
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-        });
+        patchState(store, { data: { kind: 'list', value: [] }, isLoading: true });
 
         discountService.getUserDiscountByCustomerId(customerId).subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'list', value },
-            subErrors: undefined,
-            response: undefined,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       create(discount: IDiscount): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudCreate(store);
 
         discountService.createDiscount(discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -150,8 +105,6 @@ export const DiscountStore = signalStore(
               path: `discounts/${ response.id }`,
               redirect: 'discounts',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -159,12 +112,7 @@ export const DiscountStore = signalStore(
       },
 
       update(id: string, discount: IDiscount): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudUpdate(store);
 
         discountService.updateDiscount(id, discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -173,8 +121,6 @@ export const DiscountStore = signalStore(
               path: `discounts/${ response.id }`,
               redirect: 'discounts',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -182,12 +128,7 @@ export const DiscountStore = signalStore(
       },
 
       delete(id: string, name: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudDelete(store);
 
         discountService.deleteDiscount(id).subscribe({
           next: () => patchState(store, {
@@ -196,8 +137,6 @@ export const DiscountStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -205,20 +144,13 @@ export const DiscountStore = signalStore(
       },
 
       sendToCustomers(id: string, customersDiscount: string[]): void {
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         discountService.sendDiscounts(id, customersDiscount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translate.instant('DISCOUNT.SEND', { name: response.name }),
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

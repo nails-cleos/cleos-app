@@ -5,7 +5,7 @@ import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { IInvoice, IInvoiceData } from '../invoice/invoice';
 import { Pagination } from '../interfaces/pagination';
 import { InvoiceService } from '../services/invoice.service';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { cleanCrudCreate, createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type InvoiceStoreState = StoreState<IInvoice[], never> & {
@@ -40,54 +40,25 @@ export const InvoiceStore = signalStore(
       },
 
       loadPage({ sort, direction, page, size, officeId }: PageRequest & { officeId: string }): void {
-        patchState(store, {
-          page: undefined,
-          data: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { page: undefined, isLoading: true });
 
         invoiceService.getInvoicesPage(officeId, page, sort, direction, size).subscribe({
-          next: (value) => patchState(store, {
-            page: value,
-            response: undefined,
-            subErrors: undefined,
-            error: undefined,
-            isLoading: false,
-          }),
+          next: (page) => patchState(store, { page, isLoading: false }),
           error: patchError,
         });
       },
 
       loadOfficeToInvoice(officeId: string, start: string, end: string, types?: string[]): void {
-        patchState(store, {
-          data: undefined,
-          page: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         invoiceService.getOfficeToInvoice(officeId, start, end, types).subscribe({
-          next: (data) => patchState(store, {
-            data: data ?? [],
-            response: undefined,
-            subErrors: undefined,
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data: data, isLoading: false }),
           error: patchError,
         });
       },
 
       uploadInvoices(officeId: string, blob: Blob, fileName: string, upload: boolean): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         const response: IResponseSuccess = {
           message: translate.instant('INVOICE.UPLOAD_SUCCESS', { fileName }),
@@ -98,7 +69,6 @@ export const InvoiceStore = signalStore(
         if (!upload) {
           patchState(store, {
             response,
-            subErrors: undefined,
             isLoading: false,
           });
           return;
@@ -107,7 +77,6 @@ export const InvoiceStore = signalStore(
         invoiceService.uploadInvoices(officeId, blob, fileName).subscribe({
           next: () => patchState(store, {
             response,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

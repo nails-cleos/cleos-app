@@ -41,13 +41,7 @@ export const NotificationStore = signalStore(
       },
 
       loadPage(request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         notificationService.getNotificationsPage(request.page, request.sort, request.direction, request.size)
           .subscribe({
@@ -57,13 +51,7 @@ export const NotificationStore = signalStore(
       },
 
       readNotification(id: string): void {
-        patchState(store, {
-          dataRead: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { dataRead: undefined, isLoading: true });
 
         notificationService.readNotification(id).subscribe({
           next: (dataRead) => {
@@ -78,13 +66,7 @@ export const NotificationStore = signalStore(
       },
 
       deleteNotification(notification: INotification): void {
-        patchState(store, {
-          dataDeleted: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { dataDeleted: undefined, isLoading: true });
 
         notificationService.deleteNotification(notification.id).subscribe({
           next: () => patchState(store, { dataDeleted: notification, isLoading: false }),
@@ -93,13 +75,7 @@ export const NotificationStore = signalStore(
       },
 
       subscribeNotification(token: string): void {
-        patchState(store, {
-          dataDeleted: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { isLoading: true });
 
         notificationService.subscribeNotification(token).subscribe({
           next: () => patchState(store, { isLoading: false }),

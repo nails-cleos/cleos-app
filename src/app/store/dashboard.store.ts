@@ -20,7 +20,7 @@ import {
   MonthSummary,
   QuarterSummary,
 } from '../dashboard/dashboard';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import { cleanCrudCreate, createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { getMonth } from '../util/dates';
 import type { Subscription } from 'rxjs';
@@ -106,99 +106,59 @@ export const DashboardStore = signalStore(
 
       getEvents(date: Date): void {
         getEventsSubscription?.unsubscribe();
-        patchState(store, {
-          data: cleanEventMap(store.data()),
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: cleanEventMap(store.data()), isLoading: true });
 
         getEventsSubscription = dashboardService
           .getEvents(date)
           .subscribe({
-            next: (eventSummaries) => {
-              const data = mergeDashboard(store.data(), eventSummaries);
-              patchState(store, { data, isLoading: false });
-            },
+            next: (eventSummaries) => patchState(store,
+              { data: mergeDashboard(store.data(), eventSummaries), isLoading: false }),
             error: patchError,
           });
       },
 
       getCards(date: Date): void {
         getCardsSubscription?.unsubscribe();
-        patchState(store, {
-          data: cleanCardMap(store.data()),
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: cleanCardMap(store.data()), isLoading: true });
 
         getCardsSubscription = dashboardService
           .getCards(date)
           .subscribe({
-            next: (cardSummaries) => {
-              const data = mergeDashboard(store.data(), cardSummaries);
-              patchState(store, { data, isLoading: false });
-            },
+            next: (cardSummaries) => patchState(store,
+              { data: mergeDashboard(store.data(), cardSummaries), isLoading: false }),
             error: patchError,
           });
       },
 
       getMyEvent(date: Date): void {
         getMyEventSubscription?.unsubscribe();
-        patchState(store, {
-          dashboard: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { dashboard: undefined, isLoading: true });
 
-        getMyEventSubscription = dashboardService
-          .getMyEvent(date)
-          .subscribe({
-            next: (dashboard) => patchState(store, { dashboard, isLoading: false }),
-            error: patchError,
-          });
+        getMyEventSubscription = dashboardService.getMyEvent(date).subscribe({
+          next: (dashboard) => patchState(store, { dashboard, isLoading: false }),
+          error: patchError,
+        });
       },
 
       updateEvent(reservationId: string, reservation: IReservation): void {
         updateEventSubscription?.unsubscribe();
-        patchState(store, {
-          dashboard: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
-        updateEventSubscription = dashboardService
-          .updateEvent(reservationId, reservation)
-          .subscribe({
-            next: () => patchState(store, { isLoading: false }),
-            error: patchError,
-          });
+        updateEventSubscription = dashboardService.updateEvent(reservationId, reservation).subscribe({
+          next: () => patchState(store, { isLoading: false }),
+          error: patchError,
+        });
       },
 
       getMonthlySummary(date: string): void {
         getMonthlySummarySubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { monthlySummaryMap: undefined, isLoading: true });
 
-        getMonthlySummarySubscription = dashboardService
-          .getMonthlySummary(date)
-          .subscribe({
-            next: (monthlySummaries) => patchState(store,
-              { monthlySummaryMap: monthSummaryMap(monthlySummaries), isLoading: false }),
-            error: patchError,
-          });
+        getMonthlySummarySubscription = dashboardService.getMonthlySummary(date).subscribe({
+          next: (monthlySummaries) => patchState(store,
+            { monthlySummaryMap: monthSummaryMap(monthlySummaries), isLoading: false }),
+          error: patchError,
+        });
       },
 
       updateMonthlySummary(
@@ -210,13 +170,7 @@ export const DashboardStore = signalStore(
         step: number,
       ): void {
         updateMonthlySummarySubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { monthlySummaryMap: undefined, response: undefined, isLoading: true });
 
         updateMonthlySummarySubscription = dashboardService
           .updateMonthlySummary(date, type, totals, summaries, roomId)
@@ -232,59 +186,35 @@ export const DashboardStore = signalStore(
 
       getYearSummary(year: number): void {
         getYearSummarySubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { yearSummaryMap: undefined, isLoading: true });
 
-        getYearSummarySubscription = dashboardService
-          .getYearSummary(year)
-          .subscribe({
-            next: (yearSummaries) => patchState(store,
-              { yearSummaryMap: yearSummaryMap(yearSummaries), isLoading: false }),
-            error: patchError,
-          });
+        getYearSummarySubscription = dashboardService.getYearSummary(year).subscribe({
+          next: (yearSummaries) => patchState(store,
+            { yearSummaryMap: yearSummaryMap(yearSummaries), isLoading: false }),
+          error: patchError,
+        });
       },
 
       exportYearSummary(year: number): void {
         exportYearSummarySubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { yearExport: undefined, isLoading: true });
 
-        exportYearSummarySubscription = dashboardService
-          .exportYearSummary(year)
-          .subscribe({
-            next: (yearExports) => patchState(store,
-              { yearExport: yearExportMap(yearExports), isLoading: false }),
-            error: patchError,
-          });
+        exportYearSummarySubscription = dashboardService.exportYearSummary(year).subscribe({
+          next: (yearExports) => patchState(store,
+            { yearExport: yearExportMap(yearExports), isLoading: false }),
+          error: patchError,
+        });
       },
 
       getQuarterSummary(year: number, quarter: number): void {
         getQuarterSummarySubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { quarterSummaryMap: undefined, isLoading: true });
 
-        getQuarterSummarySubscription = dashboardService
-          .getQuarterSummary(year, quarter)
-          .subscribe({
-            next: (quarterSummaries) => patchState(store,
-              { quarterSummaryMap: quarterSummaryMap(quarterSummaries), isLoading: false }),
-            error: patchError,
-          });
+        getQuarterSummarySubscription = dashboardService.getQuarterSummary(year, quarter).subscribe({
+          next: (quarterSummaries) => patchState(store,
+            { quarterSummaryMap: quarterSummaryMap(quarterSummaries), isLoading: false }),
+          error: patchError,
+        });
       },
     };
   }),

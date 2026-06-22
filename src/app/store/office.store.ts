@@ -5,7 +5,13 @@ import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IOffice, IOfficeAll } from '../office/office';
 import { Pagination } from '../interfaces/pagination';
 import { OfficeService } from '../services/office.service';
-import { createStoreInitialState, patchCrudError } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type OfficeData =
@@ -37,49 +43,25 @@ export const OfficeStore = signalStore(
       },
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         officeService.getOfficesPage(page, sort, direction, size).subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'pagination', value },
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadMyOffices(): void {
-        patchState(store, {
-          data: { kind: 'list', value: [] },
-          error: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         officeService.getAllMyOffices().subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'list', value: value ?? [] },
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'list', value: value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         officeService.getOffice(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -88,12 +70,7 @@ export const OfficeStore = signalStore(
       },
 
       create(office: IOffice): void {
-        patchState(store, {
-          selected: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         officeService.createOffice(office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -109,12 +86,7 @@ export const OfficeStore = signalStore(
       },
 
       update(id: string, office: IOffice): void {
-        patchState(store, {
-          selected: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        cleanCrudUpdate(store);
 
         officeService.updateOffice(id, office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -130,12 +102,7 @@ export const OfficeStore = signalStore(
       },
 
       delete(id: string, name: string): void {
-        patchState(store, {
-          selected: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        cleanCrudDelete(store);
 
         officeService.deleteOffice(id).subscribe({
           next: () => patchState(store, {

@@ -6,7 +6,13 @@ import { Pagination } from '../interfaces/pagination';
 import { IUnavailable, IUnavailableAll } from '../unavailable/unavailable';
 import { UnavailableService } from '../services/unavailable.service';
 import { newDateTimestamp } from '../util/dates';
-import { createStoreInitialState, patchCrudError } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 type UpdateUnavailableArgs = {
@@ -32,15 +38,6 @@ export const UnavailableStore = signalStore(
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
-    const patchSavingState = (): void => {
-      patchState(store, {
-        subErrors: undefined,
-        response: undefined,
-        error: undefined,
-        isLoading: true,
-      });
-    };
-
     const createResponse = (key: string, timestamp: number | undefined, path?: string): IResponseSuccess => ({
       message: translate.instant(key, { date: newDateTimestamp(timestamp) }),
       path,
@@ -61,32 +58,16 @@ export const UnavailableStore = signalStore(
       },
 
       loadPage(request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (data) => patchState(store, {
-            data,
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          selected: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         unavailableService.getUnavailable(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -95,7 +76,7 @@ export const UnavailableStore = signalStore(
       },
 
       create(unavailable: IUnavailable, isRoomAdmin: boolean): void {
-        patchSavingState();
+        cleanCrudCreate(store);
 
         unavailableService.createUnavailable(unavailable).subscribe({
           next: (response) => patchState(store, {
@@ -104,8 +85,6 @@ export const UnavailableStore = signalStore(
               response.timestamp,
               isRoomAdmin ? 'dashboard/events' : `unavailable/${ response.id }`,
             ),
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -113,7 +92,7 @@ export const UnavailableStore = signalStore(
       },
 
       createBlockAgenda(unavailable: IUnavailable, isRoomAdmin: boolean): void {
-        patchSavingState();
+        cleanCrudCreate(store);
 
         unavailableService.createBlockAgenda(unavailable).subscribe({
           next: (response) => patchState(store, {
@@ -122,8 +101,6 @@ export const UnavailableStore = signalStore(
               response.timestamp,
               isRoomAdmin ? 'dashboard/events' : `unavailable/block-agenda/${ response.id }`,
             ),
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -131,13 +108,11 @@ export const UnavailableStore = signalStore(
       },
 
       update({ id, unavailable, path }: UpdateUnavailableArgs): void {
-        patchSavingState();
+        cleanCrudUpdate(store);
 
         unavailableService.updateUnavailable(id, unavailable).subscribe({
           next: (response) => patchState(store, {
             response: createResponse('UNAVAILABLE.UPDATED.MESSAGE', response.timestamp, `${ path }/${ response.id }`),
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -145,7 +120,7 @@ export const UnavailableStore = signalStore(
       },
 
       delete({ id, timestamp, timeZone }: DeleteUnavailableArgs): void {
-        patchSavingState();
+        cleanCrudDelete(store);
 
         unavailableService.deleteUnavailable(id).subscribe({
           next: () => patchState(store, {
@@ -156,8 +131,6 @@ export const UnavailableStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

@@ -11,7 +11,14 @@ import { Role, Token } from '../interfaces/token';
 import { IOverview, IUser, IUserAll } from '../user/user';
 import { UserService } from '../services/user.service';
 import { loginSuccess } from './actions/auth.actions';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { getLocale } from '../util/helper';
 import { IRoomAll } from '../room/room';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -82,15 +89,6 @@ export const UserStore = signalStore(
     };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
-    const patchMutationStart = (): void => {
-      patchState(store, {
-        subErrors: undefined,
-        response: undefined,
-        error: undefined,
-        isLoading: true,
-      });
-    };
-
     const requestSuccess = (
       key: string,
       displayName?: string,
@@ -141,186 +139,99 @@ export const UserStore = signalStore(
 
       loadPage(request: PageRequest & { filter?: string }): void {
         loadPageSubscription?.unsubscribe();
-        patchState(store, {
-          data: undefined,
-          overview: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         loadPageSubscription = userService
           .getUsersPage(request.page, request.sort, request.direction, request.size, request.filter)
           .subscribe({
-            next: (data) => patchState(store, {
-              data,
-              isLoading: false,
-            }),
+            next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
           });
       },
 
       loadCustomers(): void {
         loadCustomersSubscription?.unsubscribe();
-        patchState(store, {
-          customers: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { customers: undefined, isLoading: true });
 
         loadCustomersSubscription = userService.getCustomers().subscribe({
-          next: (customers) => patchState(store, {
-            customers,
-            isLoading: false,
-          }),
+          next: (customers) => patchState(store, { customers, isLoading: false }),
           error: patchError,
         });
       },
 
       loadProfessionals(): void {
         loadProfessionalsSubscription?.unsubscribe();
-        patchState(store, {
-          professionals: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          error: undefined,
-        });
+        patchState(store, { professionals: undefined, isLoading: true });
 
         loadProfessionalsSubscription = userService.getProfessionals().subscribe({
-          next: (professionals) => patchState(store, {
-            professionals,
-            isLoading: false,
-          }),
+          next: (professionals) => patchState(store, { professionals, isLoading: false }),
           error: patchError,
         });
       },
 
       loadManagers(): void {
         loadManagersSubscription?.unsubscribe();
-        patchState(store, {
-          managers: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          isLoading: true,
-        });
+        patchState(store, { managers: undefined, isLoading: true });
 
         loadManagersSubscription = userService.getManagers().subscribe({
-          next: (managers) => patchState(store, {
-            managers: managers ?? [],
-            isLoading: false,
-          }),
+          next: (managers) => patchState(store, { managers: managers, isLoading: false }),
           error: patchError,
         });
       },
 
       loadRoomsByProfessionalId(professionalId: string): void {
         loadRoomsByProfessionalIdSubscription?.unsubscribe();
-        patchState(store, {
-          rooms: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { rooms: undefined, isLoading: true });
 
         loadRoomsByProfessionalIdSubscription = userService.getAllRoomsByProfessionalId(professionalId).subscribe({
-          next: (rooms) => patchState(store, {
-            rooms,
-            isLoading: false,
-          }),
+          next: (rooms) => patchState(store, { rooms, isLoading: false }),
           error: patchError,
         });
       },
 
       loadDisabledUsers(): void {
         loadDisabledUsersSubscription?.unsubscribe();
-        patchState(store, {
-          users: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { users: undefined, isLoading: true });
 
         loadDisabledUsersSubscription = userService.getAllDisableUsers().subscribe({
-          next: (users) => patchState(store, {
-            users: users ?? [],
-            isLoading: false,
-          }),
+          next: (users) => patchState(store, { users: users, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
         loadByIdSubscription?.unsubscribe();
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         loadByIdSubscription = userService.getUser(id).subscribe({
-          next: (selected) => patchState(store, {
-            selected,
-            isLoading: false,
-          }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadMyUser(): void {
         loadByIdSubscription?.unsubscribe();
-        patchState(store, {
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         loadByIdSubscription = userService.getMyUser().subscribe({
-          next: (selected) => patchState(store, {
-            selected,
-            isLoading: false,
-          }),
+          next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadOverview(id: string): void {
         loadOverviewSubscription?.unsubscribe();
-        patchState(store, {
-          overview: undefined,
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { overview: undefined, isLoading: true });
 
         loadOverviewSubscription = userService.getCustomerOverview(id).subscribe({
-          next: (overview) => patchState(store, {
-            overview,
-            isLoading: false,
-          }),
+          next: (overview) => patchState(store, { overview, isLoading: false }),
           error: patchError,
         });
       },
 
       save(user: IUser, id?: string, role?: Role): void {
         saveSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudUpdate(store);
 
         saveSubscription = userService.saveUser(user, id, role).subscribe({
           next: (response) => patchState(store, {
@@ -335,7 +246,7 @@ export const UserStore = signalStore(
 
       setRole(id: string, displayName: string, role: Role, action: 'ADD' | 'REMOVE'): void {
         setRoleSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudUpdate(store);
 
         setRoleSubscription = userService.setRole(id, role).subscribe({
           next: () => patchState(store, {
@@ -349,7 +260,7 @@ export const UserStore = signalStore(
 
       updateMyUser(user: IUser, redirectUrl?: string, message?: string): void {
         updateMyUserSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudUpdate(store);
 
         updateMyUserSubscription = userService.updateMyUser(user).subscribe({
           next: (response) => {
@@ -369,7 +280,7 @@ export const UserStore = signalStore(
 
       updateMyPhoto(file: string): void {
         updateMyPhotoSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudUpdate(store);
 
         updateMyPhotoSubscription = userService.updateMyPhoto(file).subscribe({
           next: (response) => {
@@ -389,7 +300,7 @@ export const UserStore = signalStore(
 
       delete(id: string, displayName: string): void {
         deleteSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudDelete(store);
 
         deleteSubscription = userService.deleteUser(id).subscribe({
           next: () => patchState(store, {
@@ -402,7 +313,7 @@ export const UserStore = signalStore(
 
       restore(id: string, user: IUser): void {
         restoreSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudCreate(store);
 
         restoreSubscription = userService.restore(id, user).subscribe({
           next: (response) => patchState(store, {
@@ -415,7 +326,7 @@ export const UserStore = signalStore(
 
       resendToken(id: string): void {
         resendTokenSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudCreate(store);
 
         resendTokenSubscription = userService.resendToken(id).subscribe({
           next: () => patchState(store, {
@@ -428,7 +339,7 @@ export const UserStore = signalStore(
 
       mergeUsers(oldUserId: string, newUserId: string): void {
         mergeUsersSubscription?.unsubscribe();
-        patchMutationStart();
+        cleanCrudUpdate(store);
 
         mergeUsersSubscription = userService.mergeUsers(oldUserId, newUserId).subscribe({
           next: () => patchState(store, {

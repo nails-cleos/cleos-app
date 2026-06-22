@@ -6,7 +6,13 @@ import { Pagination } from '../interfaces/pagination';
 import { ITreatmentAll, ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { TreatmentService } from '../services/treatment.service';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
-import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
+import {
+  cleanCrudCreate, cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+  StoreState,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 export type TreatmentData =
@@ -31,15 +37,6 @@ export const TreatmentStore = signalStore(
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
-    const patchSavingState = (): void => {
-      patchState(store, {
-        subErrors: undefined,
-        response: undefined,
-        error: undefined,
-        isLoading: true,
-      });
-    };
-
     const createSaveResponse = (message: string, response: IApiResponse): IResponseSuccess => ({
       message,
       path: `treatments/${ response.id }/view`,
@@ -60,52 +57,25 @@ export const TreatmentStore = signalStore(
       },
 
       loadPage(request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         treatmentService.getTreatmentsPage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'pagination', value },
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadAllGroups(): void {
-        patchState(store, {
-          data: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         treatmentService.getAllTreatmentsGroup().subscribe({
-          next: (value) => patchState(store, {
-            data: { kind: 'list', value },
-            isLoading: false,
-          }),
+          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          selected: undefined,
-          history: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         treatmentService.getTreatmentGroup(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -114,7 +84,7 @@ export const TreatmentStore = signalStore(
       },
 
       create(treatmentGroup: ITreatmentGroup): void {
-        patchSavingState();
+        cleanCrudCreate(store);
 
         treatmentService.createTreatment(treatmentGroup).subscribe({
           next: (response) => patchState(store, {
@@ -129,7 +99,7 @@ export const TreatmentStore = signalStore(
       },
 
       update(id: string, treatmentGroup: ITreatmentGroup): void {
-        patchSavingState();
+        cleanCrudUpdate(store);
 
         treatmentService.updateTreatmentGroup(id, treatmentGroup).subscribe({
           next: (response) => patchState(store, {
@@ -144,7 +114,7 @@ export const TreatmentStore = signalStore(
       },
 
       sortTreatments(treatments: ISorted[]): void {
-        patchSavingState();
+        patchState(store, { data: undefined, response: undefined, isLoading: true });
 
         treatmentService.sortTreatment(treatments).subscribe({
           next: () => patchState(store, {
@@ -156,7 +126,7 @@ export const TreatmentStore = signalStore(
       },
 
       sortGroups(groups: ISorted[]): void {
-        patchSavingState();
+        patchState(store, { data: undefined, response: undefined, isLoading: true });
 
         treatmentService.sortGroupTreatment(groups).subscribe({
           next: () => patchState(store, {
@@ -168,7 +138,7 @@ export const TreatmentStore = signalStore(
       },
 
       delete(args: { id: string; name: string }): void {
-        patchSavingState();
+        cleanCrudDelete(store);
 
         treatmentService.deleteTreatmentGroup(args.id).subscribe({
           next: () => patchState(store, {
@@ -184,19 +154,10 @@ export const TreatmentStore = signalStore(
       },
 
       loadHistory(id: string, treatmentId: string): void {
-        patchState(store, {
-          history: undefined,
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { history: undefined, isLoading: true });
 
         treatmentService.getAllTreatmentsHistory(id, treatmentId).subscribe({
-          next: (history) => patchState(store, {
-            history,
-            isLoading: false,
-          }),
+          next: (history) => patchState(store, { history, isLoading: false }),
           error: patchError,
         });
       },

@@ -4,7 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
 import { INote, INoteAll } from '../note/note';
 import { NoteService } from '../services/note.service';
-import { createStoreInitialState, patchCrudError } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 const initialState = createStoreInitialState<INote, INoteAll>();
@@ -32,13 +38,7 @@ export const NoteStore = signalStore(
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          selected: undefined,
-          subErrors: undefined,
-          response: undefined,
-          isLoading: true,
-          error: undefined,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         noteService.getNote(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -47,12 +47,7 @@ export const NoteStore = signalStore(
       },
 
       create(note: INote): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudCreate(store);
 
         noteService.createNote(note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -61,8 +56,6 @@ export const NoteStore = signalStore(
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -70,12 +63,7 @@ export const NoteStore = signalStore(
       },
 
       update(id: string, note: INote): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudUpdate(store);
 
         noteService.updateNote(id, note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -84,8 +72,6 @@ export const NoteStore = signalStore(
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -93,12 +79,7 @@ export const NoteStore = signalStore(
       },
 
       delete(id: string, description: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudDelete(store);
 
         noteService.deleteNote(id).subscribe({
           next: () => patchState(store, {
@@ -106,8 +87,6 @@ export const NoteStore = signalStore(
               message: translate.instant('NOTE.UPDATED.MESSAGE', { description }),
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -115,12 +94,7 @@ export const NoteStore = signalStore(
       },
 
       complete(id: string): void {
-        patchState(store, {
-          subErrors: undefined,
-          response: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        cleanCrudUpdate(store);
 
         noteService.completeNote(id).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -129,8 +103,6 @@ export const NoteStore = signalStore(
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,

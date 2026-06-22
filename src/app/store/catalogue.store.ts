@@ -4,7 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { IApiResponse } from '../interfaces/common';
 import { CatalogueService } from '../services/catalogue.service';
-import { createStoreInitialState, patchCrudError } from './crud-signal-store';
+import {
+  cleanCrudCreate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
+  createStoreInitialState,
+  patchCrudError,
+} from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 const initialState = createStoreInitialState<ICatalogueAll[], ICatalogueAll>();
@@ -32,50 +38,25 @@ export const CatalogueStore = signalStore(
       },
 
       loadAllCatalogues(): void {
-        patchState(store, {
-          data: undefined,
-          response: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         catalogueService.getAllCatalogues().subscribe({
-          next: (data) => patchState(store, {
-            data: data ?? [],
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadCatalogs(): void {
-        patchState(store, {
-          data: undefined,
-          response: undefined,
-          subErrors: undefined,
-          selected: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, isLoading: true });
 
         catalogueService.getAllCatalogs().subscribe({
-          next: (data) => patchState(store, {
-            data: data ?? [],
-            isLoading: false,
-          }),
+          next: (data) => patchState(store, { data: data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
-        patchState(store, {
-          selected: undefined,
-          response: undefined,
-          subErrors: undefined,
-          isLoading: true,
-        });
+        patchState(store, { selected: undefined, isLoading: true });
 
         catalogueService.getCatalogue(id).subscribe({
           next: (selected) => patchState(store, { selected }),
@@ -84,12 +65,7 @@ export const CatalogueStore = signalStore(
       },
 
       create(catalogue: ICatalogue, resizedImageDataUrl: string): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudCreate(store);
 
         catalogueService.createCatalogue(catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -98,8 +74,6 @@ export const CatalogueStore = signalStore(
               path: `catalogues/${ response.id }`,
               redirect: 'catalogues',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -107,12 +81,7 @@ export const CatalogueStore = signalStore(
       },
 
       update(id: string, catalogue: ICatalogue, resizedImageDataUrl: string): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudUpdate(store);
 
         catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
@@ -121,8 +90,6 @@ export const CatalogueStore = signalStore(
               path: `catalogues/${ response.id }`,
               redirect: 'catalogues',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
@@ -130,13 +97,7 @@ export const CatalogueStore = signalStore(
       },
 
       sort(catalogues: ICatalogueAll[]): void {
-        patchState(store, {
-          data: undefined,
-          response: undefined,
-          subErrors: undefined,
-          error: undefined,
-          isLoading: true,
-        });
+        patchState(store, { data: undefined, response: undefined, isLoading: true });
 
         catalogueService.updateCatalogueOrder(catalogues).subscribe({
           next: () => patchState(store, {
@@ -151,12 +112,7 @@ export const CatalogueStore = signalStore(
       },
 
       delete(id: string, name: string): void {
-        patchState(store, {
-          response: undefined,
-          subErrors: undefined,
-          isLoading: true,
-          selected: undefined,
-        });
+        cleanCrudDelete(store);
 
         catalogueService.deleteCatalogue(id).subscribe({
           next: () => patchState(store, {
@@ -165,8 +121,6 @@ export const CatalogueStore = signalStore(
               reload: true,
               toastType: 'warning',
             },
-            selected: undefined,
-            subErrors: undefined,
             isLoading: false,
           }),
           error: patchError,
