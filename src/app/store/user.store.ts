@@ -1,7 +1,6 @@
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { type Subscription } from 'rxjs';
 import { IResponseSuccess, PageRequest } from '../interfaces/common';
@@ -10,7 +9,6 @@ import { ToastType } from '../shared/toast/toast.model';
 import { Role, Token } from '../interfaces/token';
 import { IOverview, IUser, IUserAll } from '../user/user';
 import { UserService } from '../services/user.service';
-import { loginSuccess } from './actions/auth.actions';
 import {
   cleanCrudCreate,
   cleanCrudDelete,
@@ -22,6 +20,7 @@ import {
 import { getLocale } from '../util/helper';
 import { IRoomAll } from '../room/room';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthStore } from './auth.store';
 
 type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
@@ -50,7 +49,7 @@ export const UserStore = signalStore(
     userService = inject(UserService),
     translate = inject(TranslateService),
     router = inject(Router),
-    ngrxStore = inject(Store),
+    authStore = inject(AuthStore),
   ) => {
     let loadPageSubscription: Subscription | undefined;
     let loadCustomersSubscription: Subscription | undefined;
@@ -108,10 +107,7 @@ export const UserStore = signalStore(
     const dispatchLoginSuccess = (token: Token, returnUrl?: string, lang?: string): void => {
       const state = lang === undefined ? { returnUrl } : { returnUrl, lang };
 
-      ngrxStore.dispatch(loginSuccess({
-        token,
-        queryParams: { state: btoa(JSON.stringify(state)) },
-      }));
+      authStore.loginSuccess(token, { state: btoa(JSON.stringify(state)) });
     };
 
     return {

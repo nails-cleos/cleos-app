@@ -7,7 +7,6 @@ import { AuthUserService, initialAuthUser } from '../services/auth-user.service'
 import { ActivatedRoute, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
-import { redirect } from '../store/actions/auth.actions';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
 import { MainState } from '../store/reducers/main.reducers';
@@ -15,13 +14,23 @@ import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.com
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
-import { updateMyUser } from '../store/actions/main.actions';
 import { provideAppIcons } from '../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { UserStore } from '../store/user.store';
+import { AuthStore } from '../store/auth.store';
+import { IUser, User } from '../user/user';
 
 describe('MainComponent', () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
+
+  let userStoreSpy: {
+    updateMyUser: jasmine.Spy;
+  };
+
+  let authStoreSpy: {
+    authRedirect: jasmine.Spy;
+  };
 
   let lang$: BehaviorSubject<any>;
   let navigateSpy: jasmine.Spy;
@@ -37,7 +46,13 @@ describe('MainComponent', () => {
   let translateService: TranslateService;
 
   beforeEach(async () => {
-    lang$ = new BehaviorSubject<any>('en');
+    userStoreSpy = {
+      updateMyUser: jasmine.createSpy('updateMyUser'),
+    };
+    authStoreSpy = {
+      authRedirect: jasmine.createSpy('authRedirect'),
+    };
+    lang$ = new BehaviorSubject<any>(DEFAULT_LOCALE);
 
     const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
@@ -72,12 +87,14 @@ describe('MainComponent', () => {
       }
     });
 
-    paramMapSpy.get.and.returnValue('en');
-    navigationServiceSpy.attachLang.and.returnValue('en');
+    paramMapSpy.get.and.returnValue(DEFAULT_LOCALE);
+    navigationServiceSpy.attachLang.and.returnValue(DEFAULT_LOCALE);
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },
@@ -118,13 +135,13 @@ describe('MainComponent', () => {
 
     component.scrollToElement(element);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', 'en']);
+    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE]);
   }));
 
   it('should initialize language on construction', () => {
     expect(authUserServiceSpy.cookieConsent).toHaveBeenCalledWith(translateService);
-    expect(navigationServiceSpy.attachLang).toHaveBeenCalledWith('en');
-    expect(component.language).toBe('en');
+    expect(navigationServiceSpy.attachLang).toHaveBeenCalledWith(DEFAULT_LOCALE);
+    expect(component.language).toBe(DEFAULT_LOCALE);
   });
 
   it('should toggle theme in changeTheme', () => {
@@ -138,20 +155,18 @@ describe('MainComponent', () => {
 
   it('should persist theme only when toggled by an authenticated user', () => {
     firebaseServiceSpy.isAuthenticated.set(true);
-    storeSpy.dispatch.calls.reset();
+    userStoreSpy.updateMyUser.calls.reset();
 
     component.changeTheme();
 
-    const dispatched: any = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched.type).toBe(updateMyUser.type);
-    expect(dispatched.user.theme).toBe('dark-theme');
-    expect(dispatched.redirectUrl).toEqual(jasmine.any(String));
-    expect(dispatched.message).toEqual(jasmine.any(String));
+    const authenticatedUser: IUser = new User();
+    authenticatedUser.theme = 'dark-theme';
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(authenticatedUser, jasmine.any(String), jasmine.any(String));
   });
 
   it('should dispatch Redirect action in redirect()', () => {
     component.redirect();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
+    expect(authStoreSpy.authRedirect).toHaveBeenCalled();
   });
 
   it('should call treatment and navigate to biab-treatment/treatment', () => {

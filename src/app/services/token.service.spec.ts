@@ -1,30 +1,28 @@
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
 import { signal, WritableSignal } from '@angular/core';
-import { Store } from '@ngrx/store';
 
 import { TokenService } from './token.service';
-import { AuthState } from '../store/reducers/auth.reducers';
 import { FirebaseService } from './firebase.service';
 import { IUserAll } from '../user/user';
+import { AuthStore } from '../store/auth.store';
 
 describe('TokenService', () => {
   let service: TokenService;
-  let storeSpy: jasmine.SpyObj<Store<AuthState>>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
-  let driveToken$: BehaviorSubject<string | undefined>;
   let userSignal: WritableSignal<any>;
+  let authStoreSpy: {
+    driveToken: ReturnType<typeof signal>;
+  };
 
   const firebaseUser = {
     getIdToken: jasmine.createSpy('getIdToken').and.resolveTo('initial-token'),
   };
 
   beforeEach(() => {
-    driveToken$ = new BehaviorSubject<string | undefined>('driveToken');
+    authStoreSpy = {
+      driveToken: signal(undefined),
+    };
     userSignal = signal(firebaseUser);
-
-    storeSpy = jasmine.createSpyObj<Store<AuthState>>('Store', ['pipe']);
-    storeSpy.pipe.and.returnValue(driveToken$.asObservable());
 
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['getIdToken'], {
       user: userSignal.asReadonly(),
@@ -35,7 +33,7 @@ describe('TokenService', () => {
     TestBed.configureTestingModule({
       providers: [
         TokenService,
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
     });
@@ -45,14 +43,17 @@ describe('TokenService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+    expect(service.driveToken()).toBeUndefined();
   });
 
   it('should expose the drive token from the store', () => {
+    authStoreSpy.driveToken.set('driveToken');
+
     expect(service.driveToken()).toBe('driveToken');
   });
 
   it('should store the firebase id token when the firebase user changes', fakeAsync(() => {
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
 
     expect(firebaseUser.getIdToken).toHaveBeenCalled();
@@ -61,11 +62,11 @@ describe('TokenService', () => {
 
   it('should clear the token and user when firebase user becomes null', fakeAsync(() => {
     service.setUser = { id: 'user-1' } as IUserAll;
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
 
     userSignal.set(null);
-    TestBed.flushEffects();
+    TestBed.tick();
     tick();
 
     expect(service.token()).toBeNull();
@@ -73,7 +74,7 @@ describe('TokenService', () => {
   }));
 
   it('should refresh the token when it is near expiration', fakeAsync(() => {
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
     firebaseServiceSpy.getIdToken.calls.reset();
 
@@ -83,7 +84,7 @@ describe('TokenService', () => {
     });
 
     (service as any).tokenSignal.set('initial-token');
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
     tick();
     flushMicrotasks();
@@ -93,7 +94,7 @@ describe('TokenService', () => {
   }));
 
   it('should not refresh the token when expiration is still far away', fakeAsync(() => {
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
     firebaseServiceSpy.getIdToken.calls.reset();
 
@@ -103,7 +104,7 @@ describe('TokenService', () => {
     });
 
     (service as any).tokenSignal.set('initial-token');
-    TestBed.flushEffects();
+    TestBed.tick();
     flushMicrotasks();
     tick();
     flushMicrotasks();

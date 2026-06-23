@@ -8,7 +8,6 @@ import { Store } from '@ngrx/store';
 import { MessagingService } from '../services/messaging.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { logOut, redirect } from '../store/actions/auth.actions';
 import { CookieService } from 'ngx-cookie-service';
 import { IUser, IUserAll, User } from '../user/user';
 import { NavigationService } from '../services/navigation.service';
@@ -20,6 +19,7 @@ import { IResponseSuccess } from '../interfaces/common';
 import { ToastService } from '../services/toast.service';
 import { UserStore } from '../store/user.store';
 import { NotificationStore } from '../store/notification.store';
+import { AuthStore } from '../store/auth.store';
 
 describe('NavComponent', () => {
   let component: NavComponent;
@@ -28,10 +28,6 @@ describe('NavComponent', () => {
   let response$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
   let message$: BehaviorSubject<any>;
-  let isAuthenticated$: BehaviorSubject<any>;
-  let user$: BehaviorSubject<any>;
-  let menus$: BehaviorSubject<any>;
-  let redirect$: BehaviorSubject<any>;
   let action$: BehaviorSubject<any>;
   let notificationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -44,6 +40,17 @@ describe('NavComponent', () => {
     clearResponse: jasmine.Spy;
     readNotification: jasmine.Spy;
     deleteNotification: jasmine.Spy;
+  };
+
+  let authStoreSpy: {
+    isAuthenticated: ReturnType<typeof signal>;
+    redirect: ReturnType<typeof signal>;
+    menus: ReturnType<typeof signal>;
+    user: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    authRedirect: jasmine.Spy;
+    logOut: jasmine.Spy;
   };
 
   let navigateSpy: jasmine.Spy;
@@ -93,10 +100,6 @@ describe('NavComponent', () => {
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
-    isAuthenticated$ = new BehaviorSubject(undefined);
-    user$ = new BehaviorSubject(undefined);
-    menus$ = new BehaviorSubject(undefined);
-    redirect$ = new BehaviorSubject(undefined);
     action$ = new BehaviorSubject(undefined);
 
     notificationStoreSpy = {
@@ -110,6 +113,16 @@ describe('NavComponent', () => {
       clearResponse: jasmine.createSpy('clearResponse'),
       readNotification: jasmine.createSpy('readNotification'),
       deleteNotification: jasmine.createSpy('deleteNotification'),
+    };
+    authStoreSpy = {
+      isAuthenticated: signal(false),
+      redirect: signal(false),
+      menus: signal(undefined),
+      user: signal(undefined),
+      error: signal(undefined),
+      response: signal(undefined),
+      authRedirect: jasmine.createSpy('authRedirect'),
+      logOut: jasmine.createSpy('logOut'),
     };
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
@@ -149,23 +162,6 @@ describe('NavComponent', () => {
       }
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return isAuthenticated$.asObservable();
-        case 2:
-          return user$.asObservable();
-        case 3:
-          return menus$.asObservable();
-        case 4:
-          return redirect$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     await TestBed.configureTestingModule({
       imports: [NavComponent, TranslateModule.forRoot()],
       providers: [
@@ -178,6 +174,7 @@ describe('NavComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
         { provide: NotificationStore, useValue: notificationStoreSpy },
       ],
     }).compileComponents();
@@ -207,7 +204,7 @@ describe('NavComponent', () => {
   it('should execute logout', () => {
     component.logout();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(logOut());
+    expect(authStoreSpy.logOut).toHaveBeenCalled();
   });
 
   it('should update user when change theme is called', () => {
@@ -282,8 +279,8 @@ describe('NavComponent', () => {
   it('should handle auth state changes', () => {
     expect(component.countNotifications()).toBe(0);
 
-    isAuthenticated$.next(true);
-    user$.next(mockUser);
+    authStoreSpy.isAuthenticated.set(true);
+    authStoreSpy.user.set(mockUser);
 
     fixture.detectChanges();
 
@@ -351,26 +348,26 @@ describe('NavComponent', () => {
   });
 
   it('should dispatch redirect', () => {
-    isAuthenticated$.next(true);
-    user$.next(mockUser);
-    redirect$.next(false);
+    authStoreSpy.isAuthenticated.set(true);
+    authStoreSpy.user.set(mockUser);
+    authStoreSpy.redirect.set(false);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(redirect());
+    expect(authStoreSpy.authRedirect).toHaveBeenCalled();
   });
 
   it('should navigate to home when not authenticated', () => {
-    isAuthenticated$.next(false);
-    redirect$.next(false);
+    authStoreSpy.isAuthenticated.set(false);
+    authStoreSpy.redirect.set(false);
     fixture.detectChanges();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);
   });
 
   it('should navigate to home when redirect', () => {
-    isAuthenticated$.next(true);
-    user$.next(mockUser);
-    redirect$.next(true);
+    authStoreSpy.isAuthenticated.set(true);
+    authStoreSpy.user.set(mockUser);
+    authStoreSpy.redirect.set(true);
     fixture.detectChanges();
 
     expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);

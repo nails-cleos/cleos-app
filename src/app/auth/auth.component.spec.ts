@@ -1,76 +1,68 @@
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { AuthComponent } from './auth.component';
-import { BehaviorSubject, of, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { ActivatedRoute } from '@angular/router';
+import { of, Subject } from 'rxjs';
+import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { AuthState } from '../store/reducers/auth.reducers';
 import { FirebaseService } from '../services/firebase.service';
 import { signal } from '@angular/core';
 import { Validators } from '@angular/forms';
 import { ToastService } from '../services/toast.service';
 import { CookieService } from 'ngx-cookie-service';
 import { VERIFICATION_EMAIL } from '../util/helper';
+import { AuthStore } from '../store/auth.store';
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
   let fixture: ComponentFixture<AuthComponent>;
 
-  let currentCode$: BehaviorSubject<any>;
-  let isAuthenticated$: BehaviorSubject<any>;
-  let redirect$: BehaviorSubject<any>;
-  let queryParams$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
+  let authStoreSpy: {
+    isAuthenticated: ReturnType<typeof signal>;
+    redirect: ReturnType<typeof signal>;
+    queryParams: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    authRedirect: jasmine.Spy;
+    login: jasmine.Spy;
+    signupSuccess: jasmine.Spy;
+    setCurrentCode: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+
   let action$: Subject<void>;
 
-  let storeSpy: jasmine.SpyObj<Store<AuthState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let cookieService: CookieService;
 
   beforeEach(async () => {
-    currentCode$ = new BehaviorSubject(undefined);
-    isAuthenticated$ = new BehaviorSubject(false);
-    redirect$ = new BehaviorSubject(undefined);
-    queryParams$ = new BehaviorSubject(undefined);
-    error$ = new BehaviorSubject(undefined);
-    response$ = new BehaviorSubject(undefined);
+    authStoreSpy = {
+      isAuthenticated: signal(false),
+      redirect: signal(false),
+      queryParams: signal(undefined),
+      error: signal(undefined),
+      response: signal(undefined),
+      authRedirect: jasmine.createSpy('authRedirect'),
+      login: jasmine.createSpy('login'),
+      signupSuccess: jasmine.createSpy('signupSuccess'),
+      setCurrentCode: jasmine.createSpy('setCurrentCode'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      clean: jasmine.createSpy('clean'),
+    };
     action$ = new Subject<void>();
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         queryParams: {},
       },
+      queryParamMap: of(convertToParamMap({})),
     });
 
     toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return currentCode$.asObservable();
-        case 2:
-          return isAuthenticated$.asObservable();
-        case 3:
-          return redirect$.asObservable();
-        case 4:
-          return queryParams$.asObservable();
-        case 5:
-          return error$.asObservable();
-        case 6:
-          return response$.asObservable();
-        default:
-          return of(undefined);
-      }
     });
 
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', [
@@ -83,7 +75,7 @@ describe('AuthComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AuthComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
@@ -97,12 +89,7 @@ describe('AuthComponent', () => {
   });
 
   afterEach(() => {
-    currentCode$.complete();
-    isAuthenticated$.complete();
-    redirect$.complete();
-    queryParams$.complete();
-    error$.complete();
-    response$.complete();
+    action$.complete();
     cookieService.deleteAll('/');
   });
 
@@ -184,9 +171,7 @@ describe('AuthComponent', () => {
 
     expect(firebaseServiceSpy.updateProfile).toHaveBeenCalledWith({ displayName: 'Test User' });
     expect(firebaseServiceSpy.sendVerificationEmail).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Signup Success',
-    }));
+    expect(authStoreSpy.signupSuccess).toHaveBeenCalled();
   }));
 
   it('should dispatch login when processing a verified user', fakeAsync(() => {
@@ -197,10 +182,7 @@ describe('AuthComponent', () => {
     flushMicrotasks();
 
     expect(firebaseServiceSpy.sendVerificationEmail).not.toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Login',
-      token: 'id-token',
-    }));
+    expect(authStoreSpy.login).toHaveBeenCalledWith('id-token', undefined, '', {});
   }));
 
   it('should not dispatch login when verified user has no id token', fakeAsync(() => {
@@ -210,9 +192,7 @@ describe('AuthComponent', () => {
     (component as any).processUser(mockUser);
     flushMicrotasks();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Login',
-    }));
+    expect(authStoreSpy.login).not.toHaveBeenCalled();
   }));
 
   it('should login instead of sending verification email when verification cookie exists', fakeAsync(() => {
@@ -224,10 +204,7 @@ describe('AuthComponent', () => {
     flushMicrotasks();
 
     expect(firebaseServiceSpy.sendVerificationEmail).not.toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Login',
-      token: 'id-token',
-    }));
+    expect(authStoreSpy.login).toHaveBeenCalledWith('id-token', undefined, '', {});
   }));
 
   it('should map sign up invalid-email errors to the email control', fakeAsync(() => {
@@ -257,14 +234,12 @@ describe('AuthComponent', () => {
   }));
 
   it('should clear auth state when the response toast action is used', () => {
-    response$.next({ message: 'OK', toastType: 'success' });
+    authStoreSpy.response.set({ message: 'OK', toastType: 'success' });
     fixture.detectChanges();
 
     action$.next();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Clean',
-    }));
+    expect(authStoreSpy.clearResponse).toHaveBeenCalled();
   });
 
   it('should dispatch setCurrentCode when codeSignal changes', () => {
@@ -273,19 +248,16 @@ describe('AuthComponent', () => {
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Set current code',
-      code: testCode,
-    }));
+    expect(authStoreSpy.setCurrentCode).toHaveBeenCalledWith(testCode);
   });
 
   it('should show toast when errorSignal has message', () => {
     const mockError = { message: 'Some error' };
-    error$.next(mockError);
+    authStoreSpy.error.set(mockError);
 
     fixture.detectChanges();
 
-    error$.next(mockError);
+    authStoreSpy.error.set(mockError);
     fixture.detectChanges();
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith('Some error', 'error');

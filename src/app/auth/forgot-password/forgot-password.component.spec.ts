@@ -1,53 +1,45 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../services/toast.service';
 import { Router } from '@angular/router';
-import { BehaviorSubject, of, Subject } from 'rxjs';
-import { AuthState } from '../../store/reducers/auth.reducers';
-import { IError } from '../../interfaces/common';
+import { of, Subject } from 'rxjs';
 import { FirebaseService } from '../../services/firebase.service';
 import { NavigationService } from '../../services/navigation.service';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { signal } from '@angular/core';
+import { AuthStore } from '../../store/auth.store';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
   let fixture: ComponentFixture<ForgotPasswordComponent>;
 
-  let error$: Subject<IError | undefined>;
-  let response$: Subject<any>;
   let action$: Subject<void>;
 
-  let storeSpy: jasmine.SpyObj<Store<AuthState>>;
+  let authStoreSpy: {
+    error: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    signupSuccess: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
 
   beforeEach(async () => {
-    error$ = new Subject<IError | undefined>();
-    response$ = new Subject<any>();
+    authStoreSpy = {
+      error: signal(undefined),
+      response: signal(undefined),
+      signupSuccess: jasmine.createSpy('signupSuccess'),
+      clean: jasmine.createSpy('clean'),
+    };
     action$ = new Subject<void>();
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['sendPasswordResetEmail']);
 
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return error$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
@@ -57,7 +49,7 @@ describe('ForgotPasswordComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ForgotPasswordComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
@@ -75,8 +67,6 @@ describe('ForgotPasswordComponent', () => {
   });
 
   afterEach(() => {
-    error$.complete();
-    response$.complete();
     action$.complete();
   });
 
@@ -86,14 +76,14 @@ describe('ForgotPasswordComponent', () => {
   });
 
   it('should call toast.error when errorMessage emits', () => {
-    error$.next({ message: 'My error!' });
+    authStoreSpy.error.set({ message: 'My error!' });
     fixture.detectChanges();
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith('My error!', 'error');
   });
 
   it('should show toast and navigate when response emits', () => {
-    response$.next({ message: 'OK', toastType: 'success' });
+    authStoreSpy.response.set({ message: 'OK', toastType: 'success' });
     fixture.detectChanges();
 
     action$.next();
@@ -110,8 +100,6 @@ describe('ForgotPasswordComponent', () => {
     await fixture.whenStable();
 
     expect(firebaseServiceSpy.sendPasswordResetEmail).toHaveBeenCalledWith('test@example.com');
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Auth] Signup Success',
-    }));
+    expect(authStoreSpy.signupSuccess).toHaveBeenCalled();
   });
 });

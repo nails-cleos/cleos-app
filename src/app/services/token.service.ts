@@ -1,18 +1,15 @@
 import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Subscription, timer } from 'rxjs';
 
 import { IUserAll } from '../user/user';
 import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
-import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
-import { AuthState } from '../store/reducers/auth.reducers';
-import { Store } from '@ngrx/store';
 import { FirebaseService } from './firebase.service';
+import { AuthStore } from '../store/auth.store';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
   private readonly destroyRef = inject(DestroyRef);
-  private readonly store = inject(Store<AuthState>);
+  private readonly authStore = inject(AuthStore);
   private readonly firebaseService = inject(FirebaseService);
 
   private readonly tokenSignal = signal<string | null>(null);
@@ -21,8 +18,7 @@ export class TokenService {
   private readonly userSignal = signal<IUserAll | null>(null);
   readonly user = computed(() => this.userSignal());
 
-  readonly storeDriveToken = toSignal(this.store.pipe(getDriveTokenPipe), { initialValue: undefined });
-  readonly driveToken = computed(() => this.storeDriveToken());
+  readonly driveToken = this.authStore.driveToken;
 
   private refreshSubscription?: Subscription;
   private readonly refreshInterval = 55 * 60 * 1000; // 55 min

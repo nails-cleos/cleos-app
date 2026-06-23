@@ -9,7 +9,6 @@ import {
   sendMessage,
   setCurrentLang,
   treatmentSuccess,
-  updateMyUser,
 } from '../actions/main.actions';
 import { ICatalogueAll } from '../../catalogue/catalogue';
 import { ITreatmentGroup } from '../../treatment/treatment';
@@ -50,7 +49,7 @@ export const mainReducer = createReducer(
     response: undefined,
     isLoading: true,
   })),
-  on(updateMyUser, sendMessage, (state) => ({
+  on(sendMessage, (state) => ({
     ...state,
     response: undefined,
     isLoading: true,

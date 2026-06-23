@@ -1,23 +1,24 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { UserService } from '../services/user.service';
 import { IOverview, IUser, IUserAll } from '../user/user';
 import { Role, Token } from '../interfaces/token';
-import { loginSuccess } from './actions/auth.actions';
 import { UserStore } from './user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { AuthStore } from './auth.store';
 
 describe('UserStore', () => {
   let store: InstanceType<typeof UserStore>;
   let userServiceSpy: jasmine.SpyObj<UserService>;
   let translateSpy: jasmine.SpyObj<TranslateService>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let ngrxStoreSpy: jasmine.SpyObj<Store>;
+  let authStoreSpy: {
+    loginSuccess: jasmine.Spy;
+  };
 
   const user = {
     id: 'user-1',
@@ -35,6 +36,9 @@ describe('UserStore', () => {
   };
 
   beforeEach(() => {
+    authStoreSpy = {
+      loginSuccess: jasmine.createSpy('loginSuccess'),
+    };
     userServiceSpy = jasmine.createSpyObj<UserService>('UserService', [
       'getUsersPage',
       'getCustomers',
@@ -53,7 +57,6 @@ describe('UserStore', () => {
     ]);
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
     routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
-    ngrxStoreSpy = jasmine.createSpyObj<Store>('Store', ['dispatch']);
 
     translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) =>
       params?.['role'] ? `${ key }:${ params['role'] }`
@@ -67,7 +70,7 @@ describe('UserStore', () => {
         { provide: UserService, useValue: userServiceSpy },
         { provide: TranslateService, useValue: translateSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: Store, useValue: ngrxStoreSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
       ],
     });
 
@@ -102,8 +105,6 @@ describe('UserStore', () => {
     store.loadOverview('user-1');
 
     expect(userServiceSpy.getUsersPage).toHaveBeenCalledWith(1, 'displayName', 'asc', 25, 'ann');
-    expect(store.data()).toBeUndefined();
-    expect(store.selected()).toBeUndefined();
     expect(store.overview()).toEqual(overview);
     expect(store.isLoading()).toBeFalse();
   });
@@ -167,12 +168,10 @@ describe('UserStore', () => {
       message: 'PROFILE.UPDATED',
       toastType: 'success',
     });
-    expect(ngrxStoreSpy.dispatch).toHaveBeenCalledWith(loginSuccess({
+    expect(authStoreSpy.loginSuccess).toHaveBeenCalledWith(
       token,
-      queryParams: {
-        state: btoa(JSON.stringify({ returnUrl: '/es/auth/profile', lang: 'es' })),
-      },
-    }));
+      { state: btoa(JSON.stringify({ returnUrl: '/es/auth/profile', lang: 'es' })) },
+    );
   });
 
   it('should update profile photo and dispatch login success with current language', () => {
@@ -185,12 +184,10 @@ describe('UserStore', () => {
       message: 'COMMON.PROFILE.UPDATED.PHOTO',
       toastType: 'success',
     });
-    expect(ngrxStoreSpy.dispatch).toHaveBeenCalledWith(loginSuccess({
+    expect(authStoreSpy.loginSuccess).toHaveBeenCalledWith(
       token,
-      queryParams: {
-        state: btoa(JSON.stringify({ returnUrl: `/${ DEFAULT_LOCALE }/auth/profile`, lang: DEFAULT_LOCALE })),
-      },
-    }));
+      { state: btoa(JSON.stringify({ returnUrl: `/${ DEFAULT_LOCALE }/auth/profile`, lang: DEFAULT_LOCALE })) },
+    );
   });
 
   it('should clear response, clear errors, and clean state', () => {

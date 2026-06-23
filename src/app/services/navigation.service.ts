@@ -1,14 +1,11 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
-import { IUser, User } from '../user/user';
 import { Store } from '@ngrx/store';
 import { setLanguage } from '../store/actions/i18n.actions';
 import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { I18NState } from '../store/reducers/i18n.reducers';
-import { UserStore } from '../store/user.store';
 
 @Injectable({
   providedIn: 'root',
@@ -20,7 +17,6 @@ export class NavigationService {
   private store: Store<I18NState> = inject(Store<I18NState>);
   private router: Router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly userStore = inject(UserStore);
 
   private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
 
@@ -132,11 +128,8 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void {
-    const currentLang = getLocale(this.languageSignal()).language;
-    const navigateUrl = `/${ lang || currentLang }${ reloadURL }`;
-    this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
-      this.router.navigate(url.filter(path => path), { state: data, queryParams }));
+  reload(url: string[], data?: any, queryParams?: any): void {
+    this.router.navigate(url.filter(Boolean), { state: data, queryParams });
   }
 
   reloadPage(url?: string): void {
@@ -145,7 +138,7 @@ export class NavigationService {
     this.router.navigateByUrl(currentUrl).then(() => window.location.reload());
   }
 
-  attachLang(lang?: string, currentUser?: IUser): string {
+  attachLang(lang?: string): string {
     const language = getLocale(lang).language;
     const currentLang = this.languageSignal();
 
@@ -154,19 +147,6 @@ export class NavigationService {
     }
 
     this.store.dispatch(setLanguage({ language }));
-
-    if (!currentUser) {
-      return language;
-    }
-
-    const userLanguage = getLocale(currentUser?.locale).language;
-
-    if (userLanguage !== language) {
-      const user: IUser = new User();
-      user.locale = language;
-
-      this.userStore.updateMyUser(user, this.router.url);
-    }
 
     return language;
   }

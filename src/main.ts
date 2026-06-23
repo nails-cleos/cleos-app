@@ -9,7 +9,7 @@ import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
-import { ActionReducer, MetaReducer, provideStore } from '@ngrx/store';
+import { provideStore } from '@ngrx/store';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -31,21 +31,21 @@ import localeEs from '@angular/common/locales/es';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
-import { localStorageSync } from 'ngrx-store-localstorage';
-import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { i18nReducer } from './app/store/reducers/i18n.reducers';
 import { I18NEffects } from './app/store/effects/i18n.effects';
 import { provideEffects } from '@ngrx/effects';
-import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app/app.routes';
 import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
 import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 import { DEFAULT_LOCALE } from './app/util/dates';
+import { AuthStore } from './app/store/auth.store';
+import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
 
 export interface ISendMessage {
   name: string;
@@ -74,18 +74,13 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
   type: 'info',
   content: {
-    href: `${environment.appServer}/privacy`,
+    href: `${ environment.appServer }/privacy`,
   },
 };
-
-const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
-  { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
 
 registerLocaleData(localeEnGB, DEFAULT_LOCALE);
 registerLocaleData(localeNl, 'nl');
 registerLocaleData(localeEs, 'es');
-
-const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 export function initializePwaService(pwaService: PwaService) {
   pwaService.initPwaPrompt();
@@ -94,14 +89,14 @@ export function initializePwaService(pwaService: PwaService) {
 const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
   provideStore({
-    auth: authReducer,
     reservation: reservationReducer,
     main: mainReducer,
     payment: paymentReducer,
     i18n: i18nReducer,
-  }, { metaReducers }),
+  }),
   provideRouter(
     routes,
+    withRouterConfig({ onSameUrlNavigation: 'reload' }),
     withComponentInputBinding(),
     withInMemoryScrolling({ anchorScrolling: 'enabled' }),
   ),
@@ -148,6 +143,9 @@ const providers = [
   provideAppIcons(),
   provideAppInitializer(() => {
     inject(I18nBridgeService);
+    inject(AuthRedirectEffect);
+    const authStore = inject(AuthStore);
+    authStore.hydrate();
   }),
   provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),

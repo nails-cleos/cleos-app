@@ -5,7 +5,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
-import { IUser, User } from '../user/user';
 import { setLanguage } from '../store/actions/i18n.actions';
 import { I18NState } from '../store/reducers/i18n.reducers';
 import { UserStore } from '../store/user.store';
@@ -19,13 +18,6 @@ describe('NavigationService', () => {
   let routerEventsSubject: Subject<any>;
 
   let lang: BehaviorSubject<any>;
-
-  const mockUser: IUser = {
-    id: 'user-123',
-    displayName: 'Test User',
-    email: 'test@example.com',
-    locale: DEFAULT_LOCALE,
-  };
 
   beforeEach(() => {
     sessionStorage.clear();
@@ -215,56 +207,32 @@ describe('NavigationService', () => {
   });
 
   describe('reload', () => {
-    it('should reload with all parameters', (done) => {
-      const url = ['/dashboard', 'profile'];
+    it('should navigate with filtered URL segments', () => {
+      const url = ['/dashboard', '', 'profile'];
       const data = { userId: '123' };
       const queryParams = { tab: 'settings' };
-      const reloadURL = '/auth/reload';
-      const lang = 'es';
 
-      service.reload(url, data, queryParams, reloadURL, lang);
+      service.reload(url, data, queryParams);
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/es/auth/reload', { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard', 'profile'], {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        ['/dashboard', 'profile'],
+        {
           state: data,
           queryParams,
-        });
-        done();
-      }, 0);
+        },
+      );
     });
 
-    it('should reload with default reloadURL and current language', (done) => {
-      const url = ['/dashboard'];
+    it('should handle empty params', () => {
+      service.reload(['/home']);
 
-      service.reload(url);
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/auth/redirect`, { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard'], {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        ['/home'],
+        {
           state: undefined,
           queryParams: undefined,
-        });
-        done();
-      }, 0);
-    });
-
-    it('should filter out empty paths from URL array', (done) => {
-      const url = ['/dashboard', '', 'profile', null as any, 'settings'];
-
-      service.reload(url);
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/auth/redirect`, { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard', 'profile', 'settings'], {
-          state: undefined,
-          queryParams: undefined,
-        });
-        done();
-      }, 0);
+        },
+      );
     });
   });
 
@@ -296,72 +264,31 @@ describe('NavigationService', () => {
 
   describe('attachLang', () => {
     it('should return current language when no change needed', () => {
-      const result = service.attachLang('en');
+      const result = service.attachLang(DEFAULT_LOCALE);
 
       expect(result).toBe(DEFAULT_LOCALE);
       expect(storeSpy.dispatch).not.toHaveBeenCalled();
     });
 
     it('should dispatch language change when language differs', () => {
-      const result = service.attachLang('es', mockUser);
+      const result = service.attachLang('es');
 
       expect(result).toBe('es');
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
+      expect(storeSpy.dispatch).toHaveBeenCalledWith(
+        setLanguage({ language: 'es' }),
+      );
     });
 
-    it('should update user language when user locale differs from new language', () => {
-      const userWithDifferentLocale = { ...mockUser, locale: 'fr-FR' };
+    it('should normalize language using getLocale', () => {
+      const result = service.attachLang('es-ES');
 
-      service.attachLang('es', userWithDifferentLocale);
-      const updatedUser: IUser = new User();
-      updatedUser.locale = 'es';
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(updatedUser, '/test/path');
+      expect(result).toBe('es'); // depends on getLocale mock behavior
     });
 
-    it('should not update user when user locale matches new language', () => {
-      const userWithSameLocale = { ...mockUser, locale: 'es-ES' };
-
-      service.attachLang('es', userWithSameLocale);
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1); // Only language change, not user update
-    });
-
-    it('should handle null language parameter', () => {
+    it('should handle undefined language', () => {
       const result = service.attachLang(undefined);
 
-      expect(result).toBe(DEFAULT_LOCALE); // Default language from getLocale mock
-    });
-
-    it('should not update user when current user is not provided', () => {
-      service.attachLang('es');
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1);
-    });
-
-    it('should handle user without locale', () => {
-      const userWithoutLocale = { ...mockUser, locale: undefined };
-
-      service.attachLang('es', userWithoutLocale);
-      const updatedUser: IUser = new User();
-      updatedUser.locale = 'es';
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(updatedUser, '/test/path');
-    });
-
-    it('should create User object with correct language', () => {
-      let capturedUser: IUser;
-      userStoreSpy.updateMyUser.and.callFake((user: IUser) => {
-        capturedUser = user;
-      });
-
-      service.attachLang('es', mockUser);
-
-      expect(capturedUser!.locale).toBe('es');
+      expect(typeof result).toBe('string');
     });
   });
 

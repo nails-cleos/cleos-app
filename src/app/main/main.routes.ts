@@ -10,7 +10,6 @@ import { MainEffects } from '../store/effects/main.effects';
 import { MainService } from '../services/main.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
-import { LoginEffects } from '../store/effects/auth.effects';
 import { AuthService } from '../services/auth.service';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { provideState } from '@ngrx/store';
@@ -29,7 +28,7 @@ const providers = [
     useClass: HashLocationStrategy,
   },
   provideState(MAIN_FEATURE_KEY, mainReducer),
-  provideEffects(MainEffects, LoginEffects, MainNavigationEffects),
+  provideEffects(MainEffects, MainNavigationEffects),
 ];
 
 const children: Routes = [

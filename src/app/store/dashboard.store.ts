@@ -177,8 +177,7 @@ export const DashboardStore = signalStore(
           .subscribe({
             next: () => {
               patchState(store, { isLoading: false, response: { message: 'SUMMARY.UPDATED' } });
-              navigationService.reload(router.url.split('/'),
-                { date: date, step: step }, null, '/dashboard/quarter/summary');
+              navigationService.reload(router.url.split('/'), { date: date, step: step });
             },
             error: patchError,
           });

@@ -2,28 +2,34 @@ import { TestBed } from '@angular/core/testing';
 
 import { PermissionsService } from './auth-guard.service';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { signal } from '@angular/core';
+import { AuthStore } from '../store/auth.store';
 
 describe('authGuard', () => {
   let service: PermissionsService;
   let router: jasmine.SpyObj<Router>;
 
-  let user$: BehaviorSubject<any>;
   let action$: BehaviorSubject<any>;
 
+  let authStoreSpy: {
+    user: ReturnType<typeof signal>;
+    authRedirect: jasmine.Spy;
+  };
+
   beforeEach(() => {
-    user$ = new BehaviorSubject({ authorities: [{ authority: 'ROLE_USER' }] });
+    authStoreSpy = {
+      user: signal({ authorities: [{ authority: 'ROLE_USER' }] }),
+      authRedirect: jasmine.createSpy('authRedirect'),
+    };
     action$ = new BehaviorSubject(undefined);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-    const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     const toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
     routerSpy.currentNavigation.and.returnValue(null);
-    storeSpy.pipe.and.returnValue(user$.asObservable());
 
     toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
@@ -35,7 +41,7 @@ describe('authGuard', () => {
       providers: [
         PermissionsService,
         { provide: Router, useValue: routerSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     });
@@ -67,7 +73,7 @@ describe('authGuard', () => {
   });
 
   it('should deny activation and redirect if user is not logged in', () => {
-    user$.next(undefined);
+    authStoreSpy.user.set(undefined);
     const route = {} as ActivatedRouteSnapshot;
     const state = { url: '/test' } as RouterStateSnapshot;
 

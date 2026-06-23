@@ -11,6 +11,10 @@ type TestEntity = {
   name: string;
 };
 
+type TestData =
+  | { kind: 'pagination'; value?: Pagination<TestEntity> }
+  | { kind: 'list'; value?: TestEntity[] };
+
 type TestResponse = {
   id: string;
   name: string;
@@ -36,7 +40,7 @@ class TestCrudApi {
 }
 
 const TestCrudStore = signalStore(
-  withCrudStoreState<TestEntity>(),
+  withCrudStoreState<TestEntity, TestData, TestEntity>(),
   withCrudStoreMethods<TestEntity, TestResponse, TestResponse, TestDeleteArgs>(() => {
     const api = inject(TestCrudApi);
 
@@ -116,7 +120,7 @@ describe('crud-signal-store', () => {
 
     secondPage$.next(secondPage);
     secondPage$.complete();
-    expect(store.data()).toEqual(secondPage);
+    expect(store.data()).toEqual({ kind: 'pagination', value: secondPage });
     expect(store.isLoading()).toBeFalse();
   });
 
@@ -187,7 +191,7 @@ describe('crud-signal-store', () => {
     store.loadPage({ page: 0, sort: 'name', direction: 'asc', size: 10 });
     store.create({ name: 'x' });
 
-    expect(store.data()).toEqual(page);
+    expect(store.data()).toEqual({ kind: 'pagination', value: page });
     expect(store.error()).toEqual(jasmine.objectContaining({
       status: 'SERVER_ERROR',
       message: 'COMMON.ERROR.TRY_LATER',

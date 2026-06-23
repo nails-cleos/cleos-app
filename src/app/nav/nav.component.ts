@@ -3,7 +3,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../user/user';
-import { logOut, redirect } from '../store/actions/auth.actions';
 import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
@@ -22,7 +21,6 @@ import { ErrorComponent } from '../shared/error/error.component';
 import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
 import { of } from 'rxjs';
 import { selectGlobalError, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
@@ -44,6 +42,7 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { MatBadge } from '@angular/material/badge';
 import { UserStore } from '../store/user.store';
 import { NotificationStore } from '../store/notification.store';
+import { AuthStore } from '../store/auth.store';
 
 @Component({
   selector: 'app-nav',
@@ -62,6 +61,7 @@ export class NavComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly store: Store = inject(Store);
+  private readonly authStore = inject(AuthStore);
   private readonly notificationStore = inject(NotificationStore);
   private readonly messagingService: MessagingService = inject(MessagingService);
   private readonly toastService: ToastService = inject(ToastService);
@@ -78,10 +78,6 @@ export class NavComponent {
 
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
-  private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
-  private user$ = this.store.pipe(getUserPipe);
-  private menus$ = this.store.pipe(getMenusPipe);
-  private redirect$ = this.store.pipe(getRedirectPipe);
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -98,9 +94,9 @@ export class NavComponent {
 
   title = this.env.title;
 
-  private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
-  private redirectSignal = toSignal(this.redirect$);
-  private menuItemsSignal = toSignal(this.menus$);
+  private isAuthenticatedSignal = this.authStore.isAuthenticated;
+  private redirectSignal = this.authStore.redirect;
+  private menuItemsSignal = this.authStore.menus;
   private notificationSignal = computed(() => this.notificationStore.data());
   private dataDeletedSignal = computed(() => this.notificationStore.dataDeleted());
   private dataReadSignal = computed(() => this.notificationStore.dataRead());
@@ -110,7 +106,7 @@ export class NavComponent {
   private readonly feedbackResponse = computed(() => this.findFeedbackSource(source => source.response()));
   private readonly feedbackError = computed(() => this.findFeedbackSource(source => source.error()));
 
-  currentUserSignal = toSignal(this.user$);
+  currentUserSignal = this.authStore.user;
 
   private authUserSignal = this.authUserService.authUser;
   private isAuthorized = computed(() => this.isAuthenticatedSignal() ?? false);
@@ -285,7 +281,7 @@ export class NavComponent {
       }
       if (this.router.url === `/${ language }`) {
         if (isAuthorized && !redirectSignal) {
-          this.store.dispatch(redirect());
+          this.authStore.authRedirect();
         } else {
           this.router.navigate(['/', language, 'home']);
         }
@@ -367,7 +363,7 @@ export class NavComponent {
   }
 
   logout() {
-    this.store.dispatch(logOut());
+    this.authStore.logOut();
   }
 
   changeTheme() {

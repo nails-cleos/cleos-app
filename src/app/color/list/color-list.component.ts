@@ -108,6 +108,7 @@ export class ColorListComponent {
       }
 
       const currentPage = this.paginatorPageIndex();
+      this.colorStore.clearResponse();
 
       if (currentPage === 0) {
         const request = this.tableState.baseRequest();

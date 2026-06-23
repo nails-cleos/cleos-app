@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { redirect } from '../store/actions/auth.actions';
 import { IUser, User } from '../user/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
@@ -12,7 +11,6 @@ import { ThemeService } from 'ng2-charts';
 import { goTo, observeElementSignal } from '../util/animation';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
-import { updateMyUser } from '../store/actions/main.actions';
 import { NavigationService } from '../services/navigation.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { getCurrentLangPipe } from '../store/selectors/main.selectors';
@@ -27,6 +25,9 @@ import { MatSidenavContainer, MatSidenavContent } from '@angular/material/sidena
 import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
 import { UpperCasePipe } from '@angular/common';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { AuthStore } from '../store/auth.store';
+import { UserStore } from '../store/user.store';
+import { getLocale } from '../util/helper';
 
 @Component({
   selector: 'app-main',
@@ -43,6 +44,8 @@ export class MainComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly authStore = inject(AuthStore);
+  private readonly userStore = inject(UserStore);
   private readonly router: Router = inject(Router);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
@@ -114,7 +117,22 @@ export class MainComponent {
     effect(() => {
       const lang = this.langSignal();
       this.authUserService.cookieConsent(this.translate);
-      this.language = this.navigationService.attachLang(lang);
+
+      const resolvedLang = this.navigationService.attachLang(lang);
+      const currentUser = untracked(() => this.authUserService.authUser());
+
+      if (!currentUser) {
+        return;
+      }
+
+      const userLang = getLocale(currentUser.locale).language;
+
+      if (userLang !== resolvedLang) {
+        const user: IUser = new User();
+        user.locale = resolvedLang;
+
+        this.userStore.updateMyUser(user, this.router.url);
+      }
     });
 
     this.router.events
@@ -132,7 +150,7 @@ export class MainComponent {
   }
 
   redirect(): void {
-    return this.store.dispatch(redirect());
+    this.authStore.authRedirect();
   }
 
   treatment(): void {
@@ -163,7 +181,7 @@ export class MainComponent {
     authenticatedUser.theme = theme;
     const redirectUrl = this.router.url;
     const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ isDark.toString().toUpperCase() }`);
-    this.store.dispatch(updateMyUser({ user: authenticatedUser, redirectUrl, message }));
+    this.userStore.updateMyUser(authenticatedUser, redirectUrl, message);
   }
 
   private navigationAnimation = (): void => {

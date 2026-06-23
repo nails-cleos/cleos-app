@@ -1,6 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { cleanAuth, login, redirect, setCurrentCode, signupSuccess } from '../store/actions/auth.actions';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { VERIFICATION_EMAIL } from '../util/helper';
@@ -8,16 +6,7 @@ import { THEME } from '../util/theme';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
-import {
-  getAuthErrorPipe,
-  getAuthResponsePipe,
-  getCurrentCodePipe,
-  getIsAuthenticatedPipe,
-  getQueryParamsPipe,
-  getRedirectPipe,
-} from '../store/selectors/auth.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AuthState } from '../store/reducers/auth.reducers';
 import { EnvService } from '../services/env.service';
 import { FirebaseService } from '../services/firebase.service';
 import { User } from 'firebase/auth';
@@ -25,6 +14,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { NgTemplateOutlet } from '@angular/common';
+import { AuthStore } from '../store/auth.store';
 
 type AuthForm = {
   email: FormControl<string>;
@@ -44,27 +34,21 @@ type AuthForm = {
 export class AuthComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly authStore = inject(AuthStore);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly firebaseService = inject(FirebaseService);
 
-  private currentCode$ = this.store.pipe(getCurrentCodePipe);
-  private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
-  private redirect$ = this.store.pipe(getRedirectPipe);
-  private queryParams$ = this.store.pipe(getQueryParamsPipe);
+  queryParams = toSignal(this.route.queryParamMap);
 
-  private error$ = this.store.pipe(getAuthErrorPipe);
-  private response$ = this.store.pipe(getAuthResponsePipe);
-
-  private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
-  private redirectSignal = toSignal(this.redirect$);
-  private queryParamsSignal = toSignal(this.queryParams$);
-  private errorSignal = toSignal(this.error$);
-  private responseSignal = toSignal(this.response$);
-  private codeSignal = toSignal(this.currentCode$);
+  private isAuthenticatedSignal = this.authStore.isAuthenticated;
+  private redirectSignal = this.authStore.redirect;
+  private queryParamsSignal = this.authStore.queryParams;
+  private errorSignal = this.authStore.error;
+  private responseSignal = this.authStore.response;
+  private codeSignal = computed(() => this.queryParams()?.get('code') ?? undefined);
 
   statusSignal = signal('init');
 
@@ -83,10 +67,11 @@ export class AuthComponent {
 
   language: string = this.translate.getCurrentLang();
   showForm: boolean = false;
-  tos: string = `${this.env.appServer}/${this.language}/term-and-conditions`;
-  privacyPolicy: string = `${this.env.appServer}/${this.language}/privacy`;
+  tos: string = `${ this.env.appServer }/${ this.language }/term-and-conditions`;
+  privacyPolicy: string = `${ this.env.appServer }/${ this.language }/privacy`;
 
   constructor() {
+    this.authStore.clean();
     effect(() => {
       if (this.isAuthenticatedSignal()) {
         const queryParams = this.queryParamsSignal();
@@ -95,7 +80,7 @@ export class AuthComponent {
           returnUrl = JSON.parse(atob(queryParams.state))?.returnUrl;
         }
         if (!this.redirectSignal() && !returnUrl) {
-          this.store.dispatch(redirect());
+          this.authStore.authRedirect();
         }
       }
     });
@@ -112,7 +97,7 @@ export class AuthComponent {
       if (response?.message) {
         const actionType = 'button';
         const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
-        toastRef.onAction().subscribe(() => this.store.dispatch(cleanAuth()));
+        toastRef.onAction().subscribe(() => this.authStore.clearResponse());
       }
     });
 
@@ -128,7 +113,7 @@ export class AuthComponent {
     effect(() => {
       const code = this.currentCodeSignal();
       if (code) {
-        this.store.dispatch(setCurrentCode({ code }));
+        this.authStore.setCurrentCode(code);
       }
     });
 
@@ -204,7 +189,7 @@ export class AuthComponent {
       this.firebaseService.sendVerificationEmail()
         .then(() => {
           const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
-          this.store.dispatch(signupSuccess({ message }));
+          this.authStore.signupSuccess({ message });
           this.cookieService.set(VERIFICATION_EMAIL, 'sent');
         })
         .catch(console.error);
@@ -216,14 +201,8 @@ export class AuthComponent {
         if (!idToken) {
           return;
         }
-        this.store.dispatch(
-          login({
-            token: idToken,
-            queryParams: this.route.snapshot.queryParams,
-            theme: this.cookieService.get(THEME),
-            code: this.codeSignal(),
-          }),
-        );
+        this.authStore.login(idToken, this.codeSignal(), this.cookieService.get(THEME),
+          this.route.snapshot.queryParams);
       });
   }
 }

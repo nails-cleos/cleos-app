@@ -1,14 +1,12 @@
 import { Routes } from '@angular/router';
 import { NavComponent } from './nav.component';
 import { provideEffects } from '@ngrx/effects';
-import { LoginEffects } from '../store/effects/auth.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { provideState } from '@ngrx/store';
-import { AUTH_FEATURE_KEY, authReducer } from '../store/reducers/auth.reducers';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
 import { RoomService } from '../services/room.service';
@@ -53,6 +51,7 @@ import { NotificationStore } from '../store/notification.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { MessagingService } from '../services/messaging.service';
+import { AuthStore } from '../store/auth.store';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
@@ -75,6 +74,11 @@ const providers = [
   AccountService,
   DashboardService,
   MessagingService,
+  TrackingService,
+  AwsLambdaService,
+  DocumentService,
+  StatementService,
+  InvoiceService,
   UserStore,
   CatalogueStore,
   ColorStore,
@@ -110,16 +114,10 @@ const providers = [
   provideGlobalFeedbackSource(UnavailableStore),
   provideGlobalFeedbackSource(TreatmentStore),
   provideGlobalFeedbackSource(RoomStore),
-  TrackingService,
-  AwsLambdaService,
-  DocumentService,
-  StatementService,
-  InvoiceService,
-  provideState(AUTH_FEATURE_KEY, authReducer),
+  provideGlobalFeedbackSource(AuthStore),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
   provideEffects(
-    LoginEffects,
     ReservationEffects,
     PaymentEffects,
   ),

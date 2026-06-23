@@ -11,18 +11,14 @@ import {
   requestSuccess,
   sendMessage,
   treatmentSuccess,
-  updateMyUser,
 } from '../actions/main.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/catalogue.service';
 import { TreatmentService } from '../../services/treatment.service';
 import { MainService } from '../../services/main.service';
-import { UserService } from '../../services/user.service';
-import { Token } from '../../interfaces/token';
 import { ICatalogueAll } from '../../catalogue/catalogue';
 import { ITreatmentGroup } from '../../treatment/treatment';
 import { success } from '../../interfaces/common';
-import { loginSuccess } from '../actions/auth.actions';
 import { effectRequest } from '../../util/rxjs';
 
 @Injectable()
@@ -32,7 +28,6 @@ export class MainEffects {
   mainService: MainService = inject(MainService);
   catalogueService: CatalogueService = inject(CatalogueService);
   treatmentService: TreatmentService = inject(TreatmentService);
-  userService: UserService = inject(UserService);
 
   getAllCatalogue$ = createEffect(() => this.actions.pipe(
     ofType(getAllCatalogue),
@@ -59,23 +54,6 @@ export class MainEffects {
     switchMap(({ sendMessage }) => effectRequest(
       this.mainService.sendMessage(sendMessage).pipe(switchMap(() =>
         success(requestSuccess, 'MAIN.CONTACT.SEND.MESSAGE'))),
-      action => action,
-      requestFailure,
-    )),
-  ));
-
-  update$ = createEffect(() => this.actions.pipe(
-    ofType(updateMyUser),
-    switchMap(({ user, message, redirectUrl }) => effectRequest(
-      this.userService.updateMyUser(user).pipe(switchMap((response: Token) => {
-        const updateMessage = this.translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
-          { displayName: response.user.displayName });
-        return success(requestSuccess, message ? message : updateMessage, undefined, undefined, undefined,
-          loginSuccess({
-            token: response,
-            queryParams: { state: btoa(JSON.stringify({ returnUrl: redirectUrl })) },
-          }));
-      })),
       action => action,
       requestFailure,
     )),

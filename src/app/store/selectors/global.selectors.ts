@@ -1,10 +1,8 @@
 import { createSelector } from '@ngrx/store';
 import { selectReservationError, selectReservationResponse } from './reservation.selectors';
 import { selectPaymentError, selectPaymentResponse } from './payment.selectors';
-import { selectAuthError, selectAuthResponse } from './auth.selectors';
 
 export const selectGlobalResponse = createSelector(
-  selectAuthResponse,
   selectPaymentResponse,
   selectReservationResponse,
   (...responses) =>
@@ -12,7 +10,6 @@ export const selectGlobalResponse = createSelector(
 );
 
 export const selectGlobalError = createSelector(
-  selectAuthError,
   selectPaymentError,
   selectReservationError,
   (...errors) =>
