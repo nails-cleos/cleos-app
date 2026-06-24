@@ -1,7 +1,5 @@
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { MainComponent } from './main.component';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,7 +7,6 @@ import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
-import { MainState } from '../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
@@ -32,10 +29,8 @@ describe('MainComponent', () => {
     authRedirect: jasmine.Spy;
   };
 
-  let lang$: BehaviorSubject<any>;
   let navigateSpy: jasmine.Spy;
 
-  let storeSpy: jasmine.SpyObj<Store<MainState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
@@ -52,10 +47,7 @@ describe('MainComponent', () => {
     authStoreSpy = {
       authRedirect: jasmine.createSpy('authRedirect'),
     };
-    lang$ = new BehaviorSubject<any>(DEFAULT_LOCALE);
-
     const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     const authUserSignal = signal({ ...initialAuthUser });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode'], {
       authUser: authUserSignal.asReadonly(),
@@ -76,23 +68,11 @@ describe('MainComponent', () => {
       isAuthenticated: signal(false),
     };
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return lang$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     paramMapSpy.get.and.returnValue(DEFAULT_LOCALE);
     navigationServiceSpy.attachLang.and.returnValue(DEFAULT_LOCALE);
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -146,7 +126,6 @@ describe('MainComponent', () => {
 
   it('should toggle theme in changeTheme', () => {
     const initialMode = component.isDarkMode();
-    storeSpy.dispatch.calls.reset();
 
     component.changeTheme();
 

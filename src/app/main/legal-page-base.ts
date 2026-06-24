@@ -20,6 +20,7 @@ import { goTo } from '../util/animation';
 import { getLocale } from '../util/helper';
 import { EnvService } from '../services/env.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { MainContentService } from '../services/main-content.service';
 
 export interface LegalPageConfig {
   routeSegment: string;
@@ -33,6 +34,7 @@ export abstract class LegalPageBase {
   protected readonly http: HttpClient = inject(HttpClient);
   protected readonly sanitizer: DomSanitizer = inject(DomSanitizer);
   protected readonly host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
+  private readonly mainContent = inject(MainContentService);
 
   readonly url = this.env.appServer;
   readonly title = this.env.title;
@@ -50,6 +52,8 @@ export abstract class LegalPageBase {
   private readonly language = toSignal(this.language$, { initialValue: DEFAULT_LOCALE });
 
   protected constructor(private readonly config: LegalPageConfig) {
+    this.mainContent.configure(false, 'open');
+
     effect((onCleanup) => {
       const lang = this.language();
       const sub = this.loadContent(lang).subscribe((html) => this.legalContent.set(html));

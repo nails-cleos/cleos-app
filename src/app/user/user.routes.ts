@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { TranslationLoaderResolver } from '../util/translation.resolver';
 import { OverviewComponent } from './overview/overview.component';
 import { UserListComponent } from './list/user-list.component';
 import { UserCreatePageComponent } from './user-create-page.component';
@@ -19,7 +18,6 @@ const children: Routes = [
     path: '',
     component: UserListComponent,
     canActivate: [authGuard],
-    resolve: { model: TranslationLoaderResolver },
     data: { roles: [Role.admin] },
   },
   { path: 'add', component: UserCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },

@@ -201,8 +201,6 @@ export class NavComponent {
 
       if (globalResponse) {
         this.store.dispatch(clearGlobalResponse());
-      } else {
-        feedbackResponse?.source.clearResponse();
       }
     });
 

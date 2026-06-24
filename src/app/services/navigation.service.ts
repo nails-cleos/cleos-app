@@ -1,11 +1,8 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
-import { Store } from '@ngrx/store';
-import { setLanguage } from '../store/actions/i18n.actions';
-import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
-import { I18NState } from '../store/reducers/i18n.reducers';
+import { I18NStore } from "../store/i18n.store";
 
 @Injectable({
   providedIn: 'root',
@@ -14,11 +11,11 @@ export class NavigationService {
   private static readonly HISTORY_STORAGE_KEY = 'cleos-navigation-history';
   private static readonly HISTORY_LIMIT = 40;
 
-  private store: Store<I18NState> = inject(Store<I18NState>);
+  private i18nStore = inject(I18NStore);
   private router: Router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
+  private readonly languageSignal = this.i18nStore.language;
 
   private history: string[] = this.readHistory();
   private isTrackingHistory = false;
@@ -146,7 +143,7 @@ export class NavigationService {
       return language;
     }
 
-    this.store.dispatch(setLanguage({ language }));
+    this.i18nStore.setLanguage(language);
 
     return language;
   }

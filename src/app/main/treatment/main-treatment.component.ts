@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '../../util/MainTreatment';
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { getCurrentLangPipe } from '../../store/selectors/main.selectors';
-import { Store } from '@ngrx/store';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MainState } from '../../store/reducers/main.reducers';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
 import { MatDivider, MatList } from '@angular/material/list';
+import { MainContentService } from '../../services/main-content.service';
+import { I18NStore } from "../../store/i18n.store";
 
 @Component({
   selector: 'app-main-treatment',
@@ -19,11 +18,10 @@ import { MatDivider, MatList } from '@angular/material/list';
 export class MainTreatmentComponent {
   id = input<string>();
 
-  private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly mainContent = inject(MainContentService);
+  private readonly i18nStore = inject(I18NStore);
 
-  private lang$ = this.store.pipe(getCurrentLangPipe);
-
-  private sections$ = combineLatest([toObservable(this.id), this.lang$]).pipe(
+  private sections$ = combineLatest([toObservable(this.id), toObservable(this.i18nStore.language)]).pipe(
     switchMap(([treatmentId, lang]) => {
       if (!treatmentId) {
         return of(undefined);
@@ -41,6 +39,10 @@ export class MainTreatmentComponent {
   );
 
   sections = toSignal(this.sections$, { initialValue: undefined });
+
+  constructor() {
+    this.mainContent.configure(false, 'open');
+  }
 
   private resolveTreatment(
     treatmentId: string,

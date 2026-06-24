@@ -18,7 +18,6 @@ import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { AuthUserService } from './app/services/auth-user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
-import { TranslationLoaderResolver } from './app/util/translation.resolver';
 import { NavigationService } from './app/services/navigation.service';
 import { TokenService } from './app/services/token.service';
 import { PermissionsService } from './app/services/auth-guard.service';
@@ -32,20 +31,16 @@ import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
-import { mainReducer } from './app/store/reducers/main.reducers';
 import { paymentReducer } from './app/store/reducers/payment.reducers';
-import { i18nReducer } from './app/store/reducers/i18n.reducers';
-import { I18NEffects } from './app/store/effects/i18n.effects';
-import { provideEffects } from '@ngrx/effects';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app/app.routes';
-import { I18nBridgeService } from './app/services/i18n-bridge.service';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
 import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 import { DEFAULT_LOCALE } from './app/util/dates';
 import { AuthStore } from './app/store/auth.store';
 import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
+import { I18NStore } from "./app/store/i18n.store";
 
 export interface ISendMessage {
   name: string;
@@ -90,9 +85,7 @@ const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
   provideStore({
     reservation: reservationReducer,
-    main: mainReducer,
     payment: paymentReducer,
-    i18n: i18nReducer,
   }),
   provideRouter(
     routes,
@@ -125,7 +118,6 @@ const providers = [
   PermissionsService,
   TokenService,
   NavigationService,
-  TranslationLoaderResolver,
   AsyncPipe,
   CookieService,
   TranslateService,
@@ -142,14 +134,14 @@ const providers = [
   ...provideAppCalendar(),
   provideAppIcons(),
   provideAppInitializer(() => {
-    inject(I18nBridgeService);
     inject(AuthRedirectEffect);
     const authStore = inject(AuthStore);
     authStore.hydrate();
+    const i18nStore = inject(I18NStore);
+    i18nStore.hydrate();
   }),
   provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),
-  provideEffects(I18NEffects),
 ];
 
 bootstrapApplication(AppComponent, {

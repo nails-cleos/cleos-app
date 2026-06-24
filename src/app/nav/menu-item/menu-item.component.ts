@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, computed, inject, input } from '@an
 import { IMenu } from '../../user/user';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import { I18NStore } from "../../store/i18n.store";
 
 @Component({
   selector: 'app-menu-item',
@@ -18,7 +18,7 @@ import { MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list
 export class MenuItemComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly i18nStore = inject(I18NStore);
 
   items = input.required<IMenu[]>();
   drawer = input<MatDrawer>();
@@ -44,14 +44,11 @@ export class MenuItemComponent {
   openSubMenus: { [key: number]: boolean } = {};
   openSubSubMenus: { [key: number]: { [key: number]: boolean } } = {};
 
-  language: string = this.translate.getCurrentLang();
-
-  constructor() {
-  }
+  languageSignal = this.i18nStore.language;
 
   navigate = (menu: IMenu, drawer?: MatDrawer): void => {
     drawer?.toggle();
-    this.router.navigate([this.language].concat(menu.path.split('/')));
+    this.router.navigate([this.languageSignal()].concat(menu.path.split('/')));
   };
 
   toggleSubMenu = (index: number) => {

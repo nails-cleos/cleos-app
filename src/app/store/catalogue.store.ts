@@ -12,6 +12,7 @@ import {
   patchCrudError,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 const initialState = createStoreInitialState<ICatalogueAll[], ICatalogueAll>();
 
@@ -22,10 +23,31 @@ export const CatalogueStore = signalStore(
     catalogueService = inject(CatalogueService),
     translate = inject(TranslateService),
   ) => {
+    let loadAllCataloguesSubscription: Subscription | undefined;
+    let getAllHomeSubscription: Subscription | undefined;
+    let loadCatalogsSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let sortSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadAllCataloguesSubscription?.unsubscribe();
+      getAllHomeSubscription?.unsubscribe();
+      loadCatalogsSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      sortSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+    };
+
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -38,36 +60,50 @@ export const CatalogueStore = signalStore(
       },
 
       loadAllCatalogues(): void {
+        loadAllCataloguesSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        catalogueService.getAllCatalogues().subscribe({
+        loadAllCataloguesSubscription = catalogueService.getAllCatalogues().subscribe({
+          next: (data) => patchState(store, { data, isLoading: false }),
+          error: patchError,
+        });
+      },
+
+      getAllHome(): void {
+        getAllHomeSubscription?.unsubscribe();
+        patchState(store, { data: undefined, isLoading: true });
+
+        getAllHomeSubscription = catalogueService.getAllHome().subscribe({
           next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadCatalogs(): void {
+        loadCatalogsSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        catalogueService.getAllCatalogs().subscribe({
-          next: (data) => patchState(store, { data: data, isLoading: false }),
+        loadCatalogsSubscription = catalogueService.getAllCatalogs().subscribe({
+          next: (data) => patchState(store, { data, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        catalogueService.getCatalogue(id).subscribe({
+        loadByIdSubscription = catalogueService.getCatalogue(id).subscribe({
           next: (selected) => patchState(store, { selected }),
           error: patchError,
         });
       },
 
       create(catalogue: ICatalogue, resizedImageDataUrl: string): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        catalogueService.createCatalogue(catalogue, resizedImageDataUrl).subscribe({
+        createSubscription = catalogueService.createCatalogue(catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translate.instant('CATALOGUE.CREATED', { name: response.name }),
@@ -81,9 +117,10 @@ export const CatalogueStore = signalStore(
       },
 
       update(id: string, catalogue: ICatalogue, resizedImageDataUrl: string): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).subscribe({
+        updateSubscription = catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name }),
@@ -97,9 +134,10 @@ export const CatalogueStore = signalStore(
       },
 
       sort(catalogues: ICatalogueAll[]): void {
+        sortSubscription?.unsubscribe();
         patchState(store, { data: undefined, response: undefined, isLoading: true });
 
-        catalogueService.updateCatalogueOrder(catalogues).subscribe({
+        sortSubscription = catalogueService.updateCatalogueOrder(catalogues).subscribe({
           next: () => patchState(store, {
             response: {
               message: 'CATALOGUE.UPDATED.ALL.MESSAGE',
@@ -112,9 +150,10 @@ export const CatalogueStore = signalStore(
       },
 
       delete(id: string, name: string): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        catalogueService.deleteCatalogue(id).subscribe({
+        deleteSubscription = catalogueService.deleteCatalogue(id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translate.instant('CATALOGUE.DELETED.MESSAGE', { name }),

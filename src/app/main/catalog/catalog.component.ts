@@ -12,6 +12,7 @@ import {
   MatCardTitle,
 } from '@angular/material/card';
 import { CatalogueStore } from '../../store/catalogue.store';
+import { MainContentService } from '../../services/main-content.service';
 
 @Component({
   selector: 'app-catalog',
@@ -23,6 +24,7 @@ import { CatalogueStore } from '../../store/catalogue.store';
 })
 export class CatalogComponent {
   private readonly catalogueStore = inject(CatalogueStore);
+  private readonly mainContent = inject(MainContentService);
   private readonly cataloguesSignal = this.catalogueStore.data;
 
   catalogues = computed(() => {
@@ -38,6 +40,7 @@ export class CatalogComponent {
   });
 
   constructor() {
+    this.mainContent.configure(false, 'open');
     this.catalogueStore.clean();
     this.catalogueStore.loadCatalogs();
   }

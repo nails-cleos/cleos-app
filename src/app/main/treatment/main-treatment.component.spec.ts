@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { MainState } from '../../store/reducers/main.reducers';
+import { of } from 'rxjs';
 import { MainTreatmentComponent } from './main-treatment.component';
 import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { signal } from "@angular/core";
+import { I18NStore } from "../../store/i18n.store";
 
 describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
 
-  let lang$: BehaviorSubject<string | undefined>;
-
-  let storeSpy: jasmine.SpyObj<Store<MainState>>;
+  let i18nStoreSpy: {
+    language: ReturnType<typeof signal>;
+  };
 
   const createTranslations = (overrides: Partial<IBiabTreatmentTranslations> = {}): IBiabTreatmentTranslations => {
     const defaults: IBiabTreatmentTranslations = {
@@ -97,10 +97,9 @@ describe('MainTreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    lang$ = new BehaviorSubject<string | undefined>(DEFAULT_LOCALE);
-
-    storeSpy = jasmine.createSpyObj<Store<MainState>>('Store', ['pipe', 'dispatch']);
-    (storeSpy.pipe as any).and.returnValue(lang$.asObservable());
+    i18nStoreSpy = {
+      language: signal(DEFAULT_LOCALE),
+    }
 
     spyOn(TranslateLoaderFactory, 'loadJson').and.returnValue(of({
       treatments: [],
@@ -109,7 +108,7 @@ describe('MainTreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MainTreatmentComponent],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: I18NStore, useValue: i18nStoreSpy },
       ],
     }).compileComponents();
   });
@@ -118,7 +117,6 @@ describe('MainTreatmentComponent', () => {
     createComponent();
 
     expect(component).toBeTruthy();
-    expect(storeSpy.pipe).toHaveBeenCalled();
     expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', DEFAULT_LOCALE);
   });
 
@@ -138,7 +136,7 @@ describe('MainTreatmentComponent', () => {
     createComponent();
     (TranslateLoaderFactory.loadJson as jasmine.Spy).calls.reset();
 
-    lang$.next('nl');
+    i18nStoreSpy.language.set('nl');
     fixture.detectChanges();
 
     expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'nl');

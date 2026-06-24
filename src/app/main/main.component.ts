@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { IUser, User } from '../user/user';
@@ -13,10 +12,8 @@ import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
 import { NavigationService } from '../services/navigation.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { getCurrentLangPipe } from '../store/selectors/main.selectors';
-import { MainState } from '../store/reducers/main.reducers';
 import { EnvService } from '../services/env.service';
-import { filter } from 'rxjs';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
 import { FirebaseService } from '../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
@@ -43,7 +40,6 @@ export class MainComponent {
 
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<MainState> = inject(Store<MainState>);
   private readonly authStore = inject(AuthStore);
   private readonly userStore = inject(UserStore);
   private readonly router: Router = inject(Router);
@@ -57,10 +53,15 @@ export class MainComponent {
   private readonly firebaseService = inject(FirebaseService);
 
   private authUserSignal = this.authUserService.authUser;
-  private lang$ = this.store.pipe(getCurrentLangPipe);
+  private lang$ = this.router.events.pipe(
+    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+    startWith(undefined),
+    map(() => this.currentLanguageFromUrl(this.router.url)),
+    distinctUntilChanged(),
+  );
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.Handset]);
 
-  private langSignal = toSignal(this.lang$);
+  private langSignal = toSignal(this.lang$, { initialValue: this.currentLanguageFromUrl(this.router.url) });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -189,4 +190,9 @@ export class MainComponent {
     this.firstSection = window.document.getElementById('slider');
     this.navigationObserve = observeElementSignal(this.navigationState, this.firstSection, true, 0.1);
   };
+
+  private currentLanguageFromUrl(url: string): string {
+    const lang = url.split('?')[0].split('#')[0].split('/').filter(Boolean)[0];
+    return getLocale(lang).language;
+  }
 }

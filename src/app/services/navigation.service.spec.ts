@@ -1,30 +1,32 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
-import { setLanguage } from '../store/actions/i18n.actions';
-import { I18NState } from '../store/reducers/i18n.reducers';
 import { UserStore } from '../store/user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { signal } from "@angular/core";
+import { I18NStore } from "../store/i18n.store";
 
 describe('NavigationService', () => {
   let service: NavigationService;
-  let storeSpy: jasmine.SpyObj<Store<I18NState>>;
+  let i18nStoreSpy: {
+    language: ReturnType<typeof signal>;
+    setLanguage: jasmine.Spy;
+  };
   let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let routerSpy: jasmine.SpyObj<Router>;
   let routerEventsSubject: Subject<any>;
 
-  let lang: BehaviorSubject<any>;
-
   beforeEach(() => {
     sessionStorage.clear();
-    lang = new BehaviorSubject(DEFAULT_LOCALE);
     routerEventsSubject = new Subject();
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    i18nStoreSpy = {
+      language: signal(DEFAULT_LOCALE),
+      setLanguage: jasmine.createSpy('setLanguage'),
+    }
     userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
@@ -34,19 +36,16 @@ describe('NavigationService', () => {
     // Mock router methods to return promises
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
-    storeSpy.pipe.and.returnValue(lang.asObservable());
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       providers: [
         NavigationService,
-        { provide: Store, useValue: storeSpy },
+        { provide: I18NStore, useValue: i18nStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: Router, useValue: routerSpy },
       ],
     });
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     service = TestBed.inject(NavigationService);
   });
@@ -93,12 +92,12 @@ describe('NavigationService', () => {
     it('should not add payment status callback routes to history', () => {
       const paymentStatusEvent = new NavigationEnd(
         1,
-        `/${DEFAULT_LOCALE}/me/reservation/res-1/payment/approved`,
-        `/${DEFAULT_LOCALE}/me/reservation/res-1/payment/approved`,
+        `/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`,
+        `/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`,
       );
       routerEventsSubject.next(paymentStatusEvent);
 
-      expect((service as any).history).not.toContain(`/${DEFAULT_LOCALE}/me/reservation/res-1/payment/approved`);
+      expect((service as any).history).not.toContain(`/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`);
     });
 
     it('should ignore non-NavigationEnd events', () => {
@@ -155,22 +154,24 @@ describe('NavigationService', () => {
 
     it('should navigate to parent route when no previous history is available', () => {
       sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
-      setRouterUrl(`/${DEFAULT_LOCALE}/colors/123`);
+      setRouterUrl(`/${ DEFAULT_LOCALE }/colors/123`);
 
       service.back();
 
       expect((service as any).history).toEqual([]);
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/colors`, { state: { date: undefined, step: 0 } });
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/colors`, { state: { date: undefined, step: 0 } });
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should fallback to language root when current route has no parent segment', () => {
       sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
-      setRouterUrl(`/${DEFAULT_LOCALE}`);
+      setRouterUrl(`/${ DEFAULT_LOCALE }`);
 
       service.back();
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}`, { state: { date: undefined, step: 0 } });
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }`, { state: { date: undefined, step: 0 } });
     });
 
     it('should read persisted history when in-memory history is empty after reload', () => {
@@ -186,23 +187,25 @@ describe('NavigationService', () => {
 
     it('should sync current route before going back when current page was not persisted', () => {
       (service as any).history = [];
-      setRouterUrl(`/${DEFAULT_LOCALE}/colors/123`);
-      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([`/${DEFAULT_LOCALE}/colors`]));
-
-      service.back();
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/colors`, { state: { date: undefined, step: 0 } });
-      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual([`/${DEFAULT_LOCALE}/colors`]);
-    });
-
-    it('should fallback to parent route when history is empty', () => {
-      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
-      setRouterUrl(`/${DEFAULT_LOCALE}/rooms/room-1/expenses/add`);
+      setRouterUrl(`/${ DEFAULT_LOCALE }/colors/123`);
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([`/${ DEFAULT_LOCALE }/colors`]));
 
       service.back();
 
       expect(routerSpy.navigateByUrl)
-        .toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/rooms/room-1/expenses`, { state: { date: undefined, step: 0 } });
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/colors`, { state: { date: undefined, step: 0 } });
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]'))
+        .toEqual([`/${ DEFAULT_LOCALE }/colors`]);
+    });
+
+    it('should fallback to parent route when history is empty', () => {
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
+      setRouterUrl(`/${ DEFAULT_LOCALE }/rooms/room-1/expenses/add`);
+
+      service.back();
+
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/rooms/room-1/expenses`, { state: { date: undefined, step: 0 } });
     });
   });
 
@@ -242,7 +245,7 @@ describe('NavigationService', () => {
 
       // Spy on the method to avoid actual page reload during test
       spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || `/${DEFAULT_LOCALE}`);
+        routerSpy.navigateByUrl(testUrl || `/${ DEFAULT_LOCALE }`);
       });
 
       service.reloadPage(url);
@@ -253,7 +256,7 @@ describe('NavigationService', () => {
     it('should use default URL when none provided', () => {
       // Spy on the method to avoid actual page reload during test
       spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || `/${DEFAULT_LOCALE}`);
+        routerSpy.navigateByUrl(testUrl || `/${ DEFAULT_LOCALE }`);
       });
 
       service.reloadPage();
@@ -267,16 +270,14 @@ describe('NavigationService', () => {
       const result = service.attachLang(DEFAULT_LOCALE);
 
       expect(result).toBe(DEFAULT_LOCALE);
-      expect(storeSpy.dispatch).not.toHaveBeenCalled();
+      expect(i18nStoreSpy.setLanguage).not.toHaveBeenCalled();
     });
 
     it('should dispatch language change when language differs', () => {
       const result = service.attachLang('es');
 
       expect(result).toBe('es');
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        setLanguage({ language: 'es' }),
-      );
+      expect(i18nStoreSpy.setLanguage).toHaveBeenCalledWith('es');
     });
 
     it('should normalize language using getLocale', () => {

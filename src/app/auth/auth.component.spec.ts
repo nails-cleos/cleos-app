@@ -85,6 +85,7 @@ describe('AuthComponent', () => {
     fixture = TestBed.createComponent(AuthComponent);
     component = fixture.componentInstance;
     cookieService = TestBed.inject(CookieService);
+    cookieService.deleteAll('/');
     fixture.detectChanges();
   });
 

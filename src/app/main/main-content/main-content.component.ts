@@ -11,9 +11,7 @@ import {
 import { ITreatmentGroupAll } from '../../treatment/treatment';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../main';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { sendMessage } from '../../store/actions/main.actions';
 import { AuthUserService } from '../../services/auth-user.service';
 import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';
@@ -22,15 +20,8 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
-import {
-  getMainErrorPipe,
-  getResponsePipe,
-  selectCatalogueData,
-  selectMainIsLoading,
-} from '../../store/selectors/main.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
-import { MainState } from '../../store/reducers/main.reducers';
 import { EnvService } from '../../services/env.service';
 import { ICatalogueAll } from '../../catalogue/catalogue';
 import { getImage } from '../../util/file';
@@ -39,6 +30,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
 import { NgClass, NgStyle } from '@angular/common';
 import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+import { CatalogueStore } from '../../store/catalogue.store';
+import { MainStore } from '../../store/main.store';
+import { MainContentService } from '../../services/main-content.service';
 
 type MainForm = {
   name: FormControl<string>;
@@ -58,7 +52,9 @@ type MainForm = {
 export class MainContentComponent {
   private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
 
-  private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly catalogueStore = inject(CatalogueStore);
+  private readonly mainStore = inject(MainStore);
+  private readonly mainContent = inject(MainContentService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -82,17 +78,13 @@ export class MainContentComponent {
   private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
   private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
 
-  private response$ = this.store.pipe(getResponsePipe);
-  private error$ = this.store.pipe(getMainErrorPipe);
-  private catalogue$ = this.store.select(selectCatalogueData);
-  private isLoading$ = this.store.select(selectMainIsLoading);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private authUserSignal = this.authUserService.authUser;
-  private responseSignal = toSignal(this.response$);
-  private errorSignal = toSignal(this.error$);
-  private catalogueSignal = toSignal(this.catalogue$);
-  private isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
+  private responseSignal = this.mainStore.response;
+  private errorSignal = this.mainStore.error;
+  private catalogueSignal = this.catalogueStore.data;
+  private isLoadingSignal = this.mainStore.isLoading;
   private breakpointsSignal = toSignal(this.breakpointObserver$, {
     initialValue: {
       matches: false,
@@ -218,11 +210,14 @@ export class MainContentComponent {
   ];
 
   currentIndex = signal(0);
-  sliderTransform = computed(() => `translateX(-${this.currentIndex() * 100}%)`);
+  sliderTransform = computed(() => `translateX(-${ this.currentIndex() * 100 }%)`);
 
   private readonly sliderIntervalMs = 5000;
 
   constructor() {
+    this.mainContent.configure(false, 'close', true);
+    this.mainStore.clean();
+    this.catalogueStore.getAllHome();
     effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
@@ -375,7 +370,7 @@ export class MainContentComponent {
         subject: this.getForm.subject.value,
         body: this.getForm.body.value,
       };
-      this.store.dispatch(sendMessage({ sendMessage: sendMessageData }));
+      this.mainStore.create(sendMessageData);
     }
   }
 
@@ -391,7 +386,7 @@ export class MainContentComponent {
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${social.name}${suffix}`;
+    social.svgIcon = `${ social.name }${ suffix }`;
   };
 
   filterBy = (group?: ITreatmentGroupAll): void => {

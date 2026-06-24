@@ -2,14 +2,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuItemComponent } from './menu-item.component';
 import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { signal } from "@angular/core";
+import { I18NStore } from "../../store/i18n.store";
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
   let fixture: ComponentFixture<MenuItemComponent>;
+  let i18nStoreSpy: {
+    language: ReturnType<typeof signal>;
+  };
 
   let breakpoint$: Subject<BreakpointState>;
 
@@ -17,6 +22,9 @@ describe('MenuItemComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   beforeEach(async () => {
+    i18nStoreSpy = {
+      language: signal(DEFAULT_LOCALE),
+    }
     breakpoint$ = new Subject<BreakpointState>();
 
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
@@ -27,12 +35,10 @@ describe('MenuItemComponent', () => {
       imports: [MenuItemComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Router, useValue: routerSpy },
+        { provide: I18NStore, useValue: i18nStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
@@ -49,7 +55,7 @@ describe('MenuItemComponent', () => {
   });
 
   it('should set language from TranslateService', () => {
-    expect(component.language).toBe(DEFAULT_LOCALE);
+    expect(component.languageSignal()).toBe(DEFAULT_LOCALE);
   });
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
