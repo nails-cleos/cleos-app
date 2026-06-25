@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { paymentNotComplete, paymentSave } from '../../../store/actions/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,6 +10,7 @@ import {
   getResultParamsPipe,
   getSubErrorsPipe,
 } from '../../../store/selectors/payment.selectors';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-payment-complete',
@@ -21,9 +21,9 @@ import {
 })
 // TODO remove?
 export class PaymentCompleteComponent {
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
 
   private paymentResultParams$ = this.store.pipe(getResultParamsPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
@@ -35,7 +35,6 @@ export class PaymentCompleteComponent {
 
   private id: string = '';
   private path: 'reservation' | 'transaction' = 'reservation';
-  private readonly language: string;
 
   constructor() {
     effect(() => {
@@ -48,12 +47,12 @@ export class PaymentCompleteComponent {
         let type;
         let referenceId;
         if (params.paymentType) {
-          this.router.navigate([this.language, 'me', this.path, this.id, 'payment'],
+          this.navigationService.navigate(['me', this.path, this.id, 'payment'],
             { queryParams: { accountId: params.accountId } });
           return;
         }
         if (!type || !referenceId) {
-          const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
+          const message = this.translateService.instant('ME.PAYMENT.ERROR', { reason: 'incomplete' });
           this.store.dispatch(
             paymentNotComplete({ subError: [{ message }] }),
           );
@@ -63,20 +62,18 @@ export class PaymentCompleteComponent {
         this.store.dispatch(paymentSave({ id: params.id, path: params.path, status, paymentStatus }));
       }
     });
-    this.language = this.translate.getCurrentLang();
-
 
     effect(() => {
       const subErrors = this.subErrorsSignal();
       if (subErrors) {
-        this.router.navigate([this.language, 'me', this.path, this.id, 'payment']);
+        this.navigationService.navigate(['me', this.path, this.id, 'payment']);
       }
     });
 
     effect(() => {
       const path = this.responseSignal()?.path;
       if (path) {
-        this.router.navigate([`${ this.language }/${ path }`]);
+        this.navigationService.navigate([path]);
       }
     });
   }

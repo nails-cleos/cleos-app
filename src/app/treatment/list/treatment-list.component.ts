@@ -34,6 +34,7 @@ import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { TreatmentStore } from '../../store/treatment.store';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-treatment-list',
@@ -49,7 +50,8 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class TreatmentListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly treatmentStore = inject(TreatmentStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -91,8 +93,7 @@ export class TreatmentListComponent {
 
   expanded?: ITreatmentGroup;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     this.treatmentStore.clean();
@@ -108,8 +109,8 @@ export class TreatmentListComponent {
   }
 
   delete = (treatment: ITreatmentGroupAll): void => {
-    const title = this.translate.instant('TREATMENT.DELETED.TITLE');
-    const content = this.translate.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
+    const title = this.translateService.instant('TREATMENT.DELETED.TITLE');
+    const content = this.translateService.instant('TREATMENT.DELETED.CONTENT', { name: treatment.name });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: treatment, variant: 'warning' },
     });

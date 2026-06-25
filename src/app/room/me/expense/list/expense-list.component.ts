@@ -18,7 +18,7 @@ import { EnvService } from '../../../../services/env.service';
 import { DriveAccessService } from '../../../../services/drive-access.service';
 import { IDocument } from '../../../../document/document';
 import { DocumentStore } from '../../../../store/document.store';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CurrencySymbolPipe } from '../../../../pipes/currency-symbol.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -43,10 +43,10 @@ import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } f
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ExpenseStore } from '../../../../store/expense.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../../services/navigation.service';
 
 type ExpensesForm = {
   date: FormControl<Date | undefined>;
@@ -73,11 +73,11 @@ export class ExpenseListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly expenseStore = inject(ExpenseStore);
   private readonly documentStore = inject(DocumentStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
-  private readonly router: Router = inject(Router);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -120,8 +120,7 @@ export class ExpenseListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IExpenseAll;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   form: FormGroup<ExpensesForm> = this.formBuilder.group<ExpensesForm>({
     date: this.formBuilder.control(undefined),
@@ -184,12 +183,11 @@ export class ExpenseListComponent {
   };
 
   openDialog = (expense: IExpenseAll): void => openDialog(
-    expense.room, this.dateFormat, this.translate, this.dialog, newDateTimestamp(expense.timestamp),
+    expense.room, this.language, this.translateService, this.dialog, newDateTimestamp(expense.timestamp),
   );
 
   edit = (selected: IExpenseAll): void => {
-    this.router.navigate([
-      this.language,
+    this.navigationService.navigate([
       'rooms',
       selected.room.id,
       'expenses',
@@ -202,8 +200,8 @@ export class ExpenseListComponent {
     if (!roomId) {
       return;
     }
-    const title = this.translate.instant('EXPENSE.DELETED.TITLE');
-    const content = this.translate.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
+    const title = this.translateService.instant('EXPENSE.DELETED.TITLE');
+    const content = this.translateService.instant('EXPENSE.DELETED.CONTENT', { invoice: expense.invoice });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: expense, variant: 'warning' },
     });

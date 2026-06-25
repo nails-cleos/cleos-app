@@ -48,7 +48,7 @@ export interface UploadFile {
 })
 export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private hadCurrentFile = false;
 
@@ -128,7 +128,7 @@ export class FileDropComponent {
     if (!this.undo()) {
       this.fileSelected.emit(undefined);
     } else {
-      const content = this.translate.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
+      const content = this.translateService.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
       const toastRef = this.toastService.show(content, 'warning', 5000, { actionType: 'button', action: 'undo' });
       toastRef.onAction().subscribe(() => {
         this.file.set(file);

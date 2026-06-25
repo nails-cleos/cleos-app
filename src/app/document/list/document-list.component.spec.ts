@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
@@ -9,7 +9,7 @@ import { DocumentListComponent } from './document-list.component';
 import { DriveAccessService } from '../../services/drive-access.service';
 import { IOfficeAll } from '../../office/office';
 import { DocumentTypeEnum, IDocument } from '../document';
-import { DEFAULT_LOCALE, getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DocumentStore } from '../../store/document.store';
 import { OfficeStore } from '../../store/office.store';
@@ -102,9 +102,6 @@ describe('DocumentListComponent', () => {
 
     fixture = TestBed.createComponent(DocumentListComponent);
     component = fixture.componentInstance;
-
-    const translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
@@ -303,7 +300,7 @@ describe('DocumentListComponent', () => {
       expect(documentStoreSpy.downloadZip).toHaveBeenCalledWith({
         officeId: mockOffice.id,
         date,
-        fileName: `${mockOffice.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`,
+        fileName: `${ mockOffice.name } Q${ getDateQuarter(date) } ${ monthViewTitle(date) }.zip`,
       });
     });
 

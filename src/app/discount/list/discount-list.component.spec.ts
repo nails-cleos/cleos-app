@@ -1,24 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { IDiscount } from '../discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountListComponent } from './discount-list.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { DiscountStore } from '../../store/discount.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
   let fixture: ComponentFixture<DiscountListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let discountStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -44,6 +44,9 @@ describe('DiscountListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -54,7 +57,6 @@ describe('DiscountListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     discountStoreSpy = {
       isLoading: signal(false),
       data: signal<any>({ kind: 'paginationDiscount', value: mockPagination }),
@@ -77,16 +79,13 @@ describe('DiscountListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DiscountListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(DiscountListComponent);
     component = fixture.componentInstance;
@@ -183,7 +182,7 @@ describe('DiscountListComponent', () => {
     const item = mockDiscount[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'discounts', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['discounts', item.id]);
   });
 
   it('should dispatch deleteDiscount when dialog returns a result', () => {

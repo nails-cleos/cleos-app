@@ -24,6 +24,12 @@ import { AuthStore } from '../store/auth.store';
 describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
+  let navigationServiceSpy: {
+    navigate: jasmine.Spy;
+    language: string;
+    attachLang: string;
+    language$: ReturnType<typeof signal>;
+  };
 
   let response$: BehaviorSubject<any>;
   let error$: BehaviorSubject<any>;
@@ -55,7 +61,6 @@ describe('NavComponent', () => {
 
   let navigateSpy: jasmine.Spy;
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let storeSpy: jasmine.SpyObj<Store>;
@@ -97,6 +102,12 @@ describe('NavComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = {
+      language: DEFAULT_LOCALE,
+      attachLang: DEFAULT_LOCALE,
+      language$: signal(DEFAULT_LOCALE),
+      navigate: jasmine.createSpy('navigate'),
+    };
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
     message$ = new BehaviorSubject(undefined);
@@ -127,7 +138,6 @@ describe('NavComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
     userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
@@ -147,7 +157,6 @@ describe('NavComponent', () => {
     });
 
     paramMapSpy.get.and.returnValue(null);
-    navigationServiceSpy.attachLang.and.returnValue(DEFAULT_LOCALE);
 
     let selectCallIndex = 0;
     storeSpy.select.and.callFake(() => {
@@ -165,13 +174,13 @@ describe('NavComponent', () => {
     await TestBed.configureTestingModule({
       imports: [NavComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: MessagingService, useValue: messagingServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: CookieService, useValue: cookieServiceSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthStore, useValue: authStoreSpy },
@@ -224,7 +233,7 @@ describe('NavComponent', () => {
   it('should go to home when goHome is called', () => {
     component.goToHome();
 
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'home']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home']);
   });
 
   it('should toggle and close menus', () => {
@@ -361,7 +370,7 @@ describe('NavComponent', () => {
     authStoreSpy.redirect.set(false);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home']);
   });
 
   it('should navigate to home when redirect', () => {
@@ -370,7 +379,7 @@ describe('NavComponent', () => {
     authStoreSpy.redirect.set(true);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE, 'home']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home']);
   });
 
   it('should handle notifications', () => {
@@ -569,7 +578,7 @@ describe('NavComponent', () => {
     response$.next(response);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith([`/${ DEFAULT_LOCALE }/${ response.redirect }`]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([response.redirect]);
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
       { actionType: 'link', action: `/${ DEFAULT_LOCALE }/${ response.path }` });

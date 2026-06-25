@@ -4,7 +4,7 @@ import { QuarterSummaryComponent } from './quarter-summary.component';
 import { of } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, Navigation, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IMonthSummary, ISummaryRoom, ISummaryTotal, MonthSummary, SummaryTotals, Total } from '../dashboard';
@@ -13,10 +13,12 @@ import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
   let fixture: ComponentFixture<QuarterSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let dashboardStoreSpy: {
     quarterSummaryMap: ReturnType<typeof signal>;
@@ -26,7 +28,6 @@ describe('QuarterSummaryComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -104,6 +105,9 @@ describe('QuarterSummaryComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dashboardStoreSpy = {
       quarterSummaryMap: signal<any>(undefined),
       getQuarterSummary: jasmine.createSpy('getQuarterSummary'),
@@ -111,7 +115,6 @@ describe('QuarterSummaryComponent', () => {
     };
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
@@ -122,7 +125,6 @@ describe('QuarterSummaryComponent', () => {
       },
     });
 
-    routerSpy.currentNavigation.and.returnValue(null);
     breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
 
     paramMapSpy.get.and.returnValue('test');
@@ -130,9 +132,9 @@ describe('QuarterSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [QuarterSummaryComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
@@ -473,8 +475,8 @@ describe('QuarterSummaryComponent', () => {
 
       component.goBack();
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        [component.language, 'dashboard', 'year', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'year', 'summary'],
         { state: { year: 2024 } },
       );
     });

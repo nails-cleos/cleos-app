@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, viewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
@@ -70,7 +70,6 @@ export class DocumentListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly officeStore = inject(OfficeStore);
   private readonly documentStore = inject(DocumentStore);
-  private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -114,8 +113,6 @@ export class DocumentListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedDocument?: IDocument;
-
-  language: string = this.translate.getCurrentLang();
 
   form: FormGroup<DocumentsForm> = this.formBuilder.group<DocumentsForm>({
     office: this.formBuilder.control(undefined, {

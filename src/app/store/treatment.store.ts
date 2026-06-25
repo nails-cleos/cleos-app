@@ -33,7 +33,7 @@ export const TreatmentStore = signalStore(
   withMethods((
     store,
     treatmentService = inject(TreatmentService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -89,7 +89,7 @@ export const TreatmentStore = signalStore(
         treatmentService.createTreatment(treatmentGroup).subscribe({
           next: (response) => patchState(store, {
             response: createSaveResponse(
-              translate.instant('TREATMENT.CREATED', { name: response.name }),
+              translateService.instant('TREATMENT.CREATED', { name: response.name }),
               response,
             ),
             isLoading: false,
@@ -104,7 +104,7 @@ export const TreatmentStore = signalStore(
         treatmentService.updateTreatmentGroup(id, treatmentGroup).subscribe({
           next: (response) => patchState(store, {
             response: createSaveResponse(
-              translate.instant('TREATMENT.UPDATED.MESSAGE', { name: response.name }),
+              translateService.instant('TREATMENT.UPDATED.MESSAGE', { name: response.name }),
               response,
             ),
             isLoading: false,
@@ -118,7 +118,7 @@ export const TreatmentStore = signalStore(
 
         treatmentService.sortTreatment(treatments).subscribe({
           next: () => patchState(store, {
-            response: { message: translate.instant('TREATMENT.SORTED.MESSAGE') },
+            response: { message: translateService.instant('TREATMENT.SORTED.MESSAGE') },
             isLoading: false,
           }),
           error: patchError,
@@ -130,7 +130,7 @@ export const TreatmentStore = signalStore(
 
         treatmentService.sortGroupTreatment(groups).subscribe({
           next: () => patchState(store, {
-            response: { message: translate.instant('TREATMENT.SORTED.MESSAGE') },
+            response: { message: translateService.instant('TREATMENT.SORTED.MESSAGE') },
             isLoading: false,
           }),
           error: patchError,
@@ -143,7 +143,7 @@ export const TreatmentStore = signalStore(
         treatmentService.deleteTreatmentGroup(args.id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('TREATMENT.DELETED.MESSAGE', { name: args.name }),
+              message: translateService.instant('TREATMENT.DELETED.MESSAGE', { name: args.name }),
               reload: true,
               toastType: 'warning',
             },

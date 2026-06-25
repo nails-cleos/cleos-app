@@ -34,7 +34,8 @@ import {
   MatCell,
   MatCellDef,
   MatColumnDef,
-  MatFooterCell, MatFooterCellDef,
+  MatFooterCell,
+  MatFooterCellDef,
   MatFooterRow,
   MatFooterRowDef,
   MatHeaderCell,
@@ -47,6 +48,7 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-reservation-table',
@@ -66,7 +68,8 @@ export class ReservationTableComponent {
 
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
@@ -113,8 +116,7 @@ export class ReservationTableComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IReservationAll;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     effect(() => {
@@ -135,12 +137,12 @@ export class ReservationTableComponent {
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
   };
 
   delete = (reservation: IReservation): void => {
-    const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
+    const title = this.translateService.instant('RESERVATION.DELETED.TITLE');
+    const content = this.translateService.instant('RESERVATION.DELETED.CONTENT',
       { date: newDateTimestamp(reservation.timestamp) });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' },

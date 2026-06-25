@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
-import { Router } from '@angular/router';
 import { IReservationOverview } from '../../reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { IChart } from '../../dashboard/dashboard';
@@ -22,6 +21,7 @@ import { MatCard, MatCardContent } from '@angular/material/card';
 import { AvatarComponent } from '../../shared/avatar/avatar.component';
 import { MatGridList, MatGridTile } from '@angular/material/grid-list';
 import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-overview',
@@ -35,11 +35,11 @@ import { UserStore } from '../../store/user.store';
 export class OverviewComponent {
   id = input<string>();
 
-  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private userStore = inject(UserStore);
-  private translate: TranslateService = inject(TranslateService);
-  private router: Router = inject(Router);
-  private authUserService: AuthUserService = inject(AuthUserService);
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly userStore = inject(UserStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private authUserSignal = this.authUserService.authUser;
@@ -71,7 +71,7 @@ export class OverviewComponent {
   readonly chartSkeletons = Array.from({ length: 2 }, (_, index) => index);
 
   upcoming: number[] = [];
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   layoutSignal = computed(() => {
     if (this.breakpointsSignal().matches) {
@@ -117,7 +117,7 @@ export class OverviewComponent {
             if (ro.primaryId || ro.secondaryId) {
               return Object.assign({}, ro, {
                 link: (id: string | undefined) => !id ||
-                  this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]),
+                  this.navigationService.navigate(['reservation', id]),
               });
             }
             return ro;
@@ -143,14 +143,14 @@ export class OverviewComponent {
   }
 
   goTo() {
-    this.router.navigate(['/', this.language, 'accounts', this.account?.id, 'transactions', 'view']);
+    this.navigationService.navigate(['accounts', this.account?.id, 'transactions', 'view']);
   }
 
   goToProfile() {
     if (this.hasAdminRole()) {
-      this.router.navigate(['/', this.language, 'users', this.customer?.id]);
+      this.navigationService.navigate(['users', this.customer?.id]);
     } else {
-      this.router.navigate(['/', this.language, 'auth', 'profile']);
+      this.navigationService.navigate(['auth', 'profile']);
     }
   }
 
@@ -158,14 +158,14 @@ export class OverviewComponent {
     let message: string;
     if (this.upcoming.length === 1) {
       const date = formatDateTime(newDateTimestamp(this.upcoming[0]), this.language);
-      message = this.translate.instant('WHATSAPP.SEND.APPROVE', { date });
+      message = this.translateService.instant('WHATSAPP.SEND.APPROVE', { date });
     } else {
-      message = this.translate.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
+      message = this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
       this.upcoming.forEach(r => {
         const date = formatDateTime(newDateTimestamp(r), this.language);
-        message += this.translate.instant('WHATSAPP.SEND.FOLLOWINGS.VALUE', { date });
+        message += this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.VALUE', { date });
       });
-      message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
+      message += this.translateService.instant('WHATSAPP.SEND.ATTENTION');
     }
     const userPhone = this.customer?.phone;
     window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');

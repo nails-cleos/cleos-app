@@ -1,11 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../account';
 import { currencySymbol } from '../../util/helper';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { BankComponent, BankForm } from '../../shared/bank/bank.component';
@@ -19,6 +18,7 @@ import { PaymentOptionSelectComponent } from '../../shared/payment-option-select
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
+import { NavigationService } from '../../services/navigation.service';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -42,8 +42,7 @@ export class TransactionComponent {
   private readonly accountStore = inject(AccountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
@@ -66,7 +65,7 @@ export class TransactionComponent {
   });
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
   amountMin: number = 100;
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   bankForm = this.formBuilder.group<BankForm>({
     percentage: this.formBuilder.control(undefined),
@@ -109,9 +108,9 @@ export class TransactionComponent {
     effect(() => {
       if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
-          this.router.navigate([this.language, 'users', this.accountSignal()?.customer?.id, 'overview']);
+          this.navigationService.navigate(['users', this.accountSignal()?.customer?.id, 'overview']);
         } else {
-          this.router.navigate([this.language, 'me', 'overview']);
+          this.navigationService.navigate(['me', 'overview']);
         }
       }
     });

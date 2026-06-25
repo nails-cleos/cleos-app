@@ -26,7 +26,7 @@ export const AdditionalStore = signalStore(
   withMethods((
     store,
     additionalService = inject(AdditionalService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -76,7 +76,7 @@ export const AdditionalStore = signalStore(
         additionalService.createAdditional(additional).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('ADDITIONAL.CREATED', { name: response.name }),
+              message: translateService.instant('ADDITIONAL.CREATED', { name: response.name }),
               path: `additional/${ response.id }`,
               redirect: 'additional',
             },
@@ -92,7 +92,7 @@ export const AdditionalStore = signalStore(
         additionalService.updateAdditional(id, additional).subscribe({
           next: (response: IAdditional) => patchState(store, {
             response: {
-              message: translate.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name }),
+              message: translateService.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name }),
               path: `additional/${ response.id }`,
               redirect: 'additional',
             },
@@ -120,7 +120,7 @@ export const AdditionalStore = signalStore(
         additionalService.deleteAdditional(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('ADDITIONAL.DELETED.MESSAGE', { name }),
+              message: translateService.instant('ADDITIONAL.DELETED.MESSAGE', { name }),
               reload: true,
               toastType: 'warning',
             },

@@ -11,10 +11,12 @@ import { IChart } from '../../dashboard/dashboard';
 import { signal, WritableSignal } from '@angular/core';
 import { UserStore } from '../../store/user.store';
 import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let overviewSignal: WritableSignal<IOverview | undefined>;
   let errorSignal: WritableSignal<any>;
@@ -27,6 +29,10 @@ describe('OverviewComponent', () => {
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService',
+      ['navigate', 'back', 'reload'],
+      { language: DEFAULT_LOCALE },
+    );
     overviewSignal = signal<IOverview | undefined>(undefined);
     errorSignal = signal(undefined);
     isLoadingSignal = signal(false);
@@ -50,11 +56,6 @@ describe('OverviewComponent', () => {
     });
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
-
-    const navigationServiceSpy = jasmine.createSpyObj(
-      'NavigationService',
-      ['back', 'reload', 'reloadPage', 'attachLang'],
-    );
 
     await TestBed.configureTestingModule({
       imports: [OverviewComponent, TranslateModule.forRoot()],

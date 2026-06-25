@@ -27,7 +27,7 @@ export const AccountStore = signalStore(
   withMethods((
     store,
     accountService = inject(AccountService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -97,7 +97,7 @@ export const AccountStore = signalStore(
 
             patchState(store, {
               response: {
-                message: translate.instant('ACCOUNT.MONEY_ADDED', { id }),
+                message: translateService.instant('ACCOUNT.MONEY_ADDED', { id }),
                 path: `accounts/${ id }/transactions/${ response.id }`,
               },
               isLoading: false,
@@ -113,7 +113,7 @@ export const AccountStore = signalStore(
         accountService.updateAccount(id, transaction).subscribe({
           next: (response) => patchState(store, {
             response: {
-              message: translate.instant('ACCOUNT.UPDATED', { id: response.id }),
+              message: translateService.instant('ACCOUNT.UPDATED', { id: response.id }),
               path: `accounts/customers/${ transaction.customerId }`,
             },
             isLoading: false,

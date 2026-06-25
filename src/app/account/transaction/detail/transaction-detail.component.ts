@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Router, RouterLink } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -12,6 +12,7 @@ import { getPaymentResponsePipe, getSubErrorsPipe } from '../../../store/selecto
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-transaction-detail',
@@ -27,8 +28,7 @@ export class TransactionDetailComponent {
 
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly accountStore = inject(AccountStore);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private response$ = this.store.pipe(getPaymentResponsePipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
@@ -46,9 +46,9 @@ export class TransactionDetailComponent {
     return transaction;
   });
 
-  dateFormat = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
+
   step?: number = history.state?.step;
-  language = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -63,9 +63,9 @@ export class TransactionDetailComponent {
     effect(() => {
       const path = this.responseSignal()?.path;
       if (path) {
-        this.router.navigate([`${ this.language }/${ path }`]);
+        this.navigationService.navigate([path]);
       } else if (this.subErrorsSignal()?.[0]?.message) {
-        this.router.navigate([this.language, 'me', 'transaction', this.transactionId(), 'payment']);
+        this.navigationService.navigate(['me', 'transaction', this.transactionId(), 'payment']);
       }
     });
   }

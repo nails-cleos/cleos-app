@@ -15,10 +15,12 @@ import { IExtras } from '../../reservation';
 import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../room/room';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
   let fixture: ComponentFixture<ReservationCompleteComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
 
@@ -125,6 +127,9 @@ describe('ReservationCompleteComponent', () => {
   ];
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     navigationParams$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     treatmentDiscount$ = new BehaviorSubject(mockTreatmentDiscount);
@@ -159,6 +164,7 @@ describe('ReservationCompleteComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReservationCompleteComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();

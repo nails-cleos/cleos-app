@@ -1,10 +1,8 @@
-import { Injectable, effect, inject } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { effect, inject, Injectable } from '@angular/core';
 
 import { AuthStore } from '../store/auth.store';
 import { NavigationService } from '../services/navigation.service';
-import { getLocale } from '../util/helper';
-import { hasRoomAdmin } from '../util/helper';
+import { getLocale, hasRoomAdmin } from '../util/helper';
 import { IAuthority } from '../user/user';
 import { Role } from '../interfaces/token';
 
@@ -12,7 +10,6 @@ import { Role } from '../interfaces/token';
 export class AuthRedirectEffect {
   private readonly authStore = inject(AuthStore);
   private readonly navigationService = inject(NavigationService);
-  private readonly translate = inject(TranslateService);
 
   constructor() {
     effect(() => {
@@ -26,7 +23,7 @@ export class AuthRedirectEffect {
 
       if (!isAuth || !user) {return;}
 
-      const lang = getLocale(this.translate.getCurrentLang()).language;
+      const lang = getLocale(this.navigationService.language).language;
 
       const result = this.resolveRedirect(queryParams, lang, user.authorities);
 

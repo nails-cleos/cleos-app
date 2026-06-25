@@ -40,7 +40,7 @@ import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 import { DEFAULT_LOCALE } from './app/util/dates';
 import { AuthStore } from './app/store/auth.store';
 import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
-import { I18NStore } from "./app/store/i18n.store";
+import { I18NStore } from './app/store/i18n.store';
 
 export interface ISendMessage {
   name: string;

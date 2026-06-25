@@ -64,6 +64,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -85,7 +86,8 @@ type SearchForm = {
 export class SearchComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
@@ -141,8 +143,7 @@ export class SearchComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expandedReservation?: IReservation;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   form: FormGroup<SearchForm> = this.formBuilder.group<SearchForm>({
     customer: this.formBuilder.control(undefined, {
@@ -207,15 +208,15 @@ export class SearchComponent {
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
   };
 
   showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone);
 
   cancel = (reservation: IReservationAll): void => {
-    const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
+    const title = this.translateService.instant('RESERVATION.LIST.CANCEL.TITLE');
     const date = newDateTimestamp(reservation.timestamp);
-    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
+    const content = this.translateService.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: reservation.id },
     });

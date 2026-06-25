@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpcomingComponent } from './upcoming.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
 import { IUpcomingAll } from '../../../reservation/reservation';
 import { Price } from '../../../treatment/treatment';
 import { ServiceType } from '../../../room/room';
 import { Role } from '../../../interfaces/token';
 import { ICurrencyAll } from '../../../currency/currency';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
   let fixture: ComponentFixture<UpcomingComponent>;
-  let routerSpyObj: jasmine.SpyObj<Router>;
   let dialogSpy: jasmine.Spy<any>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const currency: ICurrencyAll = {
     id: '1',
@@ -99,12 +99,14 @@ describe('UpcomingComponent', () => {
   };
 
   beforeEach(async () => {
-    routerSpyObj = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
 
     await TestBed.configureTestingModule({
       imports: [UpcomingComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerSpyObj },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
@@ -139,7 +141,7 @@ describe('UpcomingComponent', () => {
     fixture.componentRef.setInput('upcoming', upcoming);
 
     component.edit();
-    expect(routerSpyObj.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', '1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation', '1']);
   });
 
   it('should handle openDialog call when upcoming is defined', () => {

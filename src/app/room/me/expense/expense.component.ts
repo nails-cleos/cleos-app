@@ -18,7 +18,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Expense, ExpenseForm, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from './expense';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
@@ -48,6 +47,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatCheckbox } from '@angular/material/checkbox';
 import { AwsStore } from '../../../store/aws.store';
 import { ExpenseStore } from '../../../store/expense.store';
+import { NavigationService } from '../../../services/navigation.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -77,8 +77,8 @@ export class ExpenseComponent {
   private readonly expenseStore = inject(ExpenseStore);
   private readonly awsStore = inject(AwsStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
   private readonly tokenService: TokenService = inject(TokenService);
@@ -139,7 +139,7 @@ export class ExpenseComponent {
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
   private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
 
-  private readonly language: string = this.translate.getCurrentLang();
+  private readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {
@@ -181,7 +181,7 @@ export class ExpenseComponent {
           return;
         }
 
-        this.router.navigate([this.language, 'rooms', this.roomId(), 'expenses']);
+        this.navigationService.navigate(['rooms', this.roomId(), 'expenses']);
       }
     });
 
@@ -367,7 +367,7 @@ export class ExpenseComponent {
         expense?.setValue(null);
         return;
       }
-      const EXPENSE = this.translate.instant('EXPENSE');
+      const EXPENSE = this.translateService.instant('EXPENSE');
       if (min !== undefined && value < min) {
         this.errors.update(prev => {
           prev[input.id] = EXPENSE[id.toUpperCase()].MIN;

@@ -36,7 +36,7 @@
               mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
           </th>
           <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            <div>{{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}
+            <div>{{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}
               @if (showTimeZone(reservation)) {
                 <button (click)="openDialog(reservation)" mat-icon-button type="button">
                   <mat-icon>info_outline</mat-icon>
@@ -94,7 +94,7 @@
                 <mat-list-item>
                   <span matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</span>
                   <span matListItemLine>
-                    {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}
+                    {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}
                     @if (showTimeZone(reservation)) {
                       <button (click)="openDialog(reservation)" mat-icon-button type="button">
                         <mat-icon>info_outline</mat-icon>

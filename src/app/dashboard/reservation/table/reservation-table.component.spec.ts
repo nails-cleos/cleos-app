@@ -16,14 +16,15 @@ import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
   let fixture: ComponentFixture<ReservationTableComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -65,6 +66,9 @@ describe('ReservationTableComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     reservationList$ = new BehaviorSubject(mockPagination);
     response$ = new BehaviorSubject<any>(undefined);
     isLoading$ = new BehaviorSubject<boolean>(false);
@@ -102,6 +106,7 @@ describe('ReservationTableComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReservationTableComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
@@ -113,8 +118,8 @@ describe('ReservationTableComponent', () => {
     fixture = TestBed.createComponent(ReservationTableComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -33,7 +33,7 @@ import {
   getTimeZoneFromRoom,
   titleCase,
 } from '../../util/helper';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import fs from 'file-saver';
 import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
@@ -67,6 +67,7 @@ import {
   SlicePipe,
 } from '@angular/common';
 import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -89,9 +90,9 @@ type MonthlySummaryForm = {
 })
 export class MonthSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dashboardStore = inject(DashboardStore);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
@@ -145,8 +146,7 @@ export class MonthSummaryComponent {
   type: typeof SummaryType = SummaryType;
   locale = 'es';
 
-  dateFormat: string = this.translate.getCurrentLang();
-  readonly language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     this.dashboardStore.clean();
@@ -279,7 +279,7 @@ export class MonthSummaryComponent {
   }
 
   get dateFormatted(): string {
-    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.translate.getCurrentLang()) : '';
+    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.language) : '';
   }
 
   private static groupSummary = (summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> =>
@@ -448,9 +448,9 @@ export class MonthSummaryComponent {
     if (this.getForm.date.value) {
       const year = this.getForm.date.value.getFullYear();
       const quarter = getDateQuarter(this.getForm.date.value);
-      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year, quarter } });
+      this.navigationService.navigate(['dashboard', 'quarter', 'summary'], { state: { year, quarter } });
     } else {
-      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary']);
+      this.navigationService.navigate(['dashboard', 'quarter', 'summary']);
     }
     return;
   }
@@ -502,7 +502,8 @@ export class MonthSummaryComponent {
 
   exportMonthlySummary = (): void => {
     const title = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
-    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()), this.translate,
+    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()),
+      this.translateService,
       this.env, this.timeZone(), this.summaryReservations as IMonthlySummarySale[],
       this.summaryExpenses as IMonthlySummaryExpense[]);
 
@@ -526,7 +527,7 @@ export class MonthSummaryComponent {
   ): void => {
     if (data?.length) {
       const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.getForm.date.value) }`;
-      const name = this.translate.instant(`SUMMARY.${ title }`);
+      const name = this.translateService.instant(`SUMMARY.${ title }`);
 
       let workbook;
       const header = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
@@ -534,16 +535,17 @@ export class MonthSummaryComponent {
       switch (totalTypes.type) {
         case SummaryType.payment:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
+            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
             this.env, this.timeZone());
           break;
         case SummaryType.expense:
           workbook = createMonthlyExpenseWorkbook(header, data as IMonthlySummaryExpense[], this.weeks,
-            name, workbookName, this.translate, currencySymbol(this.currencySignal()), this.env, this.timeZone());
+            name, workbookName, this.translateService, currencySymbol(this.currencySignal()), this.env,
+            this.timeZone());
           break;
         case SummaryType.cash:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
+            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
             this.env, this.timeZone());
           break;
       }

@@ -3,7 +3,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { IAdditional } from '../additional';
+import { IAdditional, IAdditionalAll } from '../additional';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -33,9 +33,10 @@ import { MatIconButton } from '@angular/material/button';
 import { MatPrefix } from '@angular/material/input';
 import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
 import { DecimalPipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AdditionalStore } from '../../store/additional.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-additional-list',
@@ -50,9 +51,9 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class AdditionalListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly additionalStore = inject(AdditionalStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router = inject(Router);
+  private readonly navigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -101,7 +102,7 @@ export class AdditionalListComponent {
 
   expandedAdditional?: IAdditional;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     this.additionalStore.clean();
@@ -115,13 +116,13 @@ export class AdditionalListComponent {
     this.tableState.resetOn(this.responseSignal, () => this.additionalStore.clearResponse());
   }
 
-  edit = (selected: IAdditional): void => {
-    void this.router.navigate([this.language, 'additional', selected.id]);
+  edit = (selected: IAdditionalAll): void => {
+    this.navigationService.navigate(['additional', selected.id]);
   };
 
   delete = (additional: IAdditional): void => {
-    const title = this.translate.instant('ADDITIONAL.DELETED.TITLE');
-    const content = this.translate.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
+    const title = this.translateService.instant('ADDITIONAL.DELETED.TITLE');
+    const content = this.translateService.instant('ADDITIONAL.DELETED.CONTENT', { name: additional.name });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: additional, variant: 'warning' },
       result => {

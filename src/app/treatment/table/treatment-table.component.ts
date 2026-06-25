@@ -21,12 +21,13 @@ import {
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { ITreatmentAll } from '../treatment';
 import { convertDuration } from '../../util/dates';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PAGE_SIZE } from '../../interfaces/pagination';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { TableSkeletonColumn } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-treatment-table',
@@ -38,7 +39,7 @@ import { TableSkeletonColumn } from '../../shared/skeleton/table-skeleton.compon
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentTableComponent {
-  private readonly translate = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   treatment = input<ITreatmentAll[]>([]);
 
@@ -66,7 +67,7 @@ export class TreatmentTableComponent {
   resultsLengthSignal = computed(() => this.dataSource().data.length);
   pageSizeSignal = computed(() => PAGE_SIZE);
 
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {

@@ -14,7 +14,7 @@ type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
 })
 export class BottomSheetBookAppointmentComponent {
   private readonly bottomSheetRef = inject(MatBottomSheetRef<BottomSheetBookAppointmentComponent>);
-  private readonly translate = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
 
   private readonly actionSignal = signal<ContactKey | undefined>(undefined);
 
@@ -25,7 +25,7 @@ export class BottomSheetBookAppointmentComponent {
         return;
       }
 
-      const contact = this.translate.instant('MAIN.CONTACT');
+      const contact = this.translateService.instant('MAIN.CONTACT');
       let url = '';
 
       switch (action) {

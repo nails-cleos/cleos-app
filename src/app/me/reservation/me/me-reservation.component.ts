@@ -43,7 +43,6 @@ import {
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Router } from '@angular/router';
 import {
   cleanReservation,
   createReservation,
@@ -129,6 +128,7 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatCheckbox } from '@angular/material/checkbox';
+import { NavigationService } from '../../../services/navigation.service';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -163,12 +163,12 @@ const ME_RESERVATION_ERROR_FIELDS = [
 export class MeReservationComponent {
   id = input<string>();
 
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
@@ -207,7 +207,7 @@ export class MeReservationComponent {
       },
     },
   );
-  private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange, {
+  private langChangeSignal = toSignal<LangChangeEvent>(this.translateService.onLangChange, {
     initialValue: undefined,
   });
   private readonly paymentOptions = computed(
@@ -218,7 +218,7 @@ export class MeReservationComponent {
 
   labels = computed(() => {
     this.langChangeSignal();
-    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+    const phoneTranslations = this.translateService.instant('COMMON.USER.PHONE');
 
     return {
       mainLabel: '',
@@ -406,7 +406,7 @@ export class MeReservationComponent {
   private treatmentDiscount?: IDiscount;
   private hydratedReservationKey?: string;
   private hydratingEdit = false;
-  private readonly language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   smallScreen = computed(() => this.breakpointsSignal()?.matches);
 
@@ -426,7 +426,7 @@ export class MeReservationComponent {
         const key = createNewDate(date).toString();
 
         let dates: any = group.get(key) || [];
-        dates = [...dates, { time: getTime(date, this.dateFormat), date }];
+        dates = [...dates, { time: getTime(date, this.language), date }];
         group.set(key, dates);
 
         return group;
@@ -439,7 +439,6 @@ export class MeReservationComponent {
   activeStepIndex = signal(0);
   isPreview = false;
   isPayment = false;
-  dateFormat: string = this.translate.getCurrentLang();
 
   isEditing = false;
   canCreate = true;
@@ -448,7 +447,7 @@ export class MeReservationComponent {
   distance?: string;
   minDate: Date = getNowTimeZone();
   maxDate: Date = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
-  maxDateFormat: string = formatDateTwoDigit(this.maxDate, this.dateFormat);
+  maxDateFormat: string = formatDateTwoDigit(this.maxDate, this.language);
   date?: Date;
   endDate?: Date;
   totalDurationFormatted?: string;
@@ -521,11 +520,11 @@ export class MeReservationComponent {
       if (room) {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
-          const localDate = localeTimeZoneDate(this.translate.getCurrentLang(), now);
-          const timeZoneDate = localeTimeZoneDate(this.translate.getCurrentLang(), now, room.timeZone);
-          const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
-          const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
-          const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
+          const localDate = localeTimeZoneDate(this.language, now);
+          const timeZoneDate = localeTimeZoneDate(this.language, now, room.timeZone);
+          const warning = this.translateService.instant('COMMON.TIME_ZONE.WARNING');
+          const localDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
+          const roomDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
           const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
           toastRef.onAction().subscribe(() => {
@@ -660,7 +659,7 @@ export class MeReservationComponent {
         }
         this.hydratedReservationKey = reservationKey;
         if (reservation.paymentRequired) {
-          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
+          const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
           this.canNotContinue(message, 'update');
         } else {
           this.setData(reservation);
@@ -678,8 +677,8 @@ export class MeReservationComponent {
       if (customerReservation?.upcoming && customerReservation.upcoming.length >=
         MAX_UPCOMING_RESERVATION) {
         const dates = customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
-          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.getCurrentLang()));
-        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
+          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.language));
+        const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
           { date1: dates[0], date2: dates[1], date3: dates[2] });
         this.canNotContinue(message, 'create');
       } else {
@@ -1009,7 +1008,7 @@ export class MeReservationComponent {
     }
     const additionalSelected = this.additionalSelected();
     const duration = totalDuration(treatment, additionalSelected);
-    this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.dateFormat);
+    this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.language);
 
     this.store.dispatch(
       customerSearchReservation({
@@ -1107,7 +1106,7 @@ export class MeReservationComponent {
   };
 
   openDialog = (reservationDate?: Date): void => openDialog(
-    this.room!, this.dateFormat, this.translate, this.dialog, reservationDate,
+    this.room!, this.language, this.translateService, this.dialog, reservationDate,
   );
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.getOfficeForm.room.value);
@@ -1123,7 +1122,7 @@ export class MeReservationComponent {
   displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
   dateNoContent = (date?: Date): string => formatDateName(
-    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.translate.getCurrentLang(), this.measure,
+    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.language, this.measure,
   );
 
   selectDate = (datetime: AvailabilityData): void => {
@@ -1143,8 +1142,8 @@ export class MeReservationComponent {
 
   formatKey = (key: string): string => {
     const date = newDate(key);
-    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.translate.getCurrentLang())
-      : formatDateName(date, this.translate.getCurrentLang(), this.measure);
+    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.language)
+      : formatDateName(date, this.language, this.measure);
 
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   };
@@ -1155,9 +1154,9 @@ export class MeReservationComponent {
 
   setDistance = ($event: number): void => {
     this.distance = $event > 999 ?
-      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
+      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
         { distance: round($event / 1000) }) :
-      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
+      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
         { distance: round($event) });
   };
 
@@ -1244,7 +1243,7 @@ export class MeReservationComponent {
     const toastRef = this.toastService.show(message, 'error', 5000);
     toastRef.onDismiss().subscribe(() => {
       this.store.dispatch(cleanReservation());
-      this.router.navigate([this.language, 'me', 'reservations']);
+      this.navigationService.navigate(['me', 'reservations']);
     });
   };
 
@@ -1295,7 +1294,7 @@ export class MeReservationComponent {
     this.roomList.set(reservation.room.office.rooms);
     this.professionalList.set(reservation.room.professionals);
     this.getEventForm.event.setValue(date, { emitEvent: false });
-    this.time = getTime(date, this.dateFormat);
+    this.time = getTime(date, this.language);
     this.getOfficeForm.office.setValue(reservation.room.office, { emitEvent: false });
     this.getOfficeForm.room.setValue(reservation.room, { emitEvent: false });
     this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });

@@ -11,15 +11,16 @@ import { signal, WritableSignal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '../../store/user.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
   let fixture: ComponentFixture<UserListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   let breakpoint$: BehaviorSubject<any>;
@@ -41,6 +42,9 @@ describe('UserListComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     paginationSignal = signal(mockPagination);
     responseSignal = signal(undefined);
     isLoadingSignal = signal(false);
@@ -82,6 +86,7 @@ describe('UserListComponent', () => {
       imports: [UserListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
@@ -91,8 +96,8 @@ describe('UserListComponent', () => {
     fixture = TestBed.createComponent(UserListComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -3,7 +3,6 @@ import { MainContentComponent } from './main-content.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../main';
@@ -15,16 +14,17 @@ import { provideAppIcons } from '../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { CatalogueStore } from '../../store/catalogue.store';
 import { MainStore } from '../../store/main.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
   let fixture: ComponentFixture<MainContentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
     getAllHome: jasmine.Spy;
   };
-
   let mainStoreSpy: {
     response: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
@@ -35,13 +35,13 @@ describe('MainContentComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
 
-  let translateService: TranslateService;
-
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     catalogueStoreSpy = {
       data: signal<any>(undefined),
       getAllHome: jasmine.createSpy('getAllHome'),
@@ -57,18 +57,17 @@ describe('MainContentComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
 
     await TestBed.configureTestingModule({
       imports: [MainContentComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MainStore, useValue: mainStoreSpy },
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
@@ -76,7 +75,7 @@ describe('MainContentComponent', () => {
       ],
     }).compileComponents();
 
-    translateService = TestBed.inject(TranslateService);
+    const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
     translateService.setTranslation(DEFAULT_LOCALE, {
       TREATMENTS: [{
@@ -152,13 +151,13 @@ describe('MainContentComponent', () => {
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-    expect(routerSpy.navigate)
-      .toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab-treatment', 'treatment']);
+    expect(navigationServiceSpy.navigate)
+      .toHaveBeenCalledWith(['home', 'biab-treatment', 'treatment']);
   });
 
   it('should not navigate for other treatments', () => {
     component.goToTreatment('other');
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should update social icon on hover', () => {

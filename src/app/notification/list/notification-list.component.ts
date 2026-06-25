@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { INotification } from '../notification';
 import { Router } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { zoneDateToDate } from '../../util/dates';
 import { PAGE_SIZE } from '../../interfaces/pagination';
@@ -24,13 +24,12 @@ export class NotificationListComponent {
   readonly skeletonNotificationCards = Array.from({ length: 3 }, (_, index) => index);
   private readonly router: Router = inject(Router);
   private readonly notificationStore = inject(NotificationStore);
-  private readonly translate: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
   private notificationsSignal = computed(() => this.notificationStore.data());
 
   notifications = signal<INotification[]>([]);
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   showMore = false;
   badge = 0;
   pageLoading = signal(false);
@@ -70,7 +69,7 @@ export class NotificationListComponent {
     if (notification.read) {
       this.router.navigate([notification.navigation]);
     } else {
-      this.navigationService.reload(this.router.url.split('/'));
+      this.navigationService.reload();
       this.notificationStore.readNotification(notification.id);
     }
   };

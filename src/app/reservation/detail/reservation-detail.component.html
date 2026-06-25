@@ -45,7 +45,7 @@
 
               <span class="detail-chip app-detail-chip">
                 <mat-icon>event</mat-icon>
-                {{ start | date:'EEE d MMM, HH:mm':gmt:dateFormat }}
+                {{ start | date:'EEE d MMM, HH:mm':gmt:language }}
               </span>
 
               <span class="detail-chip app-detail-chip">
@@ -138,27 +138,27 @@
               <div class="info-item app-surface-item">
                 <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</span>
                 <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ start | date:'fullDate':gmt:dateFormat }}
+                  {{ start | date:'fullDate':gmt:language }}
                   @if (showTimeZone()) {
                     <button (click)="openDialog(start)" class="summary-slot-button" mat-icon-button type="button">
                       <mat-icon>info_outline</mat-icon>
                     </button>
                   }
                 </strong>
-                <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:dateFormat }}</p>
+                <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:language }}</p>
               </div>
 
               <div class="info-item app-surface-item">
                 <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.END' | translate }}</span>
                 <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ end | date:'fullDate':gmt:dateFormat }}
+                  {{ end | date:'fullDate':gmt:language }}
                   @if (showTimeZone()) {
                     <button (click)="openDialog(end)" class="summary-slot-button" mat-icon-button type="button">
                       <mat-icon>info_outline</mat-icon>
                     </button>
                   }
                 </strong>
-                <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:dateFormat }}</p>
+                <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:language }}</p>
               </div>
 
               @if (currentState === 'EDIT_CANCELLED') {
@@ -473,7 +473,7 @@
                   <ng-container matColumnDef="start">
                     <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
                     <td *matCellDef="let history" mat-cell>
-                      {{ history.timestamp | timeDetail | date:'short':gmt:dateFormat }}
+                      {{ history.timestamp | timeDetail | date:'short':gmt:language }}
                       @if (showTimeZone(history)) {
                         <button (click)="openHistoryDialog(history)" mat-icon-button type="button">
                           <mat-icon>info_outline</mat-icon>

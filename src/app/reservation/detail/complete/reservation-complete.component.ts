@@ -59,6 +59,7 @@ import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker
 import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ReservationDetailSkeletonComponent } from '../reservation-detail-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -89,7 +90,8 @@ export class ReservationCompleteComponent {
 
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
@@ -109,6 +111,8 @@ export class ReservationCompleteComponent {
 
   private readonly isDashboard = computed(() => this.reservationParamsSignal()?.isDashboard ?? false);
 
+  readonly language = this.navigationService.language;
+
   startDate: Date = getNowTimeZone();
   endDate: Date = getNowTimeZone();
 
@@ -124,7 +128,7 @@ export class ReservationCompleteComponent {
     startTime: this.formBuilder.control('', {
       validators: [Validators.required],
     }),
-    endTime: this.formBuilder.control(getTime(this.endDate, this.translate.getCurrentLang()), {
+    endTime: this.formBuilder.control(getTime(this.endDate, this.language), {
       validators: [Validators.required],
     }),
     color: this.formBuilder.control(undefined, {
@@ -198,7 +202,6 @@ export class ReservationCompleteComponent {
     return !!time && !time.includes('-');
   });
 
-  dateFormat: string = this.translate.getCurrentLang();
   split: boolean = false;
   isValid: boolean = true;
   isValidSplit = signal(true);
@@ -211,7 +214,7 @@ export class ReservationCompleteComponent {
       const reservation = this.selectedReservationSignal();
       if (reservation) {
         this.startDate = newDateTimestamp(reservation.startedTimestamp, reservation.room.timeZone);
-        this.getForm.startTime.setValue(getTime(this.startDate, this.translate.getCurrentLang()));
+        this.getForm.startTime.setValue(getTime(this.startDate, this.language));
         const endDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
         this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
         this.price.set(getPrice(reservation, this.payments()));
@@ -326,8 +329,8 @@ export class ReservationCompleteComponent {
 
   complete(): void {
     if (!this.isValid) {
-      const title = this.translate.instant('COMMON.COMPLETE.TITLE');
-      const content = this.translate.instant('COMMON.COMPLETE.CONTENT');
+      const title = this.translateService.instant('COMMON.COMPLETE.TITLE');
+      const content = this.translateService.instant('COMMON.COMPLETE.CONTENT');
       const dialogRef = this.dialog.open(DialogComponent, {
         data: { title, content, value: this.selectedReservationSignal() },
       });

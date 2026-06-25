@@ -36,6 +36,7 @@ import PlaceResult = google.maps.places.PlaceResult;
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ProfileForm } from '../../user/user-form.types';
 import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-profile',
@@ -50,8 +51,9 @@ import { UserStore } from '../../store/user.store';
 export class ProfileComponent {
   private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private langChangeSignal = toSignal<LangChangeEvent>(this.translateService.onLangChange);
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
@@ -80,7 +82,7 @@ export class ProfileComponent {
   });
   labels = computed(() => {
     this.langChangeSignal();
-    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+    const phoneTranslations = this.translateService.instant('COMMON.USER.PHONE');
 
     return {
       mainLabel: '',
@@ -122,6 +124,7 @@ export class ProfileComponent {
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
   private lastImageUrl?: string;
+  private readonly language = this.navigationService.language;
 
   constructor() {
     this.userStore.clean();
@@ -214,12 +217,12 @@ export class ProfileComponent {
       return;
     }
     const selectedUser = this.selectedUserSignal();
-    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.getCurrentLang();
+    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.language;
     const user = User.fromProfileForm(
       this.getForm,
       this.showCashSignal(),
       selectedUser,
-      this.translate.getCurrentLang(),
+      this.language,
       this.formattedAddress,
       this.geometry?.location,
     );

@@ -15,7 +15,7 @@ export const ColorStore = signalStore(
   withCrudStoreState<IColorAll, ColorData, IColorAll>(),
   withCrudStoreMethods<IColor, IApiResponse, IApiResponse, { id: string; name: string }>(() => {
     const colorService = inject(ColorService);
-    const translate = inject(TranslateService);
+    const translateService = inject(TranslateService);
 
     return {
       loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
@@ -25,17 +25,17 @@ export const ColorStore = signalStore(
       update: (id, color) => colorService.updateColor(id, color),
       delete: ({ id }) => colorService.deleteColor(id),
       createResponse: (response) => ({
-        message: translate.instant('COLOR.CREATED', { name: response.name }),
+        message: translateService.instant('COLOR.CREATED', { name: response.name }),
         path: `colors/${ response.id }`,
         redirect: 'colors',
       }),
       updateResponse: (response) => ({
-        message: translate.instant('COLOR.UPDATED.MESSAGE', { name: response.name }),
+        message: translateService.instant('COLOR.UPDATED.MESSAGE', { name: response.name }),
         path: `colors/${ response.id }`,
         redirect: 'colors',
       }),
       deleteResponse: ({ name }) => ({
-        message: translate.instant('COLOR.DELETED.MESSAGE', { name }),
+        message: translateService.instant('COLOR.DELETED.MESSAGE', { name }),
         reload: true,
         toastType: 'warning',
       }),

@@ -21,16 +21,16 @@ import {
 } from '../actions/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
-import { Router } from '@angular/router';
 import { IPay, IPayment, IPaymentOption } from '../../interfaces/payment';
 import { IApiResponse, successResponse } from '../../interfaces/common';
 import { effectRequest } from '../../util/rxjs';
+import { NavigationService } from '../../services/navigation.service';
 
 @Injectable()
 export class PaymentEffects {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly actions: Actions = inject(Actions);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly paymentService: PaymentService = inject(PaymentService);
 
   getAll$ = createEffect(() => this.actions.pipe(
@@ -82,7 +82,7 @@ export class PaymentEffects {
           case 'pending':
             return this.requestSuccess('COMMON.PAYMENT.PENDING', path);
           default:
-            const message = this.translate.instant('ME.PAYMENT.ERROR', { reason: response.message });
+            const message = this.translateService.instant('ME.PAYMENT.ERROR', { reason: response.message });
             return of(paymentNotComplete(
               { subError: [{ message }], response: { message, path, toastType: 'error', redirect: path } }));
         }
@@ -132,7 +132,7 @@ export class PaymentEffects {
             case 'pending':
               return this.requestSuccess('COMMON.PAYMENT.PENDING');
             default:
-              const message = this.translate.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
+              const message = this.translateService.instant('COMMON.PAYMENT.ERROR', { reason: response.message });
               return of(paymentNotComplete({ subError: [message] }));
           }
         })),
@@ -146,10 +146,10 @@ export class PaymentEffects {
     tap(({ selected, redirect }) => {
       if (redirect && selected instanceof Array) {
         if (selected[0].transactionId || selected[0].transaction?.id) {
-          this.router.navigate([this.translate.getCurrentLang(), 'me', 'transaction',
+          this.navigationService.navigate(['me', 'transaction',
             selected[0].transactionId || selected[0].transaction?.id, 'payment']);
         } else {
-          this.router.navigate([this.translate.getCurrentLang(), 'me', 'reservation',
+          this.navigationService.navigate(['me', 'reservation',
             selected[0].reservationId || selected[0].reservation?.id, 'payment']);
         }
       }
@@ -162,7 +162,7 @@ export class PaymentEffects {
   ), { dispatch: false });
 
   private requestSuccess(key: string, path?: string, reload?: boolean) {
-    const message = this.translate.instant(key);
+    const message = this.translateService.instant(key);
     return successResponse(paymentSaveSuccess, message, path, path, reload);
   }
 }

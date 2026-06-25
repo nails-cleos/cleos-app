@@ -2,11 +2,10 @@ import { ChangeDetectionStrategy, Component, effect, inject, input, output, sign
 import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Discount, DiscountForm, DiscountType, IDiscount, IDiscountAll } from './discount';
-import { Router } from '@angular/router';
 import { ICurrency } from '../currency/currency';
 import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError } from '../interfaces/common';
@@ -18,6 +17,7 @@ import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { DiscountStore } from '../store/discount.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-discount',
@@ -36,8 +36,7 @@ export class DiscountComponent {
 
   private readonly discountStore = inject(DiscountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private subErrorsSignal = this.discountStore.subErrors;
 
@@ -74,8 +73,6 @@ export class DiscountComponent {
   );
 
   errors = signal<Record<string, unknown>>({});
-
-  private readonly language: string = this.translate.getCurrentLang();
 
   types = DiscountType;
 
@@ -121,7 +118,7 @@ export class DiscountComponent {
   }
 
   addCurrency(): void {
-    this.router.navigate([this.language, 'currency', 'add']);
+    this.navigationService.navigate(['currency', 'add']);
   }
 
   displayCurrencyFn = (currency: ICurrency): string => currency?.code ? currency.code : '';

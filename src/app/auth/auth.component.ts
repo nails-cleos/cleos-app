@@ -15,6 +15,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { NgTemplateOutlet } from '@angular/common';
 import { AuthStore } from '../store/auth.store';
+import { NavigationService } from '../services/navigation.service';
 
 type AuthForm = {
   email: FormControl<string>;
@@ -38,8 +39,9 @@ export class AuthComponent {
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly cookieService: CookieService = inject(CookieService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly firebaseService = inject(FirebaseService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   queryParams = toSignal(this.route.queryParamMap);
 
@@ -65,7 +67,7 @@ export class AuthComponent {
   private emailSignal = toSignal(this.getForm.email.valueChanges, { initialValue: '' });
   private currentCodeSignal = toSignal(this.getForm.code.valueChanges, { initialValue: undefined });
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   showForm: boolean = false;
   tos: string = `${ this.env.appServer }/${ this.language }/term-and-conditions`;
   privacyPolicy: string = `${ this.env.appServer }/${ this.language }/privacy`;
@@ -188,7 +190,7 @@ export class AuthComponent {
     if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
       this.firebaseService.sendVerificationEmail()
         .then(() => {
-          const message = this.translate.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
+          const message = this.translateService.instant('AUTH.ACTIVATE_ACCOUNT.MESSAGE');
           this.authStore.signupSuccess({ message });
           this.cookieService.set(VERIFICATION_EMAIL, 'sent');
         })

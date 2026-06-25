@@ -20,7 +20,7 @@ export const NoteStore = signalStore(
   withMethods((
     store,
     noteService = inject(NoteService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -52,7 +52,7 @@ export const NoteStore = signalStore(
         noteService.createNote(note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('NOTE.CREATED.MESSAGE', { description: response.name }),
+              message: translateService.instant('NOTE.CREATED.MESSAGE', { description: response.name }),
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },
@@ -68,7 +68,7 @@ export const NoteStore = signalStore(
         noteService.updateNote(id, note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('NOTE.UPDATED.MESSAGE', { description: response.name }),
+              message: translateService.instant('NOTE.UPDATED.MESSAGE', { description: response.name }),
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },
@@ -84,7 +84,7 @@ export const NoteStore = signalStore(
         noteService.deleteNote(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('NOTE.UPDATED.MESSAGE', { description }),
+              message: translateService.instant('NOTE.UPDATED.MESSAGE', { description }),
               toastType: 'warning',
             },
             isLoading: false,
@@ -99,7 +99,7 @@ export const NoteStore = signalStore(
         noteService.completeNote(id).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('NOTE.COMPLETED.MESSAGE', { description: response.name }),
+              message: translateService.instant('NOTE.COMPLETED.MESSAGE', { description: response.name }),
               path: `notes/${ response.id }`,
               redirect: 'reservation/calendar',
             },

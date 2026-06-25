@@ -33,7 +33,7 @@ export const DiscountStore = signalStore(
   withMethods((
     store,
     discountService = inject(DiscountService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -101,7 +101,7 @@ export const DiscountStore = signalStore(
         discountService.createDiscount(discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('DISCOUNT.CREATED', { name: response.name }),
+              message: translateService.instant('DISCOUNT.CREATED', { name: response.name }),
               path: `discounts/${ response.id }`,
               redirect: 'discounts',
             },
@@ -117,7 +117,7 @@ export const DiscountStore = signalStore(
         discountService.updateDiscount(id, discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name }),
+              message: translateService.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name }),
               path: `discounts/${ response.id }`,
               redirect: 'discounts',
             },
@@ -133,7 +133,7 @@ export const DiscountStore = signalStore(
         discountService.deleteDiscount(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('DISCOUNT.DELETED.MESSAGE', { name }),
+              message: translateService.instant('DISCOUNT.DELETED.MESSAGE', { name }),
               reload: true,
               toastType: 'warning',
             },
@@ -149,7 +149,7 @@ export const DiscountStore = signalStore(
         discountService.sendDiscounts(id, customersDiscount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('DISCOUNT.SEND', { name: response.name }),
+              message: translateService.instant('DISCOUNT.SEND', { name: response.name }),
             },
             isLoading: false,
           }),

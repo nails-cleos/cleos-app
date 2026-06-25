@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardEventComponent } from './dashboard-event.component';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { DayViewSchedulerCalendarUtils, Professional } from './day-view-scheduler.component';
@@ -16,15 +15,16 @@ import { approveReservation, startReservation } from '../../store/actions/reserv
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { DashboardStore } from '../../store/dashboard.store';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
   let component: DashboardEventComponent;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let dialogSpy: jasmine.Spy<any>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dashboardStoreSpy: {
@@ -35,6 +35,9 @@ describe('DashboardEventComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dashboardStoreSpy = {
       dashboard: signal<any>(undefined),
       updateEvent: jasmine.createSpy('updateEvent'),
@@ -42,7 +45,6 @@ describe('DashboardEventComponent', () => {
       clean: jasmine.createSpy('clean'),
     };
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
@@ -51,9 +53,9 @@ describe('DashboardEventComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardEventComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         DayViewSchedulerCalendarUtils,
         provideAppDateAdapter(),
@@ -416,8 +418,8 @@ describe('DashboardEventComponent', () => {
       jasmine.any(Function),
       jasmine.objectContaining({ data: null }));
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(
-      [DEFAULT_LOCALE, 'unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['unavailable', 'block-agenda'], { state: { date, professionalId, isDashboard: true } });
   });
 
   it('should calculate reservation duration seconds from started and finished timestamps', () => {

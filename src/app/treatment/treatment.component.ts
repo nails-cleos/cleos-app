@@ -22,7 +22,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { IColorAll } from '../color/color';
@@ -41,6 +41,7 @@ import { TreatmentStore } from '../store/treatment.store';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
 import { ColorStore } from '../store/color.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-treatment',
@@ -61,7 +62,7 @@ export class TreatmentComponent {
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly colorStore = inject(ColorStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private subErrorsSignal = this.treatmentStore.subErrors;
 
@@ -103,7 +104,7 @@ export class TreatmentComponent {
 
   treatmentsSignal = signal<ITreatment[]>([]);
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   private currentColorIds: string[] = [];
 
   constructor() {

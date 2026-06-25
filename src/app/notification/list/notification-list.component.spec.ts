@@ -1,7 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NotificationListComponent } from './notification-list.component';
 import { Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../../services/navigation.service';
 import { INotification, INotificationDTO } from '../notification';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
@@ -14,7 +14,7 @@ describe('NotificationListComponent', () => {
   let fixture: ComponentFixture<NotificationListComponent>;
 
   let routerSpy: jasmine.SpyObj<Router>;
-  let navigationSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let notificationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
@@ -61,20 +61,18 @@ describe('NotificationListComponent', () => {
       deleteNotification: jasmine.createSpy('deleteNotification'),
     };
     routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/test/url' });
-    navigationSpy = jasmine.createSpyObj('NavigationService', ['reload']);
-
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
 
     TestBed.configureTestingModule({
       imports: [NotificationListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NotificationStore, useValue: notificationStoreSpy },
         { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NotificationListComponent);
     component = fixture.componentInstance;
@@ -118,7 +116,7 @@ describe('NotificationListComponent', () => {
       notDate: mockNoteDate,
     };
     component.notification(notif);
-    expect(navigationSpy.reload).toHaveBeenCalled();
+    expect(navigationServiceSpy.reload).toHaveBeenCalled();
     expect(notificationStoreSpy.readNotification).toHaveBeenCalledWith(notif.id);
   });
 

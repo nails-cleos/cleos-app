@@ -133,7 +133,7 @@
               <ng-container matColumnDef="timestamp">
                 <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
                 <td *matCellDef="let invoice" mat-cell>
-                  {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:dateFormat }}
+                  {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:language }}
                   <!--              @if (showTimeZone(invoice)) {-->
                   <!--                <button (click)="openDialog(invoice)" mat-icon-button type="button">-->
                   <!--                  <mat-icon>info_outline</mat-icon>-->

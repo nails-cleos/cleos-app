@@ -2,7 +2,7 @@ import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
@@ -11,14 +11,14 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { OfficeStore } from '../../store/office.store';
 import { OfficeListComponent } from './office-list.component';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('OfficeListComponent', () => {
   let component: OfficeListComponent;
   let fixture: ComponentFixture<OfficeListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let officeStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -43,6 +43,9 @@ describe('OfficeListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -53,7 +56,6 @@ describe('OfficeListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     officeStoreSpy = {
       isLoading: signal(false),
       data: signal<any>({ kind: 'pagination', value: mockPagination }),
@@ -79,12 +81,12 @@ describe('OfficeListComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(OfficeListComponent);
     component = fixture.componentInstance;
@@ -182,7 +184,7 @@ describe('OfficeListComponent', () => {
     const item = mockOffice[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'offices', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['offices', item.id]);
   });
 
   it('should call delete when dialog returns a result', () => {

@@ -35,6 +35,7 @@ import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } f
 import { RouterLink } from '@angular/router';
 import { RoomStore } from '../../store/room.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-room-list',
@@ -49,7 +50,8 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class RoomListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly roomStore = inject(RoomStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -95,7 +97,7 @@ export class RoomListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IRoom;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     this.roomStore.clean();
@@ -117,8 +119,8 @@ export class RoomListComponent {
   edit = (selected: IRoomAll): void => this.roomStore.selectAndNavigate(selected);
 
   delete = (room: IRoom): void => {
-    const title = this.translate.instant('ROOM.DELETED.TITLE');
-    const content = this.translate.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
+    const title = this.translateService.instant('ROOM.DELETED.TITLE');
+    const content = this.translateService.instant('ROOM.DELETED.CONTENT', { name: room.address?.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: room, variant: 'warning' }, result => {
       if (result) {
         this.roomStore.delete(result);

@@ -12,10 +12,13 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { By } from '@angular/platform-browser';
 import { YearComponent } from './year/year.component';
 import { DashboardStore } from '../../store/dashboard.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
@@ -33,6 +36,9 @@ describe('YearSummaryComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dashboardStoreSpy = {
       yearSummaryMap: signal<any>(undefined),
       yearExport: signal<any>(undefined),
@@ -64,6 +70,7 @@ describe('YearSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

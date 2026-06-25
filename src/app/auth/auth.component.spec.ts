@@ -10,10 +10,13 @@ import { ToastService } from '../services/toast.service';
 import { CookieService } from 'ngx-cookie-service';
 import { VERIFICATION_EMAIL } from '../util/helper';
 import { AuthStore } from '../store/auth.store';
+import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
   let fixture: ComponentFixture<AuthComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let authStoreSpy: {
     isAuthenticated: ReturnType<typeof signal>;
@@ -37,6 +40,9 @@ describe('AuthComponent', () => {
   let cookieService: CookieService;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authStoreSpy = {
       isAuthenticated: signal(false),
       redirect: signal(false),
@@ -75,6 +81,7 @@ describe('AuthComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AuthComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: ToastService, useValue: toastServiceSpy },

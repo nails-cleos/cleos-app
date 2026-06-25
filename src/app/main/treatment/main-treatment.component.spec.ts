@@ -4,15 +4,16 @@ import { MainTreatmentComponent } from './main-treatment.component';
 import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
 import { DEFAULT_LOCALE } from '../../util/dates';
-import { signal } from "@angular/core";
-import { I18NStore } from "../../store/i18n.store";
+import { NavigationService } from '../../services/navigation.service';
+import { signal } from '@angular/core';
 
 describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
-
-  let i18nStoreSpy: {
-    language: ReturnType<typeof signal>;
+  let navigationServiceSpy: {
+    navigate: jasmine.Spy;
+    language: string;
+    language$: ReturnType<typeof signal>;
   };
 
   const createTranslations = (overrides: Partial<IBiabTreatmentTranslations> = {}): IBiabTreatmentTranslations => {
@@ -97,9 +98,11 @@ describe('MainTreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    i18nStoreSpy = {
-      language: signal(DEFAULT_LOCALE),
-    }
+    navigationServiceSpy = {
+      language: DEFAULT_LOCALE,
+      language$: signal(DEFAULT_LOCALE),
+      navigate: jasmine.createSpy('navigate'),
+    };
 
     spyOn(TranslateLoaderFactory, 'loadJson').and.returnValue(of({
       treatments: [],
@@ -108,7 +111,7 @@ describe('MainTreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MainTreatmentComponent],
       providers: [
-        { provide: I18NStore, useValue: i18nStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
   });
@@ -135,8 +138,7 @@ describe('MainTreatmentComponent', () => {
   it('should request localized treatment content when language changes', () => {
     createComponent();
     (TranslateLoaderFactory.loadJson as jasmine.Spy).calls.reset();
-
-    i18nStoreSpy.language.set('nl');
+    navigationServiceSpy.language$.set('nl');
     fixture.detectChanges();
 
     expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'nl');

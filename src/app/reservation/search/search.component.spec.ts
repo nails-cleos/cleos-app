@@ -15,14 +15,15 @@ import { ICurrencyAll } from '../../currency/currency';
 import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
 
   const professional: IUserAll = {
     id: 'prof-123',
@@ -99,6 +100,9 @@ describe('SearchComponent', () => {
   let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     reservationList$ = new BehaviorSubject(mockPagination);
     customerList$ = new BehaviorSubject(undefined);
     response$ = new BehaviorSubject<any>(undefined);
@@ -141,6 +145,7 @@ describe('SearchComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SearchComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -150,8 +155,8 @@ describe('SearchComponent', () => {
     fixture = TestBed.createComponent(SearchComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

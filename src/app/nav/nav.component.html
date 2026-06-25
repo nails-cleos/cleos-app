@@ -19,15 +19,15 @@
             @if (isHandsetSignal()) {
               <app-avatar class="circle pointer-only"
                           mat-card-avatar
-                          [routerLink]="['/', language(), 'auth', 'profile']"
+                          [routerLink]="['/', languageSignal(), 'auth', 'profile']"
                           [src]="image"
                           [initials]="initials">
               </app-avatar>
             }
-            <mat-card-title class="pointer-only" [routerLink]="['/', language(), 'auth', 'profile']">
+            <mat-card-title class="pointer-only" [routerLink]="['/', languageSignal(), 'auth', 'profile']">
               {{ currentUser.displayName | uppercase }}
             </mat-card-title>
-            <mat-card-subtitle class="pointer-only" [routerLink]="['/', language(), 'auth', 'profile']">
+            <mat-card-subtitle class="pointer-only" [routerLink]="['/', languageSignal(), 'auth', 'profile']">
               {{ currentUser.email }}
             </mat-card-subtitle>
           </mat-card-header>
@@ -47,12 +47,12 @@
           <mat-card-content>
             <mat-nav-list>
               @if (isHandsetSignal()) {
-                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', language(), 'home']">
+                <mat-list-item (click)="drawer.toggle()" [routerLink]="['/', languageSignal(), 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
               } @else {
-                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'home']">
+                <mat-list-item [routerLinkActive]="['active-link']" [routerLink]="['/', languageSignal(), 'home']">
                   <mat-icon matListItemIcon>home</mat-icon>
                   <div matListItemTitle>{{ 'COMMON.DASHBOARD.HOME' | translate }}</div>
                 </mat-list-item>
@@ -135,7 +135,7 @@
                               @if (!not.read) {
                                 <span class="app-surface-notification-card__dot"></span>
                               }
-                              <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:dateFormat }}</span>
+                              <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:language }}</span>
                             </div>
                             <div [matTooltip]="not.message" class="app-surface-notification-card__message">
                               {{ not.message }}
@@ -145,7 +145,7 @@
                         <div class="app-detail-actions app-surface-notification-menu__actions">
                           <button mat-stroked-button
                                   type="button"
-                                  [routerLink]="['/', language(), 'notifications']"
+                                  [routerLink]="['/', languageSignal(), 'notifications']"
                                   (click)="closeActiveMenu()">
                             <mat-icon>notifications</mat-icon>
                             <span>{{ 'COMMON.NOTIFICATION.LOAD_MORE' | translate }}</span>
@@ -198,7 +198,7 @@
                 <div class="app-crud-view-grid">
                   <button type="button"
                           class="app-surface-item app-surface-config-card"
-                          [routerLink]="['/', language(), 'home']"
+                          [routerLink]="['/', languageSignal(), 'home']"
                           routerLinkActive="app-surface-config-card--active"
                           (click)="closeActiveMenu()">
                     <span class="app-surface-config-card__icon">
@@ -209,7 +209,7 @@
 
                   <button type="button"
                           class="app-surface-item app-surface-config-card"
-                          [routerLink]="['/', language(), 'auth', 'profile']"
+                          [routerLink]="['/', languageSignal(), 'auth', 'profile']"
                           (click)="closeActiveMenu()">
                     <span class="app-surface-config-card__icon">
                       @if (incomplete) {
@@ -244,12 +244,12 @@
           </div>
         </div>
       } @else if (!isHandsetSignal()) {
-        <button mat-button [routerLink]="['/', language(), 'home']">
+        <button mat-button [routerLink]="['/', languageSignal(), 'home']">
           <mat-icon>home</mat-icon>
           {{ 'COMMON.DASHBOARD.HOME' | translate }}
         </button>
       } @else {
-        <button class="header-action-button" mat-icon-button [routerLink]="['/', language(), 'home']">
+        <button class="header-action-button" mat-icon-button [routerLink]="['/', languageSignal(), 'home']">
           <mat-icon>home</mat-icon>
         </button>
       }
@@ -269,21 +269,21 @@
     @if (isHandsetSignal() && (isProfessional() || isManager() || isAdmin())) {
       <footer>
         <mat-toolbar class="header nav-gradient footer">
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'calendar']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', languageSignal(), 'reservation', 'calendar']">
             <mat-icon>event</mat-icon>
             <span class="footer-label">{{ 'COMMON.DASHBOARD.CALENDAR' | translate }}</span>
           </a>
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'dashboard']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', languageSignal(), 'dashboard']">
             <mat-icon>dashboard</mat-icon>
             <span class="footer-label">{{ 'DASHBOARD.FIELD' | translate }}</span>
           </a>
           @if (isAdmin()) {
-            <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'reservation', 'search']">
+            <a [routerLinkActive]="['active-link']" [routerLink]="['/', languageSignal(), 'reservation', 'search']">
               <mat-icon>find_in_page</mat-icon>
               <span class="footer-label">{{ 'COMMON.DASHBOARD.SEARCH' | translate }}</span>
             </a>
           }
-          <a [routerLinkActive]="['active-link']" [routerLink]="['/', language(), 'unavailable', 'add']">
+          <a [routerLinkActive]="['active-link']" [routerLink]="['/', languageSignal(), 'unavailable', 'add']">
             <mat-icon>event_busy</mat-icon>
             <span class="footer-label">{{ 'COMMON.DASHBOARD.BLOCK_TIME' | translate }}</span>
           </a>

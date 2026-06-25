@@ -14,9 +14,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth } from '../../util/helper';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CatalogueStore } from '../../store/catalogue.store';
 import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-catalogue-list',
@@ -27,9 +28,9 @@ import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skele
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueListComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly responseSignal = this.catalogueStore.response;
   private readonly cataloguesSignal = this.catalogueStore.data;
@@ -41,7 +42,7 @@ export class CatalogueListComponent {
   });
   isLoading = computed(() => this.isLoadingSignal());
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     this.catalogueStore.clean();
@@ -64,12 +65,12 @@ export class CatalogueListComponent {
   }
 
   edit(selected: ICatalogueAll): void {
-    void this.router.navigate([this.language, 'catalogues', selected.id]);
+    this.navigationService.navigate(['catalogues', selected.id]);
   }
 
   delete(catalogue: ICatalogueAll): void {
-    const title = this.translate.instant('CATALOGUE.DELETED.TITLE');
-    const content = this.translate.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
+    const title = this.translateService.instant('CATALOGUE.DELETED.TITLE');
+    const content = this.translateService.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue, variant: 'warning' }, result => {
       if (result) {
         this.catalogueStore.delete(result.id, result.name);

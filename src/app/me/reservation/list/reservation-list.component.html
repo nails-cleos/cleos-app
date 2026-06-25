@@ -34,7 +34,7 @@
 
                 <mat-tab-group class="reservations-tabs">
                     @for (up of upcoming; track up) {
-                        <mat-tab label="{{up.timestamp | timeDetail | date:'short':up.room.timeZone:dateFormat}}">
+                        <mat-tab label="{{up.timestamp | timeDetail | date:'short':up.room.timeZone:language}}">
                             <div class="reservations-tab-content">
                                 <app-upcoming [upcoming]="up" [small]="small()"></app-upcoming>
                             </div>
@@ -87,7 +87,7 @@
                             mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
                         </th>
                         <td *matCellDef="let reservation" mat-cell>
-                            {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}
+                            {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}
                             @if (showTimeZone(reservation)) {
                                 <button (click)="openDialog(reservation)" mat-icon-button type="button">
                                     <mat-icon>info_outline</mat-icon>

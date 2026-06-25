@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { IUser, User } from '../user/user';
@@ -13,7 +13,7 @@ import { MainContentService } from '../services/main-content.service';
 import { NavigationService } from '../services/navigation.service';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { EnvService } from '../services/env.service';
-import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
+import { filter } from 'rxjs';
 import { FirebaseService } from '../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
@@ -24,7 +24,6 @@ import { UpperCasePipe } from '@angular/common';
 import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
 import { AuthStore } from '../store/auth.store';
 import { UserStore } from '../store/user.store';
-import { getLocale } from '../util/helper';
 
 @Component({
   selector: 'app-main',
@@ -43,7 +42,7 @@ export class MainComponent {
   private readonly authStore = inject(AuthStore);
   private readonly userStore = inject(UserStore);
   private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly themeService: ThemeService = inject(ThemeService);
@@ -53,15 +52,8 @@ export class MainComponent {
   private readonly firebaseService = inject(FirebaseService);
 
   private authUserSignal = this.authUserService.authUser;
-  private lang$ = this.router.events.pipe(
-    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-    startWith(undefined),
-    map(() => this.currentLanguageFromUrl(this.router.url)),
-    distinctUntilChanged(),
-  );
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.Handset]);
 
-  private langSignal = toSignal(this.lang$, { initialValue: this.currentLanguageFromUrl(this.router.url) });
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -86,7 +78,7 @@ export class MainComponent {
 
   cssClass?: string;
   backgroundColor = computed(() => this.isDarkMode() ? '126, 119, 105' : '169, 163, 151');
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
   showArrow: boolean = false;
 
   private navigationObserve?: IntersectionObserver;
@@ -116,24 +108,8 @@ export class MainComponent {
     });
 
     effect(() => {
-      const lang = this.langSignal();
-      this.authUserService.cookieConsent(this.translate);
-
-      const resolvedLang = this.navigationService.attachLang(lang);
-      const currentUser = untracked(() => this.authUserService.authUser());
-
-      if (!currentUser) {
-        return;
-      }
-
-      const userLang = getLocale(currentUser.locale).language;
-
-      if (userLang !== resolvedLang) {
-        const user: IUser = new User();
-        user.locale = resolvedLang;
-
-        this.userStore.updateMyUser(user, this.router.url);
-      }
+      this.navigationService.language$();
+      this.authUserService.cookieConsent(this.translateService);
     });
 
     this.router.events
@@ -156,12 +132,12 @@ export class MainComponent {
 
   treatment(): void {
     goTo('home');
-    this.router.navigate([this.translate.getCurrentLang(), 'home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
+    this.navigationService.navigate(['home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
     return;
   }
 
   scrollToElement = (element: HTMLElement | string): void => {
-    this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
+    this.navigationService.navigate(['']).then(() => setTimeout(() => {
       this.navigationAnimation();
       goTo(element);
     }, 100));
@@ -181,7 +157,8 @@ export class MainComponent {
     const authenticatedUser: IUser = new User();
     authenticatedUser.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${ isDark.toString().toUpperCase() }`);
+    const message = this.translateService.instant(
+      `COMMON.PROFILE.UPDATED.DARK_MODE_${ isDark.toString().toUpperCase() }`);
     this.userStore.updateMyUser(authenticatedUser, redirectUrl, message);
   }
 
@@ -190,9 +167,4 @@ export class MainComponent {
     this.firstSection = window.document.getElementById('slider');
     this.navigationObserve = observeElementSignal(this.navigationState, this.firstSection, true, 0.1);
   };
-
-  private currentLanguageFromUrl(url: string): string {
-    const lang = url.split('?')[0].split('#')[0].split('/').filter(Boolean)[0];
-    return getLocale(lang).language;
-  }
 }

@@ -12,7 +12,7 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -21,6 +21,7 @@ import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/inp
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/list';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-review-dialog',
@@ -34,12 +35,12 @@ import { MatDivider } from '@angular/material/list';
 export class ReviewDialogComponent {
   private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(MatDialogRef<ReviewDialogComponent>);
   private readonly data = inject<IReservationAll>(MAT_DIALOG_DATA);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly firebaseService = inject(FirebaseService);
 
   reservation?: IReservationAll;
   end?: Date;
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   price: IPrice = getPrice(this.data);
   rating = -1;

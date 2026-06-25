@@ -179,7 +179,7 @@ export class Room {
     currentAvailabilities: IAvailability[],
     currentRoom?: IRoomAll,
     formattedAddress?: string,
-    location?: google.maps.LatLng,
+    location?: { lat: () => number; lng: () => number },
   ): IRoom {
     const room: IRoom = {
       officeId: valueChange(roomForm.office.value, currentRoom?.office)?.id,

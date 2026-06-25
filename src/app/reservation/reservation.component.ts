@@ -49,11 +49,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
-  DEFAULT_LOCALE,
   createDate,
   createFullDate,
   createNewDate,
   dateToUTC,
+  DEFAULT_LOCALE,
   Duration,
   filterDateRoom,
   formatTime,
@@ -72,7 +72,6 @@ import {
   totalDuration,
 } from '../util/dates';
 import { DataEvent, IDataEvent } from '../util/event';
-import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { IUnavailableAll } from '../unavailable/unavailable';
 import { DiscountType, IDiscount, IUserDiscount } from '../discount/discount';
@@ -151,6 +150,7 @@ import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.compo
 import { MatCheckbox } from '@angular/material/checkbox';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { CardListSkeletonComponent } from '../shared/skeleton/card-list-skeleton.component';
+import { NavigationService } from '../services/navigation.service';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -191,11 +191,11 @@ export class ReservationComponent {
 
   private readonly dialog = inject(MatDialog);
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly router: Router = inject(Router);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formErrorService = inject(ReservationFormErrorService);
   private readonly reservationCalendarService = inject(ReservationCalendarService);
@@ -438,7 +438,7 @@ export class ReservationComponent {
   day: IDay = new Day();
   refresh: Subject<any> = new Subject();
 
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   isPreview = false;
   totalDurationFormatted?: string;
 
@@ -475,7 +475,6 @@ export class ReservationComponent {
   private groupId?: string;
   private isDashboard = false;
   private hydratingEdit = false;
-  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     const preview = new Step(6, 'preview', () => this.create());
@@ -500,7 +499,7 @@ export class ReservationComponent {
       if (params?.date) {
         let start = this.minDate;
         if (params.date.getMinutes() % 15 === 0 && params.date.getSeconds() === 0) {
-          start = getTime(params.date, this.dateFormat);
+          start = getTime(params.date, this.language);
         }
         this.removeDate(0);
         this.addDate(params.date, start);
@@ -631,11 +630,11 @@ export class ReservationComponent {
       if (room) {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
-          const localDate = localeTimeZoneDate(this.translate.getCurrentLang(), now);
-          const timeZoneDate = localeTimeZoneDate(this.translate.getCurrentLang(), now, room.timeZone);
-          const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
-          const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
-          const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
+          const localDate = localeTimeZoneDate(this.language, now);
+          const timeZoneDate = localeTimeZoneDate(this.language, now, room.timeZone);
+          const warning = this.translateService.instant('COMMON.TIME_ZONE.WARNING');
+          const localDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
+          const roomDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
           const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'none' });
           toastRef.onAction().subscribe(() => {
@@ -916,7 +915,7 @@ export class ReservationComponent {
   }
 
   get addCustomer(): void {
-    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.customer } });
+    this.navigationService.navigate(['users', 'add'], { state: { role: Role.customer } });
     return;
   }
 
@@ -958,7 +957,7 @@ export class ReservationComponent {
     }
 
     const date = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
-    return [{ date, start: getTime(date, this.dateFormat) }];
+    return [{ date, start: getTime(date, this.language) }];
   }
 
   private get summaryPriceSource(): IPrice {
@@ -1165,7 +1164,7 @@ export class ReservationComponent {
       this.isPreview = false;
       const duration = totalDuration(treatment, this.additionalSelected());
       this.totalDuration = duration.duration;
-      this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.dateFormat);
+      this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.language);
       this.dataEvents = new Map();
 
       const timeZone = room.timeZone;
@@ -1289,7 +1288,7 @@ export class ReservationComponent {
     if (!room) {
       return;
     }
-    openDialog(room, this.dateFormat, this.translate, this.dialog, reservationDate);
+    openDialog(room, this.language, this.translateService, this.dialog, reservationDate);
   };
 
   segmentClick = (date: Date, state: string, eventKey: string, id: string = `${ Math.random() }`): void => {
@@ -1434,7 +1433,7 @@ export class ReservationComponent {
 
     const dateGroup = this.getFormDateTimeControls(eventData.index);
     dateGroup.date.setValue(date);
-    dateGroup.start.setValue(getTime(date, this.dateFormat));
+    dateGroup.start.setValue(getTime(date, this.language));
 
     const nowTime = getTimeNumber(date);
 
@@ -1449,17 +1448,18 @@ export class ReservationComponent {
       const selectedEvent = this.events.at(eventData.index)?.get('event')?.value;
       const eventsOverlapping = eventData.getOverlapEvent(start, end, this.professionalId());
       if (eventsOverlapping?.length && eventsOverlapping[0] !== selectedEvent) {
-        title = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
-        content = this.translate.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {
+        title = this.translateService.instant('RESERVATION.EVENT.OVERLAPPING.TITLE');
+        content = this.translateService.instant('RESERVATION.EVENT.OVERLAPPING.CONTENT', {
           data: this.createOverlapMessage(eventsOverlapping),
         });
       } else {
         if (!selectedEvent && !id) {
-          title = this.translate.instant('RESERVATION.EVENT.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(DEFAULT_LOCALE) });
+          title = this.translateService.instant('RESERVATION.EVENT.TITLE');
+          content =
+            this.translateService.instant('RESERVATION.EVENT.CONTENT', { date: start.toLocaleString(DEFAULT_LOCALE) });
         } else {
-          title = this.translate.instant('RESERVATION.EVENT.CHANGE.TITLE');
-          content = this.translate.instant('RESERVATION.EVENT.CHANGE.CONTENT',
+          title = this.translateService.instant('RESERVATION.EVENT.CHANGE.TITLE');
+          content = this.translateService.instant('RESERVATION.EVENT.CHANGE.CONTENT',
             { date: start.toLocaleString(DEFAULT_LOCALE) });
         }
       }
@@ -1553,7 +1553,7 @@ export class ReservationComponent {
     const schedule = end ? `${ start } - ${ end }` : start;
 
     if (event.meta?.isReservation) {
-      const none = this.translate.instant('RESERVATION.FLOW.SUMMARY.NONE');
+      const none = this.translateService.instant('RESERVATION.FLOW.SUMMARY.NONE');
       const treatment = event.meta.treatmentName || this.stripHtml(event.title);
       const additionals = event.meta.additionalNames?.length ? event.meta.additionalNames.join(', ') : none;
 
@@ -1736,7 +1736,7 @@ export class ReservationComponent {
     this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });
     this.treatmentId.set(reservation.treatment.key);
     this.getTreatmentForm.treatment.setValue(reservation.treatment, { emitEvent: false });
-    const time = getTime(date, this.dateFormat);
+    const time = getTime(date, this.language);
     if (this.dateTimeList.controls?.length === 1) {
       const control = this.getFormDateTimeControls(0);
       const controlDate = control.date;
@@ -1744,10 +1744,10 @@ export class ReservationComponent {
         controlDate.setValue(date, { emitEvent: false });
         control.start.setValue(time, { emitEvent: false });
       } else {
-        this.addDate(date, getTime(date, this.dateFormat));
+        this.addDate(date, getTime(date, this.language));
       }
     } else {
-      this.addDate(date, getTime(date, this.dateFormat));
+      this.addDate(date, getTime(date, this.language));
     }
     this.setPrice(getPrice(reservation, reservation.payments));
     this.additionalSelected.set(reservation.additional ? reservation.additional

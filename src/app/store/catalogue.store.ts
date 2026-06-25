@@ -21,7 +21,7 @@ export const CatalogueStore = signalStore(
   withMethods((
     store,
     catalogueService = inject(CatalogueService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     let loadAllCataloguesSubscription: Subscription | undefined;
     let getAllHomeSubscription: Subscription | undefined;
@@ -106,7 +106,7 @@ export const CatalogueStore = signalStore(
         createSubscription = catalogueService.createCatalogue(catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('CATALOGUE.CREATED', { name: response.name }),
+              message: translateService.instant('CATALOGUE.CREATED', { name: response.name }),
               path: `catalogues/${ response.id }`,
               redirect: 'catalogues',
             },
@@ -123,7 +123,7 @@ export const CatalogueStore = signalStore(
         updateSubscription = catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name }),
+              message: translateService.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name }),
               path: `catalogues/${ response.id }`,
               redirect: 'catalogues',
             },
@@ -156,7 +156,7 @@ export const CatalogueStore = signalStore(
         deleteSubscription = catalogueService.deleteCatalogue(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('CATALOGUE.DELETED.MESSAGE', { name }),
+              message: translateService.instant('CATALOGUE.DELETED.MESSAGE', { name }),
               reload: true,
               toastType: 'warning',
             },

@@ -17,7 +17,7 @@
                }">
             <div class="step-counter">
               @if (tracking.createdTimestamp) {
-                <span>{{ tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
+                <span>{{ tracking.createdTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language }}</span>
               }
             </div>
             <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.CREATED' | translate }}</div>
@@ -30,7 +30,7 @@
                }">
             <div class="step-counter">
               @if (tracking.approvedTimestamp || tracking.createdTimestamp) {
-                <span>{{ (tracking.approvedTimestamp || tracking.createdTimestamp) | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
+                <span>{{ (tracking.approvedTimestamp || tracking.createdTimestamp) | timeDetail | date:'short':tracking.reservation.room.timeZone:language }}</span>
               }
             </div>
             <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.APPROVED' | translate }}</div>
@@ -43,7 +43,7 @@
                }">
             <div class="step-counter">
               @if (tracking.startedTimestamp) {
-                <span>{{ tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
+                <span>{{ tracking.startedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language }}</span>
               }
             </div>
             <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.STARTED' | translate }}</div>
@@ -56,7 +56,7 @@
                }">
             <div class="step-counter">
               @if (tracking.completedTimestamp) {
-                <span>{{ tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:dateFormat }}</span>
+                <span>{{ tracking.completedTimestamp | timeDetail | date:'short':tracking.reservation.room.timeZone:language }}</span>
               }
             </div>
             <div class="step-name">{{ 'COMMON.STATUS.RESERVATION.COMPLETED' | translate }}</div>

@@ -3,7 +3,7 @@
     <ng-container matColumnDef="date">
       <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}</th>
       <td *matCellDef="let treatment" mat-cell>
-        <div>{{ treatment.createdAt | date:'shortDate':undefined:dateFormat }}</div>
+        <div>{{ treatment.createdAt | date:'shortDate':undefined:language }}</div>
       </td>
     </ng-container>
 

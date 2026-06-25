@@ -16,7 +16,7 @@ import { LegalPageBase } from '../legal-page-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TermsAndConditionsComponent extends LegalPageBase implements OnInit {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly seoService: SeoService = inject(SeoService);
   termsContent = this.legalContent;
 
@@ -29,7 +29,7 @@ export class TermsAndConditionsComponent extends LegalPageBase implements OnInit
   }
 
   ngOnInit(): void {
-    const meta = this.translate.instant('META');
+    const meta = this.translateService.instant('META');
 
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);

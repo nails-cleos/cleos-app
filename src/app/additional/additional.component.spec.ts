@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { IAdditionalAll } from './additional';
 import { ICommon } from '../interfaces/common';
@@ -14,6 +14,7 @@ import { TreatmentStore } from '../store/treatment.store';
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
   let fixture: ComponentFixture<AdditionalComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let additionalStoreSpy: {
     subErrors: ReturnType<typeof signal>;
@@ -46,6 +47,9 @@ describe('AdditionalComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     additionalStoreSpy = {
       subErrors: signal<any>(undefined),
       clean: jasmine.createSpy('clean'),
@@ -54,14 +58,13 @@ describe('AdditionalComponent', () => {
       data: signal<any>(undefined),
       loadAllGroups: jasmine.createSpy('loadAllGroups'),
     };
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
       imports: [AdditionalComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
@@ -70,8 +73,6 @@ describe('AdditionalComponent', () => {
       .createComponent(AdditionalComponent);
     component = fixture.componentInstance;
 
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
     fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });

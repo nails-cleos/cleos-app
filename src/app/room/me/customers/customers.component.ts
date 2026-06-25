@@ -20,7 +20,7 @@ import {
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { IRoomCustomer } from '../../room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
@@ -33,6 +33,7 @@ import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
 import { RoomStore } from '../../../store/room.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-customers',
@@ -48,7 +49,7 @@ export class CustomersComponent {
   id = input<string>();
 
   private readonly roomStore = inject(RoomStore);
-  private readonly translate = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly breakpointObserver = inject(BreakpointObserver);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -86,7 +87,7 @@ export class CustomersComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IRoomCustomer;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {

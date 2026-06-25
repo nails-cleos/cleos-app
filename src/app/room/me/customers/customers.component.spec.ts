@@ -7,10 +7,13 @@ import { IRoomCustomer } from '../../room';
 import { ActivatedRoute } from '@angular/router';
 import { RoomStore } from '../../../store/room.store';
 import { signal } from '@angular/core';
+import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;
   let fixture: ComponentFixture<CustomersComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpointObserver$: Subject<BreakpointState>;
 
@@ -22,6 +25,9 @@ describe('CustomersComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpointObserver$ = new Subject<BreakpointState>();
 
     roomStoreSpy = {
@@ -36,6 +42,7 @@ describe('CustomersComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CustomersComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

@@ -1,23 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReviewDialogComponent } from './review-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { IReservationAll } from '../../../reservation/reservation';
 import { IAddress, IRoomAll, ServiceType } from '../../../room/room';
 import { IUserAll } from '../../../user/user';
 import { ICurrencyAll } from '../../../currency/currency';
 import { ITreatmentAll } from '../../../treatment/treatment';
-import { getCurrentTimeZone } from '../../../util/dates';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
   let fixture: ComponentFixture<ReviewDialogComponent>;
 
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReviewDialogComponent>>;
 
-  let translateService: TranslateService;
-
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     const customer: IUserAll = {
@@ -82,13 +85,13 @@ describe('ReviewDialogComponent', () => {
       imports: [ReviewDialogComponent, TranslateModule.forRoot()],
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewDialogComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
     fixture.detectChanges();
   });
 
@@ -100,7 +103,7 @@ describe('ReviewDialogComponent', () => {
     expect(component.reservation).toBeDefined();
     expect(component.price).toBeDefined();
     expect(component.end).toBeInstanceOf(Date);
-    expect(component.dateFormat).toBe(translateService.getCurrentLang());
+    expect(component.language).toBe(DEFAULT_LOCALE);
   });
 
   it('should close dialog on onNoClick', () => {

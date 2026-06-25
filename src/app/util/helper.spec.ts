@@ -332,13 +332,13 @@ describe('Helper Utils', () => {
 
   describe('openDialog & createDialog', () => {
     let dialog: jasmine.SpyObj<MatDialog>;
-    let translate: jasmine.SpyObj<TranslateService>;
+    let translateService: jasmine.SpyObj<TranslateService>;
     let myRoom: IRoomAll;
 
     beforeEach(() => {
       dialog = jasmine.createSpyObj('MatDialog', ['open']);
-      translate = jasmine.createSpyObj('TranslateService', ['instant']);
-      translate.instant.and.callFake((key: string) => key);
+      translateService = jasmine.createSpyObj('TranslateService', ['instant']);
+      translateService.instant.and.callFake((key: string) => key);
 
       myRoom = {
         id: 'room-1',
@@ -350,7 +350,7 @@ describe('Helper Utils', () => {
     it('openDialog should call createDialog and open dialog', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      openDialog(myRoom, 'en', translate, dialog, time);
+      openDialog(myRoom, 'en', translateService, dialog, time);
 
       expect(dialog.open).toHaveBeenCalledWith(DialogComponent, jasmine.any(Object));
       const dataArg = dialog.open.calls.mostRecent().args[1]?.data;
@@ -367,10 +367,10 @@ describe('Helper Utils', () => {
     it('createDialog should open dialog with correct translation keys', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      createDialog('ROOM_INFO', 'Main Room', 'en', translate, dialog, 'Europe/Amsterdam', time);
+      createDialog('ROOM_INFO', 'Main Room', 'en', translateService, dialog, 'Europe/Amsterdam', time);
 
-      expect(translate.instant).toHaveBeenCalledWith('COMMON.TIME_ZONE.TITLE');
-      expect(translate.instant).toHaveBeenCalledWith(
+      expect(translateService.instant).toHaveBeenCalledWith('COMMON.TIME_ZONE.TITLE');
+      expect(translateService.instant).toHaveBeenCalledWith(
         'COMMON.TIME_ZONE.ROOM_INFO',
         jasmine.objectContaining({
           localTime: jasmine.any(String),
@@ -391,7 +391,7 @@ describe('Helper Utils', () => {
     });
 
     it('createDialog should add +1D when localDate is earlier', () => {
-      translate.instant.and.callFake((key: string, params?: any) => {
+      translateService.instant.and.callFake((key: string, params?: any) => {
         if (params?.arg) {
           expect(params.arg).toContain('+1D');
         }
@@ -401,13 +401,13 @@ describe('Helper Utils', () => {
       const now = new Date();
       const pastDate = new Date(now.getTime() - 86400000); // 1 día antes
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translate, dialog, undefined, pastDate);
+      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, pastDate);
 
       expect(dialog.open).toHaveBeenCalled();
     });
 
     it('createDialog should add -1D when localDate is later', () => {
-      translate.instant.and.callFake((key: string, params?: any) => {
+      translateService.instant.and.callFake((key: string, params?: any) => {
         if (params?.arg) {
           expect(params.arg).toContain('-1D');
         }
@@ -417,7 +417,7 @@ describe('Helper Utils', () => {
       const now = new Date();
       const futureDate = new Date(now.getTime() + 86400000); // 1 día después
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translate, dialog, undefined, futureDate);
+      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, futureDate);
 
       expect(dialog.open).toHaveBeenCalled();
     });

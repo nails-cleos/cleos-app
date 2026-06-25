@@ -5,7 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
@@ -21,14 +21,15 @@ import { States } from '../reservation';
 import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -124,6 +125,9 @@ describe('CalendarComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
@@ -139,7 +143,6 @@ describe('CalendarComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
@@ -168,8 +171,8 @@ describe('CalendarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CalendarComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -221,7 +224,6 @@ describe('CalendarComponent', () => {
     });
 
     it('should set locale from translate service', () => {
-      expect(component.locale).toBe(DEFAULT_LOCALE);
       expect(component.language).toBe(DEFAULT_LOCALE);
     });
   });
@@ -425,7 +427,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['reservation-123']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation-123']);
     });
 
     it('should not navigate when event id is OUT_OF_WORK_ALL_DAY', () => {
@@ -437,7 +439,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should not navigate when event id is OUT_OF_WORK', () => {
@@ -449,7 +451,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should not navigate when event id is LUNCH', () => {
@@ -461,7 +463,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should open dialog on segmentClick when date is valid', () => {

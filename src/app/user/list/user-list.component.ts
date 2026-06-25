@@ -11,7 +11,7 @@ import { Role } from '../../interfaces/token';
 import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { RoleIconKey, RoleIconName } from '../../util/icon';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -38,13 +38,15 @@ import {
   MatDivider,
   MatList,
   MatListItem,
-  MatListItemIcon, MatListItemTitle,
+  MatListItemIcon,
+  MatListItemTitle,
   MatListSubheaderCssMatStyler,
 } from '@angular/material/list';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { LowerCasePipe, NgClass } from '@angular/common';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;
@@ -64,9 +66,9 @@ type UsersForm = {
 export class UserListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly userStore = inject(UserStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -112,7 +114,7 @@ export class UserListComponent {
 
   expandedUser?: IUserAll;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   form: FormGroup<UsersForm> = this.formBuilder.group<UsersForm>({
     filter: this.formBuilder.control(undefined),
@@ -144,8 +146,8 @@ export class UserListComponent {
 
   delete = (user: IUserAll): void => {
     this.noExpanded(user);
-    const title = this.translate.instant('USER.DELETED.TITLE');
-    const content = this.translate.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
+    const title = this.translateService.instant('USER.DELETED.TITLE');
+    const content = this.translateService.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user, variant: 'warning' },
     });
@@ -159,8 +161,8 @@ export class UserListComponent {
 
   sendInvite = (user: IUserAll): void => {
     this.noExpanded(user);
-    const title = this.translate.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translate.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
+    const title = this.translateService.instant('USER.ACTIVATION_RESEND.TITLE');
+    const content = this.translateService.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user },
     });
@@ -174,8 +176,8 @@ export class UserListComponent {
 
   restore = (user: IUserAll): void => {
     this.noExpanded(user);
-    const title = this.translate.instant('USER.RESTORE.TITLE');
-    const content = this.translate.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
+    const title = this.translateService.instant('USER.RESTORE.TITLE');
+    const content = this.translateService.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user },
     });
@@ -217,7 +219,7 @@ export class UserListComponent {
 
   book = (customer: IUser): void => {
     const data = { customerId: customer.id };
-    this.router.navigate([this.translate.getCurrentLang(), 'reservation'], { state: data });
+    this.navigationService.navigate(['reservation'], { state: data });
   };
 
   private noExpanded = (user: IUserAll): void => {

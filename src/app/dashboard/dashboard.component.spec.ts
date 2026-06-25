@@ -14,10 +14,13 @@ import { provideAppCalendar } from '../util/adapter/app-date.provider';
 import { DashboardStore } from '../store/dashboard.store';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject } from 'rxjs';
+import { NavigationService } from '../services/navigation.service';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let dashboardStoreSpy: {
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
@@ -61,10 +64,12 @@ describe('DashboardComponent', () => {
     notes: [],
   };
 
-
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     history.replaceState({}, '');
     dashboardStoreSpy = {
       data: signal<any>(undefined),
@@ -86,6 +91,7 @@ describe('DashboardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -96,8 +102,8 @@ describe('DashboardComponent', () => {
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
 
-    const translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

@@ -13,10 +13,12 @@ import { signal, WritableSignal } from '@angular/core';
 import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { UserStore } from '../../store/user.store';
 import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
   let fixture: ComponentFixture<ProfileComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let selectedUserSignal: WritableSignal<any>;
   let subErrorsSignal: WritableSignal<any>;
@@ -28,6 +30,10 @@ describe('ProfileComponent', () => {
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService',
+      ['back', 'reload', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     selectedUserSignal = signal(undefined);
     subErrorsSignal = signal(undefined);
     responseSignal = signal(undefined);
@@ -49,11 +55,6 @@ describe('ProfileComponent', () => {
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates'], {
       createMap: () => of(MapStatus.ready),
     });
-
-    const navigationServiceSpy = jasmine.createSpyObj(
-      'NavigationService',
-      ['back', 'reload', 'reloadPage', 'attachLang'],
-    );
 
     await TestBed.configureTestingModule({
       imports: [ProfileComponent, TranslateModule.forRoot()],

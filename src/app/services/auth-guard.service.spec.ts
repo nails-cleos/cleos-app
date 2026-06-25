@@ -1,17 +1,18 @@
 import { TestBed } from '@angular/core/testing';
 
 import { PermissionsService } from './auth-guard.service';
-import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { signal } from '@angular/core';
 import { AuthStore } from '../store/auth.store';
+import { NavigationService } from './navigation.service';
 
 describe('authGuard', () => {
   let service: PermissionsService;
-  let router: jasmine.SpyObj<Router>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let action$: BehaviorSubject<any>;
 
@@ -21,15 +22,16 @@ describe('authGuard', () => {
   };
 
   beforeEach(() => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authStoreSpy = {
       user: signal({ authorities: [{ authority: 'ROLE_USER' }] }),
       authRedirect: jasmine.createSpy('authRedirect'),
     };
     action$ = new BehaviorSubject(undefined);
-    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     const toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
-    routerSpy.currentNavigation.and.returnValue(null);
 
     toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
@@ -40,14 +42,13 @@ describe('authGuard', () => {
       imports: [TranslateModule.forRoot()],
       providers: [
         PermissionsService,
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     });
 
     service = TestBed.inject(PermissionsService);
-    router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
@@ -79,7 +80,8 @@ describe('authGuard', () => {
 
     TestBed.runInInjectionContext(() => {
       expect(service.canActivate(route, state)).toBeFalse();
-      expect(router.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'auth'], { queryParams: { state: jasmine.any(String) } });
+      expect(navigationServiceSpy.navigate)
+        .toHaveBeenCalledWith(['auth'], { queryParams: { state: jasmine.any(String) } });
     });
   });
 });

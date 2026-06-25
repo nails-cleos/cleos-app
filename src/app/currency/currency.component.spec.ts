@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { CurrencyComponent } from './currency.component';
@@ -7,7 +7,6 @@ import { ICurrencyAll } from './currency';
 import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';
-import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
@@ -45,9 +44,6 @@ describe('CurrencyComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CurrencyComponent);
     component = fixture.componentInstance;

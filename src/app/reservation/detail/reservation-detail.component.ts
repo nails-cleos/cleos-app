@@ -15,7 +15,7 @@ import {
   updateReservationNote,
 } from '../../store/actions/reservation.actions';
 import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../reservation';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   createNewDate,
   Duration,
@@ -112,12 +112,10 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { MatSort } from '@angular/material/sort';
 import { MatTooltip } from '@angular/material/tooltip';
-import {
-  MatCard,
-  MatCardContent,
-} from '@angular/material/card';
+import { MatCard, MatCardContent } from '@angular/material/card';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { ReservationDetailSkeletonComponent } from './reservation-detail-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 type PaymentForm = {
   amount: FormControl<string>;
@@ -147,10 +145,10 @@ export class ReservationDetailComponent {
 
   private static readonly PROFESSIONAL_PAYMENT_TYPES = ['CASH', 'TRANSFER', 'MOLLIE'];
 
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -191,7 +189,7 @@ export class ReservationDetailComponent {
   start: Date = getNowTimeZone();
   end: Date = getNowTimeZone();
   state = signal<string | undefined>(undefined);
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   changeState: IFabMenu[] = [];
 
   historyTableColumns: TableSkeletonColumn[] = [
@@ -248,7 +246,6 @@ export class ReservationDetailComponent {
   isReservationAdmin?: boolean;
   isCustomer = signal(false);
   step = computed(() => this.navigationParams()?.step);
-  language: string = this.translate.getCurrentLang();
 
   private static stateMachineDefinition: any;
   private machine: any;
@@ -349,7 +346,7 @@ export class ReservationDetailComponent {
           this.professionalMachine(this);
           this.changeState = this.machine.next(snakeToCamel(reservation.state));
           if (reservation.state === 'APPROVED') {
-            const discount = this.createAction(this.translate.instant('RESERVATION.TREATMENT.DISCOUNT.FIELD'),
+            const discount = this.createAction(this.translateService.instant('RESERVATION.TREATMENT.DISCOUNT.FIELD'),
               ReservationIconName.discount, 'discount');
             const discountTransaction = ReservationDetailComponent.createTransaction('discount',
               (): void => this.addDiscount());
@@ -370,7 +367,7 @@ export class ReservationDetailComponent {
             }, 5000);
           }
         }
-        const note = this.createAction(this.translate.instant('RESERVATION.NOTE.FIELD'),
+        const note = this.createAction(this.translateService.instant('RESERVATION.NOTE.FIELD'),
           ReservationIconName.note, 'note');
         const noteTransaction = ReservationDetailComponent.createTransaction('note',
           (): void => this.addNote());
@@ -380,7 +377,7 @@ export class ReservationDetailComponent {
           note,
           false,
         );
-        const overview = this.createAction(this.translate.instant('COMMON.BUTTON.VIEW'),
+        const overview = this.createAction(this.translateService.instant('COMMON.BUTTON.VIEW'),
           ReservationIconName.overview, 'overview');
         const overviewTransaction = ReservationDetailComponent.createTransaction('overview',
           (): void => this.overview());
@@ -441,7 +438,7 @@ export class ReservationDetailComponent {
         const previous = 'previous';
 
         const previousAction = this.createAction(
-          this.translate.instant('RESERVATION.ACTION.PREVIOUS'),
+          this.translateService.instant('RESERVATION.ACTION.PREVIOUS'),
           ReservationIconName.previous,
           previous,
         );
@@ -449,8 +446,7 @@ export class ReservationDetailComponent {
         const previousTransition =
           ReservationDetailComponent.createTransaction(
             previous,
-            () => this.router.navigate([
-              this.language,
+            () => this.navigationService.navigate([
               'reservation',
               allReservations[currentIndex - 1],
             ]),
@@ -468,7 +464,7 @@ export class ReservationDetailComponent {
         const next = 'next';
 
         const nextAction = this.createAction(
-          this.translate.instant('RESERVATION.ACTION.NEXT'),
+          this.translateService.instant('RESERVATION.ACTION.NEXT'),
           ReservationIconName.next,
           next,
         );
@@ -476,8 +472,7 @@ export class ReservationDetailComponent {
         const nextTransition =
           ReservationDetailComponent.createTransaction(
             next,
-            () => this.router.navigate([
-              this.language,
+            () => this.navigationService.navigate([
               'reservation',
               allReservations[currentIndex + 1],
             ]),
@@ -533,9 +528,9 @@ export class ReservationDetailComponent {
 
   overview() {
     if (this.isCustomer()) {
-      this.router.navigate(['/', this.language, 'me', 'overview']);
+      this.navigationService.navigate(['me', 'overview']);
     } else {
-      this.router.navigate(['/', this.language, 'users', this.reservation()?.customer?.id, 'overview']);
+      this.navigationService.navigate(['users', this.reservation()?.customer?.id, 'overview']);
     }
   }
 
@@ -641,7 +636,7 @@ export class ReservationDetailComponent {
   openDialog = (reservationDate: Date): void => {
     const reservation = this.reservation();
     if (reservation) {
-      openDialog(reservation.room, this.language, this.translate, this.dialog, reservationDate);
+      openDialog(reservation.room, this.language, this.translateService, this.dialog, reservationDate);
     }
   };
 
@@ -659,9 +654,9 @@ export class ReservationDetailComponent {
       this.machine.transition(snakeToCamel(state), snakeToCamel(id));
       return;
     }
-    const title = this.translate.instant('RESERVATION.CHANGE_STATE.TITLE');
-    const action = this.translate.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
-    const content = this.translate.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
+    const title = this.translateService.instant('RESERVATION.CHANGE_STATE.TITLE');
+    const action = this.translateService.instant(`RESERVATION.CHANGE_STATE.ACTION.${ id.toUpperCase() }`);
+    const content = this.translateService.instant('RESERVATION.CHANGE_STATE.CONTENT', { action });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: id },
     });
@@ -708,34 +703,34 @@ export class ReservationDetailComponent {
     const customerId = reservation.customer.id;
     const initialState = reservation.state;
     const store = self.store;
-    const translate = self.translate;
+    const translateService = self.translateService;
 
-    const approve = this.createAction(translate.instant('RESERVATION.ACTION.APPROVE'),
+    const approve = this.createAction(translateService.instant('RESERVATION.ACTION.APPROVE'),
       ReservationIconName.approved, 'approve');
-    const start = this.createAction(translate.instant('RESERVATION.ACTION.START'),
+    const start = this.createAction(translateService.instant('RESERVATION.ACTION.START'),
       ReservationIconName.started, 'start');
-    const complete = this.createAction(translate.instant('RESERVATION.ACTION.COMPLETE'),
+    const complete = this.createAction(translateService.instant('RESERVATION.ACTION.COMPLETE'),
       ReservationIconName.completed, 'complete');
-    const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+    const edit = this.createAction(translateService.instant('RESERVATION.ACTION.EDIT'),
       ReservationIconName.edit, 'edit');
-    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'),
+    const cancel = this.createAction(translateService.instant('RESERVATION.ACTION.CANCEL'),
       ReservationIconName.cancelled, 'cancel');
-    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
+    const book = this.createAction(translateService.instant('RESERVATION.ACTION.BOOK'),
       ReservationIconName.book, 'book');
-    const sendMessage = this.createAction(translate.instant('RESERVATION.ACTION.SEND'),
+    const sendMessage = this.createAction(translateService.instant('RESERVATION.ACTION.SEND'),
       ReservationIconName.send, 'send');
-    const coffeeMessage = this.createAction(translate.instant('RESERVATION.ACTION.COFFEE'),
+    const coffeeMessage = this.createAction(translateService.instant('RESERVATION.ACTION.COFFEE'),
       ReservationIconName.coffee, 'coffee');
-    const change = this.createAction(translate.instant('RESERVATION.ACTION.CHANGE'),
+    const change = this.createAction(translateService.instant('RESERVATION.ACTION.CHANGE'),
       ReservationIconName.change, 'change');
 
-    const more = this.createAction(translate.instant('RESERVATION.ACTION.MORE'),
+    const more = this.createAction(translateService.instant('RESERVATION.ACTION.MORE'),
       ReservationIconName.more, 'more');
 
-    const color = this.createAction(translate.instant('RESERVATION.ACTION.COLOR'),
+    const color = this.createAction(translateService.instant('RESERVATION.ACTION.COLOR'),
       ReservationIconName.color, 'color');
 
-    const clone = this.createAction(translate.instant('RESERVATION.ACTION.CLONE'),
+    const clone = this.createAction(translateService.instant('RESERVATION.ACTION.CLONE'),
       ReservationIconName.clone, 'clone');
 
     const userPhone = reservation.customer.phone;
@@ -779,13 +774,13 @@ export class ReservationDetailComponent {
             key = 'APPROVE';
             break;
         }
-        const message = translate.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
+        const message = translateService.instant(`WHATSAPP.SEND.${ key }`, { date, treatment });
         window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
       }
     });
 
     const coffeeMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
-      const message = translate.instant('WHATSAPP.SEND.COFFEE');
+      const message = translateService.instant('WHATSAPP.SEND.COFFEE');
       window.open(`https://api.whatsapp.com/send?phone=+${ userPhone }&text=${ message }`, '_blank');
     });
 
@@ -794,16 +789,16 @@ export class ReservationDetailComponent {
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-      self.router.navigate([this.language, 'reservation', id, 'edit'], { state: { roomId } });
+      self.navigationService.navigate(['reservation', id, 'edit'], { state: { roomId } });
     });
 
     const completeTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.router.navigate(
-        [this.language, 'reservation', id, 'rooms', roomId, 'customer', customerId, 'complete']);
+      self.navigationService.navigate(
+        ['reservation', id, 'rooms', roomId, 'customer', customerId, 'complete']);
     });
 
     const moreTransaction = ReservationDetailComponent.createTransaction('more', (): void => {
-      self.router.navigate([this.language, 'reservation', id, 'more-info']);
+      self.navigationService.navigate(['reservation', id, 'more-info']);
     });
 
     const changeCustomerTransaction = ReservationDetailComponent.createTransaction('change',
@@ -833,7 +828,7 @@ export class ReservationDetailComponent {
       const treatmentId = reservation.treatment.key;
       const professionalId = reservation.professional.id;
       const data = { customerId, roomId, treatmentId, professionalId };
-      this.router.navigate([this.language, 'reservation'], { state: data });
+      this.navigationService.navigate(['reservation'], { state: data });
     });
 
     const approved = {
@@ -923,9 +918,9 @@ export class ReservationDetailComponent {
     }
     const reservationId = reservation.id;
     const initialState = reservation.state;
-    const translate = self.translate;
+    const translateService = self.translateService;
 
-    const book = this.createAction(translate.instant('RESERVATION.ACTION.BOOK'),
+    const book = this.createAction(translateService.instant('RESERVATION.ACTION.BOOK'),
       ReservationIconName.book, 'book');
 
     let cancelIcon = ReservationIconName.cancelled;
@@ -956,7 +951,7 @@ export class ReservationDetailComponent {
       }
     }
 
-    const cancel = this.createAction(translate.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel');
+    const cancel = this.createAction(translateService.instant('RESERVATION.ACTION.CANCEL'), cancelIcon, 'cancel');
 
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, cancelOptions, price, result => {
@@ -970,7 +965,7 @@ export class ReservationDetailComponent {
       const treatmentId = reservation.treatment.key;
       const professionalId = reservation.professional.id;
       const data = { roomId, treatmentId, professionalId };
-      this.router.navigate([this.language, 'me', 'reservation'], { state: data });
+      this.navigationService.navigate(['me', 'reservation'], { state: data });
     });
 
     const created = {
@@ -1018,11 +1013,11 @@ export class ReservationDetailComponent {
 
     /* EDIT */
     if (reservation.canEdit || price.totalPaid >= price.penalty) {
-      const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+      const edit = this.createAction(translateService.instant('RESERVATION.ACTION.EDIT'),
         ReservationIconName.edit, 'edit');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
-        self.router.navigate([this.language, 'me', 'reservation', reservationId]);
+        self.navigationService.navigate(['me', 'reservation', reservationId]);
       });
 
       created.transitions.edit = editTransaction;
@@ -1034,12 +1029,12 @@ export class ReservationDetailComponent {
       paid.transitions.edit = editTransaction;
       paid.next.unshift(edit);
     } else {
-      const edit = this.createAction(translate.instant('RESERVATION.ACTION.EDIT'),
+      const edit = this.createAction(translateService.instant('RESERVATION.ACTION.EDIT'),
         ReservationIconName.edit, 'cancel_edit');
 
       const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void =>
-        customerEditDialog(self.dialog, self.router, reservationId, reservation.room.currency, self.small(),
-          self.language, price));
+        customerEditDialog(self.dialog, self.navigationService, reservationId, reservation.room.currency, self.small(),
+          price));
 
       created.transitions.cancelEdit = editTransaction;
       created.next.unshift(edit);
@@ -1055,7 +1050,7 @@ export class ReservationDetailComponent {
       const paymentPaid = self.paymentPaid();
       const paymentPending = paymentPaid?.filter((p: IPayment) => p.status === 'PENDING')[0];
       if (paymentPending) {
-        const notify = this.createAction(translate.instant('RESERVATION.ACTION.NOTIFY'),
+        const notify = this.createAction(translateService.instant('RESERVATION.ACTION.NOTIFY'),
           ReservationIconName.notify, 'notify');
         cancelledPaymentRequired.next = [notify];
 
@@ -1064,13 +1059,13 @@ export class ReservationDetailComponent {
             this.notify(paymentPending);
           });
       } else {
-        const pay = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
+        const pay = this.createAction(translateService.instant('RESERVATION.ACTION.PAY'),
           ReservationIconName.payment, 'pay');
         cancelledPaymentRequired.next = [pay];
 
         cancelledPaymentRequired.transitions.pay =
           ReservationDetailComponent.createTransaction('cancelledPaymentRequired', (): void => {
-            this.router.navigate(['/', this.language, 'me', 'payment',
+            this.navigationService.navigate(['me', 'payment',
               paymentPaid?.filter((p: IPayment) => p.status !== 'APPROVED')[0]?.id]);
           });
       }
@@ -1078,14 +1073,14 @@ export class ReservationDetailComponent {
     }
 
     if (price.total > price.totalPaid) {
-      const next = this.createAction(translate.instant('RESERVATION.ACTION.PAY'),
+      const next = this.createAction(translateService.instant('RESERVATION.ACTION.PAY'),
         ReservationIconName.payment, 'pay');
       approved.next = [...approved.next, next];
       partiallyCompleted.next = [...partiallyCompleted.next, next];
 
       const transaction = ReservationDetailComponent.createTransaction('paid',
         (): void => {
-          this.router.navigate(['/', this.language, 'me', 'reservation', reservation.id, 'payment', 'option']);
+          this.navigationService.navigate(['me', 'reservation', reservation.id, 'payment', 'option']);
         });
       approved.transitions.pay = transaction;
       partiallyCompleted.transitions.pay = transaction;
@@ -1179,7 +1174,7 @@ export class ReservationDetailComponent {
           groupId: reservation.treatment.groupId,
           additionalIds: reservation.additional?.map(it => it.key),
         };
-        this.router.navigate([this.language, 'reservation'], { state });
+        this.navigationService.navigate(['reservation'], { state });
       }
     },
     true,

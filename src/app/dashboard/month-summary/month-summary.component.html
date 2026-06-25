@@ -232,7 +232,7 @@
                             {{ summary.position + 1 }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">
-                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:language }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
@@ -366,7 +366,7 @@
                           {{ summary.position + 1 }}
                         </td>
                         <td [rowSpan]="summary.total.payments.length || 1">
-                          {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
+                          {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:language)?.replace(',', '') }}
                         </td>
                         <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
                         <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
@@ -488,7 +488,7 @@
                             {{ summary.position + 1 }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">
-                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:language }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>

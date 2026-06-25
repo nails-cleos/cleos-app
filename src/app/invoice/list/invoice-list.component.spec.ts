@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { InvoiceListComponent } from './invoice-list.component';
 import { IInvoice, IRoomInvoice } from '../invoice';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { IOfficeAll } from '../../office/office';
 import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { IUserAll } from '../../user/user';
@@ -26,10 +26,11 @@ import { InvoiceStore } from '../../store/invoice.store';
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
   let fixture: ComponentFixture<InvoiceListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
   let officeStoreSpy: {
@@ -45,7 +46,6 @@ describe('InvoiceListComponent', () => {
     loadOfficeToInvoice: jasmine.Spy;
     uploadInvoices: jasmine.Spy;
   };
-  let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -168,6 +168,9 @@ describe('InvoiceListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     paymentOptions$ = new BehaviorSubject(paymentOptions);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -179,7 +182,6 @@ describe('InvoiceListComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
@@ -202,8 +204,6 @@ describe('InvoiceListComponent', () => {
       },
     });
 
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
-
     storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
@@ -211,13 +211,12 @@ describe('InvoiceListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [InvoiceListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: InvoiceStore, useValue: invoiceStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
         provideAppDateAdapter(),
@@ -226,9 +225,6 @@ describe('InvoiceListComponent', () => {
 
     fixture = TestBed.createComponent(InvoiceListComponent);
     component = fixture.componentInstance;
-
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     spyOn(globalThis, 'fetch').and.callFake(() =>
       Promise.resolve({
@@ -487,7 +483,7 @@ describe('InvoiceListComponent', () => {
   it('should navigate to invoice path when goToPath is called', () => {
     component.goToPath(mockInvoice[0]);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['invoice', '1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['invoice', '1']);
   });
 
   it('should auto-select office when only one office is available', () => {

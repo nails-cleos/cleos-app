@@ -32,7 +32,7 @@
       <div class="app-surface-spacer"></div>
       <div class="dashboard-events-title">
         <span class="app-surface-eyebrow">{{ 'DASHBOARD.FIELD' | translate }}</span>
-        <h2>{{ displayDate | calendarDate:'dayViewTitle':locale }}</h2>
+        <h2>{{ displayDate | calendarDate:'dayViewTitle':language }}</h2>
         <app-counter (refreshViewDate)="refreshViewDate($event)"></app-counter>
       </div>
     </div>
@@ -45,7 +45,7 @@
           (segmentClicked)="segmentClick($event.date, $event.professionalId)"
           (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
           (beforeViewRender)="beforeMonthViewRender($event)"
-          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="locale"
+          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="language"
           [viewDate]="currentViewDate">
         </app-mwl-day-view-scheduler>
       </div>
@@ -55,7 +55,7 @@
       <div class="dashboard-events-empty app-surface-item">
         <mat-icon>event_busy</mat-icon>
         <h2>
-          {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':locale } }}
+          {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':language } }}
         </h2>
       </div>
     </section>

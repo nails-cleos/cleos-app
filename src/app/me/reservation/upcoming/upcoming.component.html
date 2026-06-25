@@ -22,7 +22,7 @@
       <div class="app-surface-item">
         <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</span>
         <strong class="app-surface-item__value">
-          {{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+          {{ currentUpcoming.start | date:'short':currentUpcoming.room.timeZone:language }}
         </strong>
         @if (showTimeZone()) {
           <button (click)="openDialog(currentUpcoming.start)" mat-icon-button type="button" class="upcoming-info-button">
@@ -35,7 +35,7 @@
         <div class="app-surface-item">
           <span class="app-surface-item__label">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</span>
           <strong class="app-surface-item__value">
-            {{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:dateFormat }}
+            {{ currentUpcoming.end | date:'short':currentUpcoming.room.timeZone:language }}
           </strong>
           @if (showTimeZone()) {
             <button (click)="openDialog(currentUpcoming.end)" mat-icon-button type="button" class="upcoming-info-button">

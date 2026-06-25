@@ -2,23 +2,24 @@ import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
-import { IAdditional } from '../additional';
+import { IAdditional, IAdditionalAll } from '../additional';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import { AdditionalStore } from '../../store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
   let fixture: ComponentFixture<AdditionalListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let additionalStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -43,6 +44,9 @@ describe('AdditionalListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -53,7 +57,6 @@ describe('AdditionalListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     additionalStoreSpy = {
       isLoading: signal(false),
       data: signal<any>({ kind: 'pagination', value: mockPagination }),
@@ -75,16 +78,13 @@ describe('AdditionalListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AdditionalListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
-
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(AdditionalListComponent);
     component = fixture.componentInstance;
@@ -181,10 +181,10 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should navigate when edit is called', () => {
-    const item = mockAdditional[0];
+    const item = mockAdditional[0] as IAdditionalAll;
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'additional', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['additional', item.id]);
   });
 
   it('should call delete when dialog returns a result', () => {

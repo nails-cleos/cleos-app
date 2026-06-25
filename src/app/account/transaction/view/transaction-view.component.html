@@ -27,7 +27,7 @@
           <ng-container matColumnDef="timestamp">
             <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}</th>
             <td *matCellDef="let transaction" mat-cell>
-              <div>{{ transaction.date | date:'short':undefined:dateFormat }}</div>
+              <div>{{ transaction.date | date:'short':undefined:language }}</div>
             </td>
           </ng-container>
 

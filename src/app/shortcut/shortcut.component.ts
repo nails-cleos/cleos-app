@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
 import { AuthUserService } from '../services/auth-user.service';
+import { NavigationService } from '../services/navigation.service';
 
 enum ShortcutEnum {
   dashboard,
@@ -18,9 +17,8 @@ enum ShortcutEnum {
 export class ShortcutComponent {
   key = input<keyof typeof ShortcutEnum>();
 
-  private readonly translate = inject(TranslateService);
   private readonly authUserService = inject(AuthUserService);
-  private readonly router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserSignal = this.authUserService.authUser;
 
   constructor() {
@@ -67,7 +65,7 @@ export class ShortcutComponent {
           break;
       }
 
-      this.router.navigate([this.translate.getCurrentLang(), ...redirect]);
+      this.navigationService.navigate(redirect);
     });
   }
 }

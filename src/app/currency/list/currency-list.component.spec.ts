@@ -5,20 +5,21 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CurrencyListComponent } from './currency-list.component';
 import { ICurrency } from '../currency';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CurrencyStore } from '../../store/currency.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
   let fixture: ComponentFixture<CurrencyListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let currencyStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
@@ -27,8 +28,6 @@ describe('CurrencyListComponent', () => {
     clearResponse: jasmine.Spy;
     delete: jasmine.Spy;
   };
-
-  let translate: TranslateService;
 
   const mockCurrencyList: ICurrency[] = [
     { id: '1', name: 'Euro', code: 'EUR', icon: 'euro' },
@@ -46,6 +45,9 @@ describe('CurrencyListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -56,7 +58,6 @@ describe('CurrencyListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     currencyStoreSpy = {
       isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
@@ -77,16 +78,16 @@ describe('CurrencyListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CurrencyListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: CurrencyStore, useValue: currencyStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CurrencyListComponent);
     component = fixture.componentInstance;
@@ -183,7 +184,7 @@ describe('CurrencyListComponent', () => {
     const item = mockCurrencyList[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'currency', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['currency', item.id]);
   });
 
   it('should dispatch deleteCurrency when dialog returns a result', () => {

@@ -1,6 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
@@ -10,12 +9,14 @@ import { Role, Token } from '../interfaces/token';
 import { UserStore } from './user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { AuthStore } from './auth.store';
+import { NavigationService } from '../services/navigation.service';
 
 describe('UserStore', () => {
   let store: InstanceType<typeof UserStore>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let userServiceSpy: jasmine.SpyObj<UserService>;
   let translateSpy: jasmine.SpyObj<TranslateService>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let authStoreSpy: {
     loginSuccess: jasmine.Spy;
   };
@@ -36,6 +37,9 @@ describe('UserStore', () => {
   };
 
   beforeEach(() => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authStoreSpy = {
       loginSuccess: jasmine.createSpy('loginSuccess'),
     };
@@ -56,7 +60,6 @@ describe('UserStore', () => {
       'mergeUsers',
     ]);
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) =>
       params?.['role'] ? `${ key }:${ params['role'] }`
@@ -67,9 +70,9 @@ describe('UserStore', () => {
     TestBed.configureTestingModule({
       providers: [
         UserStore,
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserService, useValue: userServiceSpy },
         { provide: TranslateService, useValue: translateSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: AuthStore, useValue: authStoreSpy },
       ],
     });

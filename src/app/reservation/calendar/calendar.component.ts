@@ -7,9 +7,9 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   addPeriod,
-  DEFAULT_LOCALE,
   CalendarPeriod,
   createNewDate,
+  DEFAULT_LOCALE,
   formatDateTime,
   formatDateTwoDigit,
   getAvailability,
@@ -35,7 +35,7 @@ import {
   OUT_OF_WORK,
   OUT_OF_WORK_ALL_DAY,
 } from '../../util/event';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IUser, IUserAll } from '../../user/user';
@@ -63,6 +63,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, NgClass } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { NavigationService } from '../../services/navigation.service';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {
@@ -100,9 +101,9 @@ type CalendarForm = {
 })
 export class CalendarComponent {
   private readonly dialog = inject(MatDialog);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly router: Router = inject(Router);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -208,8 +209,7 @@ export class CalendarComponent {
   calendarEventsSignal = signal<CalendarEvent[]>([]);
   calendarDaySignal = signal<IDay | undefined>(undefined);
   calendarRoomSignal = signal<IRoomAll | undefined>(undefined);
-  locale: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
   professionalId?: string;
 
   refresh: Subject<any> = new Subject();
@@ -356,8 +356,8 @@ export class CalendarComponent {
       const endDate = addDays(this.searchDate, Math.floor(daysInWeek / 2));
       const startDate = addDays(endDate, 1 - daysInWeek);
 
-      document.title = `From ${formatDateTwoDigit(startDate, this.locale)} to ${formatDateTwoDigit(endDate,
-        this.locale)}`;
+      document.title = `From ${ formatDateTwoDigit(startDate, this.language) } to ${ formatDateTwoDigit(endDate,
+        this.language) }`;
 
       document.body.innerHTML = clone.innerHTML;
       window.print();
@@ -365,7 +365,7 @@ export class CalendarComponent {
     }
   }
 
-  displayFnOffice = (office: IOffice): string => office ? `${office.name}` : '';
+  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
 
   displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
 
@@ -395,8 +395,8 @@ export class CalendarComponent {
   };
 
   view = (event: CalendarEvent): void => {
-    if (event.id && ![OUT_OF_WORK_ALL_DAY, OUT_OF_WORK, LUNCH].includes(`${event.id}`)) {
-      this.router.navigate([event.id]);
+    if (event.id && ![OUT_OF_WORK_ALL_DAY, OUT_OF_WORK, LUNCH].includes(`${ event.id }`)) {
+      this.navigationService.navigate([event.id]);
     }
   };
 
@@ -406,7 +406,7 @@ export class CalendarComponent {
       const data = { date, roomId: room.id, professionalId: professional?.id };
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate([this.language].concat(result.split(',')), { state: data });
+          this.navigationService.navigate(result.split(','), { state: data });
         }
       });
     }
@@ -438,10 +438,10 @@ export class CalendarComponent {
     event.start = newStart;
     event.end = newEnd;
     this.refresh.next(event);
-    const title = this.translate.instant('RESERVATION.MOVE.TITLE', { customer: event.meta.customer?.trim() });
-    const from = formatDateTime(oldStart, this.locale);
-    const to = formatDateTime(newStart, this.locale);
-    const content = this.translate.instant('RESERVATION.MOVE.CONTENT', { from, to });
+    const title = this.translateService.instant('RESERVATION.MOVE.TITLE', { customer: event.meta.customer?.trim() });
+    const from = formatDateTime(oldStart, this.language);
+    const to = formatDateTime(newStart, this.language);
+    const content = this.translateService.instant('RESERVATION.MOVE.CONTENT', { from, to });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
       if (result) {
         this.store.dispatch(
@@ -477,7 +477,7 @@ export class CalendarComponent {
       let treatments = createBullet(it.treatment.name);
       treatments += it.additional?.map(additional => createBullet(additional.name));
 
-      const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
+      const detail = this.translateService.instant('RESERVATION.EVENT.DETAIL', {
         customerName: it.customer.displayName,
         professionalName: it.professional.displayName,
         treatments,
@@ -493,10 +493,10 @@ export class CalendarComponent {
       meta.additionalNames = it.additional?.map(additional => additional.name) || [];
       const draggable = [States.approved, States.created, States.partiallyPaid, States.paid].includes(
         it.state as States);
-      const event = calendarEvent(detail, color, start, darkMode, end, `${this.language}/reservation/${it.id}`,
+      const event = calendarEvent(detail, color, start, darkMode, end, `reservation/${ it.id }`,
         meta, draggable);
       if (it.showNotification) {
-        event.cssClass = `diagonal ${it.state.toLowerCase()}`;
+        event.cssClass = `diagonal ${ it.state.toLowerCase() }`;
       }
       return event;
     }
@@ -511,11 +511,11 @@ export class CalendarComponent {
         const start = it.allDay ? createNewDate(startDate) : startDate;
         const id = it.id;
         const professionalId = it.professional.id;
-        const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
+        const title = this.translateService.instant('RESERVATION.EVENT.UNAVAILABLE', {
           description: it.description ?? '',
           professionalName: it.professional.displayName,
         });
-        let path = `${this.language}/unavailable/`;
+        let path = 'unavailable/';
         if (it.type === 'BLOCK_AGENDA') {
           path += 'block-agenda/';
         }
@@ -530,13 +530,13 @@ export class CalendarComponent {
     const birthdays: IUserAll[] = rr.birthdays;
     birthdays.forEach(it => {
       if (it.dob) {
-        const detail = this.translate.instant('RESERVATION.EVENT.BIRTHDAY', {
+        const detail = this.translateService.instant('RESERVATION.EVENT.BIRTHDAY', {
           customerName: it.displayName,
         });
         const startDate = newDateTimestamp(it.dob);
         startDate.setFullYear(getNowTimeZone().getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        const event = allDayEvent(detail, color, startDate, darkMode, `${this.language}/users/${it.id}`);
+        const event = allDayEvent(detail, color, startDate, darkMode, `users/${ it.id }`);
         this.calendar?.addEvent(event);
       }
     });
@@ -545,12 +545,12 @@ export class CalendarComponent {
   private addNotes = (rr: IRoomReservation, darkMode: boolean): void => {
     const notes: INoteAll[] = rr.notes;
     notes.forEach(it => {
-      const title = this.translate.instant('RESERVATION.EVENT.NOTE', {
+      const title = this.translateService.instant('RESERVATION.EVENT.NOTE', {
         note: it.description,
       });
       const startDate = newDateTimestamp(it.date);
       const state = 'NOTE';
-      const path = `${this.language}/notes/${it.id}`;
+      const path = `notes/${ it.id }`;
       if (it.repeat === FrequencyEnum.none) {
         this.createNoteEvent(title, state, path, startDate, darkMode);
       } else {
@@ -600,9 +600,9 @@ export class CalendarComponent {
     const timeZone = calendar.room.timeZone;
     const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = getAvailability(
       calendar.room);
-    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
+    const unavailable = this.translateService.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translateService.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translateService.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
     this.calendar.recurringEvent?.addNotAvailableRecurring(this.calendar, unavailable, lunch, notWorking, sunday,
       saturday, friday, thursday, wednesday, tuesday, monday, darkMode, timeZone);
     this.addUnavailableList(calendar, darkMode);

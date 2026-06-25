@@ -3,7 +3,7 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { combineLatestWith } from 'rxjs';
 import { getNowTimeZone, invoiceFormat } from '../../util/dates';
 import { map, startWith } from 'rxjs/operators';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IOfficeAll } from '../../office/office';
 import { requireMatch } from '../../util/validators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -43,7 +43,6 @@ export class StatementListComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly officeStore = inject(OfficeStore);
   private readonly statementStore = inject(StatementStore);
-  private readonly translate: TranslateService = inject(TranslateService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private allOfficesSignal = signal<IOfficeAll[] | undefined>(undefined);
@@ -76,9 +75,6 @@ export class StatementListComponent {
     ));
 
   private selectedOfficeSignal = toSignal(this.getForm.office.valueChanges);
-
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
 
   constructor() {
     this.statementStore.clean();
@@ -136,7 +132,7 @@ export class StatementListComponent {
   onSelectedFile = (currentFile?: UploadFile): void => {
     const file = currentFile?.raw;
     if (file) {
-      this.fileName.set(`Statement_${invoiceFormat(this.getForm.date.value)}.pdf`);
+      this.fileName.set(`Statement_${ invoiceFormat(this.getForm.date.value) }.pdf`);
       this.blob.set(new Blob([file], { type: file.type }));
     } else {
       this.fileName.set(undefined);

@@ -16,7 +16,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -26,7 +26,6 @@ import { pdf } from '../../util/invoice';
 import { requireMatch } from '../../util/validators';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
 import {
   MatDatepickerToggle,
@@ -72,6 +71,7 @@ import { OfficeStore } from '../../store/office.store';
 import { InvoiceStore } from '../../store/invoice.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -109,8 +109,7 @@ export class InvoiceListComponent {
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly officeStore = inject(OfficeStore);
   private readonly invoiceStore = inject(InvoiceStore);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -176,19 +175,16 @@ export class InvoiceListComponent {
   dataSourceSignal = computed(() => {
     const invoiceList = this.invoiceStore.data();
     return invoiceList?.map((invoice: IInvoice, position: number) => {
-      if (invoice.id) {
-        const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
-        let order;
-        if (position + 1 < invoiceList.length) {
-          const nextRow = invoiceList[position + 1];
-          const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
-          if (!datesInSameWeek(date1, date2)) {
-            order = 'newWeek';
-          }
+      const date1 = newDateTimestamp(invoice.timestamp, invoice.room.timeZone);
+      let order;
+      if (position + 1 < invoiceList.length) {
+        const nextRow = invoiceList[position + 1];
+        const date2 = newDateTimestamp(nextRow.timestamp, nextRow.room.timeZone);
+        if (!datesInSameWeek(date1, date2)) {
+          order = 'newWeek';
         }
-        return Object.assign({}, invoice, { position, order });
       }
-      return invoice;
+      return Object.assign({}, invoice, { position, order });
     });
   });
   showResultsSignal = computed(() => this.isLoading() || this.dataSourceSignal() !== undefined);
@@ -220,8 +216,7 @@ export class InvoiceListComponent {
   isAllSelected = computed(() => this.selectionSignal().selected.length === this.resultsLengthSignal());
   isIndeterminate = computed(() => this.selectionSignal().selected.length > 0 && !this.isAllSelected());
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     this.invoiceStore.clean();
@@ -360,7 +355,7 @@ export class InvoiceListComponent {
       `${ this.selectionSignal().isSelected(row) ? 'deselect' : 'select' } row ${ row.position + 1 }`;
 
   goToPath = (invoice: IInvoice): void => {
-    this.router.navigate(invoice.paths);
+    this.navigationService.navigate(invoice.paths);
   };
 
   private filterTypes = (

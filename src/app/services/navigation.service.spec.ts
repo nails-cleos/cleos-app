@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
 import { UserStore } from '../store/user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
-import { signal } from "@angular/core";
-import { I18NStore } from "../store/i18n.store";
+import { signal } from '@angular/core';
+import { I18NStore } from '../store/i18n.store';
 
 describe('NavigationService', () => {
   let service: NavigationService;
@@ -26,7 +26,7 @@ describe('NavigationService', () => {
     i18nStoreSpy = {
       language: signal(DEFAULT_LOCALE),
       setLanguage: jasmine.createSpy('setLanguage'),
-    }
+    };
     userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
@@ -236,60 +236,6 @@ describe('NavigationService', () => {
           queryParams: undefined,
         },
       );
-    });
-  });
-
-  describe('reloadPage', () => {
-    it('should navigate to URL when provided', () => {
-      const url = '/custom/path';
-
-      // Spy on the method to avoid actual page reload during test
-      spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || `/${ DEFAULT_LOCALE }`);
-      });
-
-      service.reloadPage(url);
-
-      expect(service.reloadPage).toHaveBeenCalledWith(url);
-    });
-
-    it('should use default URL when none provided', () => {
-      // Spy on the method to avoid actual page reload during test
-      spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || `/${ DEFAULT_LOCALE }`);
-      });
-
-      service.reloadPage();
-
-      expect(service.reloadPage).toHaveBeenCalledWith();
-    });
-  });
-
-  describe('attachLang', () => {
-    it('should return current language when no change needed', () => {
-      const result = service.attachLang(DEFAULT_LOCALE);
-
-      expect(result).toBe(DEFAULT_LOCALE);
-      expect(i18nStoreSpy.setLanguage).not.toHaveBeenCalled();
-    });
-
-    it('should dispatch language change when language differs', () => {
-      const result = service.attachLang('es');
-
-      expect(result).toBe('es');
-      expect(i18nStoreSpy.setLanguage).toHaveBeenCalledWith('es');
-    });
-
-    it('should normalize language using getLocale', () => {
-      const result = service.attachLang('es-ES');
-
-      expect(result).toBe('es'); // depends on getLocale mock behavior
-    });
-
-    it('should handle undefined language', () => {
-      const result = service.attachLang(undefined);
-
-      expect(typeof result).toBe('string');
     });
   });
 

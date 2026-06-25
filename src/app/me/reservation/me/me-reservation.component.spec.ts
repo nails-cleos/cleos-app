@@ -16,11 +16,13 @@ import { IRoomAll, ServiceType } from '../../../room/room';
 import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { ToastService } from '../../../services/toast.service';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
   let fixture: ComponentFixture<MeReservationComponent>;
-  let translate: TranslateService;
+  let translateService: TranslateService;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let navigationParams$: BehaviorSubject<any>;
   let additionalList$: BehaviorSubject<any>;
@@ -165,6 +167,9 @@ describe('MeReservationComponent', () => {
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     navigationParams$ = new BehaviorSubject(undefined);
     additionalList$ = new BehaviorSubject(undefined);
     treatmentDiscount$ = new BehaviorSubject(undefined);
@@ -205,6 +210,7 @@ describe('MeReservationComponent', () => {
       imports: [MeReservationComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
@@ -214,8 +220,8 @@ describe('MeReservationComponent', () => {
     fixture = TestBed.createComponent(MeReservationComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
@@ -953,7 +959,7 @@ describe('MeReservationComponent', () => {
 
   describe('labels (computed)', () => {
     it('should map translation values correctly', () => {
-      translate.setTranslation(DEFAULT_LOCALE, {
+      translateService.setTranslation(DEFAULT_LOCALE, {
         COMMON: {
           USER: {
             PHONE: {
@@ -984,7 +990,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should fallback to empty string when keys are missing', () => {
-      translate.setTranslation(DEFAULT_LOCALE, {});
+      translateService.setTranslation(DEFAULT_LOCALE, {});
 
       const result = component.labels();
 

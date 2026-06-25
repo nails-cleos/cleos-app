@@ -1,19 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { RoomService } from '../services/room.service';
 import { RoomStore } from './room.store';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { NavigationService } from '../services/navigation.service';
 
 describe('RoomStore', () => {
   let store: InstanceType<typeof RoomStore>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let roomServiceSpy: jasmine.SpyObj<RoomService>;
   let translateSpy: jasmine.SpyObj<TranslateService>;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   beforeEach(() => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     roomServiceSpy = jasmine.createSpyObj<RoomService>('RoomService', [
       'getRoomsPage',
       'getAllRoomsInfo',
@@ -26,16 +29,16 @@ describe('RoomStore', () => {
       'getAllCustomersInfo',
     ]);
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
-    translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
+    translateSpy.instant.and.callFake(
+      (key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
     translateSpy.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
 
     TestBed.configureTestingModule({
       providers: [
         RoomStore,
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomService, useValue: roomServiceSpy },
         { provide: TranslateService, useValue: translateSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     });
 
@@ -50,7 +53,13 @@ describe('RoomStore', () => {
       currencies: [{ id: 'currency-1' }],
     } as any;
     const room = { id: 'room-1' } as any;
-    const services = { currency: { code: 'EUR' }, additionalList: [], selectedAdditionalList: [], treatments: [], selectedTreatments: [] } as any;
+    const services = {
+      currency: { code: 'EUR' },
+      additionalList: [],
+      selectedAdditionalList: [],
+      treatments: [],
+      selectedTreatments: [],
+    } as any;
     const customers = [{ customerId: 'customer-1' }] as any;
     roomServiceSpy.getRoomsPage.and.returnValue(of(page));
     roomServiceSpy.getAllRoomsInfo.and.returnValue(of(roomInfo));
@@ -111,7 +120,7 @@ describe('RoomStore', () => {
     store.selectAndNavigate(room);
 
     expect(store.selected()).toBe(room);
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', 'room-1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['rooms', 'room-1']);
   });
 
   it('should clear response and error state', () => {

@@ -57,7 +57,7 @@ export class NavComponent {
   private readonly elementRef: ElementRef = inject(ElementRef);
   private readonly env: EnvService = inject(EnvService);
   private readonly tokenService: TokenService = inject(TokenService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly store: Store = inject(Store);
@@ -120,11 +120,13 @@ export class NavComponent {
   isManager = computed(() => this.authUserSignal()?.isManager ?? false);
   menuItems = computed(() => this.menuItemsSignal() || []);
 
-  readonly language = computed(() => {
+  language: string = this.navigationService.language;
+
+  readonly languageSignal = computed(() => {
     const user = this.currentUserSignal();
 
     return getLocale(
-      user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.getCurrentLang()).language;
+      user?.locale || this.route.snapshot.paramMap.get('lang') || this.navigationService.language$()).language;
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
@@ -139,7 +141,6 @@ export class NavComponent {
 
   readonly loading = this.loadingService.isLoading;
 
-  dateFormat: string = this.translate.getCurrentLang();
   image?: string;
   initials?: string;
   plusNotification?: string;
@@ -149,7 +150,7 @@ export class NavComponent {
   private cssClass?: string;
 
   constructor() {
-    this.authUserService.cookieConsent(this.translate);
+    this.authUserService.cookieConsent(this.translateService);
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
         const globalError = this.globalErrorSignal();
@@ -163,7 +164,7 @@ export class NavComponent {
       }
     });
 
-    const meta = this.translate.instant('DASHBOARD.META');
+    const meta = this.translateService.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
 
@@ -176,7 +177,7 @@ export class NavComponent {
       }
 
       if (response.redirect) {
-        this.router.navigate([`/${ this.language() }/${ response.redirect }`]);
+        this.navigationService.navigate([response.redirect]);
       }
 
       if (response.blob) {
@@ -195,7 +196,7 @@ export class NavComponent {
         const options = this.getToastOptions(response);
         this.toastService.show(response.message, response.toastType, 5000, options);
         if (response.reload) {
-          this.navigationService.reload(this.router.url.split('/'));
+          this.navigationService.reload();
         }
       }
 
@@ -273,7 +274,7 @@ export class NavComponent {
     effect(() => {
       const isAuthorized = this.isAuthorized();
       const redirectSignal = this.redirectSignal();
-      const language = this.language();
+      const language = this.languageSignal();
       if (isAuthorized) {
         this.notificationStore.loadPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
       }
@@ -281,7 +282,7 @@ export class NavComponent {
         if (isAuthorized && !redirectSignal) {
           this.authStore.authRedirect();
         } else {
-          this.router.navigate(['/', language, 'home']);
+          this.navigationService.navigate(['home']);
         }
       }
     });
@@ -357,7 +358,7 @@ export class NavComponent {
   }
 
   goToHome() {
-    this.router.navigate([this.language(), 'home']);
+    this.navigationService.navigate(['home']);
   }
 
   logout() {
@@ -372,7 +373,7 @@ export class NavComponent {
     const user: IUser = new User();
     user.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(
+    const message = this.translateService.instant(
       `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
     this.userStore.updateMyUser(user, redirectUrl, message);
   }
@@ -424,7 +425,7 @@ export class NavComponent {
 
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
-      return { actionType: 'link', action: `/${ this.language() }/${ res.path }` };
+      return { actionType: 'link', action: `/${ this.languageSignal() }/${ res.path }` };
     }
     return { actionType: 'none' };
   };

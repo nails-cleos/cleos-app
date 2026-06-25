@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -11,10 +11,12 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { signal } from '@angular/core';
 import { AccountStore } from '../../../store/account.store';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
   let fixture: ComponentFixture<TransactionViewComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let accountTransactionSignal: ReturnType<typeof signal<IAccountTransaction | undefined>>;
   let breakpoint$: BehaviorSubject<any>;
@@ -69,6 +71,9 @@ describe('TransactionViewComponent', () => {
   ];
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     accountTransactionSignal = signal<IAccountTransaction | undefined>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -93,15 +98,13 @@ describe('TransactionViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TransactionViewComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TransactionViewComponent);
     component = fixture.componentInstance;
@@ -115,7 +118,6 @@ describe('TransactionViewComponent', () => {
   it('should initialize with default values', () => {
     expect(component.hasAdminRole()).toBeFalse();
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
-    expect(component.dateFormat).toBe(DEFAULT_LOCALE);
     expect(component.language).toBe(DEFAULT_LOCALE);
     expect(component.displayedColumns).toEqual([
       'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',

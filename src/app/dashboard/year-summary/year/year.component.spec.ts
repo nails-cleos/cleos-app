@@ -1,27 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YearComponent } from './year.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { IQuarterSummary } from '../../dashboard';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('YearComponent', () => {
   let component: YearComponent;
   let fixture: ComponentFixture<YearComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+
     await TestBed.configureTestingModule({
       imports: [YearComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(YearComponent);
     component = fixture.componentInstance;
@@ -67,7 +67,7 @@ describe('YearComponent', () => {
   it('should navigate to quarter summary', () => {
     component.goToQuarter(3);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'quarter', 'summary'], {
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'quarter', 'summary'], {
       state: { year: 2025, quarter: 3 },
     });
   });
@@ -75,7 +75,7 @@ describe('YearComponent', () => {
   it('should navigate to month summary', () => {
     component.goToMonth(11);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'monthly', 'summary'], {
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'monthly', 'summary'], {
       state: { date: '11-2025' },
     });
   });

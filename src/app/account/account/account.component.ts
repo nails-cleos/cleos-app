@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, Signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { combineLatestWith } from 'rxjs';
 import { BalanceForm, IAccountAll, Transaction } from '../account';
 import { ICurrency, ICurrencyAll } from '../../currency/currency';
@@ -8,7 +8,7 @@ import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } fr
 import { requireMatch } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { IError } from '../../interfaces/common';
@@ -20,6 +20,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatOption } from '@angular/material/core';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-account',
@@ -36,8 +37,7 @@ export class AccountComponent {
   private readonly accountStore = inject(AccountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private authUserSignal = this.authUserService.authUser;
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
@@ -78,7 +78,7 @@ export class AccountComponent {
   showAdd = computed(() => this.hasAdminRole() && this.customerId() !== this.userId());
   isLoading = computed(() => this.accountStore.isLoading());
 
-  language: string = getLocale(this.translate.getCurrentLang()).language;
+  language: string = getLocale(this.navigationService.language).language;
 
   constructor() {
     effect(() => {
@@ -100,9 +100,9 @@ export class AccountComponent {
     effect(() => {
       if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
-          this.router.navigate([this.language, 'users', this.customerId(), 'overview']);
+          this.navigationService.navigate(['users', this.customerId(), 'overview']);
         } else {
-          this.router.navigate([this.language, 'me', 'overview']);
+          this.navigationService.navigate(['me', 'overview']);
         }
       }
     });

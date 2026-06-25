@@ -29,9 +29,10 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { OfficeStore } from '../../store/office.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-office-list',
@@ -48,7 +49,7 @@ export class OfficeListComponent {
   private readonly officeStore = inject(OfficeStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -89,7 +90,7 @@ export class OfficeListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IOffice;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     this.officeStore.clean();
@@ -104,7 +105,7 @@ export class OfficeListComponent {
   }
 
   edit = (selected: IOffice): void => {
-    void this.router.navigate([this.language, 'offices', selected.id]);
+    void this.navigationService.navigate(['offices', selected.id]);
   };
 
   delete = (office: IOffice): void => {

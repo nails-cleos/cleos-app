@@ -17,7 +17,6 @@ import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -33,6 +32,7 @@ import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skele
 import { CatalogueStore } from '../../store/catalogue.store';
 import { MainStore } from '../../store/main.store';
 import { MainContentService } from '../../services/main-content.service';
+import { NavigationService } from '../../services/navigation.service';
 
 type MainForm = {
   name: FormControl<string>;
@@ -54,13 +54,13 @@ export class MainContentComponent {
 
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly mainStore = inject(MainStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly mainContent = inject(MainContentService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly env: EnvService = inject(EnvService);
 
@@ -80,12 +80,12 @@ export class MainContentComponent {
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private authUserSignal = this.authUserService.authUser;
-  private responseSignal = this.mainStore.response;
-  private errorSignal = this.mainStore.error;
-  private catalogueSignal = this.catalogueStore.data;
-  private isLoadingSignal = this.mainStore.isLoading;
-  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly responseSignal = this.mainStore.response;
+  private readonly errorSignal = this.mainStore.error;
+  private readonly catalogueSignal = this.catalogueStore.data;
+  private readonly isLoadingSignal = this.mainStore.isLoading;
+  private readonly breakpointsSignal = toSignal(this.breakpointObserver$, {
     initialValue: {
       matches: false,
       breakpoints: {
@@ -241,7 +241,7 @@ export class MainContentComponent {
     });
 
     effect(() => {
-      const treatments = this.translate.instant('TREATMENTS');
+      const treatments = this.translateService.instant('TREATMENTS');
       const groups = Array.isArray(treatments) ? treatments : [];
       this.groups.set(groups);
     });
@@ -380,7 +380,7 @@ export class MainContentComponent {
     const treatmentId = name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
     if (treatmentId === MainContentComponent.BIAB_TREATMENT_ID) {
       goTo('home');
-      this.router.navigate([this.translate.getCurrentLang(), 'home', treatmentId, 'treatment']);
+      this.navigationService.navigate(['home', treatmentId, 'treatment']);
     }
   };
 

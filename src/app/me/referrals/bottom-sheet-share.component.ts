@@ -16,7 +16,7 @@ export type BottomSheetShareData = {
 })
 export class BottomSheetShareComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly data = inject<BottomSheetShareData>(MAT_BOTTOM_SHEET_DATA);
 
   private url = this.env.appServer;
@@ -26,7 +26,7 @@ export class BottomSheetShareComponent {
   message: string;
 
   constructor() {
-    this.message = this.translate.instant('ME.REFERRAL.LINK', {
+    this.message = this.translateService.instant('ME.REFERRAL.LINK', {
       code: this.data.code,
       url: this.code,
     });

@@ -44,21 +44,18 @@ describe('BackButtonDirective', () => {
     fixture = TestBed.createComponent(HostComponent);
     hostComp = fixture.componentInstance;
 
-    // ✅ Set all inputs before detectChanges
     hostComp.date = new Date(2026, 2, 20);
     hostComp.step = 1;
     hostComp.form = new FormGroup({ test: new FormControl('') });
 
     fixture.detectChanges();
 
-    // ✅ Query directive after inputs are stable
     const debugEl = fixture.debugElement.query(By.directive(BackButtonDirective));
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
-    // ✅ Spy on dialog AFTER directive is queried
     dialogSpy = spyOn(directive.dialog, 'open');
   });
 

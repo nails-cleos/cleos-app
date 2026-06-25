@@ -6,7 +6,7 @@ import { combineLatest, map, of, switchMap } from 'rxjs';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
 import { MatDivider, MatList } from '@angular/material/list';
 import { MainContentService } from '../../services/main-content.service';
-import { I18NStore } from "../../store/i18n.store";
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-main-treatment',
@@ -19,9 +19,9 @@ export class MainTreatmentComponent {
   id = input<string>();
 
   private readonly mainContent = inject(MainContentService);
-  private readonly i18nStore = inject(I18NStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private sections$ = combineLatest([toObservable(this.id), toObservable(this.i18nStore.language)]).pipe(
+  private sections$ = combineLatest([toObservable(this.id), toObservable(this.navigationService.language$)]).pipe(
     switchMap(([treatmentId, lang]) => {
       if (!treatmentId) {
         return of(undefined);

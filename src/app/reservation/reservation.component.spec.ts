@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
@@ -30,6 +29,7 @@ import { ToastService } from '../services/toast.service';
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
   let matches$: BehaviorSubject<any>;
@@ -45,7 +45,6 @@ describe('ReservationComponent', () => {
   let isLoading$: BehaviorSubject<boolean>;
 
   let storeSpy: jasmine.SpyObj<Store>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -136,6 +135,9 @@ describe('ReservationComponent', () => {
   });
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
     customers$ = new BehaviorSubject(undefined);
@@ -163,7 +165,6 @@ describe('ReservationComponent', () => {
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
     });
@@ -176,8 +177,6 @@ describe('ReservationComponent', () => {
       onAction: () => of(void 0),
       onDismiss: () => of(void 0),
     });
-
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -207,15 +206,12 @@ describe('ReservationComponent', () => {
     });
     storeSpy.select.and.returnValue(isLoading$.asObservable());
 
-    routerSpy.currentNavigation.and.returnValue(null);
-
     await TestBed.configureTestingModule({
       imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -226,7 +222,6 @@ describe('ReservationComponent', () => {
     }).compileComponents();
 
     storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
@@ -448,7 +443,8 @@ describe('ReservationComponent', () => {
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(navigationServiceSpy.navigate)
+        .toHaveBeenCalledWith(['users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
     });
   });
 
@@ -876,7 +872,7 @@ describe('ReservationComponent', () => {
       const reservation = createEditReservation();
       fixture.componentRef.setInput('isEditing', true);
       const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
-      const expectedStart = getTime(expectedDate, component['dateFormat']);
+      const expectedStart = getTime(expectedDate, component['language']);
 
       component['setData'](reservation as any);
       await Promise.resolve();

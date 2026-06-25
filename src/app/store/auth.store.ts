@@ -74,7 +74,7 @@ export const AuthStore = signalStore(
     authService = inject(AuthService),
     authUserService = inject(AuthUserService),
     firebaseService = inject(FirebaseService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     let loginSubscription: Subscription | undefined;
 
@@ -161,7 +161,7 @@ export const AuthStore = signalStore(
         firebaseService.signOut().then(() => {
           authUserService.reloadUser();
           localStorage.removeItem('auth');
-          window.location.href = `/${ getLocale(translate.getCurrentLang()).language }/home`;
+          window.location.href = `/${ getLocale(translateService.getCurrentLang()).language }/home`;
         }).catch((error) => {
           console.error('sign out error: ' + error);
         });

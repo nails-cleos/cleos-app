@@ -9,12 +9,12 @@ export const MainStore = signalStore(
   withCrudStoreState(),
   withCrudStoreMethods(() => {
     const mainService = inject(MainService);
-    const translate = inject(TranslateService);
+    const translateService = inject(TranslateService);
 
     return {
       create: (sendMessage: ISendMessage) => mainService.sendMessage(sendMessage),
       createResponse: () => ({
-        message: translate.instant('MAIN.CONTACT.SEND.MESSAGE'),
+        message: translateService.instant('MAIN.CONTACT.SEND.MESSAGE'),
       }),
     };
   }),

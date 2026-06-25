@@ -21,17 +21,16 @@ import { DriveAccessService } from '../../../../services/drive-access.service';
 import { DocumentStore } from '../../../../store/document.store';
 import { DocumentTypeEnum } from '../../../../document/document';
 import { ExpenseStore } from '../../../../store/expense.store';
-import { Router } from '@angular/router';
+import { NavigationService } from '../../../../services/navigation.service';
 
 describe('ExpenseListComponent', () => {
   let component: ExpenseListComponent;
   let fixture: ComponentFixture<ExpenseListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let datepickerSpy: jasmine.SpyObj<MatDatepicker<Date>>;
   let dialogSpy: jasmine.Spy<any>;
-  let navigateSpy: jasmine.Spy;
-  let translate: TranslateService;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let documentStoreSpy: { download: jasmine.Spy };
   let expenseStoreSpy: {
@@ -140,6 +139,9 @@ describe('ExpenseListComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     expenseListSignal.set(mockPagination);
     responseSignal.set(undefined);
     breakpoint$ = new BehaviorSubject(defaultBreakpoint);
@@ -163,6 +165,7 @@ describe('ExpenseListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ExpenseListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -171,12 +174,11 @@ describe('ExpenseListComponent', () => {
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ExpenseListComponent);
     component = fixture.componentInstance;
-    navigateSpy = spyOn(TestBed.inject(Router), 'navigate');
 
     fixture.detectChanges();
 
@@ -279,7 +281,7 @@ describe('ExpenseListComponent', () => {
     const item = mockExpenses[0];
     component.edit(item);
 
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', room.id, 'expenses', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['rooms', room.id, 'expenses', item.id]);
   });
 
   it('should call delete method without errors', () => {

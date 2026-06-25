@@ -3,8 +3,7 @@ import { combineLatestWith } from 'rxjs';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IUser } from '../user/user';
 import { requireMatch } from '../util/validators';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
 import { IOffice, IOfficeAll, Office, OfficeForm } from './office';
@@ -17,6 +16,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { OfficeStore } from '../store/office.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-office',
@@ -35,8 +35,7 @@ export class OfficeComponent {
 
   private readonly officeStore = inject(OfficeStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private subErrorsSignal = this.officeStore.subErrors;
 
@@ -71,8 +70,6 @@ export class OfficeComponent {
         return name ? this.filter(name, managers) : managers.slice();
       })),
   );
-
-  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -122,7 +119,7 @@ export class OfficeComponent {
   }
 
   addManager() {
-    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.manager } });
+    this.navigationService.navigate(['users', 'add'], { state: { role: Role.manager } });
   }
 
   displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';

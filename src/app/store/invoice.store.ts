@@ -22,7 +22,7 @@ export const InvoiceStore = signalStore(
   withMethods((
     store,
     invoiceService = inject(InvoiceService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -61,7 +61,7 @@ export const InvoiceStore = signalStore(
         cleanCrudCreate(store);
 
         const response: IResponseSuccess = {
-          message: translate.instant('INVOICE.UPLOAD_SUCCESS', { fileName }),
+          message: translateService.instant('INVOICE.UPLOAD_SUCCESS', { fileName }),
           blob,
           fileName,
         };

@@ -34,12 +34,12 @@ export const UnavailableStore = signalStore(
   withMethods((
     store,
     unavailableService = inject(UnavailableService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const createResponse = (key: string, timestamp: number | undefined, path?: string): IResponseSuccess => ({
-      message: translate.instant(key, { date: newDateTimestamp(timestamp) }),
+      message: translateService.instant(key, { date: newDateTimestamp(timestamp) }),
       path,
       redirect: 'unavailable',
     });
@@ -125,7 +125,7 @@ export const UnavailableStore = signalStore(
         unavailableService.deleteUnavailable(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('UNAVAILABLE.DELETED.MESSAGE', {
+              message: translateService.instant('UNAVAILABLE.DELETED.MESSAGE', {
                 date: newDateTimestamp(timestamp, timeZone),
               }),
               reload: true,

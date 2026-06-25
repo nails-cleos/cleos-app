@@ -4,12 +4,13 @@ import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-upcoming',
@@ -20,15 +21,14 @@ import { DatePipe, DecimalPipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpcomingComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
 
   small = input.required<boolean>();
   upcoming = input<IUpcomingAll>();
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   upcomingComputed = computed(() => {
     const upcoming = this.upcoming();
@@ -60,10 +60,10 @@ export class UpcomingComponent {
   edit(): void {
     const upcoming = this.upcoming();
     if (upcoming && !upcoming.canEdit) {
-      customerEditDialog(this.dialog, this.router, upcoming.id, upcoming.room.currency, this.small(),
-        this.language, upcoming.price);
+      customerEditDialog(this.dialog, this.navigationService, upcoming.id, upcoming.room.currency, this.small(),
+        upcoming.price);
     } else {
-      this.router.navigate([this.language, 'me', 'reservation', upcoming?.id]);
+      this.navigationService.navigate(['me', 'reservation', upcoming?.id]);
     }
   }
 
@@ -75,7 +75,7 @@ export class UpcomingComponent {
   openDialog = (reservationDate: Date): void => {
     const upcoming = this.upcoming();
     if (upcoming) {
-      openDialog(upcoming.room, this.dateFormat, this.translate, this.dialog, reservationDate);
+      openDialog(upcoming.room, this.language, this.translateService, this.dialog, reservationDate);
     }
   };
 }

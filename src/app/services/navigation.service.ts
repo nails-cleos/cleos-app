@@ -1,8 +1,8 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
 import { getLocale } from '../util/helper';
-import { I18NStore } from "../store/i18n.store";
+import { I18NStore } from '../store/i18n.store';
 
 @Injectable({
   providedIn: 'root',
@@ -15,10 +15,10 @@ export class NavigationService {
   private router: Router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly languageSignal = this.i18nStore.language;
-
   private history: string[] = this.readHistory();
   private isTrackingHistory = false;
+
+  readonly language$ = this.i18nStore.language;
 
   constructor() {
     this.subscribe();
@@ -56,6 +56,17 @@ export class NavigationService {
     this.router.navigateByUrl(target, { state: { date, step } });
   }
 
+  navigate(path?: (string | number | undefined)[], extras?: NavigationExtras) {
+    if (path) {
+      return this.router.navigate([`/${ this.language$() }/${ path.join('/') }`], extras);
+    }
+    return this.router.navigate([this.router.url]);
+  }
+
+  get language(): string {
+    return this.language$();
+  }
+
   private syncCurrentUrl(reloadHistory: boolean = true): void {
     if (reloadHistory) {
       this.history = this.readHistory();
@@ -65,7 +76,7 @@ export class NavigationService {
   }
 
   private resolveFallbackUrl(currentUrl: string): string {
-    const currentLang = getLocale(this.languageSignal()).language;
+    const currentLang = getLocale(this.language$()).language;
     const segments = currentUrl.split('/').filter(Boolean);
 
     if (segments.length <= 1) {
@@ -125,26 +136,7 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any): void {
+  reload(url: string[] = this.router.url.split('/'), data?: any, queryParams?: any): void {
     this.router.navigate(url.filter(Boolean), { state: data, queryParams });
-  }
-
-  reloadPage(url?: string): void {
-    const currentLang = getLocale(this.languageSignal()).language;
-    const currentUrl = url ?? `/${ currentLang }`;
-    this.router.navigateByUrl(currentUrl).then(() => window.location.reload());
-  }
-
-  attachLang(lang?: string): string {
-    const language = getLocale(lang).language;
-    const currentLang = this.languageSignal();
-
-    if (language === currentLang) {
-      return language;
-    }
-
-    this.i18nStore.setLanguage(language);
-
-    return language;
   }
 }

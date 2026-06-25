@@ -18,7 +18,6 @@ import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Ro
 import { IUser, IUserAll } from '../user/user';
 import { map, startWith } from 'rxjs/operators';
 import { requireMatch } from '../util/validators';
-import { Router } from '@angular/router';
 import { Role } from '../interfaces/token';
 import { RoomIconName } from '../util/icon';
 import { ICurrencyAll } from '../currency/currency';
@@ -29,7 +28,7 @@ import timezones, { TimeZone } from 'timezones-list';
 import { createDate, createDateFromString, getCurrentTimeZone, getTimeZone } from '../util/dates';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { goTo } from '../util/animation';
-import { isString, TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { isString, TranslatePipe } from '@ngx-translate/core';
 import { AvailabilityComponent } from './availability/availability.component';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
@@ -54,9 +53,10 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { MatCheckbox } from '@angular/material/checkbox';
 import { RoomStore } from '../store/room.store';
 import { RoomForm } from './room-form.types';
+import { getOptions } from '../store/actions/payment.actions';
+import { NavigationService } from '../services/navigation.service';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-import { getOptions } from '../store/actions/payment.actions';
 
 export interface IIcon {
   monday: RoomIconName;
@@ -90,8 +90,7 @@ export class RoomComponent {
   private readonly roomStore = inject(RoomStore);
   private readonly paymentStore: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private professionalsSignal = this.roomStore.professionals;
   private subErrorsSignal = this.roomStore.subErrors;
@@ -212,7 +211,6 @@ export class RoomComponent {
   private formattedAddress?: string;
   private currentAvailabilities: IAvailability[] = [];
   private currentProfessionalIds: string[] = [];
-  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     this.roomStore.loadInfo();
@@ -331,17 +329,17 @@ export class RoomComponent {
   }
 
   addProfessional(): void {
-    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.professional } });
+    this.navigationService.navigate(['users', 'add'], { state: { role: Role.professional } });
     return;
   }
 
   addCurrency(): void {
-    this.router.navigate([this.language, 'currency', 'add']);
+    this.navigationService.navigate(['currency', 'add']);
     return;
   }
 
   addOffice(): void {
-    this.router.navigate([this.language, 'offices', 'add']);
+    this.navigationService.navigate(['offices', 'add']);
     return;
   }
 

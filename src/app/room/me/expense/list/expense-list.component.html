@@ -44,7 +44,7 @@
           <ng-container matColumnDef="timestamp">
             <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'EXPENSE.LIST.COLUMN.DATE' | translate }}</th>
             <td *matCellDef="let expense" mat-cell>
-              <div>{{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:dateFormat }}</div>
+              <div>{{ expense.timestamp | timeDetail | date:'mediumDate':expense.room.timeZone:language }}</div>
               @if (showTimeZone(expense)) {
                 <button (click)="openDialog(expense)" mat-icon-button type="button">
                   <mat-icon>info_outline</mat-icon>

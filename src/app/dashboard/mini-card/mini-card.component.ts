@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { TranslateService } from '@ngx-translate/core';
 import { ErrorComponent } from '../../shared/error/error.component';
 import { IError } from '../../interfaces/common';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatSuffix } from '@angular/material/input';
 import { NgClass, PercentPipe } from '@angular/common';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-mini-card',
@@ -16,7 +16,7 @@ import { NgClass, PercentPipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniCardComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   title = input.required<string>();
   icon = input<string>();
@@ -35,5 +35,5 @@ export class MiniCardComponent {
   isLoading = input<boolean>();
   error = input<IError>();
 
-  locale: string = this.translate.getCurrentLang();
+  language: string = this.navigationService.language;
 }

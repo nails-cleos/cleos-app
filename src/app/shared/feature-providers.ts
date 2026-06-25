@@ -1,8 +1,13 @@
-import { importProvidersFrom, inject, makeEnvironmentProviders, provideEnvironmentInitializer, } from '@angular/core';
-import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService, } from '@ngx-translate/core';
-
-import { I18NStore } from '../store/i18n.store';
-import { MissingTranslateHandler, TranslateLoaderFactory, } from './translate-loader.factory';
+import {
+  effect,
+  importProvidersFrom,
+  inject,
+  makeEnvironmentProviders,
+  provideEnvironmentInitializer,
+} from '@angular/core';
+import { MissingTranslationHandler, TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { MissingTranslateHandler, TranslateLoaderFactory } from './translate-loader.factory';
+import { NavigationService } from '../services/navigation.service';
 
 export const provideFeatureTranslations = (scope: string) => makeEnvironmentProviders([
   importProvidersFrom(
@@ -20,13 +25,15 @@ export const provideFeatureTranslations = (scope: string) => makeEnvironmentProv
     }),
   ),
   provideEnvironmentInitializer(() => {
-    const i18nStore = inject(I18NStore);
-    const translate = inject(TranslateService);
+    const navigationService = inject(NavigationService);
+    const translateService = inject(TranslateService);
 
-    const language = i18nStore.language();
+    effect(() => {
+      const lang = navigationService.language$();
 
-    if (language) {
-      translate.use(language);
-    }
+      if (lang) {
+        translateService.use(lang);
+      }
+    });
   }),
 ]);

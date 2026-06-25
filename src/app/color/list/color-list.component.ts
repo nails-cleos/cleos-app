@@ -29,10 +29,11 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ColorStore } from '../../store/color.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-color-list',
@@ -47,9 +48,9 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class ColorListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly colorStore = inject(ColorStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -90,7 +91,7 @@ export class ColorListComponent {
 
   expandedColor?: IColor;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {
@@ -125,12 +126,12 @@ export class ColorListComponent {
   }
 
   edit = (selected: IColor): void => {
-    void this.router.navigate([this.language, 'colors', selected.id]);
+    this.navigationService.navigate(['colors', selected.id]);
   };
 
   delete = (color: IColor): void => {
-    const title = this.translate.instant('COLOR.DELETED.TITLE');
-    const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
+    const title = this.translateService.instant('COLOR.DELETED.TITLE');
+    const content = this.translateService.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color, variant: 'warning' }, result => {
       if (result) {

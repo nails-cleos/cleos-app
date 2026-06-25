@@ -26,7 +26,6 @@ import { getMonth } from '../util/dates';
 import type { Subscription } from 'rxjs';
 import { IReservation } from '../reservation/reservation';
 import { NavigationService } from '../services/navigation.service';
-import { Router } from '@angular/router';
 
 type DashboardStoreState = StoreState<Record<string, IDashboard>> & {
   dashboard: IRoomEvents | undefined;
@@ -64,7 +63,6 @@ export const DashboardStore = signalStore(
     store,
     dashboardService = inject(DashboardService),
     navigationService = inject(NavigationService),
-    router = inject(Router),
   ) => {
     let getEventsSubscription: Subscription | undefined;
     let getCardsSubscription: Subscription | undefined;
@@ -177,7 +175,7 @@ export const DashboardStore = signalStore(
           .subscribe({
             next: () => {
               patchState(store, { isLoading: false, response: { message: 'SUMMARY.UPDATED' } });
-              navigationService.reload(router.url.split('/'), { date: date, step: step });
+              navigationService.reload(undefined, { date: date, step: step });
             },
             error: patchError,
           });

@@ -62,7 +62,6 @@ import {
 } from '../actions/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { ReservationService } from '../../services/reservation.service';
-import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
 import { TreatmentService } from '../../services/treatment.service';
 import { RoomService } from '../../services/room.service';
@@ -95,12 +94,13 @@ import { IColorAll } from '../../color/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
 import { DashboardStore } from '../dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Injectable()
 export class ReservationEffects {
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly actions: Actions = inject(Actions);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly reservationService: ReservationService = inject(ReservationService);
   private readonly userService: UserService = inject(UserService);
   private readonly treatmentService: TreatmentService = inject(TreatmentService);
@@ -451,7 +451,7 @@ export class ReservationEffects {
         window.open(selected.paymentLink, '_self');
         return;
       }
-      this.router.navigate([this.router.url]);
+      this.navigationService.navigate();
     }),
   ), { dispatch: false });
 
@@ -459,23 +459,23 @@ export class ReservationEffects {
     ofType(reservationSaveSuccess),
     tap(({ navigate, role, paymentLink, deleted, id }) => {
       if (navigate) {
-        let navigation = [this.translate.getCurrentLang()];
+        let navigation: string[] = [];
         switch (role) {
           case Role.customer:
             if (paymentLink) {
               window.open(paymentLink, '_self');
             }
-            navigation = [...navigation, 'me', 'reservations'];
+            navigation = ['me', 'reservations'];
             break;
           case Role.professional:
             navigation =
-              deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', id!];
+              deleted ? ['dashboard'] : ['reservation', id!];
             break;
           case Role.roomAdmin:
-            navigation = [...navigation, 'dashboard', 'events'];
+            navigation = ['dashboard', 'events'];
             break;
         }
-        this.router.navigate(navigation);
+        this.navigationService.navigate(navigation);
       }
     }),
   ), { dispatch: false });
@@ -488,10 +488,10 @@ export class ReservationEffects {
         return;
       }
       if (isDashboard) {
-        this.router.navigate([this.translate.getCurrentLang(), 'dashboard', 'events']);
+        this.navigationService.navigate(['dashboard', 'events']);
         return;
       }
-      this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]);
+      this.navigationService.navigate(['reservation', id]);
     }),
   ), { dispatch: false });
 

@@ -1,7 +1,7 @@
 import { effect, inject } from '@angular/core';
-import { patchState, signalStore, withHooks, withMethods, withState, } from '@ngrx/signals';
+import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
-import { createStoreInitialState, StoreState, } from './crud-signal-store';
+import { createStoreInitialState, StoreState } from './crud-signal-store';
 
 type I18NStoreState = StoreState & {
   language: string;
@@ -43,7 +43,7 @@ export const I18NStore = signalStore(
 
   withMethods((
     store,
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => ({
     hydrate(): void {
       const data = loadFromStorage();
@@ -52,7 +52,7 @@ export const I18NStore = signalStore(
         patchState(store, data);
       } else {
         patchState(store, {
-          language: translate.getCurrentLang(),
+          language: translateService.getCurrentLang(),
         });
       }
     },
@@ -82,16 +82,16 @@ export const I18NStore = signalStore(
   withHooks({
     onInit(
       store,
-      translate = inject(TranslateService),
+      translateService = inject(TranslateService),
     ) {
       effect(() => {
         const lang = store.language();
 
-        if (!lang || translate.getCurrentLang() === lang) {
+        if (!lang || translateService.getCurrentLang() === lang) {
           return;
         }
 
-        translate.use(lang);
+        translateService.use(lang);
       });
     },
   }),

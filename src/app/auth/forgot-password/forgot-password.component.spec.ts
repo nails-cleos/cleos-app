@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastService } from '../../services/toast.service';
-import { Router } from '@angular/router';
 import { of, Subject } from 'rxjs';
 import { FirebaseService } from '../../services/firebase.service';
 import { NavigationService } from '../../services/navigation.service';
@@ -13,6 +12,7 @@ import { AuthStore } from '../../store/auth.store';
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
   let fixture: ComponentFixture<ForgotPasswordComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let action$: Subject<void>;
 
@@ -23,10 +23,12 @@ describe('ForgotPasswordComponent', () => {
     clean: jasmine.Spy;
   };
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authStoreSpy = {
       error: signal(undefined),
       response: signal(undefined),
@@ -36,10 +38,7 @@ describe('ForgotPasswordComponent', () => {
     action$ = new Subject<void>();
 
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['sendPasswordResetEmail']);
-
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     toastServiceSpy.show.and.returnValue({
       onAction: () => action$.asObservable(),
@@ -49,10 +48,9 @@ describe('ForgotPasswordComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ForgotPasswordComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
     }).compileComponents();
@@ -89,7 +87,7 @@ describe('ForgotPasswordComponent', () => {
     action$.next();
 
     expect(toastServiceSpy.show).toHaveBeenCalledWith('OK', 'success', 5000, { actionType: 'button' });
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'auth']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['auth']);
   });
 
   it('should request a password reset and dispatch signupSuccess', async () => {

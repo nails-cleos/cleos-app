@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { IOfficeAll } from './office';
@@ -15,12 +14,12 @@ import { DEFAULT_LOCALE } from '../util/dates';
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
   let fixture: ComponentFixture<OfficeComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let officeStoreSpy: {
     subErrors: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
   };
-  let navigateSpy: jasmine.Spy;
 
   const mockManager: Partial<IUser> = {
     id: 'mgr-1',
@@ -38,6 +37,9 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     officeStoreSpy = {
       subErrors: signal<any>(undefined),
       isLoading: signal(false),
@@ -47,12 +49,9 @@ describe('OfficeComponent', () => {
       imports: [OfficeComponent, TranslateModule.forRoot()],
       providers: [
         { provide: OfficeStore, useValue: officeStoreSpy },
-        { provide: NavigationService, useValue: jasmine.createSpyObj('NavigationService', ['back']) },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
@@ -153,6 +152,6 @@ describe('OfficeComponent', () => {
 
   it('should navigate to add manager page', () => {
     component.addManager();
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'add'], { state: { role: Role.manager } });
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'add'], { state: { role: Role.manager } });
   });
 });

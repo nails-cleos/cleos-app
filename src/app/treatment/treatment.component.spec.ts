@@ -1,16 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentComponent } from './treatment.component';
 import { IColorAll } from '../color/color';
 import { ITreatmentGroupAll } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { ColorStore } from '../store/color.store';
+import { NavigationService } from '../services/navigation.service';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
   let fixture: ComponentFixture<TreatmentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let treatmentStoreSpy: {
     subErrors: ReturnType<typeof signal<any>>;
@@ -39,6 +41,9 @@ describe('TreatmentComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     treatmentStoreSpy = {
       subErrors: signal<any>(undefined),
     };
@@ -50,6 +55,7 @@ describe('TreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TreatmentComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
       ],
@@ -59,9 +65,6 @@ describe('TreatmentComponent', () => {
       TestBed.overrideTemplate(TreatmentComponent, '<input #colorInput /> <input #nameInput />')
         .createComponent(TreatmentComponent);
     component = fixture.componentInstance;
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture.componentRef.setInput('config', config);
     fixture.detectChanges();

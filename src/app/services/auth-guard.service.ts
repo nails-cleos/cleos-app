@@ -1,23 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, RouterStateSnapshot } from '@angular/router';
 import { IUser } from '../user/user';
-import { TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { AuthStore } from '../store/auth.store';
+import { NavigationService } from './navigation.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PermissionsService {
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly router: Router = inject(Router);
   private readonly authStore = inject(AuthStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private currentUser = this.authStore.user;
 
-  constructor() {
-  }
+  private readonly language = this.navigationService.language;
 
   private static hasRole = (route: ActivatedRouteSnapshot, user: IUser): boolean => route.data.roles &&
   user.authorities ? user.authorities.some(au => route.data.roles.includes(au.authority)) : false;
@@ -29,7 +27,7 @@ export class PermissionsService {
         return true;
       } else {
         let message;
-        if (this.translate.getCurrentLang().startsWith('es')) {
+        if (this.language.startsWith('es')) {
           message = 'El usuario no tiene los permisos necesarios';
         } else {
           message = 'User not have the necessary permissions';
@@ -41,7 +39,7 @@ export class PermissionsService {
     }
     // not logged in so redirect to auth page with the return url and extra data
     const queryParams = btoa(JSON.stringify({ returnUrl: state.url, data: history.state }));
-    this.router.navigate([this.translate.getCurrentLang(), 'auth'], { queryParams: { state: queryParams } });
+    this.navigationService.navigate(['auth'], { queryParams: { state: queryParams } });
 
     return false;
   };

@@ -2,7 +2,7 @@ import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { MainComponent } from './main.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { TokenService } from '../services/token.service';
@@ -20,20 +20,21 @@ import { IUser, User } from '../user/user';
 describe('MainComponent', () => {
   let component: MainComponent;
   let fixture: ComponentFixture<MainComponent>;
+  let navigationServiceSpy: {
+    language: string;
+    language$: ReturnType<typeof signal>;
+    navigate: jasmine.Spy;
+  };
 
   let userStoreSpy: {
     updateMyUser: jasmine.Spy;
   };
-
   let authStoreSpy: {
     authRedirect: jasmine.Spy;
   };
 
-  let navigateSpy: jasmine.Spy;
-
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let firebaseServiceSpy: { isAuthenticated: ReturnType<typeof signal<boolean>> };
@@ -41,6 +42,11 @@ describe('MainComponent', () => {
   let translateService: TranslateService;
 
   beforeEach(async () => {
+    navigationServiceSpy = {
+      language: DEFAULT_LOCALE,
+      language$: signal(DEFAULT_LOCALE),
+      navigate: jasmine.createSpy('navigate'),
+    };
     userStoreSpy = {
       updateMyUser: jasmine.createSpy('updateMyUser'),
     };
@@ -52,7 +58,6 @@ describe('MainComponent', () => {
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode'], {
       authUser: authUserSignal.asReadonly(),
     });
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['attachLang']);
     mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
       value: { showPreload: false, navigationHeader: 'close', showArrow: false },
     });
@@ -69,26 +74,22 @@ describe('MainComponent', () => {
     };
 
     paramMapSpy.get.and.returnValue(DEFAULT_LOCALE);
-    navigationServiceSpy.attachLang.and.returnValue(DEFAULT_LOCALE);
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
         provideAppIcons(),
       ],
     }).compileComponents();
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
@@ -111,17 +112,15 @@ describe('MainComponent', () => {
 
   it('should navigate and scroll to element in scrollToElement', fakeAsync(() => {
     const element = 'test-element';
-    navigateSpy.and.returnValue(Promise.resolve(true));
+    navigationServiceSpy.navigate.and.returnValue(Promise.resolve(true));
 
     component.scrollToElement(element);
 
-    expect(navigateSpy).toHaveBeenCalledWith(['/', DEFAULT_LOCALE]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['']);
   }));
 
   it('should initialize language on construction', () => {
     expect(authUserServiceSpy.cookieConsent).toHaveBeenCalledWith(translateService);
-    expect(navigationServiceSpy.attachLang).toHaveBeenCalledWith(DEFAULT_LOCALE);
-    expect(component.language).toBe(DEFAULT_LOCALE);
   });
 
   it('should toggle theme in changeTheme', () => {
@@ -151,6 +150,6 @@ describe('MainComponent', () => {
   it('should call treatment and navigate to biab-treatment/treatment', () => {
     component.treatment();
 
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'home', 'biab-treatment', 'treatment']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home', 'biab-treatment', 'treatment']);
   });
 });

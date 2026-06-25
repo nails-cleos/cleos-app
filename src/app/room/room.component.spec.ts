@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { RoomComponent } from './room.component';
@@ -20,10 +20,12 @@ import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { ICommon } from '../interfaces/common';
 import { RoomStore } from '../store/room.store';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { NavigationService } from '../services/navigation.service';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
   let fixture: ComponentFixture<RoomComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
@@ -131,6 +133,9 @@ describe('RoomComponent', () => {
   ];
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     paymentOptions$ = new BehaviorSubject(paymentOptions);
     authUserSignal.update(prev => ({
       ...prev,
@@ -157,6 +162,7 @@ describe('RoomComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RoomComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
@@ -172,9 +178,6 @@ describe('RoomComponent', () => {
         add: { imports: [GoogleMapStubComponent] },
       })
       .compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(RoomComponent);
     component = fixture.componentInstance;

@@ -32,7 +32,7 @@ export class UnavailableDetailsPageComponent {
 
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly authUserService = inject(AuthUserService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   config: ICommon = {
@@ -62,9 +62,9 @@ export class UnavailableDetailsPageComponent {
     if (!unavailable) {
       return;
     }
-    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
+    const title = this.translateService.instant('UNAVAILABLE.DELETED.TITLE');
     const date = unavailable.start;
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
+    const content = this.translateService.instant('UNAVAILABLE.DELETED.CONTENT', { date });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
       result => {

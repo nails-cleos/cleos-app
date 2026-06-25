@@ -22,7 +22,7 @@ export class ReferralsComponent {
   private readonly discountStore = inject(DiscountStore);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
@@ -73,7 +73,7 @@ export class ReferralsComponent {
     const userId = this.userId();
     if (userId) {
       this.clipboard.copy(userId);
-      this.toastService.show(this.translate.instant('ME.REFERRAL.COPY'), 'info');
+      this.toastService.show(this.translateService.instant('ME.REFERRAL.COPY'), 'info');
     }
   }
 

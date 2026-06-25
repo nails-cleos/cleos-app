@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { AccountComponent } from './account.component';
@@ -8,13 +8,14 @@ import { IAccountAll, ITransaction } from '../account';
 import { AccountStore } from '../../store/account.store';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('AccountComponent', () => {
   let component: AccountComponent;
   let fixture: ComponentFixture<AccountComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let accountStoreSpy: jasmine.SpyObj<any>;
-  let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   let selectedAccountSignal: ReturnType<typeof signal<any>>;
@@ -44,6 +45,9 @@ describe('AccountComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserSignal.set(initialAuthUser);
     selectedAccountSignal = signal<any>(undefined);
     subErrorsSignal = signal<any>(undefined);
@@ -62,18 +66,15 @@ describe('AccountComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AccountComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
         provideRouter([]),
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AccountComponent);
     component = fixture.componentInstance;
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     fixture.detectChanges();
   });
@@ -138,12 +139,12 @@ describe('AccountComponent', () => {
     fixture.componentRef.setInput('customerId', 'user-1');
     responseSignal.set({ success: true });
     fixture.detectChanges();
-    expect(navigateSpy).toHaveBeenCalledWith(['en', 'users', 'user-1', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'user-1', 'overview']);
 
     authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: false }));
     responseSignal.set({ success: true });
     fixture.detectChanges();
-    expect(navigateSpy).toHaveBeenCalledWith(['en', 'me', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
   });
 
   it('should dispatch updateAccount on valid submit', () => {

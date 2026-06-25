@@ -4,20 +4,20 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MeDiscountComponent } from './me-discount.component';
 import { DiscountStore } from '../../../store/discount.store';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('MeDiscountComponent', () => {
   let component: MeDiscountComponent;
   let fixture: ComponentFixture<MeDiscountComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let navigateSpy: jasmine.Spy;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translateService: TranslateService;
   let discountStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
@@ -63,6 +63,9 @@ describe('MeDiscountComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -91,16 +94,14 @@ describe('MeDiscountComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MeDiscountComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
     }).compileComponents();
 
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    translateService = TestBed.inject(TranslateService);
+    const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MeDiscountComponent);
@@ -198,6 +199,7 @@ describe('MeDiscountComponent', () => {
     const item = mockDiscount[0];
     component.useDiscount(item);
 
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation'], { state: { discountId: item.id } });
+    expect(navigationServiceSpy.navigate)
+      .toHaveBeenCalledWith(['me', 'reservation'], { state: { discountId: item.id } });
   });
 });

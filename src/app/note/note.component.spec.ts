@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NoteComponent } from './note.component';
 import { IUser, IUserAll } from '../user/user';
@@ -17,7 +16,6 @@ import { UserStore } from '../store/user.store';
 describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let noteStoreSpy: {
     navigationParams: ReturnType<typeof navigationParamsSignal.asReadonly>;
     subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
@@ -73,8 +71,6 @@ describe('NoteComponent', () => {
       loadProfessionals: jasmine.createSpy('loadProfessionals'),
     };
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
@@ -82,7 +78,6 @@ describe('NoteComponent', () => {
       providers: [
         { provide: NoteStore, useValue: noteStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         provideAppDateAdapter(),
       ],

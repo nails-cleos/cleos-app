@@ -5,21 +5,23 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { UnavailableListComponent } from './unavailable-list.component';
 import { IUnavailableAll } from '../unavailable';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { IUserAll } from '../../user/user';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { FrequencyEnum } from '../../util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { UnavailableStore } from '../../store/unavailable.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('UnavailableListComponent', () => {
   let component: UnavailableListComponent;
   let fixture: ComponentFixture<UnavailableListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
+  let translateService: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let unavailableStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -73,6 +75,9 @@ describe('UnavailableListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -83,7 +88,6 @@ describe('UnavailableListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     unavailableStoreSpy = {
       isLoading: signal(false),
       data: signal(mockPagination),
@@ -104,17 +108,17 @@ describe('UnavailableListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [UnavailableListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
-    translate.setTranslation(DEFAULT_LOCALE, {
+    translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       COMMON: {
         TIME_ZONE: {
           TITLE: 'Time Zone',
@@ -215,13 +219,13 @@ describe('UnavailableListComponent', () => {
   it('should navigate to the unavailable detail page when edit is called', () => {
     component.edit(mockUnavailable[0]);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'unavailable', mockUnavailable[0].id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['unavailable', mockUnavailable[0].id]);
   });
 
   it('should navigate to the block agenda detail page when edit is called for block agenda', () => {
     component.edit(mockUnavailable[1]);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'unavailable', 'block-agenda', mockUnavailable[1].id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['unavailable', 'block-agenda', mockUnavailable[1].id]);
   });
 
   it('should delete when dialog returns a result', () => {

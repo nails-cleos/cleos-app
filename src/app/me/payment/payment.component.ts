@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   getPaymentResponsePipe,
   getPaymentsPipe,
@@ -34,6 +33,7 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-payment',
@@ -50,8 +50,7 @@ export class PaymentComponent {
   accountId = input<string>();
 
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private paymentList$ = this.store.pipe(getPaymentsPipe);
   private response$ = this.store.pipe(getPaymentResponsePipe);
@@ -81,7 +80,6 @@ export class PaymentComponent {
 
   errorMessage?: string;
   showError = false;
-  language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -96,7 +94,7 @@ export class PaymentComponent {
       const response = this.responseSignal();
       if (response?.path) {
         this.store.dispatch(cleanPayment());
-        this.router.navigate([`${ this.language }/${ response.path }`]);
+        this.navigationService.navigate([response.path]);
       }
     });
 
@@ -150,13 +148,13 @@ export class PaymentComponent {
     const id = this.id();
     const accountId = this.accountId();
     if (path && id) {
-      let navigate: string[] = [this.language];
+      let navigate: string[];
       if (accountId) {
-        navigate = [...navigate, 'accounts', accountId, 'transactions', id];
+        navigate = ['accounts', accountId, 'transactions', id];
       } else {
-        navigate = [...navigate, path, id];
+        navigate = [path, id];
       }
-      this.router.navigate(navigate);
+      this.navigationService.navigate(navigate);
     }
   }
 }

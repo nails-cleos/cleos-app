@@ -46,7 +46,7 @@ const buildTranslate = (): TranslateService => {
 
 describe('report util', () => {
   const env = { appServer: 'http://example.com' } as EnvService;
-  const translate = buildTranslate();
+  const translateService = buildTranslate();
 
   const buildMonthlyExport = (): IMonthlyExport[] => {
     const payment = buildSummaryTotal(100, 80, 20, { type: 'INCOME' });
@@ -92,7 +92,7 @@ describe('report util', () => {
       new Date('2024-01-01'),
       '$',
       'UTC',
-      translate,
+      translateService,
       env,
     );
 
@@ -111,7 +111,7 @@ describe('report util', () => {
       new Date('2024-01-01'),
       '$',
       'UTC',
-      translate,
+      translateService,
       env,
     );
 
@@ -125,17 +125,17 @@ describe('report util', () => {
     expect(worksheet.getCell('A3').value).toBe(january);
 
     const totalRow = 15;
-    expect(worksheet.getCell(`A${totalRow}`).value).toBe('Total');
+    expect(worksheet.getCell(`A${ totalRow }`).value).toBe('Total');
 
-    expect((worksheet.getCell(`B${totalRow}`).value as any).result).toBe(100);
-    expect((worksheet.getCell(`C${totalRow}`).value as any).result).toBe(80);
-    expect((worksheet.getCell(`D${totalRow}`).value as any).result).toBe(20);
-    expect((worksheet.getCell(`E${totalRow}`).value as any).result).toBe(40);
-    expect((worksheet.getCell(`F${totalRow}`).value as any).result).toBe(32);
-    expect((worksheet.getCell(`G${totalRow}`).value as any).result).toBe(8);
-    expect((worksheet.getCell(`H${totalRow}`).value as any).result).toBe(60);
-    expect((worksheet.getCell(`I${totalRow}`).value as any).result).toBe(48);
-    expect((worksheet.getCell(`J${totalRow}`).value as any).result).toBe(12);
+    expect((worksheet.getCell(`B${ totalRow }`).value as any).result).toBe(100);
+    expect((worksheet.getCell(`C${ totalRow }`).value as any).result).toBe(80);
+    expect((worksheet.getCell(`D${ totalRow }`).value as any).result).toBe(20);
+    expect((worksheet.getCell(`E${ totalRow }`).value as any).result).toBe(40);
+    expect((worksheet.getCell(`F${ totalRow }`).value as any).result).toBe(32);
+    expect((worksheet.getCell(`G${ totalRow }`).value as any).result).toBe(8);
+    expect((worksheet.getCell(`H${ totalRow }`).value as any).result).toBe(60);
+    expect((worksheet.getCell(`I${ totalRow }`).value as any).result).toBe(48);
+    expect((worksheet.getCell(`J${ totalRow }`).value as any).result).toBe(12);
   });
 
   it('should set active tab to the selected month', () => {
@@ -144,7 +144,7 @@ describe('report util', () => {
       new Date('2024-02-01'),
       '$',
       'UTC',
-      translate,
+      translateService,
       env,
     );
 

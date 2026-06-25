@@ -17,7 +17,7 @@ import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from './addit
 import { ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError, isString } from '../interfaces/common';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -32,6 +32,7 @@ import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { TreatmentStore } from '../store/treatment.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-additional',
@@ -51,7 +52,7 @@ export class AdditionalComponent {
   private readonly additionalStore = inject(AdditionalStore);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private readonly allGroupsSignal = computed(() => {
     const data = this.treatmentStore.data();
@@ -90,7 +91,7 @@ export class AdditionalComponent {
 
   groupInput = viewChild.required<ElementRef<HTMLInputElement>>('groupInput');
 
-  language: string = this.translate.getCurrentLang();
+  language: string = this.navigationService.language;
 
   private currentGroupIds: string[] = [];
 

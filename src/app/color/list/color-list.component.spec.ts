@@ -5,19 +5,20 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../color';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ColorStore } from '../../store/color.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
   let fixture: ComponentFixture<ColorListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let colorStoreSpy: {
     data: ReturnType<typeof signal>;
@@ -41,6 +42,9 @@ describe('ColorListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -51,7 +55,6 @@ describe('ColorListComponent', () => {
 
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     colorStoreSpy = {
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
@@ -72,16 +75,16 @@ describe('ColorListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ColorListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ColorListComponent);
     component = fixture.componentInstance;
@@ -177,7 +180,7 @@ describe('ColorListComponent', () => {
     const item = mockColor[0];
     component.edit(item);
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'colors', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['colors', item.id]);
   });
 
   it('should dispatch deleteColor when dialog returns a result', () => {

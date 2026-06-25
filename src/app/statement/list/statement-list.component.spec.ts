@@ -1,23 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { StatementListComponent } from './statement-list.component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { IOfficeAll } from '../../office/office';
 import { DriveAccessService } from '../../services/drive-access.service';
-import { NavigationService } from '../../services/navigation.service';
 import { StatementStore } from '../../store/statement.store';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('StatementListComponent', () => {
   let component: StatementListComponent;
   let fixture: ComponentFixture<StatementListComponent>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let statementStoreSpy: {
     clean: jasmine.Spy;
@@ -28,7 +26,6 @@ describe('StatementListComponent', () => {
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
   };
-  let translate: TranslateService;
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -54,7 +51,6 @@ describe('StatementListComponent', () => {
     });
 
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     statementStoreSpy = {
       clean: jasmine.createSpy('clean'),
@@ -71,8 +67,6 @@ describe('StatementListComponent', () => {
       },
     });
 
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
@@ -82,17 +76,12 @@ describe('StatementListComponent', () => {
         { provide: StatementStore, useValue: statementStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(StatementListComponent);
     component = fixture.componentInstance;
-
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

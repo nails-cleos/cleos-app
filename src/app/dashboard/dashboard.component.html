@@ -1,6 +1,6 @@
 @let mapDashboard = dashboardMapSignal();
 @let selectedDashboard = getForm.selectedDash.value;
-@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):dateFormat;
+@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):language;
 @let cardLayout = cardLayoutSignal();
 
 <div class="dashboard-shell app-surface-canvas app-surface-stack">
@@ -119,7 +119,7 @@
                                (beforeViewRender)="beforeMonthViewRender($event)"
                                [activeDayIsOpen]="activeDayIsOpen"
                                [events]="calendar.calendarEvents"
-                               [locale]="dateFormat"
+                               [locale]="language"
                                [viewDate]="viewDate()"></mwl-calendar-month-view>
     </div>
 
@@ -171,7 +171,7 @@
         <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
           <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
             <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading()"
-                       [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
+                       [locale]="language" [timeZone]="timeZone"></app-chart>
           </app-card>
         </mat-grid-tile>
       }

@@ -10,7 +10,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from './services/auth-use
 import { SeoService } from './services/seo.service';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from './util/dates';
-import { I18NStore } from "./store/i18n.store";
+import { I18NStore } from './store/i18n.store';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
@@ -29,7 +29,7 @@ describe('AppComponent', () => {
   beforeEach(async () => {
     i18nStoreSpy = {
       setLanguage: jasmine.createSpy('setLanguage'),
-    }
+    };
     overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
     themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
     seoSpy = jasmine.createSpyObj('SeoService', ['setMetaDescription', 'setMetaTitle']);
@@ -69,14 +69,14 @@ describe('AppComponent', () => {
   });
 
   it('should dispatch setLanguage when authUser emits', () => {
-    authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme' }));
+    authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme', isAuthenticated: true }));
     fixture.detectChanges();
 
     expect(i18nStoreSpy.setLanguage).toHaveBeenCalledWith('es');
   });
 
   it('should call seoService and reset theme when authUser emits', () => {
-    authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme' }));
+    authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme', isAuthenticated: true }));
     fixture.detectChanges();
 
     expect(seoSpy.setMetaDescription).toHaveBeenCalledWith('desc');

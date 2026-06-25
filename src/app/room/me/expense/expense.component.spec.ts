@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ExpenseComponent } from './expense.component';
 import { IExpenseAll, ISupplyStore } from './expense';
@@ -18,8 +17,8 @@ import { ExpenseStore } from '../../../store/expense.store';
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
   let fixture: ComponentFixture<ExpenseComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let navigateSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
   let awsStoreSpy: { data: ReturnType<typeof signal>; processPdf: jasmine.Spy; clean: jasmine.Spy };
@@ -85,6 +84,9 @@ describe('ExpenseComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserSignal.set(initialAuthUser);
     tokenSignal.set('token');
     infoSignal.set(undefined);
@@ -119,10 +121,10 @@ describe('ExpenseComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ExpenseComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
         { provide: TokenService, useValue: tokenServiceMock },
         { provide: AwsStore, useValue: awsStoreSpy },
         provideAppDateAdapter(),
@@ -143,9 +145,6 @@ describe('ExpenseComponent', () => {
         },
       },
     });
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
 
     env = TestBed.inject(EnvService);
 
@@ -196,7 +195,7 @@ describe('ExpenseComponent', () => {
     responseSignal.set(true);
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'rooms', 'room-1', 'expenses']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['rooms', 'room-1', 'expenses']);
   });
 
   it('should not emit submitData when form invalid on submit', () => {

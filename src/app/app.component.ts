@@ -10,7 +10,7 @@ import { resetTheme, Theme } from './util/theme';
 import { getLocale } from './util/helper';
 import { AuthUserService } from './services/auth-user.service';
 import { SeoService } from './services/seo.service';
-import { I18NStore } from "./store/i18n.store";
+import { I18NStore } from './store/i18n.store';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,7 @@ import { I18NStore } from "./store/i18n.store";
   imports: [RouterOutlet],
 })
 export class AppComponent {
-  private readonly translate = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
   private readonly overlayContainer = inject(OverlayContainer);
   private readonly cookieService = inject(CookieService);
   private readonly themeService = inject(ThemeService);
@@ -37,7 +37,7 @@ export class AppComponent {
   constructor() {
     effect(() => {
       const user = this.authUserSignal();
-      if (!user) {
+      if (!user || !user.isAuthenticated) {
         return;
       }
 
@@ -52,7 +52,7 @@ export class AppComponent {
       this.lastLanguage = currentLocale.language;
       this.i18nStore.setLanguage(currentLocale.language);
 
-      const meta = this.translate.instant('META');
+      const meta = this.translateService.instant('META');
 
       this.seoService.setMetaDescription(meta.CONTENT);
       this.seoService.setMetaTitle(meta.TITLE);

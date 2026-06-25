@@ -1,14 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 import { CatalogueStore } from '../../store/catalogue.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
   let fixture: ComponentFixture<CatalogComponent>;
-  let translateService: TranslateService;
 
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
@@ -32,8 +30,6 @@ describe('CatalogComponent', () => {
 
     fixture = TestBed.createComponent(CatalogComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
     fixture.detectChanges();
   });
 

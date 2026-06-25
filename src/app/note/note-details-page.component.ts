@@ -28,7 +28,7 @@ export class NoteDetailsPageComponent {
     button: { icon: 'published_with_changes', label: 'COMMON.BUTTON.UPDATE', showDelete: true },
   };
 
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly noteStore = inject(NoteStore);
   note = computed(() => this.noteStore.selected());
@@ -49,9 +49,9 @@ export class NoteDetailsPageComponent {
     if (!note) {
       return;
     }
-    const title = this.translate.instant('NOTE.DELETED.TITLE');
+    const title = this.translateService.instant('NOTE.DELETED.TITLE');
     const description = note.description;
-    const content = this.translate.instant('NOTE.DELETED.CONTENT', { description });
+    const content = this.translateService.instant('NOTE.DELETED.CONTENT', { description });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: note, variant: 'warning' }, result => {
       if (result) {

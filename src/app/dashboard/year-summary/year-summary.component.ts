@@ -38,6 +38,7 @@ import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type YearSummaryForm = {
   date: FormControl<Date>;
@@ -56,8 +57,9 @@ type YearSummaryForm = {
 })
 export class YearSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dashboardStore = inject(DashboardStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
@@ -139,7 +141,7 @@ export class YearSummaryComponent {
   });
 
   isExportLoading = signal<boolean>(false);
-  language: string = this.translate.getCurrentLang();
+  language: string = this.navigationService.language;
 
   constructor() {
     this.dashboardStore.clean();
@@ -326,7 +328,7 @@ export class YearSummaryComponent {
     }));
     if (sortedSheetData.length) {
       const workbook = createYearlyWorkbook(sortedSheetData, this.getForm.date.value || getNowTimeZone(this.timeZone()),
-        currencySymbol(this.currencySignal()), this.timeZone(), this.translate, this.env);
+        currencySymbol(this.currencySignal()), this.timeZone(), this.translateService, this.env);
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone(this.timeZone());

@@ -1,5 +1,4 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse, IResponseSuccess, PageRequest } from '../interfaces/common';
@@ -11,13 +10,15 @@ import { IUserAll } from '../user/user';
 import { RoomService } from '../services/room.service';
 import { roomName } from '../util/helper';
 import {
-  cleanCrudCreate, cleanCrudDelete,
+  cleanCrudCreate,
+  cleanCrudDelete,
   cleanCrudUpdate,
   createStoreInitialState,
   patchCrudError,
   StoreState,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NavigationService } from '../services/navigation.service';
 
 type RoomStoreState = StoreState<Pagination<IRoom>, IRoomAll> & {
   services: IRoomService | undefined;
@@ -41,8 +42,8 @@ export const RoomStore = signalStore(
   withMethods((
     store,
     roomService = inject(RoomService),
-    translate = inject(TranslateService),
-    router = inject(Router),
+    translateService = inject(TranslateService),
+    navigationService = inject(NavigationService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -102,7 +103,7 @@ export const RoomStore = signalStore(
 
         roomService.createRoom(room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
-            response: createSaveResponse(translate.instant('ROOM.CREATED', { name: response.name }), response),
+            response: createSaveResponse(translateService.instant('ROOM.CREATED', { name: response.name }), response),
             isLoading: false,
           }),
           error: patchError,
@@ -114,7 +115,7 @@ export const RoomStore = signalStore(
 
         roomService.updateRoom(id, room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
-            response: createSaveResponse(translate.instant('ROOM.UPDATED.MESSAGE', { name: response.name }), response),
+            response: createSaveResponse(translateService.instant('ROOM.UPDATED.MESSAGE', { name: response.name }), response),
             isLoading: false,
           }),
           error: patchError,
@@ -127,7 +128,7 @@ export const RoomStore = signalStore(
         roomService.deleteRoom(room.id!).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('ROOM.DELETED.MESSAGE', { name: roomName(room) }),
+              message: translateService.instant('ROOM.DELETED.MESSAGE', { name: roomName(room) }),
               reload: true,
               toastType: 'warning',
             },
@@ -169,7 +170,7 @@ export const RoomStore = signalStore(
 
       selectAndNavigate(selected: IRoomAll): void {
         patchState(store, { selected });
-        router.navigate([translate.getCurrentLang(), 'rooms', selected?.id]);
+        navigationService.navigate(['rooms', selected?.id]);
       },
     };
   }),

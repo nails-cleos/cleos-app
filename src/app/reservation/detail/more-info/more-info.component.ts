@@ -48,6 +48,7 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-more-info',
@@ -64,7 +65,8 @@ export class MoreInfoComponent {
 
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
 
@@ -87,7 +89,7 @@ export class MoreInfoComponent {
   ];
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   totalTime = computed(() => {
     const tracking = this.trackingSignal();
@@ -140,7 +142,7 @@ export class MoreInfoComponent {
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
-      this.toastService.show(this.translate.instant('PAYMENT.COPY'), 'info');
+      this.toastService.show(this.translateService.instant('PAYMENT.COPY'), 'info');
     }
   };
 }

@@ -51,7 +51,7 @@ describe('UserComponent', () => {
 
     const navigationServiceSpy = jasmine.createSpyObj(
       'NavigationService',
-      ['back', 'reload', 'reloadPage', 'attachLang'],
+      ['back', 'reload'],
     );
 
     await TestBed.configureTestingModule({

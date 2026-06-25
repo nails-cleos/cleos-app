@@ -14,12 +14,12 @@ export const StatementStore = signalStore(
   withCrudStoreState<StatementUploadRequest>(),
   withCrudStoreMethods<StatementUploadRequest, void, never, never>(() => {
     const statementService = inject(StatementService);
-    const translate = inject(TranslateService);
+    const translateService = inject(TranslateService);
 
     return {
       create: ({ officeId, blob, fileName }) => statementService.uploadStatement(officeId, blob, fileName),
       createResponse: (_response, entity) => ({
-        message: translate.instant('STATEMENT.UPLOAD_SUCCESS', { fileName: entity.fileName }),
+        message: translateService.instant('STATEMENT.UPLOAD_SUCCESS', { fileName: entity.fileName }),
       }),
     };
   }),

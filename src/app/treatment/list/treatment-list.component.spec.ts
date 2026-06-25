@@ -3,19 +3,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ITreatmentGroupAll } from '../treatment';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;
   let fixture: ComponentFixture<TreatmentListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let translate: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let treatmentStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -40,6 +42,9 @@ describe('TreatmentListComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     treatmentStoreSpy = {
@@ -62,6 +67,7 @@ describe('TreatmentListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TreatmentListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },
@@ -71,9 +77,6 @@ describe('TreatmentListComponent', () => {
 
     fixture = TestBed.createComponent(TreatmentListComponent);
     component = fixture.componentInstance;
-
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

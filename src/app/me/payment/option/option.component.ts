@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/actions/payment.actions';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { getPrice, newPercentage } from '../../../util/helper';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { IPrice, Price } from '../../../treatment/treatment';
 import { IReservationAll, IReservationPayment } from '../../../reservation/reservation';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
@@ -20,6 +19,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-option',
@@ -35,8 +35,7 @@ export class OptionComponent {
 
   private readonly store: Store<PaymentState | ReservationState> = inject(Store<PaymentState | ReservationState>);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private payments$ = this.store.pipe(getPaymentsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
@@ -60,8 +59,6 @@ export class OptionComponent {
   first = true;
   currentStepIndex = signal(0);
 
-  private readonly language: string = this.translate.getCurrentLang();
-
   constructor() {
     effect(() => {
       const id = this.id();
@@ -82,7 +79,7 @@ export class OptionComponent {
           const price = getPrice(reservation, payments);
           this.price.set(price);
           if (price.isPaid) {
-            this.router.navigate(['/', this.language, 'reservation', reservation.id]);
+            this.navigationService.navigate(['reservation', reservation.id]);
           } else {
             if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
               this.first = price.totalPaid === 0;

@@ -5,7 +5,7 @@ import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { ITransaction } from '../../account';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { BalanceComponent } from '../../balance/balance.component';
@@ -34,6 +34,7 @@ import { MatList, MatListItem, MatListItemIcon, MatListItemTitle } from '@angula
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-transaction-view',
@@ -51,7 +52,7 @@ export class TransactionViewComponent {
 
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly accountStore = inject(AccountStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -97,8 +98,7 @@ export class TransactionViewComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedTransaction?: ITransaction;
-  dateFormat = this.translate.getCurrentLang();
-  language = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     effect(() => {

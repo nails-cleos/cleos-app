@@ -7,18 +7,17 @@ import { CatalogueListComponent } from './catalogue-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { CatalogueStore } from '../../store/catalogue.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('CatalogueListComponent', () => {
   let component: CatalogueListComponent;
   let fixture: ComponentFixture<CatalogueListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let translate: TranslateService;
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
@@ -56,8 +55,10 @@ describe('CatalogueListComponent', () => {
   ];
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     catalogueStoreSpy = {
       data: signal<any>(undefined),
       isLoading: signal(false),
@@ -77,15 +78,15 @@ describe('CatalogueListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CatalogueListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CatalogueListComponent);
     component = fixture.componentInstance;
@@ -117,7 +118,7 @@ describe('CatalogueListComponent', () => {
   it('should navigate when edit is called', () => {
     const catalogue = mockCatalogues[0];
     component.edit(catalogue);
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'catalogues', catalogue.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['catalogues', catalogue.id]);
   });
 
   it('should update catalogue order when finish is called', () => {

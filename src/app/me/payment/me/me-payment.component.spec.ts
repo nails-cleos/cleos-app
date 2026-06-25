@@ -9,18 +9,23 @@ import { getPayment, updatePaymentById } from '../../../store/actions/payment.ac
 import { PaymentPercentage } from '../../../interfaces/payment';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAppIcons } from '../../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
   let fixture: ComponentFixture<MePaymentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
 
-  // streams returned by store.pipe()
   let payment$: Subject<any>;
   let paymentOptions$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     payment$ = new Subject();
     paymentOptions$ = new BehaviorSubject([
       {
@@ -63,6 +68,7 @@ describe('MePaymentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MePaymentComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         provideHttpClient(),

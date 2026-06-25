@@ -39,7 +39,7 @@
                 mat-sort-header>{{ 'UNAVAILABLE.LIST.COLUMN.START' | translate }}
             </th>
             <td *matCellDef="let unavailable" mat-cell>
-              <div>{{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:dateFormat }}
+              <div>{{ unavailable.timestamp | timeDetail | date:'short':unavailable.timeZone:language }}
                 @if (showTimeZone(unavailable)) {
                   <button (click)="openDialog(unavailable)" mat-icon-button type="button">
                     <mat-icon>info_outline</mat-icon>

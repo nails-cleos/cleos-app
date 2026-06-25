@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -11,13 +11,14 @@ import { IReservationAll } from '../../../reservation/reservation';
 import { provideHttpClient } from '@angular/common/http';
 import { NavigationService } from '../../../services/navigation.service';
 import { provideAppIcons } from '../../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../../util/dates';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
   let fixture: ComponentFixture<OptionComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<any>>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   let payments$: BehaviorSubject<any>;
@@ -25,6 +26,9 @@ describe('OptionComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     payments$ = new BehaviorSubject(undefined);
     paymentOptions$ = new BehaviorSubject([
       {
@@ -73,11 +77,8 @@ describe('OptionComponent', () => {
     breakpoint$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
-
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     // Simulate the signal order
     let pipeCallIndex = 0;
@@ -96,10 +97,9 @@ describe('OptionComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OptionComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         provideHttpClient(),
         provideAppIcons(),

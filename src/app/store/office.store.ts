@@ -25,7 +25,7 @@ export const OfficeStore = signalStore(
   withMethods((
     store,
     officeService = inject(OfficeService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -75,7 +75,7 @@ export const OfficeStore = signalStore(
         officeService.createOffice(office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('OFFICE.CREATED', { name: response.name }),
+              message: translateService.instant('OFFICE.CREATED', { name: response.name }),
               path: `offices/${ response.id }`,
               redirect: 'offices',
             },
@@ -91,7 +91,7 @@ export const OfficeStore = signalStore(
         officeService.updateOffice(id, office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('OFFICE.UPDATED.MESSAGE', { name: response.name }),
+              message: translateService.instant('OFFICE.UPDATED.MESSAGE', { name: response.name }),
               path: `offices/${ response.id }`,
               redirect: 'offices',
             },
@@ -107,7 +107,7 @@ export const OfficeStore = signalStore(
         officeService.deleteOffice(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('OFFICE.DELETED.MESSAGE', { name }),
+              message: translateService.instant('OFFICE.DELETED.MESSAGE', { name }),
               redirect: 'offices',
               reload: true,
               toastType: 'warning',

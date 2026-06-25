@@ -42,7 +42,7 @@ type SelectionEventParams = {
 
 @Injectable({ providedIn: 'root' })
 export class ReservationCalendarService {
-  private readonly translate = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
 
   getRoomSchedule(room: IRoomAll): RoomSchedule {
     const availability = getAvailability(room);
@@ -81,9 +81,9 @@ export class ReservationCalendarService {
   addRoomAvailabilityEvents(dataEvent: IDataEvent, room: IRoomAll, isDarkMode: boolean): RoomSchedule {
     const schedule = this.getRoomSchedule(room);
     const { monday, tuesday, wednesday, thursday, friday, saturday, sunday } = schedule.availability;
-    const unavailable = this.translate.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
-    const lunch = this.translate.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
-    const notWorking = this.translate.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
+    const unavailable = this.translateService.instant('RESERVATION.EVENT.MESSAGE.UNAVAILABLE');
+    const lunch = this.translateService.instant('RESERVATION.EVENT.MESSAGE.LUNCH');
+    const notWorking = this.translateService.instant('RESERVATION.EVENT.MESSAGE.OUT_OF_WORK');
 
     dataEvent.recurringEvent?.addNotAvailableRecurring(
       dataEvent,
@@ -120,7 +120,7 @@ export class ReservationCalendarService {
       let treatments = createBullet(it.treatment.name);
       treatments += it.additional?.map(additional => createBullet(additional.name));
 
-      const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
+      const detail = this.translateService.instant('RESERVATION.EVENT.DETAIL', {
         customerName: it.customer.displayName,
         professionalName: it.professional.displayName,
         treatments,
@@ -150,7 +150,7 @@ export class ReservationCalendarService {
 
       const startDate = newDateTimestamp(it.timestamp, timeZone);
       const start = it.allDay ? createNewDate(startDate) : startDate;
-      const title = this.translate.instant('RESERVATION.EVENT.UNAVAILABLE', {
+      const title = this.translateService.instant('RESERVATION.EVENT.UNAVAILABLE', {
         description: it.description ? it.description : '',
         professionalName: it.professional.displayName,
       });
@@ -193,7 +193,7 @@ export class ReservationCalendarService {
       ...params.additional.map(additional => createBullet(additional.name)),
     ].join('');
 
-    const detail = this.translate.instant('RESERVATION.EVENT.DETAIL', {
+    const detail = this.translateService.instant('RESERVATION.EVENT.DETAIL', {
       customerName: params.customer.displayName,
       professionalName: params.professional?.displayName,
       treatments,

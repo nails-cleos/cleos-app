@@ -85,7 +85,7 @@ export class User {
     currentLang?: string,
     isProfessionalOrManager: boolean = false,
     formattedAddress?: string,
-    location?: google.maps.LatLng,
+    location?: { lat: () => number; lng: () => number },
   ): IUser {
     const dob = fieldChange(userForm.dob, currentUser?.dob);
 
@@ -115,7 +115,7 @@ export class User {
     currentUser?: IUserAll,
     currentLang?: string,
     formattedAddress?: string,
-    location?: google.maps.LatLng,
+    location?: { lat: () => number; lng: () => number },
   ): IUser {
     const dob = fieldChange(profileForm.dob, currentUser?.dob);
 

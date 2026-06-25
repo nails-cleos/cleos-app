@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { IReservationAll, ITracking } from '../../reservation';
-import { getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
+import { DEFAULT_LOCALE, getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
 import { IRoomAll } from '../../../room/room';
 import { ICurrencyAll } from '../../../currency/currency';
 import { IReview } from '../../../me/reservation/list/review';
@@ -22,10 +22,12 @@ import { IPaymentAll } from '../../../interfaces/payment';
 import { recreate } from '../../../store/actions/payment.actions';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastService } from '../../../services/toast.service';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
   let fixture: ComponentFixture<MoreInfoComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let payments$: BehaviorSubject<any>;
   let tracking$: BehaviorSubject<any>;
@@ -59,6 +61,9 @@ describe('MoreInfoComponent', () => {
   } as IReservationAll;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     payments$ = new BehaviorSubject<any>(undefined);
     tracking$ = new BehaviorSubject<any>(undefined);
     review$ = new BehaviorSubject<any>(undefined);
@@ -85,6 +90,7 @@ describe('MoreInfoComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MoreInfoComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },

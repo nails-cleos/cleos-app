@@ -14,13 +14,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
 import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
-import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
 import { ISummaryRoom } from '../dashboard/dashboard';
 import { IDialog } from '../shared/dialog/dialog';
 import { ProfessionalDialogData } from '../reservation/select-professional-dialog.component';
 import { PriceDialogData } from '../room/me/add-service/price-dialog.component';
 import { SelectUserDialogData } from '../user/list/select-user-dialog.component';
+import { NavigationService } from '../services/navigation.service';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
@@ -404,11 +404,10 @@ export const openCancel = (
 
 export const customerEditDialog = (
   dialog: MatDialog,
-  router: Router,
+  navigationService: NavigationService,
   reservationId: string,
   currency: ICurrencyAll,
   small: boolean,
-  language: string,
   price?: IPrice,
 ): void => {
   const data = {
@@ -418,7 +417,7 @@ export const customerEditDialog = (
   };
   executeDialog(dialog, CustomerEditDialogComponent, data, result => {
     if (result) {
-      router.navigate([language, 'me', 'reservation', reservationId]);
+      navigationService.navigate(['me', 'reservation', reservationId]);
     }
   }, true);
 };
@@ -480,7 +479,7 @@ export enum FrequencyEnum {
 }
 
 export const createAddress = (
-  formattedAddress?: string, location?: google.maps.LatLng,
+  formattedAddress?: string, location?: { lat: () => number; lng: () => number },
   address?: IAddress, description?: string): IAddress | undefined => {
   if (location || address) {
     return {

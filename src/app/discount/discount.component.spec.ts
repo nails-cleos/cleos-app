@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountComponent } from './discount.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
 import { DiscountType, IDiscountAll } from './discount';
 import { ICurrency } from '../currency/currency';
@@ -14,11 +13,11 @@ import { DEFAULT_LOCALE } from '../util/dates';
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let discountStoreSpy: {
     subErrors: ReturnType<typeof signal>;
   };
-  let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const mockCurrency: ICurrency = {
@@ -43,26 +42,22 @@ describe('DiscountComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     discountStoreSpy = {
       subErrors: signal<any>(undefined),
     };
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
       imports: [DiscountComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: DiscountStore, useValue: discountStoreSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;

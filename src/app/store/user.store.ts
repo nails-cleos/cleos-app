@@ -1,5 +1,4 @@
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { type Subscription } from 'rxjs';
@@ -21,6 +20,7 @@ import { getLocale } from '../util/helper';
 import { IRoomAll } from '../room/room';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore } from './auth.store';
+import { NavigationService } from '../services/navigation.service';
 
 type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
@@ -47,8 +47,8 @@ export const UserStore = signalStore(
   withMethods((
     store,
     userService = inject(UserService),
-    translate = inject(TranslateService),
-    router = inject(Router),
+    translateService = inject(TranslateService),
+    navigationService = inject(NavigationService),
     authStore = inject(AuthStore),
   ) => {
     let loadPageSubscription: Subscription | undefined;
@@ -97,7 +97,7 @@ export const UserStore = signalStore(
       reload: boolean = false,
       redirect?: string,
     ): IResponseSuccess => ({
-      message: translate.instant(key, { role, displayName }),
+      message: translateService.instant(key, { role, displayName }),
       path,
       reload,
       toastType,
@@ -130,7 +130,7 @@ export const UserStore = signalStore(
           subErrors: undefined,
           response: undefined,
         });
-        router.navigate([translate.getCurrentLang(), 'users', selected.id]);
+        navigationService.navigate(['users', selected.id]);
       },
 
       loadPage(request: PageRequest & { filter?: string }): void {
@@ -247,7 +247,7 @@ export const UserStore = signalStore(
         setRoleSubscription = userService.setRole(id, role).subscribe({
           next: () => patchState(store, {
             response: requestSuccess(`USER.ROLES.${ action }`, displayName, `users/${ id }`,
-              translate.instant(`COMMON.ROLES.${ role }`)),
+              translateService.instant(`COMMON.ROLES.${ role }`)),
             isLoading: false,
           }),
           error: patchError,
@@ -262,7 +262,7 @@ export const UserStore = signalStore(
           next: (response) => {
             patchState(store, {
               response: {
-                message: message || translate.instant('COMMON.PROFILE.UPDATED.MESSAGE',
+                message: message || translateService.instant('COMMON.PROFILE.UPDATED.MESSAGE',
                   { displayName: response.user.displayName }),
                 toastType: 'success',
               },
@@ -287,7 +287,7 @@ export const UserStore = signalStore(
               },
               isLoading: false,
             });
-            const lang = getLocale(translate.getCurrentLang()).language;
+            const lang = getLocale(translateService.getCurrentLang()).language;
             dispatchLoginSuccess(response, `/${ lang }/auth/profile`, lang);
           },
           error: patchError,

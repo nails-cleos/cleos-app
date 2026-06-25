@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { ColorComponent } from './color.component';
@@ -7,7 +7,6 @@ import { IColorAll } from './color';
 import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
-import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('ColorComponent', () => {
   let component: ColorComponent;
@@ -43,9 +42,6 @@ describe('ColorComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ColorComponent);
     component = fixture.componentInstance;

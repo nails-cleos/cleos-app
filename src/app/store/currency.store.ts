@@ -15,7 +15,7 @@ export const CurrencyStore = signalStore(
   withCrudStoreState<ICurrencyAll, CurrencyData, ICurrencyAll>(),
   withCrudStoreMethods<ICurrency, IApiResponse, IApiResponse, { id: string; code: string }>(() => {
     const currencyService = inject(CurrencyService);
-    const translate = inject(TranslateService);
+    const translateService = inject(TranslateService);
 
     return {
       loadPage: ({ page, sort, direction, size }) => currencyService.getCurrenciesPage(page, sort, direction, size),
@@ -25,17 +25,17 @@ export const CurrencyStore = signalStore(
       update: (id, currency) => currencyService.updateCurrency(id, currency),
       delete: ({ id }) => currencyService.deleteCurrency(id),
       createResponse: (response) => ({
-        message: translate.instant('CURRENCY.CREATED', { code: response.name }),
+        message: translateService.instant('CURRENCY.CREATED', { code: response.name }),
         path: `currency/${ response.id }`,
         redirect: 'currency',
       }),
       updateResponse: (response) => ({
-        message: translate.instant('CURRENCY.UPDATED.MESSAGE', { code: response.name }),
+        message: translateService.instant('CURRENCY.UPDATED.MESSAGE', { code: response.name }),
         path: `currency/${ response.id }`,
         redirect: 'currency',
       }),
       deleteResponse: ({ code }) => ({
-        message: translate.instant('CURRENCY.DELETED.MESSAGE', { code }),
+        message: translateService.instant('CURRENCY.DELETED.MESSAGE', { code }),
         reload: true,
         toastType: 'warning',
         redirect: 'currency',

@@ -35,7 +35,7 @@ export const ExpenseStore = signalStore(
   withMethods((
     store,
     expenseService = inject(ExpenseService),
-    translate = inject(TranslateService),
+    translateService = inject(TranslateService),
   ) => {
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -86,7 +86,7 @@ export const ExpenseStore = signalStore(
           next: (response: IApiResponse) => {
             patchState(store, {
               response: {
-                message: translate.instant('EXPENSE.CREATED', { invoice: response.name }),
+                message: translateService.instant('EXPENSE.CREATED', { invoice: response.name }),
                 path: `rooms/${ roomId }/expenses/${ response.id }`,
               },
               isLoading: false,
@@ -102,7 +102,7 @@ export const ExpenseStore = signalStore(
         expenseService.updateExpense(id, roomId, expense, file).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
-              message: translate.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name }),
+              message: translateService.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name }),
               path: `rooms/${ roomId }/expenses/${ response.id }`,
             },
             isLoading: false,
@@ -117,7 +117,7 @@ export const ExpenseStore = signalStore(
         expenseService.deleteExpense(roomId, id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translate.instant('EXPENSE.DELETED.MESSAGE', { invoice }),
+              message: translateService.instant('EXPENSE.DELETED.MESSAGE', { invoice }),
               reload: true,
               toastType: 'warning',
             },

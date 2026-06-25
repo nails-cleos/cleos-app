@@ -1,30 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentCompleteComponent } from './payment-complete.component';
-import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { paymentNotComplete } from '../../../store/actions/payment.actions';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('PaymentCompleteComponent', () => {
   let fixture: ComponentFixture<PaymentCompleteComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   let paymentResultParams$: Subject<any>;
   let subErrors$: Subject<any>;
   let response$: Subject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     paymentResultParams$ = new Subject();
     subErrors$ = new Subject();
     response$ = new Subject();
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(() => {
@@ -44,8 +46,8 @@ describe('PaymentCompleteComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PaymentCompleteComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
@@ -143,7 +145,7 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'reservation', '123', 'payment'], {
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation', '123', 'payment'], {
       queryParams: { accountId: 'account-1' },
     });
   });
@@ -176,8 +178,7 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([
-      DEFAULT_LOCALE,
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
       'me',
       'reservation',
       '123',
@@ -190,6 +191,6 @@ describe('PaymentCompleteComponent', () => {
 
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([`${DEFAULT_LOCALE}/dashboard`]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
   });
 });

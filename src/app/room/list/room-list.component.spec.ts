@@ -11,13 +11,16 @@ import { ICurrencyAll } from '../../currency/currency';
 import { DEFAULT_LOCALE, getCurrentTimeZone } from '../../util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { RoomStore } from '../../store/room.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('RoomListComponent', () => {
   let component: RoomListComponent;
   let fixture: ComponentFixture<RoomListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
+  let translateService: TranslateService;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let roomStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -72,6 +75,9 @@ describe('RoomListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -103,6 +109,7 @@ describe('RoomListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RoomListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -113,8 +120,8 @@ describe('RoomListComponent', () => {
     fixture = TestBed.createComponent(RoomListComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use(DEFAULT_LOCALE);
+    translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });

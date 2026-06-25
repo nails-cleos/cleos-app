@@ -34,10 +34,11 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { UnavailableStore } from '../../store/unavailable.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-unavailable-list',
@@ -55,7 +56,7 @@ export class UnavailableListComponent {
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -96,8 +97,7 @@ export class UnavailableListComponent {
 
   expandedUnavailable?: IUnavailable;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {
@@ -136,7 +136,7 @@ export class UnavailableListComponent {
       ? ['unavailable', 'block-agenda', selected.id]
       : ['unavailable', selected.id];
 
-    void this.router.navigate([this.language, ...path]);
+    void this.navigationService.navigate(path);
   };
 
   delete = (unavailable: IUnavailableAll): void => {
@@ -144,15 +144,16 @@ export class UnavailableListComponent {
     const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
       { date: newDateTimestamp(unavailable.timestamp) });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' }, result => {
-      if (result) {
-        this.unavailableStore.delete({
-          id: result.id,
-          timestamp: result.timestamp,
-          timeZone: result.timeZone,
-        });
-      }
-    });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
+      result => {
+        if (result) {
+          this.unavailableStore.delete({
+            id: result.id,
+            timestamp: result.timestamp,
+            timeZone: result.timeZone,
+          });
+        }
+      });
   };
 
   showTimeZone = (unavailable: IUnavailableAll): boolean =>
@@ -162,6 +163,6 @@ export class UnavailableListComponent {
     const time = newDateTimestamp(unavailable.timestamp);
     const name = unavailable.professional.displayName;
     const timeZone = unavailable.timeZone || unavailable.professional.timeZone;
-    createDialog('PROFESSIONAL_INFO', name, this.dateFormat, this.translate, this.dialog, timeZone, time);
+    createDialog('PROFESSIONAL_INFO', name, this.language, this.translate, this.dialog, timeZone, time);
   };
 }

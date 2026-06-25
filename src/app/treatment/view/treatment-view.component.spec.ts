@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentStore } from '../../store/treatment.store';
 import { TreatmentViewComponent } from './treatment-view.component';
@@ -10,7 +9,8 @@ import { DEFAULT_LOCALE } from '../../util/dates';
 describe('TreatmentViewComponent', () => {
   let component: TreatmentViewComponent;
   let fixture: ComponentFixture<TreatmentViewComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let treatmentStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     selected: ReturnType<typeof signal<any>>;
@@ -21,7 +21,9 @@ describe('TreatmentViewComponent', () => {
   };
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     treatmentStoreSpy = {
       isLoading: signal(false),
       selected: signal({ id: '123', name: 'Deep Tissue', treatments: [] }),
@@ -34,15 +36,13 @@ describe('TreatmentViewComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TreatmentViewComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentViewComponent);
     component = fixture.componentInstance;
-    component.language = DEFAULT_LOCALE;
 
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
@@ -64,7 +64,7 @@ describe('TreatmentViewComponent', () => {
   it('should navigate to edit on edit()', () => {
     component.edit();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'treatments', '123', 'edit']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['treatments', '123', 'edit']);
   });
 
   it('should load treatment history', () => {

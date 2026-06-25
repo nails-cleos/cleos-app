@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Navigation, Router } from '@angular/router';
 import { MonthSummaryComponent } from './month-summary.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import {
@@ -18,11 +17,12 @@ import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { DashboardStore } from '../../store/dashboard.store';
-import { BlockAgendaCreatePageComponent } from '../../unavailable/block-agenda/block-agenda-create-page.component';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
   let fixture: ComponentFixture<MonthSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let dashboardStoreSpy: {
     monthlySummaryMap: ReturnType<typeof signal>;
@@ -31,7 +31,6 @@ describe('MonthSummaryComponent', () => {
     clean: jasmine.Spy;
   };
 
-  let navigateSpy: jasmine.Spy;
   let saveAsSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -76,6 +75,9 @@ describe('MonthSummaryComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     history.replaceState({}, '');
     dashboardStoreSpy = {
       monthlySummaryMap: signal<any>(undefined),
@@ -91,16 +93,12 @@ describe('MonthSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MonthSummaryComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
 
-    // Spy router.navigate
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    // Make sure translate has a language so component.language is meaningful
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
@@ -170,13 +168,13 @@ describe('MonthSummaryComponent', () => {
     it('should navigate to quarter summary with year and quarter when date is set', () => {
       component.getForm.date.setValue(new Date(2024, 0, 15));
       component.goBack();
-      expect(navigateSpy).toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).toHaveBeenCalled();
     });
 
     it('should navigate to quarter summary without state when date is undefined', () => {
       component.getForm.date.setValue(undefined as any);
       component.goBack();
-      expect(navigateSpy).toHaveBeenCalledWith([DEFAULT_LOCALE, 'dashboard', 'quarter', 'summary']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'quarter', 'summary']);
     });
   });
 

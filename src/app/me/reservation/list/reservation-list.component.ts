@@ -14,7 +14,7 @@ import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { IReview, Review } from './review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { IPayment } from '../../../interfaces/payment';
 import { UpcomingComponent } from '../upcoming/upcoming.component';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
@@ -54,6 +54,7 @@ import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { UpcomingSkeletonComponent } from '../../../shared/skeleton/upcoming-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-reservation-list',
@@ -69,8 +70,8 @@ import { UpcomingSkeletonComponent } from '../../../shared/skeleton/upcoming-ske
 export class ReservationListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly firebaseService = inject(FirebaseService);
   private readonly discountStore = inject(DiscountStore);
@@ -130,8 +131,7 @@ export class ReservationListComponent {
 
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   private showReview = true;
 
@@ -173,9 +173,9 @@ export class ReservationListComponent {
           if (link) {
             window.open(link, '_self');
           } else if (paymentId) {
-            this.router.navigate([this.language, 'me', 'payment', paymentId]);
+            this.navigationService.navigate(['me', 'payment', paymentId]);
           } else if (!pending) {
-            this.router.navigate(['/', this.language, 'me', 'reservation', u.id, 'payment', 'option']);
+            this.navigationService.navigate(['me', 'reservation', u.id, 'payment', 'option']);
           }
         }
       });
@@ -197,7 +197,7 @@ export class ReservationListComponent {
         const review: IReview = new Review(result.rating);
         review.reservationId = reservation?.id;
         review.detail = result.detail ? result.detail :
-          this.translate.instant(`ME.REVIEW.RATING.${ result.rating }`);
+          this.translateService.instant(`ME.REVIEW.RATING.${ result.rating }`);
         this.store.dispatch(createReview({ review }));
       }
     },
@@ -205,6 +205,6 @@ export class ReservationListComponent {
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
   };
 }

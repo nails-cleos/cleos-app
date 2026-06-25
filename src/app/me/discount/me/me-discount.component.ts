@@ -4,11 +4,10 @@ import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DiscountType, IUserDiscount } from '../../../discount/discount';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { currencySymbol } from '../../../util/helper';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { FirebaseService } from '../../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -33,6 +32,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatSuffix } from '@angular/material/input';
 import { DiscountStore } from '../../../store/discount.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-me-discount',
@@ -47,8 +47,7 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/ske
 export class MeDiscountComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly discountStore = inject(DiscountStore);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly firebaseService = inject(FirebaseService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
@@ -103,8 +102,6 @@ export class MeDiscountComponent {
   ];
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
-  private readonly language: string = this.translate.getCurrentLang();
-
   constructor() {
     this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
@@ -138,6 +135,6 @@ export class MeDiscountComponent {
 
   useDiscount = (discount: IUserDiscount): void => {
     const data = { discountId: discount.id };
-    this.router.navigate([this.language, 'me', 'reservation'], { state: data });
+    this.navigationService.navigate(['me', 'reservation'], { state: data });
   };
 }

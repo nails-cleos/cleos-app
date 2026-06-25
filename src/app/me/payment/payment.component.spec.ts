@@ -1,21 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, Subject } from 'rxjs';
-import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
+import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
 import { IPaymentAll } from '../../interfaces/payment';
 import { PaymentState } from '../../store/reducers/payment.reducers';
-import { cleanPayment } from '../../store/actions/payment.actions';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
   let fixture: ComponentFixture<PaymentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
 
   let paymentList$: Subject<any[]>;
   let response$: Subject<any>;
@@ -23,13 +23,15 @@ describe('PaymentComponent', () => {
   let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     paymentList$ = new Subject();
     response$ = new Subject();
     subErrors$ = new Subject();
     isLoading$ = new BehaviorSubject<boolean>(false);
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe', 'select']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
     storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     let pipeCallIndex = 0;
@@ -50,9 +52,9 @@ describe('PaymentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PaymentComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
 
@@ -93,7 +95,7 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'accounts', 'account-1', 'transactions', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['accounts', 'account-1', 'transactions', '123']);
   });
 
   it('should navigate back to the resource page when accountId is missing', () => {
@@ -103,7 +105,7 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'reservation', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', '123']);
   });
 
   it('should hide footer when paymentList has items', () => {
@@ -137,7 +139,7 @@ describe('PaymentComponent', () => {
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanPayment());
-    expect(routerSpy.navigate).toHaveBeenCalledWith([`${DEFAULT_LOCALE}/dashboard`]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
   });
 
   it('should call store.dispatch(paymentSend) when pay() is called', () => {
@@ -225,7 +227,7 @@ describe('PaymentComponent', () => {
   it('should not navigate back when path or id is missing', () => {
     component.goBack();
 
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('close() should hide error', () => {

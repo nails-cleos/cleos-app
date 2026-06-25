@@ -29,7 +29,7 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   MatList,
   MatListItem,
@@ -39,6 +39,7 @@ import {
 } from '@angular/material/list';
 import { CurrencyStore } from '../../store/currency.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-currency-list',
@@ -53,9 +54,9 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class CurrencyListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly currencyStore = inject(CurrencyStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -95,7 +96,7 @@ export class CurrencyListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: ICurrency;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {
@@ -130,12 +131,12 @@ export class CurrencyListComponent {
   }
 
   edit = (selected: ICurrency): void => {
-    void this.router.navigate([this.language, 'currency', selected.id]);
+    this.navigationService.navigate(['currency', selected.id]);
   };
 
   delete = (currency: ICurrency): void => {
-    const title = this.translate.instant('CURRENCY.DELETED.TITLE');
-    const content = this.translate.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
+    const title = this.translateService.instant('CURRENCY.DELETED.TITLE');
+    const content = this.translateService.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency, variant: 'warning' },
       result => {
         if (result) {

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { TransactionComponent } from './transaction.component';
@@ -18,6 +18,7 @@ import { DEFAULT_LOCALE } from '../../util/dates';
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
   let fixture: ComponentFixture<TransactionComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let selectedAccountSignal: ReturnType<typeof signal<IAccountAll | undefined>>;
   let subErrorsSignal: ReturnType<typeof signal<any>>;
@@ -27,7 +28,6 @@ describe('TransactionComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<any>>;
   let accountStoreSpy: jasmine.SpyObj<any>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   const mockAccount: IAccountAll = {
@@ -50,6 +50,9 @@ describe('TransactionComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserSignal.set(initialAuthUser);
     selectedAccountSignal = signal<any>(undefined);
     subErrorsSignal = signal<any>(undefined);
@@ -92,30 +95,23 @@ describe('TransactionComponent', () => {
       subErrors: subErrorsSignal.asReadonly(),
       response: responseSignal.asReadonly(),
     });
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        { provide: Router, useValue: routerSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideAppIcons(),
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
@@ -218,7 +214,7 @@ describe('TransactionComponent', () => {
     responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'users', 'customer-123', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'customer-123', 'overview']);
   });
 
   it('should navigate to me overview when response arrives (not admin)', () => {
@@ -227,7 +223,7 @@ describe('TransactionComponent', () => {
     responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith([DEFAULT_LOCALE, 'me', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
   });
 
   it('should not submit when form is invalid', () => {

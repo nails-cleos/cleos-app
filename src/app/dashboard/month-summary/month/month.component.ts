@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
 import { IMonthSummary, ISummaryTotal, Total } from '../../dashboard';
 import { ICurrencyAll } from '../../../currency/currency';
-import { Router } from '@angular/router';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencyPipe } from '@angular/common';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-month',
@@ -13,8 +13,7 @@ import { CurrencyPipe } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   month = input.required<IMonthSummary>();
   year = input.required<number>();
@@ -24,7 +23,6 @@ export class MonthComponent {
   income?: ISummaryTotal;
   expense?: ISummaryTotal;
   cash?: ISummaryTotal;
-  private readonly language: string = this.translate.getCurrentLang();
 
   constructor() {
     effect(() => {
@@ -69,7 +67,7 @@ export class MonthComponent {
         step = 2;
         break;
     }
-    this.router.navigate([this.language, 'dashboard', 'monthly', 'summary'],
+    this.navigationService.navigate(['dashboard', 'monthly', 'summary'],
       { state: { date: `${ month }-${ this.year() }`, step } });
   };
 }

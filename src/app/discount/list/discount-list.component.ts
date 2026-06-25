@@ -33,9 +33,10 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatPrefix, MatSuffix } from '@angular/material/input';
 import { DecimalPipe } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { discountIcon, DiscountStore } from '../../store/discount.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-discount-list',
@@ -51,9 +52,9 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 export class DiscountListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly discountStore = inject(DiscountStore);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router = inject(Router);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -97,7 +98,7 @@ export class DiscountListComponent {
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IDiscount;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     this.discountStore.clean();
@@ -127,12 +128,12 @@ export class DiscountListComponent {
   }
 
   edit = (selected: IDiscount): void => {
-    void this.router.navigate([this.language, 'discounts', selected.id]);
+    this.navigationService.navigate(['discounts', selected.id]);
   };
 
   delete = (discount: IDiscount): void => {
-    const title = this.translate.instant('DISCOUNT.DELETED.TITLE');
-    const content = this.translate.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
+    const title = this.translateService.instant('DISCOUNT.DELETED.TITLE');
+    const content = this.translateService.instant('DISCOUNT.DELETED.CONTENT', { name: discount.name });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: discount, variant: 'warning' },
     });

@@ -32,7 +32,6 @@ import {
 import { EventColor } from 'calendar-utils';
 import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../../reservation/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
-import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { createEventColor, getProfessionalColor } from '../../util/color';
 import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
@@ -47,6 +46,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatInput } from '@angular/material/input';
 import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -61,8 +61,8 @@ export class DashboardEventComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly dashboardStore = inject(DashboardStore);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   picker = viewChild(MatDatepicker);
@@ -85,12 +85,10 @@ export class DashboardEventComponent {
   professionals: IProfessional[] = [];
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate(), 0, false);
 
-  locale: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   prevBtnDisabled = false;
   nextBtnDisabled = false;
-
-  private readonly language: string = this.translate.getCurrentLang();
 
   private calendarReady = signal(false);
 
@@ -172,9 +170,9 @@ export class DashboardEventComponent {
           professionalEvent.calendarSummary.unavailable?.forEach(it => {
             const start = newDateTimestamp(it.start);
             const title = it.duration ?
-              it.title : `${ this.translate.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
+              it.title : `${ this.translateService.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
-            let path = `${ this.language }/unavailable/`;
+            let path = 'unavailable/';
             if (it.type === 'BLOCK_AGENDA') {
               path += 'block-agenda/';
             }
@@ -267,7 +265,7 @@ export class DashboardEventComponent {
     }
 
     this.calendar.recurringEvent?.addFrequency(note.repeat, repeatDate, note.noteId, note.title, 'NOTE',
-      `${ this.language }/notes/`, (date, recurring) => {
+      'notes/', (date, recurring) => {
         this.calendar.addEvent(this.createDashboardAllDayEvent(recurring.title, recurring.id, recurring.state,
           professional, darkMode, date));
       }, undefined, undefined, true);
@@ -356,7 +354,7 @@ export class DashboardEventComponent {
       const data = { date, professionalId, isDashboard: true };
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate([this.language].concat(result.split(',')), { state: data });
+          this.navigationService.navigate(result.split(','), { state: data });
         }
       });
     }
@@ -549,7 +547,7 @@ export class DashboardEventComponent {
   };
 
   private formatAmount = (amount: number, currency?: any): string => `${ currencySymbol(
-    currency) } ${ new Intl.NumberFormat(this.translate.getCurrentLang(), {
+    currency) } ${ new Intl.NumberFormat(this.language, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount) }`;
@@ -579,7 +577,7 @@ export class DashboardEventComponent {
   };
 
   private translation = (key: string, fallback: string): string => {
-    const value = this.translate.instant(key);
+    const value = this.translateService.instant(key);
 
     return value && value !== key ? this.stripHtml(value) : fallback;
   };
@@ -595,7 +593,7 @@ export class DashboardEventComponent {
 
   private roomTranslation(key: string, fallback: string): string {
     const translationKey = `DASHBOARD.ROOM.${ key }`;
-    const value = this.translate.instant(translationKey);
+    const value = this.translateService.instant(translationKey);
 
     return value && value !== translationKey ? value : fallback;
   }
@@ -657,7 +655,7 @@ export class DashboardEventComponent {
     const reservationId = `${ event.id! }`;
     switch (type) {
       case 'VIEW':
-        this.router.navigate([this.language, 'reservation', reservationId]);
+        this.navigationService.navigate(['reservation', reservationId]);
         break;
       case 'APPROVE':
         this.calendar.filterEvent(event);
@@ -675,11 +673,12 @@ export class DashboardEventComponent {
         setTimeout(() => this.calendar.addEvent(this.createTitle(event)), 1);
         break;
       case 'COMPLETE':
-        this.router.navigate([this.language, 'reservation', reservationId, 'rooms', this.dashboardSignal()?.roomId,
-          'customer', event.meta.customerId, 'complete'], { state: { isDashboard: true } });
+        this.navigationService.navigate(
+          ['reservation', reservationId, 'rooms', this.dashboardSignal()?.roomId,
+            'customer', event.meta.customerId, 'complete'], { state: { isDashboard: true } });
         break;
       case 'MORE_INFO':
-        this.router.navigate([this.language, 'reservation', reservationId, 'more-info']);
+        this.navigationService.navigate(['reservation', reservationId, 'more-info']);
     }
   };
 }

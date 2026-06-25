@@ -11,10 +11,12 @@ import { Price } from '../../../treatment/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { DiscountStore } from '../../../store/discount.store';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
   let fixture: ComponentFixture<ReservationListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -29,6 +31,9 @@ describe('ReservationListComponent', () => {
   let breakpoints$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     customerReservation$ = new BehaviorSubject<any>(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     error$ = new BehaviorSubject<any>(undefined);
@@ -70,6 +75,7 @@ describe('ReservationListComponent', () => {
       imports: [ReservationListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },
@@ -342,6 +348,5 @@ describe('ReservationListComponent', () => {
 
   it('should have correct language from TranslateService', () => {
     expect(component.language).toBe(DEFAULT_LOCALE);
-    expect(component.dateFormat).toBe(DEFAULT_LOCALE);
   });
 });

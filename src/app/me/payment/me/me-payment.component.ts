@@ -3,7 +3,7 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { getPayment, updatePaymentById } from '../../../store/actions/payment.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
@@ -24,6 +24,7 @@ import {
   MatCardSubtitle,
   MatCardTitle,
 } from '@angular/material/card';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-me-payment',
@@ -39,8 +40,8 @@ export class MePaymentComponent {
   id = input<string>();
 
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
   private readonly firebaseService = inject(FirebaseService);
 
   private payment$ = this.store.pipe(getSelectedPaymentPipe);
@@ -59,7 +60,7 @@ export class MePaymentComponent {
     () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
   );
 
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
     effect(() => {

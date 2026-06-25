@@ -11,7 +11,7 @@ import {
 } from '../dashboard';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { dateMonthYear, getDateQuarter, getNowTimeZone } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
@@ -32,6 +32,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { KeyValuePipe } from '@angular/common';
 import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type QuarterSummaryForm = {
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
@@ -50,9 +51,9 @@ type QuarterSummaryForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuarterSummaryComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dashboardStore = inject(DashboardStore);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -93,7 +94,7 @@ export class QuarterSummaryComponent {
   year = signal<number>(getNowTimeZone().getFullYear());
   quarterSummaryTotals = signal<ISummaryTotals>(new SummaryTotals());
 
-  readonly language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     this.dashboardStore.clean();
@@ -219,7 +220,7 @@ export class QuarterSummaryComponent {
   }
 
   goBack(): void {
-    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year() } });
+    this.navigationService.navigate(['dashboard', 'year', 'summary'], { state: { year: this.year() } });
     return;
   }
 
@@ -239,7 +240,7 @@ export class QuarterSummaryComponent {
       const quarter = this.selectedQuarterSignal() || getDateQuarter(getNowTimeZone());
       const year = this.year() || now.getFullYear();
       const workbook = createQuarterSummary(quarter, year, monthSummariesValue, this.quarterSummaryTotals(),
-        currencySymbol(this.currencySignal()), this.translate);
+        currencySymbol(this.currencySignal()), this.translateService);
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone();
