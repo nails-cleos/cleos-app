@@ -1,5 +1,6 @@
 import {
-  allElementsHaveSameKeyFilterValue, areEquals,
+  allElementsHaveSameKeyFilterValue,
+  areEquals,
   createDialog,
   createRoomOffice,
   createTreatmentGroupService,
@@ -8,7 +9,8 @@ import {
   getLocale,
   getPrice,
   getUserImage,
-  hasRoomAdmin, isProfessional,
+  hasRoomAdmin,
+  isProfessional,
   newAdditional,
   newDiscount,
   newExtra,
@@ -49,12 +51,11 @@ describe('Helper Utils', () => {
     theme: 'light-theme',
     showCash: true,
     referralMax: 10,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAA',
   };
   const user: IUser = {
     id: 'user-123',
     image: 'test',
-    imageUrl: 'test',
   };
 
   const room: IRoomAll = {
@@ -115,11 +116,11 @@ describe('Helper Utils', () => {
 
   describe('getUserImage', () => {
     it('should return imageUrl if available', () => {
-      expect(getUserImage(userAll)).toEqual(userAll.imageUrl);
+      expect(getUserImage(userAll)).toEqual(`data:image/jpeg;base64,${ userAll.image }`);
     });
 
     it('should return image if imageUrl is not available', () => {
-      expect(getUserImage(user)).toEqual(`data:image/jpeg;base64,${user.image}`);
+      expect(getUserImage(user)).toEqual(`data:image/jpeg;base64,${ user.image }`);
     });
 
     it('should return undefined when user doesnt exist', () => {
@@ -798,7 +799,7 @@ describe('Helper Utils', () => {
     const makeTreatment = (id: string, groupId: string, name = 'Treatment'): ITreatmentAll => ({
       id,
       name,
-      group: { id: groupId, name: `Group ${groupId}` },
+      group: { id: groupId, name: `Group ${ groupId }` },
       type: ServiceType.treatment,
       currency: 'USD',
     } as ITreatmentAll);

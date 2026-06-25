@@ -11,6 +11,9 @@ import { getLocale } from './util/helper';
 import { AuthUserService } from './services/auth-user.service';
 import { SeoService } from './services/seo.service';
 import { I18NStore } from './store/i18n.store';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DEFAULT_LOCALE } from './util/dates';
+import { NavigationService } from './services/navigation.service';
 
 @Component({
   selector: 'app-root',
@@ -28,16 +31,20 @@ export class AppComponent {
   private readonly authUserService = inject(AuthUserService);
   private readonly seoService = inject(SeoService);
   private readonly i18nStore = inject(I18NStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private readonly cssClass = signal<string | undefined>(undefined);
   private readonly authUserSignal = this.authUserService.authUser;
 
   private lastLanguage?: string;
 
+  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
+
   constructor() {
     effect(() => {
       const user = this.authUserSignal();
       if (!user || !user.isAuthenticated) {
+        this.resetConfig(this.language());
         return;
       }
 

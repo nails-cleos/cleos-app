@@ -150,7 +150,7 @@ describe('OverviewComponent', () => {
           authorities: [],
           locale: 'en',
           timeZone: 'Europe/Amsterdam',
-          imageUrl: 'http://example.com/image.jpg',
+          image: 'AAA',
         },
         id: 'accountId',
         balance: 0,
@@ -167,7 +167,7 @@ describe('OverviewComponent', () => {
     overviewSignal.set(mockOverview);
     fixture.detectChanges();
 
-    expect(component.image).toBe('http://example.com/image.jpg');
+    expect(component.image).toBe(`data:image/jpeg;base64,${ mockOverview.account.customer.image }`);
     expect(component.initials).toBe('UT');
     expect(component.upcoming).toEqual([1, 2, 3]);
     expect(component.miniCardData()).toEqual(jasmine.arrayContaining(miniCardOverview));

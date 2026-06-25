@@ -98,7 +98,7 @@ describe('NavComponent', () => {
     authorities: [{ authority: 'admin' }],
     theme: 'light-theme',
     displayName: 'Admin User',
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAA',
   };
 
   beforeEach(async () => {
@@ -302,7 +302,7 @@ describe('NavComponent', () => {
     expect(component.currentUserSignal()).toBe(mockUser);
     expect(component.incomplete).toBeTrue();
     expect(component.initials).toBe('AU');
-    expect(component.image).toBe(mockUser.imageUrl);
+    expect(component.image()).toBe(`data:image/jpeg;base64,${mockUser.image}`);
 
     expect(notificationStoreSpy.loadPage)
       .toHaveBeenCalledWith({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });

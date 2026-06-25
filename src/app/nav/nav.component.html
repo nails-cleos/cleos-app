@@ -20,7 +20,7 @@
               <app-avatar class="circle pointer-only"
                           mat-card-avatar
                           [routerLink]="['/', languageSignal(), 'auth', 'profile']"
-                          [src]="image"
+                          [src]="image()"
                           [initials]="initials">
               </app-avatar>
             }
@@ -175,7 +175,7 @@
                     type="button"
                     name="settings">
               <app-avatar class="header-avatar-circle"
-                          [src]="image"
+                          [src]="image()"
                           [initials]="initials">
               </app-avatar>
               @if (incomplete) {
@@ -186,7 +186,7 @@
               <div class="app-surface-header-menu__panel app-surface-header-menu__panel--settings">
                 <div class="settings-user-header">
                   <app-avatar class="header-avatar-circle settings-header-avatar"
-                              [src]="image"
+                              [src]="image()"
                               [initials]="initials">
                   </app-avatar>
                   <div class="settings-user-details">

@@ -39,18 +39,9 @@ export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefi
   return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
 };
 
-export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
-  let image;
-  if (user) {
-    if (user.imageUrl && user.imageUrl.indexOf('http') >= 0) {
-      image = user.imageUrl;
-    } else if (user.image) {
-      image = `data:image/jpeg;base64,${ user.image }`;
-    }
-  }
-
-  return image;
-};
+export const getUserImage = (
+  user?: IUser | IUserAll,
+): string | undefined => user?.image ? `data:image/jpeg;base64,${ user.image }` : undefined;
 
 interface ILocale {
   language: string;
@@ -69,6 +60,12 @@ class Locale implements ILocale {
     this.i18n = i18n;
   }
 }
+
+export const currentLanguageFromUrl = (url: string): string => {
+  const path = url.split('?')[0].split('#')[0];
+  const lang = path.split('/').filter(Boolean)[0];
+  return getLocale(lang).language;
+};
 
 export const getLocale = (userLang?: string | null): ILocale => {
   let language = DEFAULT_LOCALE;

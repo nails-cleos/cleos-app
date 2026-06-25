@@ -23,7 +23,7 @@ describe('UserService', () => {
     phone: '+1234567890',
     enabled: true,
     verified: true,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAAA',
     timeZone: 'Europa/Amsterdam',
   };
 

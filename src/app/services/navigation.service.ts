@@ -1,8 +1,9 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
-import { getLocale } from '../util/helper';
+import { currentLanguageFromUrl, getLocale } from '../util/helper';
 import { I18NStore } from '../store/i18n.store';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,6 +20,13 @@ export class NavigationService {
   private isTrackingHistory = false;
 
   readonly language$ = this.i18nStore.language;
+
+  readonly urlLanguage$ = this.router.events.pipe(
+    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+    startWith(undefined),
+    map(() => currentLanguageFromUrl(this.router.url)),
+    distinctUntilChanged(),
+  );
 
   constructor() {
     this.subscribe();

@@ -25,7 +25,7 @@ describe('SelectUserDialogComponent', () => {
     phone: '+1234567890',
     enabled: true,
     verified: true,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAA',
     timeZone: 'Europa/Amsterdam',
   };
 

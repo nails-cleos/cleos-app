@@ -141,7 +141,7 @@ export class NavComponent {
 
   readonly loading = this.loadingService.isLoading;
 
-  image?: string;
+  image = signal<string | undefined>(undefined);
   initials?: string;
   plusNotification?: string;
   incomplete = false;
@@ -239,7 +239,7 @@ export class NavComponent {
           this.tokenService.setUser = user;
           this.incomplete = !user.completed;
           this.initials = getDisplayNameInitials(user);
-          this.image = getUserImage(user);
+          this.image.set(getUserImage(user));
           this.messagingService.requestPermission(user);
           this.resetTheme(user.theme);
         }
