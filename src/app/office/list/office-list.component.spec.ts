@@ -17,6 +17,7 @@ describe('OfficeListComponent', () => {
   let component: OfficeListComponent;
   let fixture: ComponentFixture<OfficeListComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
@@ -77,11 +78,11 @@ describe('OfficeListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OfficeListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 

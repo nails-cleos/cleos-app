@@ -5,10 +5,14 @@ import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { DateAdapter } from '@angular/material/core';
+import { NavigationService } from "../services/navigation.service";
+import { DEFAULT_LOCALE } from "../util/dates";
 
 describe('OfficeDetailsPageComponent', () => {
   let component: OfficeDetailsPageComponent;
   let fixture: ComponentFixture<OfficeDetailsPageComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let officeStoreSpy: {
     selected: ReturnType<typeof signal>;
@@ -26,6 +30,9 @@ describe('OfficeDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     officeStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
@@ -37,6 +44,7 @@ describe('OfficeDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OfficeDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
       ],
     }).overrideTemplate(OfficeComponent, '')

@@ -6,10 +6,14 @@ import { AdditionalStore } from '../store/additional.store';
 import { IAdditionalAll } from './additional';
 import { AdditionalComponent } from './additional.component';
 import { TreatmentStore } from '../store/treatment.store';
+import { DateAdapter } from '@angular/material/core';
+import { NavigationService } from "../services/navigation.service";
+import { DEFAULT_LOCALE } from "../util/dates";
 
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;
   let fixture: ComponentFixture<AdditionalDetailsPageComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let additionalStoreSpy: {
     selected: ReturnType<typeof signal>;
@@ -34,6 +38,9 @@ describe('AdditionalDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     additionalStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
@@ -49,8 +56,10 @@ describe('AdditionalDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AdditionalDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
       ],
     }).overrideTemplate(AdditionalComponent, '<input #groupInput />')
       .overrideTemplate(AdditionalDetailsPageComponent, `

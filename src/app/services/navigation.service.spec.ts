@@ -1,13 +1,18 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
 import { UserStore } from '../store/user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
-import { signal } from '@angular/core';
+import { ElementRef, signal } from '@angular/core';
 import { I18NStore } from '../store/i18n.store';
+import { SeoService } from './seo.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { ThemeService } from 'ng2-charts';
+import { CookieService } from 'ngx-cookie-service';
+import { DateAdapter } from '@angular/material/core';
 
 describe('NavigationService', () => {
   let service: NavigationService;
@@ -16,6 +21,10 @@ describe('NavigationService', () => {
     setLanguage: jasmine.Spy;
   };
   let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
+  let seoSpy: jasmine.SpyObj<SeoService>;
+  let overlayContainerSpy: jasmine.SpyObj<OverlayContainer>;
+  let themeServiceSpy: jasmine.SpyObj<ThemeService>;
+  let cookieServiceSpy: jasmine.SpyObj<CookieService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let routerEventsSubject: Subject<any>;
 
@@ -31,9 +40,19 @@ describe('NavigationService', () => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
+      parseUrl: jasmine.createSpy('parseUrl').and.callFake((url: string) => {
+        const hashIndex = url.indexOf('#');
+        return { fragment: hashIndex >= 0 ? decodeURIComponent(url.substring(hashIndex + 1)) : null };
+      }),
     });
+    overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
+    themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
+    seoSpy = jasmine.createSpyObj('SeoService', ['setMetaDescription', 'setMetaTitle']);
+    cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
 
-    // Mock router methods to return promises
+    cookieServiceSpy.get.and.returnValue('light-theme');
+    overlayContainerSpy.getContainerElement.and.returnValue(document.createElement('div'));
+
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
 
@@ -43,9 +62,22 @@ describe('NavigationService', () => {
         NavigationService,
         { provide: I18NStore, useValue: i18nStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: SeoService, useValue: seoSpy },
+        { provide: OverlayContainer, useValue: overlayContainerSpy },
+        { provide: CookieService, useValue: cookieServiceSpy },
+        { provide: ThemeService, useValue: themeServiceSpy },
+        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
         { provide: Router, useValue: routerSpy },
+        {
+          provide: ElementRef,
+          useValue: new ElementRef(document.createElement('div')),
+        },
       ],
     });
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, { META: { CONTENT: 'desc', TITLE: 'title' } });
 
     service = TestBed.inject(NavigationService);
   });
@@ -64,6 +96,14 @@ describe('NavigationService', () => {
 
   it('should be created', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should call seoService and reset theme when authUser emits', () => {
+    service.resetConfig('es');
+
+    expect(seoSpy.setMetaDescription).toHaveBeenCalledWith('desc');
+    expect(seoSpy.setMetaTitle).toHaveBeenCalledWith('title');
+    expect(i18nStoreSpy.setLanguage).toHaveBeenCalledWith('es');
   });
 
   describe('constructor', () => {
@@ -261,6 +301,100 @@ describe('NavigationService', () => {
       service.back();
       expect((service as any).history).toEqual(['/page1']);
       expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/page1']);
+    });
+  });
+
+  describe('navigate', () => {
+    it('should navigate using language-prefixed path and call callback when provided', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      const path = ['home', 'profile'];
+      const extras = { queryParams: { tab: 'info' } } as any;
+
+      service.navigate(path, extras, callback);
+
+      tick();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        [`/${DEFAULT_LOCALE}/home/profile`],
+        extras,
+      );
+
+      expect(callback).toHaveBeenCalled();
+    }));
+
+    it('should navigate to current url when path is undefined', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+
+      setRouterUrl('/current/page');
+
+      service.navigate(undefined, undefined, callback);
+
+      tick();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/current/page']);
+      expect(callback).toHaveBeenCalled();
+    }));
+
+    it('should not throw if callback is not provided', fakeAsync(() => {
+      expect(() => {
+        service.navigate(['test']);
+        tick();
+      }).not.toThrow();
+
+      expect(routerSpy.navigate).toHaveBeenCalled();
+    }));
+  });
+
+  describe('scrollToAnchor', () => {
+    let hostElement: jasmine.SpyObj<HTMLElement>;
+    let element: HTMLElement;
+    let scrollSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      hostElement = jasmine.createSpyObj('HTMLElement', ['querySelector']);
+
+      element = document.createElement('div');
+      element.id = 'section1';
+
+      scrollSpy = spyOn(element, 'scrollIntoView');
+
+      hostElement.querySelector.and.returnValue(element as any);
+    });
+
+    it('should scroll to trimmed id when provided', () => {
+      service.scrollToAnchor(hostElement, '  section1  ');
+
+      expect(scrollSpy).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+    });
+
+    it('should use router fragment when id is not provided', () => {
+      setRouterUrl('/page#section1');
+
+      service.scrollToAnchor(hostElement);
+
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
+    it('should do nothing when no anchor is found', () => {
+      hostElement.querySelector.and.returnValue(null);
+
+      service.scrollToAnchor(hostElement, 'missing');
+
+      expect(hostElement.querySelector).toHaveBeenCalledWith('#missing');
+      expect(scrollSpy).not.toHaveBeenCalled();
+    });
+
+    it('should return early when no id and no fragment exist', () => {
+      setRouterUrl('/page');
+
+      service.scrollToAnchor(hostElement);
+
+      expect(hostElement.querySelector).not.toHaveBeenCalled();
+      expect(scrollSpy).not.toHaveBeenCalled();
     });
   });
 });

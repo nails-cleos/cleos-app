@@ -116,7 +116,7 @@ describe('MainComponent', () => {
 
     component.scrollToElement(element);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home'], undefined, jasmine.any(Function));
   }));
 
   it('should initialize language on construction', () => {

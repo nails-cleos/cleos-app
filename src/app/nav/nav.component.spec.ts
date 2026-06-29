@@ -20,15 +20,17 @@ import { ToastService } from '../services/toast.service';
 import { UserStore } from '../store/user.store';
 import { NotificationStore } from '../store/notification.store';
 import { AuthStore } from '../store/auth.store';
+import { DateAdapter } from '@angular/material/core';
 
 describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
   let navigationServiceSpy: {
-    navigate: jasmine.Spy;
     language: string;
-    attachLang: string;
+    urlLanguage$: BehaviorSubject<any>;
     language$: ReturnType<typeof signal>;
+    navigate: jasmine.Spy;
+    resetConfig: jasmine.Spy;
   };
 
   let response$: BehaviorSubject<any>;
@@ -104,9 +106,10 @@ describe('NavComponent', () => {
   beforeEach(async () => {
     navigationServiceSpy = {
       language: DEFAULT_LOCALE,
-      attachLang: DEFAULT_LOCALE,
+      urlLanguage$: new BehaviorSubject(DEFAULT_LOCALE),
       language$: signal(DEFAULT_LOCALE),
       navigate: jasmine.createSpy('navigate'),
+      resetConfig: jasmine.createSpy('resetConfig'),
     };
     response$ = new BehaviorSubject(undefined);
     error$ = new BehaviorSubject(undefined);
@@ -185,6 +188,7 @@ describe('NavComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: NotificationStore, useValue: notificationStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
       ],
     }).compileComponents();
 
@@ -217,6 +221,7 @@ describe('NavComponent', () => {
   });
 
   it('should update user when change theme is called', () => {
+    authStoreSpy.isAuthenticated.set(true);
     cookieServiceSpy.get.and.returnValue('light-theme');
 
     const user: IUser = new User();
@@ -302,7 +307,7 @@ describe('NavComponent', () => {
     expect(component.currentUserSignal()).toBe(mockUser);
     expect(component.incomplete).toBeTrue();
     expect(component.initials).toBe('AU');
-    expect(component.image()).toBe(`data:image/jpeg;base64,${mockUser.image}`);
+    expect(component.image()).toBe(`data:image/jpeg;base64,${ mockUser.image }`);
 
     expect(notificationStoreSpy.loadPage)
       .toHaveBeenCalledWith({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });

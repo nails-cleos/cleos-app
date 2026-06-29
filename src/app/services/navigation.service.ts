@@ -1,9 +1,17 @@
-import { DestroyRef, inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
 import { currentLanguageFromUrl, getLocale } from '../util/helper';
 import { I18NStore } from '../store/i18n.store';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
+import { resetTheme, Theme } from '../util/theme';
+import { TranslateService } from '@ngx-translate/core';
+import { SeoService } from './seo.service';
+import { DateAdapter } from '@angular/material/core';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { CookieService } from 'ngx-cookie-service';
+import { ThemeService } from 'ng2-charts';
+import { goTo } from '../util/animation';
 
 @Injectable({
   providedIn: 'root',
@@ -12,12 +20,20 @@ export class NavigationService {
   private static readonly HISTORY_STORAGE_KEY = 'cleos-navigation-history';
   private static readonly HISTORY_LIMIT = 40;
 
-  private i18nStore = inject(I18NStore);
-  private router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly seoService = inject(SeoService);
+  private readonly cookieService = inject(CookieService);
+  private readonly themeService = inject(ThemeService);
+  private readonly i18nStore = inject(I18NStore);
+  private readonly router: Router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly dateAdapter = inject(DateAdapter<Date>);
+  private readonly overlayContainer = inject(OverlayContainer);
 
   private history: string[] = this.readHistory();
   private isTrackingHistory = false;
+
+  private readonly cssClass = signal<string | undefined>(undefined);
 
   readonly language$ = this.i18nStore.language;
 
@@ -61,18 +77,66 @@ export class NavigationService {
 
     const previous = this.history[this.history.length - 1];
     const target = previous || this.resolveFallbackUrl(current);
-    this.router.navigateByUrl(target, { state: { date, step } });
+    void this.router.navigateByUrl(target, { state: { date, step } });
   }
 
-  navigate(path?: (string | number | undefined)[], extras?: NavigationExtras) {
+  navigate(path?: (string | number | undefined)[], extras?: NavigationExtras, callback?: () => void) {
+    let navigation: Promise<boolean>;
     if (path) {
-      return this.router.navigate([`/${ this.language$() }/${ path.join('/') }`], extras);
+      navigation = this.router.navigate([`/${ this.language$() }/${ path.join('/') }`], extras);
+    } else {
+      navigation = this.router.navigate([this.router.url]);
     }
-    return this.router.navigate([this.router.url]);
+    if (callback) {
+      navigation.then(() => callback());
+    }
   }
 
   get language(): string {
     return this.language$();
+  }
+
+  resetConfig = (locale: string, theme?: Theme): void => {
+    const currentLocale = getLocale(locale);
+
+    if (this.language !== currentLocale.language) {
+      this.i18nStore.setLanguage(currentLocale.language);
+
+      const meta = this.translateService.instant('META');
+
+      this.seoService.setMetaDescription(meta.CONTENT);
+      this.seoService.setMetaTitle(meta.TITLE);
+
+      this.dateAdapter.setLocale(currentLocale.language);
+    }
+
+    this.cssClass.set(resetTheme(
+      this.overlayContainer,
+      this.cookieService,
+      this.themeService,
+      theme,
+      this.cssClass(),
+    ));
+  };
+
+  scrollToAnchor(hostElement: HTMLElement, id?: string) {
+    let anchorId;
+    if (id) {
+      anchorId = id.trim();
+    } else {
+      const fragment = this.router.parseUrl(this.router.url).fragment;
+      if (fragment) {
+        anchorId = fragment;
+      }
+    }
+    if (!anchorId) {
+      return;
+    }
+
+    const target = hostElement.querySelector<HTMLElement>(`#${ anchorId }`);
+    if (target) {
+      goTo(target);
+    }
   }
 
   private syncCurrentUrl(reloadHistory: boolean = true): void {
@@ -145,6 +209,6 @@ export class NavigationService {
   }
 
   reload(url: string[] = this.router.url.split('/'), data?: any, queryParams?: any): void {
-    this.router.navigate(url.filter(Boolean), { state: data, queryParams });
+    void this.router.navigate(url.filter(Boolean), { state: data, queryParams });
   }
 }

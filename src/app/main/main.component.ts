@@ -137,7 +137,7 @@ export class MainComponent {
   }
 
   scrollToElement = (element: HTMLElement | string): void => {
-    this.navigationService.navigate(['']).then(() => setTimeout(() => {
+    this.navigationService.navigate(['home'], undefined, () => setTimeout(() => {
       this.navigationAnimation();
       goTo(element);
     }, 100));

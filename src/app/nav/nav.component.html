@@ -135,7 +135,7 @@
                               @if (!not.read) {
                                 <span class="app-surface-notification-card__dot"></span>
                               }
-                              <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:language }}</span>
+                              <span class="app-surface-item__label">{{ not.notDate | date:'short':undefined:languageSignal() }}</span>
                             </div>
                             <div [matTooltip]="not.message" class="app-surface-notification-card__message">
                               {{ not.message }}

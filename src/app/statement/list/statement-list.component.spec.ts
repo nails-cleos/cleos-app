@@ -9,10 +9,14 @@ import { DriveAccessService } from '../../services/drive-access.service';
 import { StatementStore } from '../../store/statement.store';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
+import { DateAdapter } from '@angular/material/core';
+import { NavigationService } from "../../services/navigation.service";
+import { DEFAULT_LOCALE } from "../../util/dates";
 
 describe('StatementListComponent', () => {
   let component: StatementListComponent;
   let fixture: ComponentFixture<StatementListComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -42,6 +46,9 @@ describe('StatementListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -72,6 +79,7 @@ describe('StatementListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [StatementListComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: StatementStore, useValue: statementStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

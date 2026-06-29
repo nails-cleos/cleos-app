@@ -1,6 +1,6 @@
 import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ActivatedRoute, NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { IUser, User } from '../user/user';
 import { INotification } from '../notification/notification';
@@ -15,7 +15,7 @@ import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/them
 import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
-import { newDateTimestamp } from '../util/dates';
+import { DEFAULT_LOCALE, newDateTimestamp } from '../util/dates';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { ToastService } from '../services/toast.service';
@@ -71,7 +71,6 @@ export class NavComponent {
   private readonly themeService: ThemeService = inject(ThemeService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly seoService: SeoService = inject(SeoService);
-  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingOverlayService);
   private readonly feedbackSources = inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
   private readonly userStore = inject(UserStore);
@@ -120,13 +119,12 @@ export class NavComponent {
   isManager = computed(() => this.authUserSignal()?.isManager ?? false);
   menuItems = computed(() => this.menuItemsSignal() || []);
 
-  language: string = this.navigationService.language;
+  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
 
   readonly languageSignal = computed(() => {
     const user = this.currentUserSignal();
 
-    return getLocale(
-      user?.locale || this.route.snapshot.paramMap.get('lang') || this.navigationService.language$()).language;
+    return getLocale(user?.locale || this.language()).language;
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
@@ -277,6 +275,8 @@ export class NavComponent {
       const language = this.languageSignal();
       if (isAuthorized) {
         this.notificationStore.loadPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
+      } else {
+        this.navigationService.resetConfig(language);
       }
       if (this.router.url === `/${ language }`) {
         if (isAuthorized && !redirectSignal) {
@@ -370,12 +370,14 @@ export class NavComponent {
     const theme = getThemeName(this.isDarkMode());
     this.resetTheme(theme);
     this.authUserService.updateMode(this.isDarkMode());
-    const user: IUser = new User();
-    user.theme = theme;
-    const redirectUrl = this.router.url;
-    const message = this.translateService.instant(
-      `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
-    this.userStore.updateMyUser(user, redirectUrl, message);
+    if (this.isAuthorized()) {
+      const user: IUser = new User();
+      user.theme = theme;
+      const redirectUrl = this.router.url;
+      const message = this.translateService.instant(
+        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
+      this.userStore.updateMyUser(user, redirectUrl, message);
+    }
   }
 
   notification = (notification: INotification): void => {
@@ -425,6 +427,7 @@ export class NavComponent {
 
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
+      // TODO if we change the href link we need to remove the language here.
       return { actionType: 'link', action: `/${ this.languageSignal() }/${ res.path }` };
     }
     return { actionType: 'none' };

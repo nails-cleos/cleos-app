@@ -1,23 +1,23 @@
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { BehaviorSubject } from 'rxjs';
 import { EnvService } from '../../services/env.service';
 import { PrivacyComponent } from './privacy.component';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('PrivacyComponent', () => {
   let component: PrivacyComponent;
   let fixture: ComponentFixture<PrivacyComponent>;
-  let httpMock: HttpTestingController;
-  let routerEvents: Subject<unknown>;
-  let routerMock: {
-    events: Subject<unknown>;
-    url: string;
+  let navigationServiceSpy: {
+    urlLanguage$: BehaviorSubject<any>;
     navigate: jasmine.Spy;
-    parseUrl: jasmine.Spy;
+    scrollToAnchor: jasmine.Spy;
   };
+
+  let urlLanguage$: BehaviorSubject<string>;
+  let httpMock: HttpTestingController;
 
   const envMock: Pick<EnvService, 'appServer' | 'title' | 'appDomain'> = {
     appServer: 'https://www.nailscleos.test',
@@ -42,25 +42,22 @@ describe('PrivacyComponent', () => {
     fixture.nativeElement.querySelector('.section-style') as HTMLElement;
 
   beforeEach(async () => {
-    routerEvents = new Subject<unknown>();
-
-    routerMock = {
-      events: routerEvents,
-      url: `/${DEFAULT_LOCALE}/home/privacy`,
-      navigate: jasmine.createSpy('navigate').and.resolveTo(true),
-      parseUrl: jasmine.createSpy('parseUrl').and.callFake((url: string) => {
-        const hashIndex = url.indexOf('#');
-        return { fragment: hashIndex >= 0 ? decodeURIComponent(url.substring(hashIndex + 1)) : null };
-      }),
+    urlLanguage$ = new BehaviorSubject(DEFAULT_LOCALE);
+    navigationServiceSpy = {
+      urlLanguage$: urlLanguage$,
+      navigate: jasmine.createSpy('navigate'),
+      scrollToAnchor: jasmine.createSpy('scrollToAnchor'),
     };
+
+    navigationServiceSpy.navigate.and.returnValue(Promise.resolve(true));
 
     await TestBed.configureTestingModule({
       imports: [PrivacyComponent],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: EnvService, useValue: envMock },
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: Router, useValue: routerMock },
-        { provide: EnvService, useValue: envMock },
       ],
     }).compileComponents();
 
@@ -75,7 +72,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       '<div class="layout"><main class="content"><section id="intro">Content</section></main></div>',
     );
 
@@ -86,7 +83,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
       <div class="layout">
         <main class="content">
@@ -104,7 +101,7 @@ describe('PrivacyComponent', () => {
   }));
 
   it('should load spanish legal file for /es route and not fallback when present', fakeAsync(() => {
-    routerMock.url = '/es/home/privacy';
+    urlLanguage$.next('es');
     createComponent();
 
     flushPrivacyFile(
@@ -113,11 +110,11 @@ describe('PrivacyComponent', () => {
     );
 
     expect(privacyContainer().innerHTML).toContain('Contenido es');
-    httpMock.expectNone(`assets/legal/privacy.${DEFAULT_LOCALE}.html`);
+    httpMock.expectNone(`assets/legal/privacy.${ DEFAULT_LOCALE }.html`);
   }));
 
   it('should fallback to english legal file when locale file is missing', fakeAsync(() => {
-    routerMock.url = '/es/home/privacy';
+    urlLanguage$.next('es');
     createComponent();
 
     httpMock.expectOne('assets/legal/privacy.es.html').flush('', {
@@ -125,7 +122,7 @@ describe('PrivacyComponent', () => {
       statusText: 'Not Found',
     });
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       '<div class="layout"><main class="content"><section id="intro">Fallback {{LANGUAGE}}</section></main></div>',
     );
 
@@ -133,11 +130,10 @@ describe('PrivacyComponent', () => {
   }));
 
   it('should route to same privacy page fragment when clicking in-page anchor', fakeAsync(() => {
-    const scrollSpy = spyOn(Element.prototype as unknown as { scrollIntoView: () => void }, 'scrollIntoView');
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="go-rights" href="#rights">Rights</a></nav></aside>
@@ -146,25 +142,32 @@ describe('PrivacyComponent', () => {
       `,
     );
 
-    routerMock.navigate.calls.reset();
+    navigationServiceSpy.navigate.calls.reset();
+    navigationServiceSpy.scrollToAnchor.calls.reset();
     (fixture.nativeElement.querySelector('#go-rights') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
     }));
     tick();
 
-    expect(routerMock.navigate).toHaveBeenCalledWith(
-      ['/', DEFAULT_LOCALE, 'home', 'privacy'],
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['home', 'privacy'],
       { fragment: 'rights', replaceUrl: true },
+      jasmine.any(Function),
     );
-    expect(scrollSpy).toHaveBeenCalled();
+    const callback =
+      navigationServiceSpy.navigate.calls.mostRecent().args[2] as () => void;
+
+    callback();
+
+    expect(navigationServiceSpy.scrollToAnchor).toHaveBeenCalledOnceWith(jasmine.any(HTMLElement), 'rights');
   }));
 
   it('should ignore unsafe javascript links in dynamic html', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="unsafe-link" href="javascript:void(0)">Unsafe</a></nav></aside>
@@ -173,37 +176,21 @@ describe('PrivacyComponent', () => {
       `,
     );
 
-    routerMock.navigate.calls.reset();
+    navigationServiceSpy.navigate.calls.reset();
     (fixture.nativeElement.querySelector('#unsafe-link') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
     }));
     tick();
 
-    expect(routerMock.navigate).not.toHaveBeenCalled();
-  }));
-
-  it('should scroll to URL fragment after dynamic html render', fakeAsync(() => {
-    routerMock.url = `/${DEFAULT_LOCALE}/home/privacy#rights`;
-    const scrollSpy = spyOn(Element.prototype as unknown as { scrollIntoView: () => void }, 'scrollIntoView');
-    createComponent();
-
-    flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
-      '<div class="layout"><main class="content"><section id="rights">Rights section</section></main></div>',
-    );
-
-    tick(1);
-
-    expect(scrollSpy).toHaveBeenCalled();
-    expect(routerMock.parseUrl).toHaveBeenCalledWith(`/${DEFAULT_LOCALE}/home/privacy#rights`);
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   }));
 
   it('should decode URL-encoded anchor ids before navigating', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
       <div class="layout">
         <aside class="sidebar">
@@ -214,16 +201,18 @@ describe('PrivacyComponent', () => {
       `,
     );
 
-    routerMock.navigate.calls.reset();
-    (fixture.nativeElement.querySelector('#encoded-anchor') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-    }));
+    navigationServiceSpy.navigate.calls.reset();
+    (fixture.nativeElement.querySelector('#encoded-anchor') as HTMLAnchorElement).dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }));
     tick();
 
-    expect(routerMock.navigate).toHaveBeenCalledWith(
-      ['/', DEFAULT_LOCALE, 'home', 'privacy'],
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['home', 'privacy'],
       { fragment: 'your rights', replaceUrl: true },
+      jasmine.any(Function),
     );
   }));
 
@@ -231,7 +220,7 @@ describe('PrivacyComponent', () => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="empty-anchor" href="#">Empty</a></nav></aside>
@@ -240,21 +229,21 @@ describe('PrivacyComponent', () => {
       `,
     );
 
-    routerMock.navigate.calls.reset();
+    navigationServiceSpy.navigate.calls.reset();
     (fixture.nativeElement.querySelector('#empty-anchor') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
     }));
     tick();
 
-    expect(routerMock.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   }));
 
   it('should ignore mailto links in dynamic html', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -265,7 +254,7 @@ describe('PrivacyComponent', () => {
     `,
     );
 
-    routerMock.navigate.calls.reset();
+    navigationServiceSpy.navigate.calls.reset();
 
     const link = fixture.nativeElement.querySelector('#mailto-link') as HTMLAnchorElement;
 
@@ -276,14 +265,14 @@ describe('PrivacyComponent', () => {
 
     tick();
 
-    expect(routerMock.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   }));
 
   it('should ignore external http links', fakeAsync(() => {
     createComponent();
 
     flushPrivacyFile(
-      `assets/legal/privacy.${DEFAULT_LOCALE}.html`,
+      `assets/legal/privacy.${ DEFAULT_LOCALE }.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -294,7 +283,7 @@ describe('PrivacyComponent', () => {
     `,
     );
 
-    routerMock.navigate.calls.reset();
+    navigationServiceSpy.navigate.calls.reset();
 
     const link = fixture.nativeElement.querySelector('#external-link') as HTMLAnchorElement;
 
@@ -305,6 +294,6 @@ describe('PrivacyComponent', () => {
 
     tick();
 
-    expect(routerMock.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   }));
 });

@@ -5,10 +5,14 @@ import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { DateAdapter } from '@angular/material/core';
+import { NavigationService } from "../services/navigation.service";
+import { DEFAULT_LOCALE } from "../util/dates";
 
 describe('DiscountDetailsPageComponent', () => {
   let component: DiscountDetailsPageComponent;
   let fixture: ComponentFixture<DiscountDetailsPageComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let discountStoreSpy: {
     selected: ReturnType<typeof signal>;
@@ -27,6 +31,9 @@ describe('DiscountDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     discountStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
@@ -38,6 +45,7 @@ describe('DiscountDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DiscountDetailsPageComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
       ],
     }).overrideTemplate(DiscountComponent, '')

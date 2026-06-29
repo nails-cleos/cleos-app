@@ -14,14 +14,13 @@ export class AuthRedirectEffect {
   constructor() {
     effect(() => {
       const trigger = this.authStore.authReadyTrigger();
-
-      if (!trigger) {return;}
-
       const user = this.authStore.user();
       const isAuth = this.authStore.isAuthenticated();
       const queryParams = this.authStore.queryParams();
 
-      if (!isAuth || !user) {return;}
+      if (!trigger || !isAuth || !user) {
+        return;
+      }
 
       const lang = getLocale(this.navigationService.language).language;
 
