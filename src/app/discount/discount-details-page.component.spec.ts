@@ -5,9 +5,8 @@ import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { DateAdapter } from '@angular/material/core';
-import { NavigationService } from "../services/navigation.service";
-import { DEFAULT_LOCALE } from "../util/dates";
+import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('DiscountDetailsPageComponent', () => {
   let component: DiscountDetailsPageComponent;

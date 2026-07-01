@@ -9,9 +9,8 @@ import { DriveAccessService } from '../../services/drive-access.service';
 import { StatementStore } from '../../store/statement.store';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
-import { DateAdapter } from '@angular/material/core';
-import { NavigationService } from "../../services/navigation.service";
-import { DEFAULT_LOCALE } from "../../util/dates";
+import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('StatementListComponent', () => {
   let component: StatementListComponent;

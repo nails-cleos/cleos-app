@@ -6,7 +6,6 @@ import { EnvService } from '../../services/env.service';
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { NavigationService } from '../../services/navigation.service';
-import { By } from "@angular/platform-browser";
 
 describe('TermsAndConditionsComponent', () => {
   let component: TermsAndConditionsComponent;

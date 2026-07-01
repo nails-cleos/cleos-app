@@ -7,8 +7,8 @@ import { IAdditionalAll } from './additional';
 import { AdditionalComponent } from './additional.component';
 import { TreatmentStore } from '../store/treatment.store';
 import { DateAdapter } from '@angular/material/core';
-import { NavigationService } from "../services/navigation.service";
-import { DEFAULT_LOCALE } from "../util/dates";
+import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;

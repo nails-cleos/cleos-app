@@ -5,9 +5,8 @@ import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { DateAdapter } from '@angular/material/core';
-import { NavigationService } from "../services/navigation.service";
-import { DEFAULT_LOCALE } from "../util/dates";
+import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('OfficeDetailsPageComponent', () => {
   let component: OfficeDetailsPageComponent;
