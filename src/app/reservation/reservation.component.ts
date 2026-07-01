@@ -22,13 +22,7 @@ import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../user/user';
 import { combineLatestWith, Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
-import {
-  getAllAdditionalByGroupId,
-  getAllRooms,
-  getAllTreatments,
-  getCustomerInformation,
-  searchAvailability,
-} from '../store/actions/reservation.actions';
+import { searchAvailability } from '../store/actions/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../treatment/treatment';
 import { IRoom, IRoomAll, IService } from '../room/room';
@@ -106,14 +100,9 @@ import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { PaymentOptionSelectComponent } from '../shared/payment-option-select/payment-option-select.component';
 import { ReservationState } from '../store/reducers/reservation.reducers';
 import {
-  getAdditionalListPipe,
   getCalendarPipe,
-  getCustomerInfoPipe,
-  getCustomersPipe,
   getNavigationParamsPipe,
-  getRoomsPipe,
   getSubErrorsPipe,
-  getTreatmentDiscountPipe,
   selectReservationIsLoading,
 } from '../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
@@ -151,6 +140,10 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
 import { CardListSkeletonComponent } from '../shared/skeleton/card-list-skeleton.component';
 import { NavigationService } from '../services/navigation.service';
+import { UserStore } from '../store/user.store';
+import { TreatmentStore } from '../store/treatment.store';
+import { RoomStore } from '../store/room.store';
+import { AdditionalStore } from '../store/additional.store';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -186,6 +179,7 @@ export class ReservationComponent {
   reservation = input<IUpcomingAll>();
   isEditing = input<boolean>(false);
   isAdmin = input<boolean>(false);
+  customers = input<IUserAll[]>();
 
   submitData = output<{ reservation: IReservation; role: Role }>();
 
@@ -194,6 +188,10 @@ export class ReservationComponent {
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly userStore = inject(UserStore);
+  private readonly roomStore = inject(RoomStore);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly additionalStore = inject(AdditionalStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -201,24 +199,26 @@ export class ReservationComponent {
   private readonly reservationCalendarService = inject(ReservationCalendarService);
 
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private customers$ = this.store.pipe(getCustomersPipe);
-  private customerInfo$ = this.store.pipe(getCustomerInfoPipe);
-  private rooms$ = this.store.pipe(getRoomsPipe);
-  private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly roomsSignal = toSignal(this.rooms$);
-  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private readonly customerInfoSignal = toSignal(this.customerInfo$);
+  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
+  private readonly customerInfoSignal = this.userStore.customerInfo;
   private readonly calendarSignal = toSignal(this.calendar$);
   private readonly subErrorsSignal = toSignal(this.subErrors$);
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly roomsSignal = computed(() => {
+    const data = this.roomStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
+  readonly additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -231,7 +231,6 @@ export class ReservationComponent {
     },
   );
 
-  additionalListSignal = toSignal(this.additionalList$);
   additionalSelected = signal<IAdditionalAll[]>([]);
   isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
 
@@ -304,12 +303,12 @@ export class ReservationComponent {
 
   errors = signal<ReservationErrors>(createReservationErrors());
 
-  customersSignal = toSignal(this.customers$);
+  customersSignal = this.userStore.customers;
   filteredCustomerSignal = toSignal(
     this.getCustomerForm.customer.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.displayName),
-      combineLatestWith(this.customers$),
+      combineLatestWith(toObservable(this.customersSignal)),
       map(([name, customers]) => {
         if (name) {
           return this.filterCustomer(name, customers);
@@ -584,7 +583,7 @@ export class ReservationComponent {
       const roomId = this.roomId();
       const customerId = this.customerId;
       if (skip) {
-        this.store.dispatch(getAllRooms({ customerId }));
+        this.roomStore.loadAll(customerId);
         this.getAdditionalList(roomId, this.groupId);
 
         if (this.customerForm.valid && this.officeForm.valid && this.treatmentForm.valid &&
@@ -610,7 +609,7 @@ export class ReservationComponent {
       this.customerInfo.set(undefined);
       this.cleanTreatment();
       if (!this.isEditing()) {
-        this.store.dispatch(getCustomerInformation({ id: customer.id }));
+        this.userStore.getCustomerInformation(customer.id);
       }
     });
 
@@ -1772,18 +1771,17 @@ export class ReservationComponent {
     });
   };
 
-  private getRoomList = (customerId?: string): void => this.store.dispatch(
-    getAllRooms({ customerId }));
+  private getRoomList = (customerId?: string): void => this.roomStore.loadAll(customerId);
 
   private getTreatmentList = (roomId?: string, customerId?: string): void => {
     if (roomId) {
-      this.store.dispatch(getAllTreatments({ roomId, customerId }));
+      this.treatmentStore.getAllTreatments(roomId, customerId);
     }
   };
 
   private getAdditionalList = (roomId?: string, groupId?: string): void => {
     if (roomId && groupId) {
-      this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId }));
+      this.additionalStore.loadAllByGroupId(roomId, groupId);
     }
   };
 }

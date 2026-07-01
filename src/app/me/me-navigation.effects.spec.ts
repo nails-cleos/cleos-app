@@ -10,7 +10,6 @@ import { OverviewComponent } from '../user/overview/overview.component';
 import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
 import {
   cleanReservation,
-  getAllRooms,
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/actions/reservation.actions';
@@ -121,7 +120,7 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(MeReservationCreatePageComponent));
 
     const result = await firstValueFrom(
-      effects.loadReservationCreatePage$.pipe(take(5), toArray()),
+      effects.loadReservationCreatePage$.pipe(take(4), toArray()),
     );
 
     expect(result).toEqual([
@@ -134,7 +133,6 @@ describe('MeNavigationEffects', () => {
         date,
         discountId: 'discount-1',
       }),
-      getAllRooms({}),
       getUpcomingReservation(),
     ]);
   });

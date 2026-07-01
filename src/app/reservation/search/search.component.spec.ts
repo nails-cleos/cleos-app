@@ -16,6 +16,7 @@ import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from "../../store/user.store";
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
@@ -24,6 +25,11 @@ describe('SearchComponent', () => {
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  let userStoreSpy: {
+    customers: ReturnType<typeof signal>;
+    loadCustomers: jasmine.Spy;
+  };
 
   const professional: IUserAll = {
     id: 'prof-123',
@@ -94,7 +100,6 @@ describe('SearchComponent', () => {
   };
 
   let reservationList$: BehaviorSubject<any>;
-  let customerList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
   let isLoading$: BehaviorSubject<boolean>;
@@ -103,8 +108,11 @@ describe('SearchComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    userStoreSpy = {
+      customers: signal<any>(undefined),
+      loadCustomers: jasmine.createSpy('loadCustomers'),
+    };
     reservationList$ = new BehaviorSubject(mockPagination);
-    customerList$ = new BehaviorSubject(undefined);
     response$ = new BehaviorSubject<any>(undefined);
     isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
@@ -131,8 +139,6 @@ describe('SearchComponent', () => {
         case 1:
           return reservationList$.asObservable();
         case 2:
-          return customerList$.asObservable();
-        case 3:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -146,6 +152,7 @@ describe('SearchComponent', () => {
       imports: [SearchComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -163,7 +170,6 @@ describe('SearchComponent', () => {
 
   afterEach(() => {
     reservationList$.complete();
-    customerList$.complete();
     response$.complete();
     isLoading$.complete();
     breakpoint$.complete();
@@ -274,7 +280,7 @@ describe('SearchComponent', () => {
   });
 
   it('should update allCustomersWritableSignal when store emits', async () => {
-    customerList$.next(mockCustomers);
+    userStoreSpy.customers.set(mockCustomers);
     fixture.detectChanges();
     await fixture.whenStable();
 

@@ -9,7 +9,6 @@ import { ReservationCreatePageComponent } from './reservation-create-page.compon
 import { ReservationEditPageComponent } from './reservation-edit-page.component';
 import { SearchComponent } from './search/search.component';
 import { provideEffects } from '@ngrx/effects';
-import { provideState } from '@ngrx/store';
 import { AdditionalService } from '../services/additional.service';
 import { ColorService } from '../services/color.service';
 import { CurrencyService } from '../services/currency.service';
@@ -23,8 +22,6 @@ import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { PaymentEffects } from '../store/effects/payment.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
-import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
-import { ReservationNavigationEffects } from './reservation-navigation.effects';
 
 const providers = [
   provideFeatureTranslations('reservation'),
@@ -38,18 +35,55 @@ const providers = [
   ColorService,
   DiscountService,
   CurrencyService,
-  provideState(RESERVATION_FEATURE_KEY, reservationReducer),
-  provideEffects(ReservationEffects, PaymentEffects, ReservationNavigationEffects),
+  provideEffects(ReservationEffects, PaymentEffects),
 ];
 
 const children: Routes = [
-  { path: 'search', component: SearchComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.professional] } },
-  { path: 'calendar', component: CalendarComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.professional] } },
-  { path: '', component: ReservationCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] } },
-  { path: ':id/edit', component: ReservationEditPageComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] } },
-  { path: ':id', component: ReservationDetailComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer] }, runGuardsAndResolvers: 'always' },
-  { path: ':id/rooms/:roomId/customer/:customerId/complete', component: ReservationCompleteComponent, canActivate: [authGuard], data: { roles: [Role.professional, Role.roomAdmin] }, runGuardsAndResolvers: 'always' },
-  { path: ':id/more-info', component: MoreInfoComponent, canActivate: [authGuard], data: { roles: [Role.professional, Role.manager, Role.roomAdmin] }, runGuardsAndResolvers: 'always' },
+  {
+    path: 'search',
+    component: SearchComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager, Role.professional] }
+  },
+  {
+    path: 'calendar',
+    component: CalendarComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager, Role.professional] }
+  },
+  {
+    path: '',
+    component: ReservationCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] }
+  },
+  {
+    path: ':id/edit',
+    component: ReservationEditPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] }
+  },
+  {
+    path: ':id',
+    component: ReservationDetailComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer] },
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: ':id/rooms/:roomId/customer/:customerId/complete',
+    component: ReservationCompleteComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.professional, Role.roomAdmin] },
+    runGuardsAndResolvers: 'always'
+  },
+  {
+    path: ':id/more-info',
+    component: MoreInfoComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.professional, Role.manager, Role.roomAdmin] },
+    runGuardsAndResolvers: 'always'
+  },
 ];
 
 export const RESERVATION_ROUTES: Routes = [{ path: '', providers, children }];

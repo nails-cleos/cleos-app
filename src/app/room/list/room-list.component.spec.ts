@@ -90,7 +90,7 @@ describe('RoomListComponent', () => {
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     roomStoreSpy = {
       isLoading: signal(false),
-      data: signal(mockPagination),
+      data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal(undefined),
       clean: jasmine.createSpy('clean'),
       loadPage: jasmine.createSpy('loadPage'),
@@ -135,7 +135,7 @@ describe('RoomListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    roomStoreSpy.data.set(mockPagination);
+    roomStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -143,7 +143,7 @@ describe('RoomListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    roomStoreSpy.data.set(mockPagination);
+    roomStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);

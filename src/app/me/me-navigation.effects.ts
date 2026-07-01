@@ -5,7 +5,6 @@ import { Action } from '@ngrx/store';
 import { OverviewComponent } from '../user/overview/overview.component';
 import {
   cleanReservation,
-  getAllRooms,
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/actions/reservation.actions';
@@ -120,7 +119,7 @@ export class MeNavigationEffects {
             );
           }
 
-          actions.push(getAllRooms({}), getUpcomingReservation());
+          actions.push( getUpcomingReservation());
           return actions;
         },
       }),

@@ -47,8 +47,6 @@ import {
   cleanReservation,
   createReservation,
   customerSearchReservation,
-  getAllAdditionalByGroupId,
-  getAllTreatments,
   getEditReservation,
   updateReservationById,
 } from '../../../store/actions/reservation.actions';
@@ -90,14 +88,11 @@ import { GoogleMapComponent } from '../../../shared/google-map/google-map.compon
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import {
-  getAdditionalListPipe,
   getAvailableListPipe,
   getCustomerReservationPipe,
   getMeNavigationParamsPipe,
-  getRoomsPipe,
   getSelectedReservationPipe,
   getSubErrorsPipe,
-  getTreatmentDiscountPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ToastService } from '../../../services/toast.service';
@@ -129,6 +124,8 @@ import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { NavigationService } from '../../../services/navigation.service';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { AdditionalStore } from '../../../store/additional.store';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -162,10 +159,13 @@ const ME_RESERVATION_ERROR_FIELDS = [
 })
 export class MeReservationComponent {
   id = input<string>();
+  rooms = input<IRoomAll[]>();
 
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly additionalStore = inject(AdditionalStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly navigationService: NavigationService = inject(NavigationService);
@@ -175,9 +175,6 @@ export class MeReservationComponent {
   private readonly formErrorService = inject(ReservationFormErrorService);
 
   private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
-  private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
-  private rooms$ = this.store.pipe(getRoomsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private availableList$ = this.store.pipe(getAvailableListPipe);
@@ -187,8 +184,7 @@ export class MeReservationComponent {
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private readonly roomsSignal = toSignal(this.rooms$);
+  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   private readonly customerReservationSignal = toSignal(this.customerReservation$);
   private readonly availableListSignal = toSignal(this.availableList$);
@@ -214,7 +210,10 @@ export class MeReservationComponent {
     () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
   );
 
-  additionalListSignal = toSignal(this.additionalList$);
+  readonly additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
 
   labels = computed(() => {
     this.langChangeSignal();
@@ -337,7 +336,7 @@ export class MeReservationComponent {
       })),
   );
 
-  offices = computed(() => Array.from(createRoomOffice(this.roomsSignal())?.values() || []));
+  offices = computed(() => Array.from(createRoomOffice(this.rooms())?.values() || []));
   filteredOfficeSignal = toSignal(
     this.getOfficeForm.office.valueChanges.pipe(
       startWith(''),
@@ -1203,7 +1202,7 @@ export class MeReservationComponent {
   };
 
   private getTreatmentList = (roomId: string): void => {
-    this.store.dispatch(getAllTreatments({ roomId }));
+    this.treatmentStore.getAllTreatments(roomId);
   };
 
   private shouldSyncAdditionalSelection = (current: IAdditionalAll[], next: IAdditionalAll[]): boolean => {
@@ -1229,7 +1228,7 @@ export class MeReservationComponent {
   private getAdditionalList = (): void => {
     const roomId = this.getOfficeForm.room.value!.id;
     const groupId = this.groupId || this.getTreatmentForm.group.value!.id;
-    this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId }));
+    this.additionalStore.loadAllByGroupId(roomId, groupId);
   };
 
   private canNotContinue = (message: string, type: string): void => {

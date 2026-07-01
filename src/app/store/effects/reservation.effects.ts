@@ -12,19 +12,12 @@ import {
   createReview,
   customerCancelReservation,
   customerSearchReservation,
-  customersSuccess,
-  customerSuccess,
   deleteReservation,
   executeTrackingByReservationId,
-  getAllAdditionalByGroupId,
   getAllFilterReservations,
   getAllGroupingByRoom,
-  getAllRooms,
-  getAllTreatments,
   getColorsByTreatmentId,
-  getCustomerInformation,
   getCustomerReservations,
-  getCustomers,
   getEditReservation,
   getPage,
   getReservation,
@@ -33,7 +26,6 @@ import {
   getTrackingByReservationId,
   getUpcomingReservation,
   paymentCompleteReservation,
-  reservationAdditionalSuccess,
   reservationAvailabilitySuccess,
   reservationFailure,
   reservationFilterPageSuccess,
@@ -43,11 +35,9 @@ import {
   reservationPageSuccess,
   reservationPaymentsSuccess,
   reservationReviewSuccess,
-  reservationRoomsSuccess,
   reservationSaveSuccess,
   reservationsCustomerSuccess,
   reservationSelected,
-  reservationTreatmentsSuccess,
   searchAvailability,
   startReservation,
   stateSuccess,
@@ -62,19 +52,14 @@ import {
 } from '../actions/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { ReservationService } from '../../services/reservation.service';
-import { UserService } from '../../services/user.service';
-import { TreatmentService } from '../../services/treatment.service';
-import { RoomService } from '../../services/room.service';
 import { TrackingService } from '../../services/tracking.service';
 import { PaymentService } from '../../services/payment.service';
-import { AdditionalService } from '../../services/additional.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Role } from '../../interfaces/token';
 import { ColorService } from '../../services/color.service';
 import { Pagination } from '../../interfaces/pagination';
 import {
   IAvailableDTO,
-  ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
   IReservationAll,
@@ -83,10 +68,6 @@ import {
   IUpcomingAll,
   States,
 } from '../../reservation/reservation';
-import { IUserAll } from '../../user/user';
-import { ITreatmentDiscountDTO } from '../../treatment/treatment';
-import { IRoomAll } from '../../room/room';
-import { IAdditionalAll } from '../../additional/additional';
 import { IPaymentAll } from '../../interfaces/payment';
 import { IApiResponse } from '../../interfaces/common';
 import { IReview } from '../../me/reservation/list/review';
@@ -102,10 +83,6 @@ export class ReservationEffects {
   private readonly actions: Actions = inject(Actions);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly reservationService: ReservationService = inject(ReservationService);
-  private readonly userService: UserService = inject(UserService);
-  private readonly treatmentService: TreatmentService = inject(TreatmentService);
-  private readonly roomService: RoomService = inject(RoomService);
-  private readonly additionalService: AdditionalService = inject(AdditionalService);
   private readonly trackingService: TrackingService = inject(TrackingService);
   private readonly paymentService: PaymentService = inject(PaymentService);
   private readonly colorService: ColorService = inject(ColorService);
@@ -167,46 +144,6 @@ export class ReservationEffects {
       (availability: IAvailableDTO[]) => reservationAvailabilitySuccess(
         availability ? { availability } : { availability: [] }),
       reservationFailure,
-    )),
-  ));
-
-  getAllCustomers$ = createEffect(() => this.actions.pipe(
-    ofType(getCustomers),
-    switchMap(() => this.request(
-      this.userService.getCustomers(),
-      (customers: IUserAll[]) => customersSuccess({ customers })),
-    ),
-  ));
-
-  getCustomerInfo$ = createEffect(() => this.actions.pipe(
-    ofType(getCustomerInformation),
-    switchMap(({ id }) => this.request(
-      this.userService.getCustomerInformation(id),
-      (customer: ICustomerLastReservation) => customerSuccess({ customer })),
-    ),
-  ));
-
-  getAllTreatments$ = createEffect(() => this.actions.pipe(
-    ofType(getAllTreatments),
-    switchMap(({ roomId, customerId }) => this.request(
-      this.treatmentService.getAllTreatments(roomId, customerId),
-      (treatmentDiscount: ITreatmentDiscountDTO) => reservationTreatmentsSuccess({ treatmentDiscount }),
-    )),
-  ));
-
-  getAllRooms$ = createEffect(() => this.actions.pipe(
-    ofType(getAllRooms),
-    switchMap(({ customerId }) => this.request(
-      this.roomService.getAllRooms(customerId),
-      (rooms: IRoomAll[]) => reservationRoomsSuccess({ rooms }),
-    )),
-  ));
-
-  getAllAdditional$ = createEffect(() => this.actions.pipe(
-    ofType(getAllAdditionalByGroupId),
-    switchMap(({ roomId, groupId }) => this.request(
-      this.additionalService.getAllAdditionalByGroupId(roomId, groupId),
-      (additional: IAdditionalAll[]) => reservationAdditionalSuccess({ additional }),
     )),
   ));
 

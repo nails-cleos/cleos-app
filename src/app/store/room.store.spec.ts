@@ -46,7 +46,7 @@ describe('RoomStore', () => {
   });
 
   it('should load page, room info, selected room, services, and customers', () => {
-    const page = { content: [{ id: 'room-1' }], totalElements: 1 } as any;
+    const value = { content: [{ id: 'room-1' }], totalElements: 1 } as any;
     const roomInfo = {
       professionals: [{ id: 'user-1' }],
       offices: [{ id: 'office-1' }],
@@ -61,7 +61,7 @@ describe('RoomStore', () => {
       selectedTreatments: [],
     } as any;
     const customers = [{ customerId: 'customer-1' }] as any;
-    roomServiceSpy.getRoomsPage.and.returnValue(of(page));
+    roomServiceSpy.getRoomsPage.and.returnValue(of(value));
     roomServiceSpy.getAllRoomsInfo.and.returnValue(of(roomInfo));
     roomServiceSpy.getRoom.and.returnValue(of(room));
     roomServiceSpy.getServices.and.returnValue(of(services));
@@ -73,7 +73,7 @@ describe('RoomStore', () => {
     store.loadServices('room-1');
     store.loadCustomers('room-1');
 
-    expect(store.data()).toBe(page);
+    expect(store.data()).toEqual({ kind: 'pagination', value });
     expect(store.professionals()).toEqual(roomInfo.professionals);
     expect(store.offices()).toEqual(roomInfo.offices);
     expect(store.currencies()).toEqual(roomInfo.currencies);

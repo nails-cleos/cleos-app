@@ -5,15 +5,12 @@ import { ReservationState } from '../store/reducers/reservation.reducers';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { getSelectedReservationPipe } from '../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getAllRooms,
-  getAllTreatments,
-  getReservation,
-  updateReservationById,
-} from '../store/actions/reservation.actions';
+import { getReservation, updateReservationById } from '../store/actions/reservation.actions';
 import { IReservation } from './reservation';
 import { Role } from '../interfaces/token';
 import { AuthUserService } from '../services/auth-user.service';
+import { TreatmentStore } from '../store/treatment.store';
+import { RoomStore } from '../store/room.store';
 
 @Component({
   selector: 'app-reservation-edit-page',
@@ -25,6 +22,8 @@ export class ReservationEditPageComponent {
   id = input.required<string>();
 
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly roomStore = inject(RoomStore);
   private readonly authUserService = inject(AuthUserService);
 
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
@@ -47,9 +46,9 @@ export class ReservationEditPageComponent {
 
       const customerId = reservation.customer.id;
       if (this.isAdmin()) {
-        this.store.dispatch(getAllRooms({ customerId }));
+        this.roomStore.loadAll(customerId);
       } else {
-        this.store.dispatch(getAllTreatments({ roomId: reservation.room.id, customerId }));
+        this.treatmentStore.getAllTreatments(reservation.room.id, customerId);
       }
     });
   }

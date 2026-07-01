@@ -8,5 +8,5 @@ import { MeReservationComponent } from './me-reservation.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationDetailsPageComponent {
-  id = input<string>();
+  id = input.required<string>();
 }

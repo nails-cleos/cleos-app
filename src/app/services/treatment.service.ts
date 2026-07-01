@@ -39,9 +39,6 @@ export class TreatmentService {
     return this.http.get<ITreatmentDiscountDTO>(this.urlV1, { params, ...skipLoadingOverlay() });
   };
 
-  getListTreatmentsGroup = (): Observable<ITreatmentGroup[]> => this.http.get<ITreatmentGroup[]>(
-    toUrl(this.urlV1, 'list'));
-
   getTreatmentGroup = (
     id: string,
   ): Observable<ITreatmentGroupAll | undefined> => this.http.get<ITreatmentGroupAll>(toUrl(this.urlV1, id),

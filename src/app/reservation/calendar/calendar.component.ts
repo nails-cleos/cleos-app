@@ -55,7 +55,7 @@ import { Role } from '../../interfaces/token';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { getCalendarPipe, getRoomsPipe } from '../../store/selectors/reservation.selectors';
+import { getCalendarPipe } from '../../store/selectors/reservation.selectors';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
@@ -64,6 +64,7 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, NgClass } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { NavigationService } from '../../services/navigation.service';
+import { RoomStore } from '../../store/room.store';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {
@@ -104,17 +105,20 @@ export class CalendarComponent {
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly roomStore = inject(RoomStore);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private rooms$ = this.store.pipe(getRoomsPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private breakpoints$ = this.breakpointObserver.observe(
     Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint),
   );
 
-  private roomsSignal = toSignal(this.rooms$);
+  roomsSignal = computed(() => {
+    const data = this.roomStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(this.breakpoints$, {
     initialValue: {
@@ -226,6 +230,7 @@ export class CalendarComponent {
   private previousDarkMode?: boolean;
 
   constructor() {
+    this.roomStore.loadAll();
     effect(() => {
       const calendarRooms = this.calendarSignal();
       if (!calendarRooms) {

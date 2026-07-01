@@ -4,7 +4,6 @@ import { IError, PageRequest } from '../../interfaces/common';
 import { Pagination } from '../../interfaces/pagination';
 import {
   IAvailableDTO,
-  ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
   IReservationAll,
@@ -13,10 +12,6 @@ import {
   IUpcomingAll,
   States,
 } from '../../reservation/reservation';
-import { IUserAll } from '../../user/user';
-import { ITreatmentDiscountDTO } from '../../treatment/treatment';
-import { IRoomAll } from '../../room/room';
-import { IAdditionalAll } from '../../additional/additional';
 import { IPaymentAll } from '../../interfaces/payment';
 import { Role } from '../../interfaces/token';
 import { IReview } from '../../me/reservation/list/review';
@@ -29,11 +24,6 @@ enum ReservationActionTypes {
   getCustomerReservations = '[Reservation] Get customer reservations',
   getAllFilterReservations = '[Reservation] Get all filter reservations',
   getAllGroupingByRoom = '[Reservation] Get all grouping by room',
-  getCustomers = '[Reservation] Get customers',
-  getCustomerInformation = '[Reservation] Get customer info',
-  getAllTreatments = '[Reservation] Get all treatments',
-  getAllRooms = '[Reservation] Get all rooms',
-  getAllAdditionalByGroupId = '[Reservation] find all additional by group id',
   getUpcomingReservation = '[Reservation] Get upcoming reservation',
   searchAvailability = '[Reservation] Search availability',
   customerSearchReservation = '[Reservation] Customer search reservation',
@@ -64,11 +54,6 @@ enum ReservationActionTypes {
   reservationAvailabilitySuccess = '[Reservation] Availability success',
   reservationPageSuccess = '[Reservation] Page Success',
   reservationFilterPageSuccess = '[Reservation] Filter Page Success',
-  customersSuccess = '[Reservation] Customers success',
-  customerSuccess = '[Reservation] Customer success',
-  reservationTreatmentsSuccess = '[Reservation] Treatments success',
-  reservationAdditionalSuccess = '[Reservation] Additional success',
-  reservationRoomsSuccess = '[Reservation] Rooms success',
   reservationPaymentsSuccess = '[Reservation] Payments success',
   reservationHistorySuccess = '[Reservation] History success',
   reservationSaveSuccess = '[Reservation] Save Success',
@@ -131,28 +116,6 @@ export const customerSearchReservation = createAction(
   props<{ roomId: string; treatmentId: string; date: Date; professionalId: string; additionalIds?: string[] }>(),
 );
 
-export const getCustomers = createAction(ReservationActionTypes.getCustomers);
-
-export const getCustomerInformation = createAction(
-  ReservationActionTypes.getCustomerInformation,
-  props<{ id: string }>(),
-);
-
-export const getAllTreatments = createAction(
-  ReservationActionTypes.getAllTreatments,
-  props<{ roomId: string; customerId?: string }>(),
-);
-
-export const getAllRooms = createAction(
-  ReservationActionTypes.getAllRooms,
-  props<{ customerId?: string }>(),
-);
-
-export const getAllAdditionalByGroupId = createAction(
-  ReservationActionTypes.getAllAdditionalByGroupId,
-  props<{ roomId: string; groupId: string }>(),
-);
-
 export const getUpcomingReservation = createAction(ReservationActionTypes.getUpcomingReservation);
 
 export const reservationGroupingByRoomSuccess = createAction(
@@ -173,31 +136,6 @@ export const reservationPageSuccess = createAction(
 export const reservationFilterPageSuccess = createAction(
   ReservationActionTypes.reservationFilterPageSuccess,
   props<{ filter: Pagination<IReservationAll> }>(),
-);
-
-export const customersSuccess = createAction(
-  ReservationActionTypes.customersSuccess,
-  props<{ customers: IUserAll[] }>(),
-);
-
-export const customerSuccess = createAction(
-  ReservationActionTypes.customerSuccess,
-  props<{ customer: ICustomerLastReservation }>(),
-);
-
-export const reservationTreatmentsSuccess = createAction(
-  ReservationActionTypes.reservationTreatmentsSuccess,
-  props<{ treatmentDiscount: ITreatmentDiscountDTO }>(),
-);
-
-export const reservationRoomsSuccess = createAction(
-  ReservationActionTypes.reservationRoomsSuccess,
-  props<{ rooms: IRoomAll[] }>(),
-);
-
-export const reservationAdditionalSuccess = createAction(
-  ReservationActionTypes.reservationAdditionalSuccess,
-  props<{ additional: IAdditionalAll[] }>(),
 );
 
 export const reservationPaymentsSuccess = createAction(

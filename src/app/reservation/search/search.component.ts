@@ -30,7 +30,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
 import {
-  getCustomersPipe,
   getFilteredReservationsPipe,
   getReservationResponsePipe,
   selectReservationIsLoading,
@@ -65,6 +64,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from '../../store/user.store';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -86,6 +86,7 @@ type SearchForm = {
 export class SearchComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly userStore = inject(UserStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
@@ -93,7 +94,6 @@ export class SearchComponent {
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private reservationList$ = this.store.pipe(getFilteredReservationsPipe);
-  private customerList$ = this.store.pipe(getCustomersPipe);
   private response$ = this.store.pipe(getReservationResponsePipe);
 
   private paginator = viewChild(MatPaginator);
@@ -155,12 +155,12 @@ export class SearchComponent {
   private selectCustomerSignal = toSignal(this.getForm.customer.valueChanges);
   private userId = computed(() => this.selectCustomerSignal()?.id);
 
-  customerListSignal = toSignal(this.customerList$);
+  customerListSignal = this.userStore.customers;
   filteredCustomerSignal: Signal<IUserAll[] | undefined> = toSignal(
     this.getForm.customer.valueChanges.pipe(
       startWith(undefined),
       map((value) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(this.customerList$),
+      combineLatestWith(toObservable(this.customerListSignal)),
       map(([name, customers]) => {
         if (!customers) {
           return [];
@@ -188,6 +188,7 @@ export class SearchComponent {
   );
 
   constructor() {
+    this.userStore.loadCustomers();
     effect(() => {
       const request = this.tableState.baseRequest();
       this.store.dispatch(

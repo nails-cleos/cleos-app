@@ -141,7 +141,7 @@ type DetailForm = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationDetailComponent {
-  id = input<string>();
+  id = input.required<string>();
 
   private static readonly PROFESSIONAL_PAYMENT_TYPES = ['CASH', 'TRANSFER', 'MOLLIE'];
 
@@ -177,14 +177,13 @@ export class ReservationDetailComponent {
     },
   );
 
+  reservation = toSignal(this.reservationSelected$);
   historiesSignal = toSignal(this.histories$);
   paymentsSignal = toSignal(this.payments$);
   paymentsLoading = computed(() => !!this.reservation() && this.paymentsSignal() === undefined);
   historyLoading = computed(() => !!this.reservation() && this.historiesSignal() === undefined);
 
   paginatorPageIndex = signal(0);
-
-  reservation = toSignal(this.reservationSelected$);
   duration: IDuration = new Duration();
   start: Date = getNowTimeZone();
   end: Date = getNowTimeZone();
@@ -257,6 +256,7 @@ export class ReservationDetailComponent {
   });
 
   readonly switchablePaymentTypes = ['CASH', 'TRANSFER'];
+  private hasFetched = signal(false);
 
   private getReservationPaymentOptions = (
     reservation: IReservationAll,
@@ -300,6 +300,16 @@ export class ReservationDetailComponent {
 
   constructor() {
     this.payments.clear();
+    effect(() => {
+      const id = this.id();
+      if (id && !this.hasFetched()) {
+        this.hasFetched.set(true);
+        this.store.dispatch(getReservation({ id }));
+        this.store.dispatch(reservationFindPayments({ id }));
+        this.store.dispatch(getReservationHistory({ id }));
+      }
+    });
+
     effect((onCleanup) => {
       const paginator = this.paginator();
       if (paginator) {
@@ -315,15 +325,6 @@ export class ReservationDetailComponent {
       const paginator = this.paginator();
       if (dataSource && paginator) {
         dataSource.paginator = paginator;
-      }
-    });
-
-    effect(() => {
-      const id = this.id();
-      if (id) {
-        this.store.dispatch(getReservation({ id }));
-        this.store.dispatch(reservationFindPayments({ id }));
-        this.store.dispatch(getReservationHistory({ id }));
       }
     });
 

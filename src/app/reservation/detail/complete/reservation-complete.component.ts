@@ -1,10 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
   completeReservation,
-  getAllAdditionalByGroupId,
-  getAllTreatments,
   getReservation,
   reservationFindPayments,
 } from '../../../store/actions/reservation.actions';
@@ -22,7 +29,14 @@ import {
   newExtra,
   newPrice,
 } from '../../../util/helper';
-import { DEFAULT_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import {
+  DEFAULT_LOCALE,
+  getDiffTime,
+  getNowTimeZone,
+  getTime,
+  getTimeNumber,
+  newDateTimestamp,
+} from '../../../util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
 import { IAdditionalAll } from '../../../additional/additional';
@@ -40,10 +54,9 @@ import { PricePreviewComponent } from '../../../shared/price-preview/price-previ
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import {
-  getAdditionalListPipe, getNavigationParamsPipe,
+  getNavigationParamsPipe,
   getPaymentsPipe,
   getSelectedReservationPipe,
-  getTreatmentDiscountPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
@@ -60,6 +73,8 @@ import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ReservationDetailSkeletonComponent } from '../reservation-detail-skeleton.component';
 import { NavigationService } from '../../../services/navigation.service';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { AdditionalStore } from '../../../store/additional.store';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -90,24 +105,27 @@ export class ReservationCompleteComponent {
 
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly additionalStore = inject(AdditionalStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
-  private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private readonly reservationParamsSignal = toSignal(this.reservationParams$);
-  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly paymentsSignal = toSignal(this.payments$);
   private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
 
   readonly selectedReservationSignal = toSignal(this.selectedReservation$);
-  readonly additionalListSignal = toSignal(this.additionalList$);
+  readonly additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
 
   private readonly isDashboard = computed(() => this.reservationParamsSignal()?.isDashboard ?? false);
 
@@ -242,7 +260,7 @@ export class ReservationCompleteComponent {
       const roomId = this.roomId();
       const customerId = this.customerId();
       if (roomId) {
-        this.store.dispatch(getAllTreatments({ roomId, customerId }));
+        this.treatmentStore.getAllTreatments(roomId, customerId);
       }
     });
 
@@ -261,7 +279,7 @@ export class ReservationCompleteComponent {
       if (!roomId) {
         return;
       }
-      this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId: group.id }));
+      this.additionalStore.loadAllByGroupId(roomId, group.id);
     });
 
     effect(() => {

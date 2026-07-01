@@ -21,9 +21,11 @@ import { IRoomAll } from '../room/room';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AuthStore } from './auth.store';
 import { NavigationService } from '../services/navigation.service';
+import { ICustomerLastReservation } from '../reservation/reservation';
 
 type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   customers: IUserAll[] | undefined;
+  customerInfo: ICustomerLastReservation | undefined;
   professionals: IUserAll[] | undefined;
   managers: IUserAll[] | undefined;
   rooms: IRoomAll[] | undefined;
@@ -34,6 +36,7 @@ type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
 const initialState: UserStoreState = {
   ...createStoreInitialState<Pagination<IUserAll>, IUserAll>(),
   customers: undefined,
+  customerInfo: undefined,
   professionals: undefined,
   managers: undefined,
   rooms: undefined,
@@ -67,6 +70,7 @@ export const UserStore = signalStore(
     let restoreSubscription: Subscription | undefined;
     let resendTokenSubscription: Subscription | undefined;
     let mergeUsersSubscription: Subscription | undefined;
+    let getCustomerInformationSubscription: Subscription | undefined;
 
     const cancelAll = (): void => {
       loadPageSubscription?.unsubscribe();
@@ -85,6 +89,7 @@ export const UserStore = signalStore(
       restoreSubscription?.unsubscribe();
       resendTokenSubscription?.unsubscribe();
       mergeUsersSubscription?.unsubscribe();
+      getCustomerInformationSubscription?.unsubscribe();
     };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
@@ -342,6 +347,16 @@ export const UserStore = signalStore(
             response: requestSuccess('USER.MERGE.SUCCESS'),
             isLoading: false,
           }),
+          error: patchError,
+        });
+      },
+
+      getCustomerInformation(id: string): void {
+        getCustomerInformationSubscription?.unsubscribe();
+        patchState(store, { customerInfo: undefined, isLoading: true });
+
+        getCustomerInformationSubscription = userService.getCustomerInformation(id).subscribe({
+          next: (customerInfo) => patchState(store, { customerInfo, isLoading: false }),
           error: patchError,
         });
       },

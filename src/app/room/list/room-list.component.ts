@@ -74,7 +74,11 @@ export class RoomListComponent {
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = this.roomStore.isLoading;
-  dataSourceSignal = computed(() => this.roomStore.data()?.content?.map((room: IRoom) => {
+  private roomListSignal = computed(() => {
+    const data = this.roomStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  dataSourceSignal = computed(() => this.roomListSignal()?.content?.map((room: IRoom) => {
     if (room && room.availabilities && room.availabilities.length) {
       const availabilities = room.availabilities.map((i: IAvailability) =>
         Object.assign({}, i, { order: findDayOfWeek(i.day) }));
@@ -82,7 +86,7 @@ export class RoomListComponent {
     }
     return room;
   }));
-  resultsLengthSignal = computed(() => this.roomStore.data()?.totalElements || 0);
+  resultsLengthSignal = computed(() => this.roomListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
   tableColumns: TableSkeletonColumn[] = [

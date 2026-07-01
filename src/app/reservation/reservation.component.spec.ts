@@ -25,6 +25,10 @@ import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationService } from '../services/navigation.service';
 import { ToastService } from '../services/toast.service';
+import { UserStore } from "../store/user.store";
+import { RoomStore } from "../store/room.store";
+import { TreatmentStore } from "../store/treatment.store";
+import { AdditionalStore } from "../store/additional.store";
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -32,13 +36,29 @@ describe('ReservationComponent', () => {
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
+  let userStoreSpy: {
+    customers: ReturnType<typeof signal>;
+    customerInfo: ReturnType<typeof signal>;
+    getCustomerInformation: jasmine.Spy;
+  };
+
+  let roomStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAll: jasmine.Spy;
+  };
+
+  let treatmentStoreSpy: {
+    treatmentDiscount: ReturnType<typeof signal>;
+    getAllTreatments: jasmine.Spy;
+  };
+
+  let additionalStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllByGroupId: jasmine.Spy;
+  };
+
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
-  let customers$: BehaviorSubject<any>;
-  let customerInfo$: BehaviorSubject<any>;
-  let rooms$: BehaviorSubject<any>;
-  let treatmentDiscount$: BehaviorSubject<any>;
-  let additionalList$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
@@ -138,13 +158,25 @@ describe('ReservationComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
+    userStoreSpy = {
+      customers: signal<any>(undefined),
+      customerInfo: signal<any>(undefined),
+      getCustomerInformation: jasmine.createSpy('getCustomerInformation'),
+    };
+    roomStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadCustomers'),
+    };
+    treatmentStoreSpy = {
+      treatmentDiscount: signal<any>(undefined),
+      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+    };
+    additionalStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+    };
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
-    customers$ = new BehaviorSubject(undefined);
-    customerInfo$ = new BehaviorSubject(undefined);
-    rooms$ = new BehaviorSubject(undefined);
-    treatmentDiscount$ = new BehaviorSubject(undefined);
-    additionalList$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
     isLoading$ = new BehaviorSubject<boolean>(false);
@@ -185,20 +217,10 @@ describe('ReservationComponent', () => {
         case 1:
           return navigationParams$.asObservable();
         case 2:
-          return customers$.asObservable();
-        case 3:
-          return customerInfo$.asObservable();
-        case 4:
-          return rooms$.asObservable();
-        case 5:
-          return treatmentDiscount$.asObservable();
-        case 6:
-          return additionalList$.asObservable();
-        case 7:
           return calendar$.asObservable();
-        case 8:
+        case 3:
           return subErrors$.asObservable();
-        case 9:
+        case 4:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -211,6 +233,10 @@ describe('ReservationComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },

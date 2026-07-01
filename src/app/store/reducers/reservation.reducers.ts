@@ -8,19 +8,12 @@ import {
   createReview,
   customerCancelReservation,
   customerSearchReservation,
-  customersSuccess,
-  customerSuccess,
   deleteReservation,
   executeTrackingByReservationId,
-  getAllAdditionalByGroupId,
   getAllFilterReservations,
   getAllGroupingByRoom,
-  getAllRooms,
-  getAllTreatments,
   getColorsByTreatmentId,
-  getCustomerInformation,
   getCustomerReservations,
-  getCustomers,
   getEditReservation,
   getPage,
   getReservation,
@@ -29,7 +22,6 @@ import {
   getTrackingByReservationId,
   getUpcomingReservation,
   paymentCompleteReservation,
-  reservationAdditionalSuccess,
   reservationAvailabilitySuccess,
   reservationFailure,
   reservationFilterPageSuccess,
@@ -39,11 +31,9 @@ import {
   reservationPageSuccess,
   reservationPaymentsSuccess,
   reservationReviewSuccess,
-  reservationRoomsSuccess,
   reservationSaveSuccess,
   reservationsCustomerSuccess,
   reservationSelected,
-  reservationTreatmentsSuccess,
   searchAvailability,
   setDetailReservationParams,
   setMeReservationParams,
@@ -61,30 +51,21 @@ import {
 } from '../actions/reservation.actions';
 import {
   IAvailableDTO,
-  ICustomerLastReservation,
   ICustomerReservation,
   IReservationAll,
   IRoomReservation,
   ITracking,
   IUpcomingAll,
 } from '../../reservation/reservation';
-import { IUserAll } from '../../user/user';
-import { ITreatmentDiscountDTO } from '../../treatment/treatment';
-import { IRoomAll } from '../../room/room';
 import { Pagination } from '../../interfaces/pagination';
 import { IPaymentAll } from '../../interfaces/payment';
-import { IAdditionalAll } from '../../additional/additional';
 import { IOffice } from '../../office/office';
 import { IColorAll } from '../../color/color';
 import { IReview } from '../../me/reservation/list/review';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
-import {
-  DetailReservationParams,
-  MeReservationParams,
-  ReservationParams,
-} from '../../util/models/reservation.models';
+import { DetailReservationParams, MeReservationParams, ReservationParams } from '../../util/models/reservation.models';
 
 export const RESERVATION_FEATURE_KEY = 'reservation';
 
@@ -95,12 +76,7 @@ export interface ReservationState {
   filter?: Pagination<IReservationAll>;
   page?: Pagination<IReservationAll>;
   customerReservation?: ICustomerReservation;
-  customers?: IUserAll[];
   offices?: IOffice[];
-  customer?: ICustomerLastReservation;
-  rooms?: IRoomAll[];
-  additional?: IAdditionalAll[];
-  treatmentDiscount?: ITreatmentDiscountDTO;
   tracking?: ITracking;
   payments?: IPaymentAll[];
   history?: IReservationAll[];
@@ -122,12 +98,7 @@ export const initialState: ReservationState = {
   filter: undefined,
   page: undefined,
   customerReservation: undefined,
-  customers: undefined,
   offices: undefined,
-  customer: undefined,
-  rooms: undefined,
-  additional: undefined,
-  treatmentDiscount: undefined,
   tracking: undefined,
   payments: undefined,
   history: undefined,
@@ -184,7 +155,7 @@ export const reservationReducer = createReducer(
     ...state,
     error: undefined,
     subErrors: undefined,
-    selected: undefined,
+    customerReservation: undefined,
     response: undefined,
   })),
   on(customerSearchReservation, (state) => ({
@@ -198,49 +169,6 @@ export const reservationReducer = createReducer(
   on(searchAvailability, (state) => ({
     ...state,
     groupedRooms: undefined,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: true,
-  })),
-  on(getCustomers, (state) => ({
-    ...state,
-    customers: undefined,
-    error: undefined,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-    isLoading: true,
-  })),
-  on(getCustomerInformation, (state) => ({
-    ...state,
-    customer: undefined,
-    error: undefined,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-    isLoading: true,
-  })),
-  on(getAllRooms, (state) => ({
-    ...state,
-    rooms: undefined,
-    isLoading: true,
-    error: undefined,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-  })),
-  on(getAllAdditionalByGroupId, (state) => ({
-    ...state,
-    additional: undefined,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: true,
-  })),
-  on(getAllTreatments, (state) => ({
-    ...state,
-    treatmentDiscount: undefined,
     error: undefined,
     subErrors: undefined,
     response: undefined,
@@ -354,46 +282,6 @@ export const reservationReducer = createReducer(
   on(reservationAvailabilitySuccess, (state, { availability }) => ({
     ...state,
     availability,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: false,
-  })),
-  on(customersSuccess, (state, { customers }) => ({
-    ...state,
-    customers,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: false,
-  })),
-  on(customerSuccess, (state, { customer }) => ({
-    ...state,
-    customer,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: false,
-  })),
-  on(reservationRoomsSuccess, (state, { rooms }) => ({
-    ...state,
-    rooms,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: false,
-  })),
-  on(reservationTreatmentsSuccess, (state, { treatmentDiscount }) => ({
-    ...state,
-    treatmentDiscount,
-    error: undefined,
-    subErrors: undefined,
-    response: undefined,
-    isLoading: false,
-  })),
-  on(reservationAdditionalSuccess, (state, { additional }) => ({
-    ...state,
-    additional,
     error: undefined,
     subErrors: undefined,
     response: undefined,

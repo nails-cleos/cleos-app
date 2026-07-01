@@ -38,7 +38,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('#mat-input-0').click();
       cy.get('#mat-input-0').type(discountName);
-      cy.get('#mat-input-3').click();
+      cy.get('#mat-input-4').click();
       cy.get('#mat-option-2').click();
       cy.get('#mat-input-1').click();
       cy.get('#mat-input-1').type(`${discountName} Description`);

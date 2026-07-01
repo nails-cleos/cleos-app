@@ -210,6 +210,7 @@ describe('ReservationDetailComponent', () => {
 
     fixture = TestBed.createComponent(ReservationDetailComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'reservation-id');
 
     dialogSpy = spyOn(component['dialog'], 'open');
   });

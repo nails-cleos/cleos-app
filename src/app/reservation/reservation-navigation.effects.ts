@@ -4,8 +4,6 @@ import { ROUTER_NAVIGATED } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import {
   cleanReservation,
-  getAllRooms,
-  getCustomers,
   setDetailReservationParams,
   setReservationParams,
 } from '../store/actions/reservation.actions';
@@ -27,7 +25,7 @@ export class ReservationNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(CalendarComponent, {
-        run: () => [cleanReservation(), getAllRooms({})],
+        run: () => [cleanReservation()],
       }),
     ));
 
@@ -61,7 +59,7 @@ export class ReservationNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(SearchComponent, {
-        run: () => [cleanReservation(), getCustomers()],
+        run: () => [cleanReservation()],
       }),
     ));
 
@@ -71,7 +69,7 @@ export class ReservationNavigationEffects {
       navigation(ReservationCreatePageComponent, {
         run: () => {
           const navigationState = history.state;
-          const actions: Action[] = [cleanReservation(), getCustomers(), getOptions()];
+          const actions: Action[] = [cleanReservation(), getOptions()];
           if (navigationState) {
             actions.push(this.toReservationParamsAction(navigationState));
           }

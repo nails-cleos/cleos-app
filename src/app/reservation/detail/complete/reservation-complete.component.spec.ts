@@ -6,8 +6,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import {
   completeReservation,
-  getAllAdditionalByGroupId,
-  getAllTreatments,
   getReservation,
   reservationFindPayments,
 } from '../../../store/actions/reservation.actions';
@@ -16,6 +14,9 @@ import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../room/room';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
+import { signal } from "@angular/core";
+import { TreatmentStore } from "../../../store/treatment.store";
+import { AdditionalStore } from "../../../store/additional.store";
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
@@ -24,10 +25,18 @@ describe('ReservationCompleteComponent', () => {
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
 
+  let treatmentStoreSpy: {
+    treatmentDiscount: ReturnType<typeof signal>;
+    getAllTreatments: jasmine.Spy;
+  };
+
+  let additionalStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllByGroupId: jasmine.Spy;
+  };
+
   let navigationParams$: BehaviorSubject<any>;
   let selectedReservation$: BehaviorSubject<any>;
-  let treatmentDiscount$: BehaviorSubject<any>;
-  let additionalList$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let paymentOptions$: BehaviorSubject<any>;
 
@@ -130,10 +139,16 @@ describe('ReservationCompleteComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    treatmentStoreSpy = {
+      treatmentDiscount: signal<any>(mockTreatmentDiscount),
+      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+    };
+    additionalStoreSpy = {
+      data: signal<any>({ kind: 'list', value: mockAdditionalList }),
+      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
-    treatmentDiscount$ = new BehaviorSubject(mockTreatmentDiscount);
-    additionalList$ = new BehaviorSubject(mockAdditionalList);
     payments$ = new BehaviorSubject(mockPayments);
     paymentOptions$ = new BehaviorSubject(mockPaymentOptions);
 
@@ -148,12 +163,8 @@ describe('ReservationCompleteComponent', () => {
         case 2:
           return selectedReservation$.asObservable();
         case 3:
-          return treatmentDiscount$.asObservable();
-        case 4:
-          return additionalList$.asObservable();
-        case 5:
           return payments$.asObservable();
-        case 6:
+        case 4:
           return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -165,6 +176,8 @@ describe('ReservationCompleteComponent', () => {
       imports: [ReservationCompleteComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
@@ -181,8 +194,6 @@ describe('ReservationCompleteComponent', () => {
   afterEach(() => {
     navigationParams$.complete();
     selectedReservation$.complete();
-    treatmentDiscount$.complete();
-    additionalList$.complete();
     payments$.complete();
     paymentOptions$.complete();
   });
@@ -501,9 +512,7 @@ describe('ReservationCompleteComponent', () => {
       fixture.componentRef.setInput('customerId', 'customer-1');
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        getAllTreatments({ roomId: 'new-room-id', customerId: 'customer-1' }),
-      );
+      expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('new-room-id', 'customer-1')
     });
 
     it('should dispatch getAllAdditionalByGroupId when group is selected', () => {
@@ -521,9 +530,7 @@ describe('ReservationCompleteComponent', () => {
       component.getForm.group.setValue(group as any);
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        getAllAdditionalByGroupId({ roomId: 'room-1', groupId: 'group-1' }),
-      );
+      expect(additionalStoreSpy.loadAllByGroupId).toHaveBeenCalledWith('room-1', 'group-1');
     });
   });
 

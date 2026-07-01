@@ -19,8 +19,13 @@ import {
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NavigationService } from '../services/navigation.service';
+import type { Subscription } from 'rxjs';
 
-type RoomStoreState = StoreState<Pagination<IRoom>, IRoomAll> & {
+type RoomData =
+  | { kind: 'pagination'; value?: Pagination<IRoomAll> }
+  | { kind: 'list'; value?: IRoomAll[] };
+
+type RoomStoreState = StoreState<RoomData, IRoomAll> & {
   services: IRoomService | undefined;
   professionals: IUserAll[] | undefined;
   currencies: ICurrencyAll[] | undefined;
@@ -29,7 +34,7 @@ type RoomStoreState = StoreState<Pagination<IRoom>, IRoomAll> & {
 };
 
 const initialState: RoomStoreState = {
-  ...createStoreInitialState<Pagination<IRoom>, IRoomAll>(),
+  ...createStoreInitialState<RoomData, IRoomAll>(),
   services: undefined,
   professionals: undefined,
   currencies: undefined,
@@ -45,6 +50,30 @@ export const RoomStore = signalStore(
     translateService = inject(TranslateService),
     navigationService = inject(NavigationService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadAllSubscription: Subscription | undefined;
+    let loadInfoSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+    let loadServicesSubscription: Subscription | undefined;
+    let updateServicesSubscription: Subscription | undefined;
+    let loadCustomersSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadAllSubscription?.unsubscribe();
+      loadInfoSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+      loadServicesSubscription?.unsubscribe();
+      updateServicesSubscription?.unsubscribe();
+      loadCustomersSubscription?.unsubscribe();
+    };
+
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const createSaveResponse = (message: string, response: IApiResponse): IResponseSuccess => ({
@@ -55,6 +84,7 @@ export const RoomStore = signalStore(
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -67,18 +97,30 @@ export const RoomStore = signalStore(
       },
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        roomService.getRoomsPage(page, sort, direction, size).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
+        loadPageSubscription = roomService.getRoomsPage(page, sort, direction, size).subscribe({
+          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
+          error: patchError,
+        });
+      },
+
+      loadAll(customerId?: string): void {
+        loadAllSubscription?.unsubscribe();
+        patchState(store, { customers: undefined, isLoading: true });
+
+        loadAllSubscription = roomService.loadAll(customerId).subscribe({
+          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadInfo(): void {
+        loadInfoSubscription?.unsubscribe();
         patchState(store, { professionals: undefined, offices: undefined, currencies: undefined, isLoading: true });
 
-        roomService.getAllRoomsInfo().subscribe({
+        loadInfoSubscription = roomService.getAllRoomsInfo().subscribe({
           next: (roomInfo: IRoomInfo) => patchState(store, {
             professionals: roomInfo?.professionals,
             offices: roomInfo?.offices,
@@ -90,18 +132,20 @@ export const RoomStore = signalStore(
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        roomService.getRoom(id).subscribe({
+        loadByIdSubscription = roomService.getRoom(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       create(room: IRoom): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        roomService.createRoom(room).subscribe({
+        createSubscription = roomService.createRoom(room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: createSaveResponse(translateService.instant('ROOM.CREATED', { name: response.name }), response),
             isLoading: false,
@@ -111,11 +155,13 @@ export const RoomStore = signalStore(
       },
 
       update(id: string, room: IRoom): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        roomService.updateRoom(id, room).subscribe({
+        updateSubscription = roomService.updateRoom(id, room).subscribe({
           next: (response: IApiResponse) => patchState(store, {
-            response: createSaveResponse(translateService.instant('ROOM.UPDATED.MESSAGE', { name: response.name }), response),
+            response: createSaveResponse(translateService.instant('ROOM.UPDATED.MESSAGE', { name: response.name }),
+              response),
             isLoading: false,
           }),
           error: patchError,
@@ -123,9 +169,10 @@ export const RoomStore = signalStore(
       },
 
       delete(room: IRoom): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        roomService.deleteRoom(room.id!).subscribe({
+        deleteSubscription = roomService.deleteRoom(room.id!).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('ROOM.DELETED.MESSAGE', { name: roomName(room) }),
@@ -139,18 +186,20 @@ export const RoomStore = signalStore(
       },
 
       loadServices(id: string): void {
+        loadServicesSubscription?.unsubscribe();
         patchState(store, { services: undefined, isLoading: true });
 
-        roomService.getServices(id).subscribe({
+        loadServicesSubscription = roomService.getServices(id).subscribe({
           next: (services) => patchState(store, { services, isLoading: false }),
           error: patchError,
         });
       },
 
       updateServices(id: string, prices: IServicePrice[]): void {
+        updateServicesSubscription?.unsubscribe();
         patchState(store, { services: undefined, response: undefined, isLoading: true });
 
-        roomService.updateServices(id, prices).subscribe({
+        updateServicesSubscription = roomService.updateServices(id, prices).subscribe({
           next: () => patchState(store, {
             response: { message: 'ROOM.ME.SERVICES.UPDATE.MESSAGE' },
             isLoading: false,
@@ -160,9 +209,10 @@ export const RoomStore = signalStore(
       },
 
       loadCustomers(id: string): void {
+        loadCustomersSubscription?.unsubscribe();
         patchState(store, { customers: undefined, isLoading: true });
 
-        roomService.getAllCustomersInfo(id).subscribe({
+        loadCustomersSubscription = roomService.getAllCustomersInfo(id).subscribe({
           next: (customers) => patchState(store, { customers, isLoading: false }),
           error: patchError,
         });

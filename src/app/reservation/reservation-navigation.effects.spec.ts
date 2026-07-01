@@ -7,8 +7,6 @@ import { take, toArray } from 'rxjs/operators';
 import { getOptions } from '../store/actions/payment.actions';
 import {
   cleanReservation,
-  getAllRooms,
-  getCustomers,
   setDetailReservationParams,
   setReservationParams,
 } from '../store/actions/reservation.actions';
@@ -55,13 +53,10 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigated(CalendarComponent));
 
     const result = await firstValueFrom(
-      effects.loadCalendarPage$.pipe(take(2), toArray()),
+      effects.loadCalendarPage$.pipe(take(1), toArray()),
     );
 
-    expect(result).toEqual([
-      cleanReservation(),
-      getAllRooms({}),
-    ]);
+    expect(result).toEqual([cleanReservation()]);
   });
 
   it('should clean reservation and load payment options for reservation complete route', async () => {
@@ -104,12 +99,11 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigated(ReservationCreatePageComponent));
 
     const result = await firstValueFrom(
-      effects.loadReservationCreatePage$.pipe(take(4), toArray()),
+      effects.loadReservationCreatePage$.pipe(take(3), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getCustomers(),
       getOptions(),
       setReservationParams({
         isDashboard: true,

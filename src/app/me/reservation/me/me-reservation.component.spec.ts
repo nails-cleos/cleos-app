@@ -17,6 +17,8 @@ import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { ToastService } from '../../../services/toast.service';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
+import { AdditionalStore } from "../../../store/additional.store";
+import { TreatmentStore } from "../../../store/treatment.store";
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
@@ -24,10 +26,17 @@ describe('MeReservationComponent', () => {
   let translateService: TranslateService;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
+  let treatmentStoreSpy: {
+    treatmentDiscount: ReturnType<typeof signal>;
+    getAllTreatments: jasmine.Spy;
+  };
+
+  let additionalStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllByGroupId: jasmine.Spy;
+  };
+
   let navigationParams$: BehaviorSubject<any>;
-  let additionalList$: BehaviorSubject<any>;
-  let treatmentDiscount$: BehaviorSubject<any>;
-  let rooms$: BehaviorSubject<any>;
   let selectedReservation$: BehaviorSubject<any>;
   let customerReservation$: BehaviorSubject<any>;
   let availableList$: BehaviorSubject<any>;
@@ -170,10 +179,15 @@ describe('MeReservationComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    treatmentStoreSpy = {
+      treatmentDiscount: signal<any>(undefined),
+      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+    };
+    additionalStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
-    additionalList$ = new BehaviorSubject(undefined);
-    treatmentDiscount$ = new BehaviorSubject(undefined);
-    rooms$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     customerReservation$ = new BehaviorSubject(undefined);
     availableList$ = new BehaviorSubject(undefined);
@@ -193,9 +207,6 @@ describe('MeReservationComponent', () => {
 
     const storeStreams = [
       navigationParams$,
-      additionalList$,
-      treatmentDiscount$,
-      rooms$,
       selectedReservation$,
       customerReservation$,
       availableList$,
@@ -210,6 +221,8 @@ describe('MeReservationComponent', () => {
       imports: [MeReservationComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
@@ -228,9 +241,6 @@ describe('MeReservationComponent', () => {
 
   afterEach(() => {
     navigationParams$.complete();
-    additionalList$.complete();
-    treatmentDiscount$.complete();
-    rooms$.complete();
     selectedReservation$.complete();
     customerReservation$.complete();
     availableList$.complete();
@@ -709,10 +719,7 @@ describe('MeReservationComponent', () => {
     expect(component.firstTime).toBeTrue();
     expect(component.activeStepIndex()).toBe(1);
     expect(component['setTypes']).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Reservation] Get all treatments',
-      roomId: 'room-1',
-    }));
+    expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('room-1');
     expect(component['hydratingEdit']).toBeFalse();
   });
 
@@ -723,11 +730,7 @@ describe('MeReservationComponent', () => {
 
     component['getAdditionalList']();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Reservation] find all additional by group id',
-      roomId: 'room-1',
-      groupId: 'group-1',
-    }));
+    expect(additionalStoreSpy.loadAllByGroupId).toHaveBeenCalledWith('room-1', 'group-1');
   });
 
   it('should sync rendered additional selections from the stored additional ids', async () => {
@@ -877,7 +880,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should not update anything when treatmentDiscountSignal is empty', () => {
-    treatmentDiscount$.next(undefined);
+    treatmentStoreSpy.treatmentDiscount.set(undefined);
 
     const groupsSpy = spyOn(component.groups, 'set');
     const listSpy = spyOn(component.treatmentList, 'set');
@@ -889,7 +892,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should not update when room is missing', () => {
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -906,7 +909,7 @@ describe('MeReservationComponent', () => {
   it('should create groups and set groups signal', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -924,7 +927,7 @@ describe('MeReservationComponent', () => {
   it('should select current group by groupId', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -942,7 +945,7 @@ describe('MeReservationComponent', () => {
   it('should select group using treatmentId fallback', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -1004,7 +1007,7 @@ describe('MeReservationComponent', () => {
 
   describe('discounts (computed)', () => {
     it('should return undefined when no treatmentDiscountSignal', () => {
-      treatmentDiscount$.next(undefined);
+      treatmentStoreSpy.treatmentDiscount.set(undefined);
       fixture.detectChanges();
 
       const result = component.discounts();
@@ -1013,7 +1016,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should format percentage discount correctly', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1034,7 +1037,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should format money discount correctly', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1058,7 +1061,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should fallback to original name when type is unknown', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1078,7 +1081,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should preserve original discount properties', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [mockDiscount],
       });
       fixture.detectChanges();
@@ -1090,7 +1093,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should return new objects (immutability)', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [mockDiscount],
       });
       fixture.detectChanges();

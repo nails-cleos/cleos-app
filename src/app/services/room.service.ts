@@ -21,12 +21,12 @@ export class RoomService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<IRoom>> => this.http.get<Pagination<IRoom>>(
+  ): Observable<Pagination<IRoomAll>> => this.http.get<Pagination<IRoomAll>>(
     toUrl(this.urlV1, 'pages'),
     { ...paginated(), params: createFilter(page, size, sort, direction) },
   );
 
-  getAllRooms = (customerId?: string): Observable<IRoomAll[]> => {
+  loadAll = (customerId?: string): Observable<IRoomAll[]> => {
     let params;
     if (customerId) {
       params = new HttpParams().set('customerId', customerId);

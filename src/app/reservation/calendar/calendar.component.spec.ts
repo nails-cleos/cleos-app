@@ -22,11 +22,17 @@ import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
+import { RoomStore } from "../../store/room.store";
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
+  let roomStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAll: jasmine.Spy;
+  };
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -34,7 +40,6 @@ describe('CalendarComponent', () => {
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  let rooms$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -128,13 +133,16 @@ describe('CalendarComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    roomStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadCustomers'),
+    };
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
       professionalId: 'professional-id',
       isRoomAdmin: false,
     }));
-    rooms$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject([mockCalendarData]);
     breakpoint$ = new BehaviorSubject({
       matches: false,
@@ -158,8 +166,6 @@ describe('CalendarComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return rooms$.asObservable();
-        case 2:
           return calendar$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -173,6 +179,7 @@ describe('CalendarComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -191,7 +198,6 @@ describe('CalendarComponent', () => {
   });
 
   afterEach(() => {
-    rooms$.complete();
     calendar$.complete();
     breakpoint$.complete();
   });
@@ -250,7 +256,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should compute offices from rooms', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       fixture.detectChanges();
 
       const offices = component.offices();
@@ -286,13 +292,13 @@ describe('CalendarComponent', () => {
 
   describe('Form Auto-selection', () => {
     it('should auto-select office when only one office exists', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       expect(component.getForm.office.value?.id).toEqual(mockRoom1.office?.id);
     });
 
     it('should auto-select room when office has only one room', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       fixture.detectChanges();
 
       component.getForm.office.setValue(component.offices()[0]);
@@ -301,7 +307,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should auto-select professional when room has only one professional', () => {
-      rooms$.next([mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom2] });
       fixture.detectChanges();
       expect(component.getForm.professional.value).toEqual(mockProfessional1);
     });
@@ -467,7 +473,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should open dialog on segmentClick when date is valid', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
 
       component.getForm.room.setValue(mockRoom1);
@@ -523,7 +529,7 @@ describe('CalendarComponent', () => {
 
   describe('Store Dispatching', () => {
     it('should dispatch getAllGroupingByRoom on room selection', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       component.getForm.office.setValue(component.offices()[0]);
       component.getForm.room.setValue(mockRoom1);
       fixture.detectChanges();
@@ -536,7 +542,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should dispatch updateReservationTimestamp when event times changed is confirmed', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
@@ -567,7 +573,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should revert event times when eventTimesChanged is cancelled', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
 
@@ -683,7 +689,7 @@ describe('CalendarComponent', () => {
 
   describe('Role-based behavior', () => {
     it('should dispatch with roomAdmin role when user is room admin', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: true }));
       fixture.detectChanges();
@@ -717,7 +723,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should dispatch with professional role when user is not room admin', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
       fixture.detectChanges();
