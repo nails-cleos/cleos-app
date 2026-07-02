@@ -31,7 +31,6 @@ import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
-import { paymentReducer } from './app/store/reducers/payment.reducers';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideAppIcons } from './app/util/app-icons.provider';
@@ -83,10 +82,7 @@ export function initializePwaService(pwaService: PwaService) {
 
 const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
-  provideStore({
-    reservation: reservationReducer,
-    payment: paymentReducer,
-  }),
+  provideStore({ reservation: reservationReducer }),
   provideRouter(
     routes,
     withRouterConfig({ onSameUrlNavigation: 'reload' }),

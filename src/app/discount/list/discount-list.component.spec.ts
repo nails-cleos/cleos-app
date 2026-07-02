@@ -109,6 +109,14 @@ describe('DiscountListComponent', () => {
     expect(data?.length).toBe(2);
   });
 
+  it('should not compute dataSourceSignal when is not paginationDiscount', () => {
+    discountStoreSpy.data.set({ kind: 'list', value: mockPagination });
+    fixture.detectChanges();
+
+    const data = component.dataSourceSignal() as any;
+    expect(data?.length).toBeUndefined();
+  });
+
   it('should compute resultsLengthSignal correctly', () => {
     discountStoreSpy.data.set({ kind: 'paginationDiscount', value: mockPagination });
     fixture.detectChanges();

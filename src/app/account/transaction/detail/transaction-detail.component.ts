@@ -1,14 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { notifyPayment } from '../../../store/actions/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { AccountStore } from '../../../store/account.store';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPaymentResponsePipe, getSubErrorsPipe } from '../../../store/selectors/payment.selectors';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
@@ -27,16 +22,12 @@ export class TransactionDetailComponent {
   id = input<string>();
   transactionId = input<string>();
 
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly paymentStore = inject(PaymentStore);
   private readonly accountStore = inject(AccountStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private response$ = this.store.pipe(getPaymentResponsePipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private responseSignal = toSignal(this.response$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = this.paymentStore.response;
+  private subErrorsSignal = this.paymentStore.subErrors;
 
   transactionSignal = computed(() => {
     const transaction = this.accountStore.selectedTransaction();
@@ -78,14 +69,12 @@ export class TransactionDetailComponent {
 
   notify(): void {
     const transaction = this.transactionSignal()!;
-    this.store.dispatch(
-      notifyPayment({
-        id: transaction.payment!.id!,
-        path: 'transaction',
-        resourceId: transaction.id!,
-        preferenceId: transaction.payment!.preferenceId!,
-        paymentType: transaction.payment!.type!,
-      }),
+    this.paymentStore.notify(
+      transaction.payment!.id!,
+      'transaction',
+      transaction.id!,
+      transaction.payment!.preferenceId!,
+      transaction.payment!.type!,
     );
   }
 }

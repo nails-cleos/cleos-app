@@ -2,13 +2,11 @@ import { Routes } from '@angular/router';
 import { NavComponent } from './nav.component';
 import { provideEffects } from '@ngrx/effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
-import { PaymentEffects } from '../store/effects/payment.effects';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
 import { provideState } from '@ngrx/store';
 import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
-import { PAYMENT_FEATURE_KEY, paymentReducer } from '../store/reducers/payment.reducers';
 import { RoomService } from '../services/room.service';
 import { TreatmentService } from '../services/treatment.service';
 import { CatalogueService } from '../services/catalogue.service';
@@ -119,10 +117,8 @@ const providers = [
   provideGlobalFeedbackSource(AuthStore),
   provideGlobalFeedbackSource(PaymentStore),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
-  provideState(PAYMENT_FEATURE_KEY, paymentReducer),
   provideEffects(
     ReservationEffects,
-    PaymentEffects,
   ),
 ];
 

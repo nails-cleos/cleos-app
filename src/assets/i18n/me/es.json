@@ -104,7 +104,6 @@
     },
     "PAYMENT": {
       "ERROR_TEXT": "Error",
-      "ERROR": "Pago incompleto.\n{{reason}}",
       "DETAIL": "Detalle de pago",
       "FLOW": {
         "STEPS": {

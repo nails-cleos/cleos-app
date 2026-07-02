@@ -23,7 +23,6 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { PaymentEffects } from '../store/effects/payment.effects';
 import { ReservationEffects } from '../store/effects/reservation.effects';
 import { MeNavigationEffects } from './me-navigation.effects';
 
@@ -39,7 +38,7 @@ const providers = [
   DiscountService,
   CurrencyService,
   ColorService,
-  provideEffects(ReservationEffects, PaymentEffects, MeNavigationEffects),
+  provideEffects(ReservationEffects, MeNavigationEffects),
 ];
 
 const children: Routes = [

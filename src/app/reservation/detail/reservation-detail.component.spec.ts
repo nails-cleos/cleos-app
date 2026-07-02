@@ -20,7 +20,6 @@ import {
   updateReservationColor,
   updateReservationCustomer,
 } from '../../store/actions/reservation.actions';
-import { notifyPayment } from '../../store/actions/payment.actions';
 import { ServiceType } from '../../room/room';
 import { IUserAll } from '../../user/user';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
@@ -46,6 +45,8 @@ describe('ReservationDetailComponent', () => {
   let paymentStoreSpy: {
     options: ReturnType<typeof signal>;
     getOptions: jasmine.Spy;
+    notify: jasmine.Spy;
+    adjust: jasmine.Spy;
   };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
@@ -172,6 +173,8 @@ describe('ReservationDetailComponent', () => {
         },
       ]),
       getOptions: jasmine.createSpy('getOptions'),
+      notify: jasmine.createSpy('notify'),
+      adjust: jasmine.createSpy('adjust'),
     };
     navigationParams$ = new BehaviorSubject(undefined);
     reservationSelected$ = new BehaviorSubject(undefined);
@@ -742,13 +745,13 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('notify');
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(notifyPayment({
-        id: pendingPayment.id,
-        path: 'reservation',
-        resourceId: mockReservation.id,
-        preferenceId: pendingPayment.preferenceId,
-        paymentType: pendingPayment.type,
-      }));
+      expect(paymentStoreSpy.notify).toHaveBeenCalledWith(
+        pendingPayment.id,
+        'reservation',
+        mockReservation.id,
+        pendingPayment.preferenceId,
+        pendingPayment.type,
+      );
     });
 
     it('should allow paid when payment is required and it has no pending payments', () => {

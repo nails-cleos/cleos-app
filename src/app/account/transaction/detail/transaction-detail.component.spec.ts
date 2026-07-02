@@ -1,28 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../account';
-import { notifyPayment } from '../../../store/actions/payment.actions';
 import { NavigationService } from '../../../services/navigation.service';
 import { AccountStore } from '../../../store/account.store';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
   let fixture: ComponentFixture<TransactionDetailComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
-  let accountStoreSpy: jasmine.SpyObj<any>;
+  let paymentStoreSpy: {
+    response: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    notify: jasmine.Spy;
+  };
 
-  let selectedTransactionSignal: ReturnType<typeof signal<ITransaction | undefined>>;
-  let response$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any[]>;
+  let accountStoreSpy: {
+    selectedTransaction: ReturnType<typeof signal>;
+    loadTransaction: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   const mockTransaction: ITransaction = {
     id: 'transaction-123',
@@ -41,34 +44,23 @@ describe('TransactionDetailComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
-    selectedTransactionSignal = signal<ITransaction | undefined>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any[]>([]);
-
-    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadTransaction'], {
-      selectedTransaction: selectedTransactionSignal.asReadonly(),
-    });
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let callIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      callIndex++;
-      switch (callIndex) {
-        case 1:
-          return response$.asObservable();
-        case 2:
-          return subErrors$.asObservable();
-        default:
-          return response$.asObservable();
-      }
-    });
+    accountStoreSpy = {
+      selectedTransaction: signal(undefined),
+      loadTransaction: jasmine.createSpy('loadTransaction'),
+      clean: jasmine.createSpy('clean'),
+    };
+    paymentStoreSpy = {
+      response: signal(undefined),
+      subErrors: signal(undefined),
+      notify: jasmine.createSpy('notify'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [TransactionDetailComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
       ],
     }).compileComponents();
@@ -90,7 +82,7 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should update transactionSignal when selectedTransaction emits', () => {
-    selectedTransactionSignal.set(mockTransaction);
+    accountStoreSpy.selectedTransaction.set(mockTransaction);
     fixture.detectChanges();
 
     const transaction = component.transactionSignal();
@@ -100,37 +92,49 @@ describe('TransactionDetailComponent', () => {
   });
 
   it('should dispatch notifyPayment when notify() is called', () => {
-    selectedTransactionSignal.set(mockTransaction);
+    accountStoreSpy.selectedTransaction.set(mockTransaction);
     fixture.detectChanges();
 
     component.notify();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(notifyPayment({
-      id: 'payment-123',
-      path: 'transaction',
-      resourceId: 'transaction-123',
-      preferenceId: 'preference-123',
-      paymentType: 'card',
-    }));
+    expect(paymentStoreSpy.notify)
+      .toHaveBeenCalledWith('payment-123', 'transaction', 'transaction-123', 'preference-123', 'card');
   });
 
   it('should navigate when payment response emits a path', () => {
-    response$.next({ path: 'some/path' });
+    paymentStoreSpy.response.set({ path: 'some/path' });
     fixture.detectChanges();
 
     expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['some/path']);
   });
 
   it('should navigate to payment page when payment subErrors emit', () => {
-    subErrors$.next([{ message: 'Payment failed' }]);
+    paymentStoreSpy.subErrors.set([{ message: 'Payment failed' }]);
     fixture.detectChanges();
 
     expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'transaction', 'transaction-123', 'payment']);
   });
 
   it('should handle undefined selectedTransaction gracefully', () => {
-    selectedTransactionSignal.set(undefined);
+    accountStoreSpy.selectedTransaction.set(undefined);
     fixture.detectChanges();
 
     expect(component.transactionSignal()).toBeUndefined();
+  });
+
+  it('should open payment URL in same tab when pay is called', () => {
+    const openSpy = spyOn(window, 'open');
+
+    accountStoreSpy.selectedTransaction.set({
+      payment: {
+        paymentURL: 'https://pay.example.com/123',
+      },
+    } as any);
+
+    component.pay();
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://pay.example.com/123',
+      '_self',
+    );
   });
 });

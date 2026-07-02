@@ -59,7 +59,6 @@ import {
   getSelectedReservationPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
@@ -104,7 +103,7 @@ export class ReservationCompleteComponent {
   customerId = input<string>();
 
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
   private readonly paymentStore = inject(PaymentStore);

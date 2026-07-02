@@ -54,7 +54,6 @@ import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
-import { adjustPayments, notifyPayment } from '../../store/actions/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
@@ -71,7 +70,6 @@ import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { FabMenuComponent } from './fab-menu/fab-menu.component';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
-import { PaymentState } from '../../store/reducers/payment.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   getDetailNavigationParamsPipe,
@@ -147,7 +145,7 @@ export class ReservationDetailComponent {
 
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
@@ -525,7 +523,7 @@ export class ReservationDetailComponent {
       }
     });
 
-    this.store.dispatch(adjustPayments({ payments: paymentRequests }));
+    this.paymentStore.adjust(paymentRequests);
   }
 
   overview() {
@@ -670,16 +668,16 @@ export class ReservationDetailComponent {
     });
   };
 
-  notify = (payment: IPaymentAll): void => this.store.dispatch(notifyPayment({
-    id: payment.id,
-    path: 'reservation',
-    resourceId: payment.reservation!.id,
-    preferenceId: payment.preferenceId,
-    paymentType: payment.type,
-  }));
+  notify = (payment: IPaymentAll): void => this.paymentStore.notify(
+    payment.id,
+    'reservation',
+    payment.reservation!.id,
+    payment.preferenceId,
+    payment.type,
+  );
 
   pay = (payment: IPaymentAll): void => {
-    window.open(payment.link || payment.paymentURL, '_self')
+    window.open(payment.link || payment.paymentURL, '_self');
   };
 
   twoDigit = (i: number): void => {

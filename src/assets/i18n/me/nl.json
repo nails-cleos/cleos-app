@@ -103,7 +103,6 @@
     },
     "PAYMENT": {
       "ERROR_TEXT": "Betalingsfout",
-      "ERROR": "Betaling onvolledig.\n{{reason}}",
       "DETAIL": "Betalingsdetails",
       "FLOW": {
         "STEPS": {

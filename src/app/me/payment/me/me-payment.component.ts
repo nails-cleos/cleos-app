@@ -100,6 +100,6 @@ export class MePaymentComponent {
     const payment: IReservationPayment = { type, percentage };
 
     const id = this.paymentSignal()?.id;
-    this.paymentStore.updatePaymentById(id!, payment);
+    this.paymentStore.updateById(id!, payment);
   }
 }

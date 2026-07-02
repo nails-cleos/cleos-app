@@ -1,10 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
-import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { notifyPayment } from '../../store/actions/payment.actions';
-import { PaymentState } from '../../store/reducers/payment.reducers';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { NavigationService } from '../../services/navigation.service';
 import { PaymentStore } from '../../store/payment.store';
@@ -15,13 +12,13 @@ describe('PaymentComponent', () => {
   let fixture: ComponentFixture<PaymentComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
   let paymentStoreSpy: {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
     getPaymentByResourceId: jasmine.Spy;
+    notify: jasmine.Spy;
     clean: jasmine.Spy;
     clearResponse: jasmine.Spy;
   };
@@ -36,11 +33,10 @@ describe('PaymentComponent', () => {
       subErrors: signal(undefined),
       isLoading: signal(false),
       getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      notify: jasmine.createSpy('notify'),
       clean: jasmine.createSpy('clean'),
       clearResponse: jasmine.createSpy('clearResponse'),
     };
-
-    storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe', 'select']);
 
     await TestBed.configureTestingModule({
       imports: [PaymentComponent, TranslateModule.forRoot()],
@@ -48,7 +44,6 @@ describe('PaymentComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
@@ -140,9 +135,7 @@ describe('PaymentComponent', () => {
 
     component.notify(payment);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      notifyPayment({ id: 'p1', path: 'reservation', resourceId: '123', preferenceId: 'pref1', paymentType: 'paypal' }),
-    );
+    expect(paymentStoreSpy.notify).toHaveBeenCalledWith('p1', 'reservation', '123', 'pref1', 'paypal');
   });
 
   it('should return reservation currency icon', () => {
@@ -202,5 +195,31 @@ describe('PaymentComponent', () => {
     component.showError = true;
     component.close();
     expect(component.showError).toBeFalse();
+  });
+
+  it('should open payment URL in same tab when pay is called with paymentURL', () => {
+    const openSpy = spyOn(window, 'open');
+
+    const payment = { paymentURL: 'https://pay.example.com/123' } as any;
+
+    component.pay(payment);
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://pay.example.com/123',
+      '_self',
+    );
+  });
+
+  it('should open payment URL in same tab when pay is called with link', () => {
+    const openSpy = spyOn(window, 'open');
+
+    const payment = { link: 'https://pay.example.com/123' } as any;
+
+    component.pay(payment);
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://pay.example.com/123',
+      '_self',
+    );
   });
 });

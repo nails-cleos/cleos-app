@@ -1,9 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import { notifyPayment } from '../../store/actions/payment.actions';
 import { TranslatePipe } from '@ngx-translate/core';
-import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
@@ -43,7 +40,6 @@ export class PaymentComponent {
   id = input<string>();
   accountId = input<string>();
 
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
@@ -111,14 +107,12 @@ export class PaymentComponent {
   };
 
   notify = (payment: IPayment): void => {
-    this.store.dispatch(
-      notifyPayment({
-        id: payment.id!,
-        path: this.path()!,
-        resourceId: this.id()!,
-        preferenceId: payment.preferenceId!,
-        paymentType: payment.type!,
-      }),
+    this.paymentStore.notify(
+      payment.id!,
+      this.path()!,
+      this.id()!,
+      payment.preferenceId!,
+      payment.type!,
     );
   };
 

@@ -19,10 +19,10 @@ import {
   updateTrackingByReservationId,
 } from '../../../store/actions/reservation.actions';
 import { IPaymentAll } from '../../../interfaces/payment';
-import { recreate } from '../../../store/actions/payment.actions';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastService } from '../../../services/toast.service';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
@@ -34,6 +34,9 @@ describe('MoreInfoComponent', () => {
   let review$: BehaviorSubject<any>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let paymentStoreSpy: {
+    recreate: jasmine.Spy;
+  };
   let clipboardSpy: jasmine.SpyObj<Clipboard>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let dialogSpy: jasmine.Spy<any>;
@@ -64,6 +67,9 @@ describe('MoreInfoComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    paymentStoreSpy = {
+      recreate: jasmine.createSpy('recreate'),
+    };
     payments$ = new BehaviorSubject<any>(undefined);
     tracking$ = new BehaviorSubject<any>(undefined);
     review$ = new BehaviorSubject<any>(undefined);
@@ -91,6 +97,7 @@ describe('MoreInfoComponent', () => {
       imports: [MoreInfoComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },
@@ -222,7 +229,7 @@ describe('MoreInfoComponent', () => {
 
     component.resend(payment);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(recreate({ id: payment.id, paymentType: payment.type }));
+    expect(paymentStoreSpy.recreate).toHaveBeenCalledWith(payment.id, payment.type);
   });
 
   it('should not call copy when payment link is missing', () => {

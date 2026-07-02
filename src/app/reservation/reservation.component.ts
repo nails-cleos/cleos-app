@@ -121,7 +121,6 @@ import {
 } from './reservation-form.types';
 import { ReservationFormErrorService } from './reservation-form-error.service';
 import { ReservationCalendarService } from './reservation-calendar.service';
-import { PaymentState } from '../store/reducers/payment.reducers';
 import { IPaymentOption } from '../interfaces/payment';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
@@ -143,8 +142,8 @@ import { UserStore } from '../store/user.store';
 import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { AdditionalStore } from '../store/additional.store';
-import PlaceResult = google.maps.places.PlaceResult;
 import { PaymentStore } from '../store/payment.store';
+import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
   'customer',
@@ -187,7 +186,7 @@ export class ReservationComponent {
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly userStore = inject(UserStore);
   private readonly roomStore = inject(RoomStore);
   private readonly treatmentStore = inject(TreatmentStore);

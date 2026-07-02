@@ -28,7 +28,6 @@ describe('OptionComponent', () => {
   };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
-  let payments$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
@@ -87,7 +86,6 @@ describe('OptionComponent', () => {
       createPaymentLinkByReservationId: jasmine.createSpy('createPaymentLinkByReservationId'),
       clean: jasmine.createSpy('clean'),
     };
-    payments$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject(undefined);
 
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
@@ -108,10 +106,6 @@ describe('OptionComponent', () => {
     fixture = TestBed.createComponent(OptionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    payments$.complete();
   });
 
   it('should create the component', () => {
@@ -135,7 +129,7 @@ describe('OptionComponent', () => {
       amount: 100,
     }];
 
-    payments$.next(paymentsMock);
+    paymentStoreSpy.data.set(paymentsMock);
     fixture.detectChanges();
 
     expect(component.options()).toEqual(jasmine.arrayContaining([
@@ -156,14 +150,14 @@ describe('OptionComponent', () => {
       amount: 50,
     }];
 
-    payments$.next(paymentsMock);
+    paymentStoreSpy.data.set(paymentsMock);
     fixture.detectChanges();
     expect(component.options()).toEqual([]);
   });
 
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
     fixture.componentRef.setInput('id', 'res-123');
-    payments$.next([{
+    paymentStoreSpy.data.set([{
       reservation: {
         id: 'res-123',
         room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },

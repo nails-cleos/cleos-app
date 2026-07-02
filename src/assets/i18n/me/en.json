@@ -103,7 +103,6 @@
     },
     "PAYMENT": {
       "ERROR_TEXT": "Payment error",
-      "ERROR": "Payment incomplete.\n{{reason}}",
       "DETAIL": "Payment detail",
       "FLOW": {
         "STEPS": {

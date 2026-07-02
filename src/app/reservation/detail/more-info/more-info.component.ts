@@ -8,7 +8,6 @@ import {
   reservationFindPayments,
   updateTrackingByReservationId,
 } from '../../../store/actions/reservation.actions';
-import { recreate } from '../../../store/actions/payment.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -20,12 +19,7 @@ import { RatingComponent } from '../../../shared/rating/rating.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ToastService } from '../../../services/toast.service';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import {
-  getPaymentsPipe,
-  getReviewPipe,
-  getTrackingPipe,
-} from '../../../store/selectors/reservation.selectors';
+import { getPaymentsPipe, getReviewPipe, getTrackingPipe } from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -49,6 +43,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-more-info',
@@ -64,7 +59,8 @@ export class MoreInfoComponent {
   id = input<string>();
 
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly clipboard: Clipboard = inject(Clipboard);
@@ -135,9 +131,7 @@ export class MoreInfoComponent {
     }
   }
 
-  resend = (payment: IPaymentAll): void => this.store.dispatch(
-    recreate({ id: payment.id, paymentType: payment.type }),
-  );
+  resend = (payment: IPaymentAll): void => this.paymentStore.recreate(payment.id, payment.type);
 
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {

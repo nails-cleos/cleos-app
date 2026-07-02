@@ -1,8 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { paymentSave, paymentNotComplete } from '../../store/actions/payment.actions';
-import { PaymentState } from '../../store/reducers/payment.reducers';
+import { inject, Injectable } from '@angular/core';
 import { PaymentStatus } from '../../interfaces/payment';
+import { PaymentStore } from '../../store/payment.store';
 
 /**
  * Centralised logic for handling Mollie redirect query parameters.
@@ -10,7 +8,7 @@ import { PaymentStatus } from '../../interfaces/payment';
  */
 @Injectable({ providedIn: 'root' })
 export class PaymentRedirectService {
-  constructor(private store: Store<PaymentState>) {}
+  private readonly paymentStore = inject(PaymentStore);
 
   /**
    * Dispatches the appropriate store actions based on the query parameters.
@@ -33,14 +31,7 @@ export class PaymentRedirectService {
         query.reason ?? '',
       );
 
-      this.store.dispatch(
-        paymentSave({
-          id,
-          path,
-          status: query.status ?? 'CREATED',
-          paymentStatus,
-        }),
-      );
+      this.paymentStore.create(id, path, query.status ?? 'CREATED', paymentStatus);
       return;
     }
 
@@ -52,7 +43,7 @@ export class PaymentRedirectService {
     }
 
     // Anything else is considered an error / incomplete payment.
-    const message = 'Payment incomplete – missing required data';
-    this.store.dispatch(paymentNotComplete({ subError: [{ message }] }));
+    const reason = 'missing required data';
+    this.paymentStore.notComplete(reason);
   }
 }

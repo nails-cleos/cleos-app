@@ -20,7 +20,7 @@ describe('MePaymentComponent', () => {
     options: ReturnType<typeof signal>;
     getPayment: jasmine.Spy;
     getOptions: jasmine.Spy;
-    updatePaymentById: jasmine.Spy;
+    updateById: jasmine.Spy;
     clean: jasmine.Spy;
   };
 
@@ -54,7 +54,7 @@ describe('MePaymentComponent', () => {
       ]),
       getPayment: jasmine.createSpy('getPayment'),
       getOptions: jasmine.createSpy('getOptions'),
-      updatePaymentById: jasmine.createSpy('updatePaymentById'),
+      updateById: jasmine.createSpy('updateById'),
       clean: jasmine.createSpy('clean'),
     };
 
@@ -114,7 +114,7 @@ describe('MePaymentComponent', () => {
     ]));
   });
 
-  it('should dispatch updatePaymentById on update()', () => {
+  it('should dispatch updateById on update()', () => {
     paymentStoreSpy.selected.set({
       id: 'payment-1',
       reservation: {
@@ -132,7 +132,7 @@ describe('MePaymentComponent', () => {
 
     component.update();
 
-    expect(paymentStoreSpy.updatePaymentById).toHaveBeenCalledWith(
+    expect(paymentStoreSpy.updateById).toHaveBeenCalledWith(
       'payment-1',
       { type: 'MOLLIE', percentage: PaymentPercentage.total },
     );

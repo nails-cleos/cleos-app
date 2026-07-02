@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { ReservationComponent } from './reservation.component';
 import { Store } from '@ngrx/store';
 import { ReservationState } from '../store/reducers/reservation.reducers';
-import { PaymentState } from '../store/reducers/payment.reducers';
 import { getSelectedReservationPipe } from '../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getReservation, updateReservationById } from '../store/actions/reservation.actions';
@@ -21,7 +20,7 @@ import { RoomStore } from '../store/room.store';
 export class ReservationEditPageComponent {
   id = input.required<string>();
 
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly roomStore = inject(RoomStore);
   private readonly authUserService = inject(AuthUserService);
