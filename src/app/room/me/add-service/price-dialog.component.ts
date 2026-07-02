@@ -1,9 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ServiceType } from '../../../interfaces/room';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { ServiceType } from '../../room';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 export type PriceDialogData = {
   name: string;
@@ -19,7 +27,8 @@ type PriceForm = {
   selector: 'app-price-dialog',
   templateUrl: 'price-dialog.component.html',
   styleUrls: ['./price-dialog.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, MatError, ReactiveFormsModule,
+    MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceDialogComponent {

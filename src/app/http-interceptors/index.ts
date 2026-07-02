@@ -1,4 +1,5 @@
 import { noopInterceptor } from './noop-interceptor';
+import { loadingInterceptor } from './loading-interceptor';
 import { authInterceptor } from './auth-interceptor';
 import { errorInterceptor } from './error-interceptor';
 import { requestOptionInterceptor } from './request-option-interceptor';
@@ -6,6 +7,7 @@ import { paginationInterceptor } from './pagination-interceptor';
 
 export const httpInterceptorProviders = [
   noopInterceptor,
+  loadingInterceptor,
   authInterceptor,
   errorInterceptor,
   requestOptionInterceptor,

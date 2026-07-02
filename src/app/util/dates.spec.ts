@@ -65,10 +65,10 @@ import {
   totalDuration,
 } from './dates';
 import { RRule } from 'rrule';
-import { IAvailability, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
-import { IReservationAll } from '../interfaces/reservation';
-import { ITreatmentAll } from '../interfaces/treatment';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IAvailability, IRoom, IRoomAll, ServiceType } from '../room/room';
+import { IReservationAll } from '../reservation/reservation';
+import { ITreatmentAll } from '../treatment/treatment';
+import { IAdditionalAll } from '../additional/additional';
 import { toZonedTime } from 'date-fns-tz';
 
 describe('dates utility', () => {

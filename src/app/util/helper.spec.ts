@@ -1,5 +1,6 @@
 import {
-  allElementsHaveSameKeyFilterValue, areEquals,
+  allElementsHaveSameKeyFilterValue,
+  areEquals,
   createDialog,
   createRoomOffice,
   createTreatmentGroupService,
@@ -8,7 +9,8 @@ import {
   getLocale,
   getPrice,
   getUserImage,
-  hasRoomAdmin, isProfessional,
+  hasRoomAdmin,
+  isProfessional,
   newAdditional,
   newDiscount,
   newExtra,
@@ -21,20 +23,20 @@ import {
   snakeToCamel,
 } from './helper';
 import { Role } from '../interfaces/token';
-import { IUser, IUserAll } from '../interfaces/user';
-import { IAddress, IRoomAll, ServiceType } from '../interfaces/room';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { GroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
-import { IExtras, IReservationAll } from '../interfaces/reservation';
-import { getCurrentTimeZone } from './dates';
+import { IUser, IUserAll } from '../user/user';
+import { IAddress, IRoomAll, ServiceType } from '../room/room';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
+import { GroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
+import { IExtras, IReservationAll } from '../reservation/reservation';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from './dates';
 import { IPayment } from '../interfaces/payment';
-import { DiscountType, IDiscount } from '../interfaces/discount';
-import { IAdditionalAll } from '../interfaces/additional';
+import { DiscountType, IDiscount } from '../discount/discount';
+import { IAdditionalAll } from '../additional/additional';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
-import { IOffice } from '../interfaces/office';
-import { IColorAll } from '../interfaces/color';
+import { IOffice } from '../office/office';
+import { IColorAll } from '../color/color';
 
 describe('Helper Utils', () => {
   const userAll: IUserAll = {
@@ -49,12 +51,11 @@ describe('Helper Utils', () => {
     theme: 'light-theme',
     showCash: true,
     referralMax: 10,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAA',
   };
   const user: IUser = {
     id: 'user-123',
     image: 'test',
-    imageUrl: 'test',
   };
 
   const room: IRoomAll = {
@@ -115,11 +116,11 @@ describe('Helper Utils', () => {
 
   describe('getUserImage', () => {
     it('should return imageUrl if available', () => {
-      expect(getUserImage(userAll)).toEqual(userAll.imageUrl);
+      expect(getUserImage(userAll)).toEqual(`data:image/jpeg;base64,${ userAll.image }`);
     });
 
     it('should return image if imageUrl is not available', () => {
-      expect(getUserImage(user)).toEqual(`data:image/jpeg;base64,${user.image}`);
+      expect(getUserImage(user)).toEqual(`data:image/jpeg;base64,${ user.image }`);
     });
 
     it('should return undefined when user doesnt exist', () => {
@@ -141,14 +142,14 @@ describe('Helper Utils', () => {
 
     it('should return default locale object for invalid locale string', () => {
       const locale = getLocale('invalid-locale');
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
     it('should return default locale object for invalid locale string', () => {
       const locale = getLocale('en-US');
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
@@ -169,14 +170,14 @@ describe('Helper Utils', () => {
 
     it('should return default locale object when no locale string is provided', () => {
       const locale = getLocale();
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
 
     it('should return default locale object when locale is null', () => {
       const locale = getLocale(null);
-      expect(locale.language).toEqual('en-GB');
+      expect(locale.language).toEqual(DEFAULT_LOCALE);
       expect(locale.flag).toEqual('en_GB');
       expect(locale.i18n).toEqual('en');
     });
@@ -332,13 +333,13 @@ describe('Helper Utils', () => {
 
   describe('openDialog & createDialog', () => {
     let dialog: jasmine.SpyObj<MatDialog>;
-    let translate: jasmine.SpyObj<TranslateService>;
+    let translateService: jasmine.SpyObj<TranslateService>;
     let myRoom: IRoomAll;
 
     beforeEach(() => {
       dialog = jasmine.createSpyObj('MatDialog', ['open']);
-      translate = jasmine.createSpyObj('TranslateService', ['instant']);
-      translate.instant.and.callFake((key: string) => key);
+      translateService = jasmine.createSpyObj('TranslateService', ['instant']);
+      translateService.instant.and.callFake((key: string) => key);
 
       myRoom = {
         id: 'room-1',
@@ -350,7 +351,7 @@ describe('Helper Utils', () => {
     it('openDialog should call createDialog and open dialog', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      openDialog(myRoom, 'en', translate, dialog, time);
+      openDialog(myRoom, 'en', translateService, dialog, time);
 
       expect(dialog.open).toHaveBeenCalledWith(DialogComponent, jasmine.any(Object));
       const dataArg = dialog.open.calls.mostRecent().args[1]?.data;
@@ -367,10 +368,10 @@ describe('Helper Utils', () => {
     it('createDialog should open dialog with correct translation keys', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      createDialog('ROOM_INFO', 'Main Room', 'en', translate, dialog, 'Europe/Amsterdam', time);
+      createDialog('ROOM_INFO', 'Main Room', 'en', translateService, dialog, 'Europe/Amsterdam', time);
 
-      expect(translate.instant).toHaveBeenCalledWith('COMMON.TIME_ZONE.TITLE');
-      expect(translate.instant).toHaveBeenCalledWith(
+      expect(translateService.instant).toHaveBeenCalledWith('COMMON.TIME_ZONE.TITLE');
+      expect(translateService.instant).toHaveBeenCalledWith(
         'COMMON.TIME_ZONE.ROOM_INFO',
         jasmine.objectContaining({
           localTime: jasmine.any(String),
@@ -391,7 +392,7 @@ describe('Helper Utils', () => {
     });
 
     it('createDialog should add +1D when localDate is earlier', () => {
-      translate.instant.and.callFake((key: string, params?: any) => {
+      translateService.instant.and.callFake((key: string, params?: any) => {
         if (params?.arg) {
           expect(params.arg).toContain('+1D');
         }
@@ -401,13 +402,13 @@ describe('Helper Utils', () => {
       const now = new Date();
       const pastDate = new Date(now.getTime() - 86400000); // 1 día antes
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translate, dialog, undefined, pastDate);
+      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, pastDate);
 
       expect(dialog.open).toHaveBeenCalled();
     });
 
     it('createDialog should add -1D when localDate is later', () => {
-      translate.instant.and.callFake((key: string, params?: any) => {
+      translateService.instant.and.callFake((key: string, params?: any) => {
         if (params?.arg) {
           expect(params.arg).toContain('-1D');
         }
@@ -417,7 +418,7 @@ describe('Helper Utils', () => {
       const now = new Date();
       const futureDate = new Date(now.getTime() + 86400000); // 1 día después
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translate, dialog, undefined, futureDate);
+      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, futureDate);
 
       expect(dialog.open).toHaveBeenCalled();
     });
@@ -798,7 +799,7 @@ describe('Helper Utils', () => {
     const makeTreatment = (id: string, groupId: string, name = 'Treatment'): ITreatmentAll => ({
       id,
       name,
-      group: { id: groupId, name: `Group ${groupId}` },
+      group: { id: groupId, name: `Group ${ groupId }` },
       type: ServiceType.treatment,
       currency: 'USD',
     } as ITreatmentAll);

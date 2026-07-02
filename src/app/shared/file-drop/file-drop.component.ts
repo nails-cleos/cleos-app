@@ -11,14 +11,24 @@ import {
   viewChild,
 } from '@angular/core';
 import { finalize, interval, takeWhile } from 'rxjs';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { PercentPipe } from '@angular/common';
 import { formatBytes, resizeImage } from '../../util/file';
 import { DragDropDirective } from '../../directives/drag-drop.directive';
 import { ToastService } from '../../services/toast.service';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+  MatCardTitleGroup,
+} from '@angular/material/card';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { PercentPipe } from '@angular/common';
 
 export interface UploadFile {
   raw?: File;
@@ -32,12 +42,13 @@ export interface UploadFile {
   selector: 'app-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, PercentPipe, DragDropDirective, ReactiveFormsModule],
+  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle,
+    MatCardContent, DragDropDirective, ReactiveFormsModule, MatCardTitleGroup, MatProgressBar, PercentPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private hadCurrentFile = false;
 
@@ -117,7 +128,7 @@ export class FileDropComponent {
     if (!this.undo()) {
       this.fileSelected.emit(undefined);
     } else {
-      const content = this.translate.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
+      const content = this.translateService.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
       const toastRef = this.toastService.show(content, 'warning', 5000, { actionType: 'button', action: 'undo' });
       toastRef.onAction().subscribe(() => {
         this.file.set(file);

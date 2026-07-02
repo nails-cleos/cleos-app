@@ -1,18 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../interfaces/user';
-import { IRoomAll } from '../../interfaces/room';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IUser, IUserAll } from '../../user/user';
+import { IRoomAll } from '../../room/room';
 import { combineLatestWith } from 'rxjs';
-import { fieldChange, requireMatch, valueChange } from '../../util/validators';
-import { IUnavailable, Unavailable } from '../../interfaces/unavailable';
-import { Store } from '@ngrx/store';
+import { requireMatch } from '../../util/validators';
 import {
-  API_LOCALE,
+  BlockAgendaForm,
+  IUnavailable,
+  IUnavailableAll,
+  Unavailable,
+  UnavailableNavigationParams,
+} from '../unavailable';
+import {
   createNewDate,
   diffTime,
   filterDateRoom,
   formatDuration,
-  formatFullDate,
   formatTime,
   getCurrentTimeZone,
   getMinMaxDate,
@@ -22,74 +26,47 @@ import {
   newDate,
   zoneDateToDate,
 } from '../../util/dates';
-import {
-  createBlockAgenda,
-  deleteUnavailable,
-  getAllRoomsByProfessionalId,
-  getUnavailable,
-  updateUnavailable,
-} from '../../store/unavailable.actions';
-import { executeDialogNoWidth } from '../../util/helper';
 import { map, startWith } from 'rxjs/operators';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
-import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import { AuthUserService } from '../../services/auth-user.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { UnavailableState } from '../../store/reducers/unavailable.reducers';
-import {
-  getCurrentUnavailableIdPipe,
-  getProfessionalsPipe,
-  getRoomsPipe,
-  getSelectedUnavailablePipe,
-  getSubErrorsPipe,
-  getUnavailableParamsPipe,
-} from '../../store/selectors/unavailable.selectors';
-import { IError } from '../../interfaces/common';
-import { closest } from '../../util/numbers';
-
-type BlockAgendaForm = {
-  professional: FormControl<IUserAll | undefined>;
-  startDate: FormControl<Date | undefined>;
-  startTime: FormControl<string | undefined>;
-  duration: FormControl<string | undefined>;
-}
+import { ICommon, IError } from '../../interfaces/common';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
+import { UnavailableStore } from '../../store/unavailable.store';
+import { UserStore } from '../../store/user.store';
 
 @Component({
   selector: 'app-block-agenda',
   templateUrl: './block-agenda.component.html',
   styleUrls: ['./block-agenda.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatOption, MatIcon, MatIconButton,
+    MatButton, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    BackButtonDirective, BackButtonDirective, TimepickerDirective, TimepickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BlockAgendaComponent {
-  private readonly store: Store<UnavailableState> = inject(Store<UnavailableState>);
+  config = input.required<ICommon>();
+  unavailable = input<IUnavailableAll | undefined>();
+  params = input<UnavailableNavigationParams>();
+
+  submitData = output<IUnavailable>();
+  deleteData = output();
+
+  private readonly unavailableStore = inject(UnavailableStore);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly dialog: MatDialog = inject(MatDialog);
 
-  private navigationParams$ = this.store.pipe(getUnavailableParamsPipe);
-  private unavailableId$ = this.store.pipe(getCurrentUnavailableIdPipe);
-  private selectedUnavailable$ = this.store.pipe(getSelectedUnavailablePipe);
-  private allProfessionals$ = this.store.pipe(getProfessionalsPipe);
-  private allRooms$ = this.store.pipe(getRoomsPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private allRoomsSignal = this.userStore.rooms;
+  private subErrorsSignal = this.unavailableStore.subErrors;
 
-  private navigationParams = toSignal(this.navigationParams$);
-  private unavailableIdSignal = toSignal(this.unavailableId$);
-  private allRoomsSignal = toSignal(this.allRooms$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  unavailableSignal = toSignal(this.selectedUnavailable$);
-  allProfessionalsSignal = toSignal(this.allProfessionals$);
-  isAddModeSignal = computed(() => !this.unavailableIdSignal());
+  allProfessionalsSignal = this.userStore.professionals;
   errors = signal<Record<string, unknown>>({});
-  private authUserSignal = this.authUserService.authUser;
-
-  private isRoomAdmin = computed(() => this.authUserSignal()?.isRoomAdmin ?? false);
 
   form: FormGroup<BlockAgendaForm> = this.formBuilder.group<BlockAgendaForm>({
     professional: this.formBuilder.control(undefined, {
@@ -114,13 +91,13 @@ export class BlockAgendaComponent {
     this.getForm.professional.valueChanges.pipe(
       startWith(''),
       map((value) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(this.allProfessionals$),
+      combineLatestWith(toObservable(this.allProfessionalsSignal)),
       map(([name, professionals]) => {
         if (name) {
           return this.filter(name, professionals);
-        } else {
-          return professionals ? professionals.slice() : professionals;
         }
+
+        return professionals ? professionals.slice() : professionals;
       }),
     ),
   );
@@ -138,20 +115,15 @@ export class BlockAgendaComponent {
   private readonly timeZone: string = getCurrentTimeZone();
 
   constructor() {
+    this.userStore.loadProfessionals();
+
     effect(() => {
-      const params = this.navigationParams();
+      const params = this.params();
       if (params) {
-        let startTime;
-        let showDuration = false;
         if (params.room) {
           this.rooms.set([params.room]);
-          showDuration = true;
-          const time = getTimeNumber(params.date);
-          const hour = time ? `${time.hour}`.padStart(2, '0') : '12';
-          const minute = time ? `${closest(time.minute)}`.padStart(2, '0') : '00';
-          startTime = `${hour}:${minute}`;
         }
-        this.setValues(params.date, startTime, showDuration);
+        this.setValues(params.date, params.startTime, params.showDuration);
       }
     });
 
@@ -160,8 +132,8 @@ export class BlockAgendaComponent {
     });
 
     effect(() => {
-      const selected = this.unavailableSignal();
-      if (!selected?.id) {
+      const selected = this.unavailable();
+      if (!selected) {
         return;
       }
 
@@ -192,13 +164,6 @@ export class BlockAgendaComponent {
     });
 
     effect(() => {
-      const id = this.unavailableIdSignal();
-      if (id) {
-        this.store.dispatch(getUnavailable({ id }));
-      }
-    });
-
-    effect(() => {
       const starDate = this.selectedStartDate();
       const rooms = this.rooms();
       if (starDate && rooms?.length) {
@@ -220,19 +185,20 @@ export class BlockAgendaComponent {
     effect(() => {
       const professional = this.selectedProfessional();
       if (professional) {
-        this.store.dispatch(getAllRoomsByProfessionalId({ professionalId: professional.id }));
+        this.userStore.loadRoomsByProfessionalId(professional.id);
       }
     });
 
     effect(() => {
       const professionals = this.allProfessionalsSignal();
-      const isAddMode = this.isAddModeSignal();
-      if (professionals) {
-        if (isAddMode && professionals?.length === 1 && !this.getForm.professional.value) {
-          this.getForm.professional.setValue(professionals[0]);
-        }
+      if (professionals && !this.unavailable() && professionals.length === 1 && !this.getForm.professional.value) {
+        this.getForm.professional.setValue(professionals[0]);
       }
     });
+  }
+
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): BlockAgendaForm {
@@ -244,25 +210,7 @@ export class BlockAgendaComponent {
       return;
     }
 
-    const time = getTimeNumber(this.getForm.startTime.value);
-    const date = createNewDate(this.getForm.startDate.value!, time?.hour, time?.minute);
-
-    const unavailableSignal = this.unavailableSignal();
-    const unavailable: IUnavailable = new Unavailable();
-    unavailable.professionalId = valueChange(this.getForm.professional.value, unavailableSignal?.professional)?.id;
-    unavailable.start = date.toLocaleString(API_LOCALE);
-    unavailable.timeZone = this.timeZone;
-    unavailable.time = fieldChange(this.getForm.duration, unavailableSignal?.duration);
-
-    const isRoomAdmin = this.isRoomAdmin();
-    const id = this.unavailableIdSignal();
-    if (!id) {
-      this.store.dispatch(createBlockAgenda({ unavailable, isRoomAdmin }));
-    } else {
-      this.store.dispatch(
-        updateUnavailable({ id, unavailable, path: isRoomAdmin ? 'dashboard/events' : 'unavailable/block-agenda' }),
-      );
-    }
+    this.submitData.emit(Unavailable.fromBlockAgendaForm(this.getForm, this.timeZone, this.unavailable()));
   }
 
   focusin() {
@@ -281,19 +229,7 @@ export class BlockAgendaComponent {
   }
 
   delete(): void {
-    const unavailable = this.unavailableSignal();
-    const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const date = this.getForm.startDate.value ?
-      formatFullDate(this.getForm.startDate.value, this.translate.getCurrentLang()) : unavailable?.start;
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', { date });
-
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' }, result => {
-      if (result) {
-        this.store.dispatch(
-          deleteUnavailable({ id: result.id, timestamp: result.timestamp, timeZone: result.timeZone }),
-        );
-      }
-    });
+    this.deleteData.emit();
   }
 
   displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
@@ -329,24 +265,20 @@ export class BlockAgendaComponent {
   private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
     const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
-    const availability = roomAvailability;
 
     this.minTime = getTime(minDate);
     this.maxTime = getTime(maxDate);
     this.calculateMaxDuration(startDate);
-    this.roomAvailability = availability;
+    this.roomAvailability = roomAvailability;
   };
 
   private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
     if (max) {
-      const maxHour = max.hour;
-      const diffMin = max.minute;
-
-      const d = diffTime(date, this.timeZone, Number(maxHour), Number(diffMin));
+      const d = diffTime(date, this.timeZone, Number(max.hour), Number(max.minute));
       this.showDuration.set(true);
       this.durationMax = formatTime(d, this.timeZone);
-      if (this.isAddModeSignal()) {
+      if (!this.unavailable()) {
         this.getForm.duration.setValue(undefined);
       }
     }

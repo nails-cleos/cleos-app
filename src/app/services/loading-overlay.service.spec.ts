@@ -32,4 +32,23 @@ describe('LoadingOverlayService', () => {
 
     expect(service.isLoading()).toBe(false);
   });
+
+  it('should stay loading until all active requests finish', () => {
+    service.show();
+    service.show();
+
+    service.hide();
+
+    expect(service.isLoading()).toBe(true);
+
+    service.hide();
+
+    expect(service.isLoading()).toBe(false);
+  });
+
+  it('should ignore extra hide() calls after the counter reaches zero', () => {
+    service.hide();
+
+    expect(service.isLoading()).toBe(false);
+  });
 });

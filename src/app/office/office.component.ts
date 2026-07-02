@@ -1,62 +1,45 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, Signal, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { IUser } from '../interfaces/user';
-import { fieldChange, requireMatch } from '../util/validators';
-import { TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { createOffice, getOffice, updateOffice } from '../store/office.actions';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IUser } from '../user/user';
+import { requireMatch } from '../util/validators';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { map, startWith } from 'rxjs/operators';
-import { IOffice, Office } from '../interfaces/office';
-import { SharedModule } from '../shared/shared.module';
+import { IOffice, IOfficeAll, Office, OfficeForm } from './office';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { OfficeState } from '../store/reducers/office.reducers';
-import {
-  getCurrentOfficeIdPipe,
-  getManagersPipe,
-  getSelectedOfficePipe,
-  getSubErrorsPipe,
-} from '../store/selectors/office.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
-
-type OfficeForm = {
-  name: FormControl<string>;
-  manager: FormControl<IUser | undefined>;
-  subject: FormControl<string | undefined>,
-  kvk: FormControl<string | undefined>,
-  account: FormControl<string | undefined>,
-  btw: FormControl<string | undefined>,
-  billingAddress: FormControl<string | undefined>,
-  driveFolder: FormControl<string | undefined>,
-}
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ICommon, IError } from '../interfaces/common';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { OfficeStore } from '../store/office.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-office',
   templateUrl: './office.component.html',
   styleUrls: ['./office.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
+    MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfficeComponent {
-  private readonly store: Store<OfficeState> = inject(Store<OfficeState>);
+  config = input.required<ICommon>();
+  office = input<IOfficeAll | undefined>();
+  managers = input<IUser[] | undefined>();
+
+  submitData = output<IOffice>();
+
+  private readonly officeStore = inject(OfficeStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private officeId$ = this.store.pipe(getCurrentOfficeIdPipe);
-  private selectedOffice$ = this.store.pipe(getSelectedOfficePipe);
-  private allManagers$ = this.store.pipe(getManagersPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private subErrorsSignal = this.officeStore.subErrors;
 
-  private officeIdSignal = toSignal(this.officeId$, { initialValue: null });
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  allManagersSignal = toSignal(this.allManagers$);
-  officeSignal = toSignal(this.selectedOffice$);
-  isAddModeSignal = computed(() => !this.officeIdSignal());
+  isLoading = this.officeStore.isLoading;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<OfficeForm> = this.formBuilder.group<OfficeForm>({
@@ -78,7 +61,7 @@ export class OfficeComponent {
     this.getForm.manager.valueChanges.pipe(
       startWith(undefined),
       map((value?: IUser | string) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(this.allManagers$),
+      combineLatestWith(toObservable(this.managers)),
       map(([name, managers]) => {
         if (!managers) {
           return [];
@@ -88,12 +71,10 @@ export class OfficeComponent {
       })),
   );
 
-  private readonly language: string = this.translate.getCurrentLang();
-
   constructor() {
     effect(() => {
-      const selected = this.officeSignal();
-      if (selected?.id) {
+      const selected = this.office();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -103,23 +84,21 @@ export class OfficeComponent {
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
-          const field = error.field as keyof OfficeForm | undefined;
+          const field = error.field as string | undefined;
 
           if (field && field in this.form.controls) {
+            const officeField = field as keyof OfficeForm;
             errorMap[field] = error.message;
-            this.form.controls[field].setErrors({ incorrect: true });
+            this.form.controls[officeField].setErrors({ incorrect: true });
           }
         });
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.officeIdSignal();
-      if (id) {
-        this.store.dispatch(getOffice({ id }));
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): OfficeForm {
@@ -127,8 +106,8 @@ export class OfficeComponent {
   }
 
   get managerName(): string | undefined {
-    const office = this.officeSignal();
-    return office?.manager.displayName;
+    const office = this.office();
+    return office?.manager?.displayName;
   }
 
   submit(): void {
@@ -136,28 +115,11 @@ export class OfficeComponent {
       return;
     }
 
-    const officeSignal = this.officeSignal();
-    const office: IOffice = new Office();
-    office.name = fieldChange(this.getForm.name, officeSignal?.name);
-    office.subject = fieldChange(this.getForm.subject, officeSignal?.subject);
-    office.kvk = fieldChange(this.getForm.kvk, officeSignal?.kvk);
-    office.account = fieldChange(this.getForm.account, officeSignal?.account);
-    office.btw = fieldChange(this.getForm.btw, officeSignal?.btw);
-    office.billingAddress = fieldChange(this.getForm.billingAddress, officeSignal?.billingAddress);
-    office.driveFolder = fieldChange(this.getForm.driveFolder, officeSignal?.driveFolder);
-
-    const id = this.officeIdSignal();
-    if (!id) {
-      office.managerId = this.getForm.manager.value?.id;
-      this.store.dispatch(createOffice({ office }));
-    } else {
-      this.store.dispatch(updateOffice({ id, office }));
-    }
-    return;
+    this.submitData.emit(Office.fromForm(this.getForm, this.office()));
   }
 
   addManager() {
-    this.router.navigate([this.language, 'users', 'add'], { state: { role: Role.manager } });
+    this.navigationService.navigate(['users', 'add'], { state: { role: Role.manager } });
   }
 
   displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
@@ -165,4 +127,3 @@ export class OfficeComponent {
   private filter = (name: string, managers: IUser[]): IUser[] | undefined => managers?.filter(
     option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }
-

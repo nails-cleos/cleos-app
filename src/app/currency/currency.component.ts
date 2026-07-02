@@ -1,50 +1,35 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Currency, ICurrency } from '../interfaces/currency';
-import { createCurrency, getCurrency, updateCurrency } from '../store/currency.actions';
-import { fieldChange } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Currency, CurrencyForm, ICurrency, ICurrencyAll } from './currency';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getCurrentCurrencyIdPipe,
-  getSelectedCurrencyPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/currency.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
-import { CurrencyState } from '../store/reducers/currency.reducers';
-
-type CurrencyForm = {
-  code: FormControl<string>;
-  name: FormControl<string | undefined>;
-  icon: FormControl<string | undefined>;
-}
+import { ICommon, IError } from '../interfaces/common';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatSelect, MatSelectTrigger } from '@angular/material/select';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatOption } from '@angular/material/core';
+import { CurrencyStore } from '../store/currency.store';
 
 @Component({
   selector: 'app-currency',
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatIcon, MatButton, ReactiveFormsModule,
+    TranslatePipe, MatError, BackButtonDirective, BackButtonDirective, MatSelectTrigger],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyComponent {
-  private readonly store: Store<CurrencyState> = inject(Store<CurrencyState>);
+  config = input.required<ICommon>();
+  currency = input<ICurrencyAll | undefined>();
+
+  submitData = output<ICurrency>();
+
+  private readonly currencyStore = inject(CurrencyStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private currencyId$ = this.store.pipe(getCurrentCurrencyIdPipe);
-  private selectedCurrency$ = this.store.pipe(getSelectedCurrencyPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private subErrorsSignal = this.currencyStore.subErrors;
 
-  private currencyIdSignal = toSignal(this.currencyId$);
-  private selectedCurrencySignal = toSignal(this.selectedCurrency$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  private currencyId = computed(() => this.currencyIdSignal());
-
-  currencySignal = computed(() => this.selectedCurrencySignal());
-
-  isAddModeSignal = computed(() => !this.currencyId());
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<CurrencyForm> = this.formBuilder.group<CurrencyForm>({
@@ -59,8 +44,8 @@ export class CurrencyComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.selectedCurrencySignal();
-      if (selected?.id) {
+      const selected = this.currency();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -81,13 +66,10 @@ export class CurrencyComponent {
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.currencyId();
-      if (id) {
-        this.store.dispatch(getCurrency({ id }));
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): CurrencyForm {
@@ -99,18 +81,6 @@ export class CurrencyComponent {
       return;
     }
 
-    const currencySignal = this.currencySignal();
-    const currency: ICurrency = new Currency();
-    currency.code = fieldChange(this.getForm.code, currencySignal?.code);
-    currency.name = fieldChange(this.getForm.name, currencySignal?.name);
-    currency.icon = fieldChange(this.getForm.icon, currencySignal?.icon);
-
-    const id = this.currencyId();
-    if (!id) {
-      this.store.dispatch(createCurrency({ currency }));
-    } else {
-      this.store.dispatch(updateCurrency({ id, currency }));
-    }
-    return;
+    this.submitData.emit(Currency.fromForm(this.getForm, this.currency()));
   }
 }

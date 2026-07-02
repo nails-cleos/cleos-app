@@ -1,26 +1,26 @@
-import { DiscountType, IDiscount } from '../interfaces/discount';
-import { IAuthority, IUser, IUserAll } from '../interfaces/user';
-import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../interfaces/treatment';
+import { DiscountType, IDiscount } from '../discount/discount';
+import { IAuthority, IUser, IUserAll } from '../user/user';
+import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
-import { IReservationAll } from '../interfaces/reservation';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IReservationAll } from '../reservation/reservation';
+import { IAdditionalAll } from '../additional/additional';
 import { TranslateService } from '@ngx-translate/core';
-import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../interfaces/room';
-import { IOfficeAll } from '../interfaces/office';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
-import { getTime, getTimeZone, localeTimeZoneDate } from './dates';
+import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../room/room';
+import { IOfficeAll } from '../office/office';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
+import { DEFAULT_LOCALE, getTime, getTimeZone, localeTimeZoneDate } from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
 import { Role } from '../interfaces/token';
 import { CancelDialogComponent } from '../shared/dialog/cancel/cancel-dialog.component';
-import { Router } from '@angular/router';
 import { CustomerEditDialogComponent } from '../shared/dialog/customer-edit/customer-edit-dialog.component';
-import { ISummaryRoom } from '../interfaces/dashboard';
-import { IDialog } from '../interfaces/dialog';
+import { ISummaryRoom } from '../dashboard/dashboard';
+import { IDialog } from '../shared/dialog/dialog';
 import { ProfessionalDialogData } from '../reservation/select-professional-dialog.component';
 import { PriceDialogData } from '../room/me/add-service/price-dialog.component';
 import { SelectUserDialogData } from '../user/list/select-user-dialog.component';
+import { NavigationService } from '../services/navigation.service';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
@@ -39,18 +39,9 @@ export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefi
   return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
 };
 
-export const getUserImage = (user?: IUser | IUserAll): string | undefined => {
-  let image;
-  if (user) {
-    if (user.imageUrl && user.imageUrl.indexOf('http') >= 0) {
-      image = user.imageUrl;
-    } else if (user.image) {
-      image = `data:image/jpeg;base64,${ user.image }`;
-    }
-  }
-
-  return image;
-};
+export const getUserImage = (
+  user?: IUser | IUserAll,
+): string | undefined => user?.image ? `data:image/jpeg;base64,${ user.image }` : undefined;
 
 interface ILocale {
   language: string;
@@ -70,8 +61,14 @@ class Locale implements ILocale {
   }
 }
 
+export const currentLanguageFromUrl = (url: string): string => {
+  const path = url.split('?')[0].split('#')[0];
+  const lang = path.split('/').filter(Boolean)[0];
+  return getLocale(lang).language;
+};
+
 export const getLocale = (userLang?: string | null): ILocale => {
-  let language = 'en-GB';
+  let language = DEFAULT_LOCALE;
   let flag;
   const lang = userLang?.replace('_', '-');
   if (lang?.startsWith('es')) {
@@ -81,7 +78,7 @@ export const getLocale = (userLang?: string | null): ILocale => {
     language = 'nl';
     flag = 'nl';
   } else if (lang?.startsWith('en')) {
-    language = 'en-GB';
+    language = DEFAULT_LOCALE;
     flag = 'en_GB';
   }
 
@@ -404,11 +401,10 @@ export const openCancel = (
 
 export const customerEditDialog = (
   dialog: MatDialog,
-  router: Router,
+  navigationService: NavigationService,
   reservationId: string,
   currency: ICurrencyAll,
   small: boolean,
-  language: string,
   price?: IPrice,
 ): void => {
   const data = {
@@ -418,7 +414,7 @@ export const customerEditDialog = (
   };
   executeDialog(dialog, CustomerEditDialogComponent, data, result => {
     if (result) {
-      router.navigate([language, 'me', 'reservation', reservationId]);
+      navigationService.navigate(['me', 'reservation', reservationId]);
     }
   }, true);
 };
@@ -480,7 +476,7 @@ export enum FrequencyEnum {
 }
 
 export const createAddress = (
-  formattedAddress?: string, location?: google.maps.LatLng,
+  formattedAddress?: string, location?: { lat: () => number; lng: () => number },
   address?: IAddress, description?: string): IAddress | undefined => {
   if (location || address) {
     return {

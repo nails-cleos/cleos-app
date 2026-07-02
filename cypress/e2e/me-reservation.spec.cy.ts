@@ -1,5 +1,6 @@
 import '../support/commands';
 import { devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height }) => {
   describe(`Me reservation flow  with ${ name }`, () => {
@@ -19,7 +20,7 @@ devices.forEach(({ name, width, height }) => {
     reservationDate.setDate(reservationDate.getDate() + diffToWednesday);
     reservationDate.setHours(13, 30, 0, 0);
 
-    const formattedDate = reservationDate.toLocaleDateString('en-GB');
+    const formattedDate = reservationDate.toLocaleDateString(DEFAULT_LOCALE);
 
     beforeEach(() => cy.viewport(width, height));
 
@@ -40,7 +41,7 @@ devices.forEach(({ name, width, height }) => {
         groupId,
       );
 
-      cy.visit('en-GB/me/reservation');
+      cy.visit(`${DEFAULT_LOCALE}/me/reservation`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -138,7 +139,7 @@ devices.forEach(({ name, width, height }) => {
         additionalIds,
       );
 
-      cy.visit('en-GB/me/reservations');
+      cy.visit(`${DEFAULT_LOCALE}/me/reservations`);
       cy.mockFirebaseAppCheck();
     });
 

@@ -1,8 +1,9 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
-  describe(`Additional with ${name}`, () => {
+  describe(`Discount with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
 
     beforeEach(() => {
@@ -13,7 +14,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdminDashboard(new Date(), 'CLEOS');
       cy.mockCurrencyList(false);
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -28,7 +29,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/discounts').as('saveDiscounts');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
-      cy.get('tr').contains('No discounts');
+      cy.contains('.no-content', 'No discounts', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/discounts/add');
 
@@ -37,7 +38,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('#mat-input-0').click();
       cy.get('#mat-input-0').type(discountName);
-      cy.get('#mat-input-3').click();
+      cy.get('#mat-input-4').click();
       cy.get('#mat-option-2').click();
       cy.get('#mat-input-1').click();
       cy.get('#mat-input-1').type(`${discountName} Description`);
@@ -61,6 +62,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockDiscounts(undefined, '09ae64ab-547d-43b4-8c7b-a5947296e207');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedDiscount').then((discount: any) => {
         cy.mockDiscount(discount.id, discount).then(() => {

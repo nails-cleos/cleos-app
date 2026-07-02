@@ -8,9 +8,9 @@ import {
   IReservationAll,
   IRoomReservation,
   IUpcomingAll,
-} from '../interfaces/reservation';
-import { paginated, Pagination } from '../interfaces/pagination';
-import { IReview } from '../interfaces/review';
+} from '../reservation/reservation';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import { IReview } from '../me/reservation/list/review';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -20,7 +20,7 @@ import { IApiResponse } from '../interfaces/common';
 export class ReservationService {
 
   private url = 'reservations';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -38,13 +38,13 @@ export class ReservationService {
     let baseUrl = this.urlV1;
     if (!all) {
       if (roomId) {
-        baseUrl += `/rooms/${roomId}`;
+        baseUrl += `/rooms/${ roomId }`;
       } else {
-        baseUrl += `/professionals/${professionalId}`;
+        baseUrl += `/professionals/${ professionalId }`;
       }
     }
 
-    return this.http.get<Pagination<IReservationAll>>(`${baseUrl}/pages`, { ...paginated(), params });
+    return this.http.get<Pagination<IReservationAll>>(`${ baseUrl }/pages`, { ...paginated(), params });
   };
 
   getCustomerReservations = (
@@ -61,7 +61,7 @@ export class ReservationService {
       params = params.append('direction', direction);
     }
 
-    return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { params });
+    return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { ...skipLoadingOverlay(), params });
   };
 
   getAllFilterReservations = (
@@ -136,11 +136,12 @@ export class ReservationService {
 
   getReservation = (id: string, editPath?: string): Observable<IUpcomingAll | undefined> => {
     const url = toUrl(this.urlV1, id);
-    return this.http.get<IUpcomingAll>(editPath ? `${url}/${editPath}` : url);
+    return this.http.get<IUpcomingAll>(editPath ? `${ url }/${ editPath }` : url, { ...skipLoadingOverlay() });
   };
 
   getReservationHistory = (id: string): Observable<IReservationAll[]> => this.http.get<IReservationAll[]>(
     toUrl(this.urlV1, id, 'history'),
+    skipLoadingOverlay(),
   );
 
   createReservation = (
@@ -189,7 +190,7 @@ export class ReservationService {
     review);
 
   getReview = (id: string): Observable<IReview | undefined> => this.http.get<IReview>(
-    toUrl(this.urlV1, id, 'reviews'),
+    toUrl(this.urlV1, id, 'reviews'), { ...skipLoadingOverlay() },
   );
 
   updateReservationNote = (

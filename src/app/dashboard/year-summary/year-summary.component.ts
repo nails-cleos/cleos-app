@@ -1,11 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { dateMonthYear, getNowTimeZone } from '../../util/dates';
-import { Store } from '@ngrx/store';
 import {
   IMonthlyExport,
   IQuarterSummary,
@@ -16,8 +13,7 @@ import {
   QuarterSummary,
   SummaryTotals,
   Total,
-} from '../../interfaces/dashboard';
-import { exportYearSummary, getYearSummary } from '../../store/dashboard.actions';
+} from '../dashboard';
 import { AuthUserService } from '../../services/auth-user.service';
 import {
   allElementsHaveSameKeyFilterValue,
@@ -27,21 +23,22 @@ import {
 } from '../../util/helper';
 import { createYearlyWorkbook } from '../../util/report';
 import fs from 'file-saver';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { YearComponent } from './year/year.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getYearExportPipe,
-  getYearNavigationParamsPipe,
-  getYearSummaryMapPipe,
-  isDashboardLoadingPipe,
-} from '../../store/selectors/dashboard.selectors';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
-import { DateAdapter } from '@angular/material/core';
-import { YearAdapter } from '../../util/adapter/year.adapter';
+import { MatOption } from '@angular/material/core';
+import { provideYearDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type YearSummaryForm = {
   date: FormControl<Date>;
@@ -52,22 +49,20 @@ type YearSummaryForm = {
   selector: 'app-year-summary',
   templateUrl: './year-summary.component.html',
   styleUrls: ['./year-summary.component.scss'],
-  imports: [SharedModule, YearComponent, TotalSummaryComponent],
-  providers: [{ provide: DateAdapter, useClass: YearAdapter }],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
+    MatOption, MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, KeyValuePipe,
+    RouterLink, YearComponent, TotalSummaryComponent],
+  providers: [...provideYearDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YearSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly dashboardStore = inject(DashboardStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-
-  private yearSummaryMap$ = this.store.pipe(getYearSummaryMapPipe);
-  private yearExport$ = this.store.pipe(getYearExportPipe);
-  private navigationParams$ = this.store.pipe(getYearNavigationParamsPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
 
   private authUserSignal = this.authUserService.authUser;
 
@@ -75,8 +70,6 @@ export class YearSummaryComponent {
   private quarterSummariesSignal = signal<IQuarterSummary[] | undefined>(undefined);
   private sheetDataSignal = signal<IMonthlyExport[]>([]);
   private readonly exportSignal = signal<boolean>(false);
-  private navigationParams = toSignal(this.navigationParams$);
-  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private userName = computed(() => this.authUserSignal()?.displayName);
 
@@ -90,10 +83,28 @@ export class YearSummaryComponent {
 
   private timeZone = computed(() => getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
 
-  yearSummaryMapSignal = toSignal(this.yearSummaryMap$);
-  yearExportSignal = toSignal(this.yearExport$);
+  yearSummaryMapSignal = this.dashboardStore.yearSummaryMap;
+  yearExportSignal = this.dashboardStore.yearExport;
+  private breakpointsSignal = toSignal(
+    this.breakpointObserver.observe([
+      Breakpoints.XSmall,
+      Breakpoints.Small,
+      Breakpoints.Medium,
+    ]),
+    {
+      initialValue: {
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      },
+    },
+  );
 
   showCash = computed(() => this.authUserSignal()?.showCash || false);
+  isHandset = computed(() => this.breakpointsSignal().matches);
   currencySignal = computed(() => getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
   yearSummaryTotalsSignal = computed(() => {
     const quarterSummaries = this.quarterSummariesSignal();
@@ -129,21 +140,16 @@ export class YearSummaryComponent {
     return yearSummaryTotals;
   });
 
-  isHandset$: Observable<boolean> = this.breakpointObserver.observe([
-    Breakpoints.XSmall,
-    Breakpoints.Small,
-    Breakpoints.Medium,
-  ]).pipe(map(result => result.matches), shareReplay());
-
   isExportLoading = signal<boolean>(false);
-  language: string = this.translate.getCurrentLang();
+  language: string = this.navigationService.language;
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params) {
+      const navigationState = history.state;
+      if (navigationState) {
         const now = getNowTimeZone(this.timeZone());
-        this.getForm.date.setValue(dateMonthYear(now.getMonth(), params.year || now.getFullYear()));
+        this.getForm.date.setValue(dateMonthYear(now.getMonth(), navigationState['year'] || now.getFullYear()));
       }
     });
 
@@ -322,7 +328,7 @@ export class YearSummaryComponent {
     }));
     if (sortedSheetData.length) {
       const workbook = createYearlyWorkbook(sortedSheetData, this.getForm.date.value || getNowTimeZone(this.timeZone()),
-        currencySymbol(this.currencySignal()), this.timeZone(), this.translate, this.env);
+        currencySymbol(this.currencySignal()), this.timeZone(), this.translateService, this.env);
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone(this.timeZone());
@@ -332,7 +338,7 @@ export class YearSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `Report_${this.getForm.date.value?.getFullYear()}.xlsx`);
+        fs.saveAs(blob, `Report_${ this.getForm.date.value?.getFullYear() }.xlsx`);
       });
     }
   };
@@ -341,11 +347,11 @@ export class YearSummaryComponent {
     this.quarterSummariesSignal.set(undefined);
     this.primaryRoomSignal.set(undefined);
     this.exportSignal.set(false);
-    this.store.dispatch(getYearSummary({ year }));
+    this.dashboardStore.getYearSummary(year);
   };
 
   private getExportData = (year: number): void => {
     this.isExportLoading.set(true);
-    this.store.dispatch(exportYearSummary({ year }));
+    this.dashboardStore.exportYearSummary(year);
   };
 }

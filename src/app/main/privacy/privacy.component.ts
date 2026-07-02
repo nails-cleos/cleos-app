@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject } from '@angular/core';
-import { MainContentService } from '../../services/main-content.service';
+import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
 import { LegalPageBase } from '../legal-page-base';
 
 @Component({
@@ -9,7 +8,6 @@ import { LegalPageBase } from '../legal-page-base';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PrivacyComponent extends LegalPageBase {
-  private readonly mainContent: MainContentService = inject(MainContentService);
   privacyContent = this.legalContent;
 
   constructor() {
@@ -18,7 +16,6 @@ export class PrivacyComponent extends LegalPageBase {
       unavailableHtml: '<h1>Privacy Policy</h1><p>Privacy policy content is unavailable.</p>',
       fileName: 'privacy',
     });
-    this.mainContent.configure(false, 'open');
   }
 
   @HostListener('click', ['$event'])

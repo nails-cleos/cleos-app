@@ -1,44 +1,48 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Store } from '@ngrx/store';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
-import { toSignal } from '@angular/core/rxjs-interop';
 
-import { getServices, updateServices } from '../../../store/room.actions';
-import { IService, IServicePrice, ServicePrice, ServiceType } from '../../../interfaces/room';
-import { IGroupService } from '../../../interfaces/treatment';
+import { IService, IServicePrice, ServicePrice, ServiceType } from '../../room';
+import { IGroupService } from '../../../treatment/treatment';
 import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
-import { SharedModule } from '../../../shared/shared.module';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
-import { getCurrentRoomIdPipe, getRoomResponsePipe, getServicesPipe } from '../../../store/selectors/room.selectors';
-import { RoomState } from '../../../store/reducers/room.reducers';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
+import { KeyValuePipe } from '@angular/common';
+import { RoomStore } from '../../../store/room.store';
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
-  imports: [SharedModule, CurrencySymbolPipe, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, KeyValuePipe, BackButtonDirective,
+    CurrencySymbolPipe, CurrencySymbolPipe, BackButtonDirective, CdkDropList, CdkDrag],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddServiceComponent {
-  private readonly store = inject(Store<RoomState>);
+  id = input<string>();
+
+  private readonly roomStore = inject(RoomStore);
   private readonly dialog = inject(MatDialog);
 
-  private roomIdSignal = toSignal(this.store.pipe(getCurrentRoomIdPipe));
-  private servicesSignal = toSignal(this.store.pipe(getServicesPipe));
-  private responseSignal = toSignal(this.store.pipe(getRoomResponsePipe));
+  private servicesSignal = this.roomStore.services;
+  private responseSignal = this.roomStore.response;
+  private isLoadingSignal = this.roomStore.isLoading;
 
   additional = signal<IService[]>([]);
   selectedAdditional = signal<IService[]>([]);
   groups = signal<Map<string, IGroupService>>(new Map());
+  isLoading = computed(() => this.isLoadingSignal());
+  servicesLoaded = computed(() => !!this.servicesSignal()?.currency);
 
   constructor() {
     effect(() => {
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (id) {
-        this.store.dispatch(getServices({ id }));
+        this.roomStore.loadServices(id);
       }
     });
 
@@ -80,15 +84,15 @@ export class AddServiceComponent {
 
     effect(() => {
       const response = this.responseSignal();
-      const id = this.roomIdSignal();
+      const id = this.id();
       if (response && id) {
-        this.store.dispatch(getServices({ id }));
+        this.roomStore.loadServices(id);
       }
     });
   }
 
   save() {
-    const id = this.roomIdSignal();
+    const id = this.id();
     if (!id) {
       return;
     }
@@ -114,7 +118,7 @@ export class AddServiceComponent {
       });
     }
 
-    this.store.dispatch(updateServices({ id, prices }));
+    this.roomStore.updateServices(id, prices);
   }
 
   changePrice(service: IService): void {

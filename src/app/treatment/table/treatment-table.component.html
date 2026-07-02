@@ -3,22 +3,14 @@
     <ng-container matColumnDef="date">
       <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}</th>
       <td *matCellDef="let treatment" mat-cell>
-        @if (treatment.id) {
-          <div>{{ treatment.createdAt | date:'shortDate':undefined:dateFormat }}</div>
-        } @else {
-          <div class="ssc-line"></div>
-        }
+        <div>{{ treatment.createdAt | date:'shortDate':undefined:language }}</div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="price">
       <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.PRICE' | translate }}</th>
       <td *matCellDef="let treatment" mat-cell>
-        @if (treatment.id) {
-          <mat-icon matPrefix class="app-surface-hide-mobile">attach_money</mat-icon>&nbsp;{{ treatment.price | number:'1.2-2' }}
-        } @else {
-          <div class="ssc-line"></div>
-        }
+        <mat-icon matPrefix class="app-surface-hide-mobile">attach_money</mat-icon>&nbsp;{{ treatment.price | number:'1.2-2' }}
       </td>
     </ng-container>
 
@@ -27,12 +19,8 @@
           mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}
       </th>
       <td *matCellDef="let treatment" mat-cell>
-        @if (treatment.id) {
-          <mat-icon matPrefix class="app-surface-hide-mobile">timer</mat-icon>&nbsp;
-          {{ treatment.hour | number:'2.0-0' }}:{{ treatment.minute | number:'2.0-0' }}
-        } @else {
-          <div class="ssc-line"></div>
-        }
+        <mat-icon matPrefix class="app-surface-hide-mobile">timer</mat-icon>&nbsp;
+        {{ treatment.hour | number:'2.0-0' }}:{{ treatment.minute | number:'2.0-0' }}
       </td>
     </ng-container>
 

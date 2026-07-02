@@ -1,28 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { createTransaction, getAccount } from '../../store/account.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthUserService } from '../../services/auth-user.service';
-import { ITransaction } from '../../interfaces/account';
+import { ITransaction } from '../account';
 import { currencySymbol } from '../../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { BankComponent, BankForm } from '../../shared/bank/bank.component';
 import { IError } from '../../interfaces/common';
-import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getAccountResponsePipe,
-  getCurrentAccountIdPipe,
-  getSelectedAccountPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/account.selectors';
-import { AccountState } from '../../store/reducers/account.reducers';
-import { PaymentState } from '../../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
+import { AccountStore } from '../../store/account.store';
 import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -34,32 +26,26 @@ export type TransactionForm = {
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective, BankComponent, PaymentOptionSelectComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    MatPrefix, BankComponent, BackButtonDirective, BalanceComponent, BackButtonDirective, BankComponent,
+    PaymentOptionSelectComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionComponent {
-  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
+  id = input<string>();
+
+  private readonly accountStore = inject(AccountStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private readonly accountId$ = this.store.pipe(getCurrentAccountIdPipe);
-  private readonly selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private readonly subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private readonly response$ = this.store.pipe(getAccountResponsePipe);
-  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
-
-  private accountIdSignal = toSignal(this.accountId$, { initialValue: null });
-  private selectedAccountSignal = toSignal(this.selectedAccount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
-  private authUserSignal = this.authUserService.authUser;
-  private accountId = computed(() => this.accountIdSignal());
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly accountId = computed(() => this.id());
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   errors = signal<Record<string, unknown>>({});
-  accountSignal = computed(() => this.selectedAccountSignal());
+  accountSignal = computed(() => this.accountStore.selected());
   types = computed(() => this.paymentOptionsSignal()
     .filter(option => option.enabled)
     .filter(option => ['cash', 'transfer'].includes(option.type.toLowerCase())));
@@ -73,7 +59,7 @@ export class TransactionComponent {
   });
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
   amountMin: number = 100;
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   bankForm = this.formBuilder.group<BankForm>({
     percentage: this.formBuilder.control(undefined),
@@ -92,7 +78,7 @@ export class TransactionComponent {
 
   constructor() {
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.accountStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -114,11 +100,11 @@ export class TransactionComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
+      if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
-          this.router.navigate([this.language, 'users', this.accountSignal()?.customer?.id, 'overview']);
+          this.navigationService.navigate(['users', this.accountSignal()?.customer?.id, 'overview']);
         } else {
-          this.router.navigate([this.language, 'me', 'overview']);
+          this.navigationService.navigate(['me', 'overview']);
         }
       }
     });
@@ -126,7 +112,9 @@ export class TransactionComponent {
     effect(() => {
       const id = this.accountId();
       if (id) {
-        this.store.dispatch(getAccount({ id }));
+        this.accountStore.clean();
+        this.accountStore.loadAccount(id);
+        this.paymentStore.getOptions();
       }
     });
   }
@@ -161,8 +149,8 @@ export class TransactionComponent {
       amount,
       paymentRequest: { type, transfer },
     };
-    const id = this.accountIdSignal()!;
-    this.store.dispatch(createTransaction({ id, transaction }));
+    const id = this.id()!;
+    this.accountStore.createTransaction(id, transaction);
     return;
   }
 }

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
-import { AppMaterialModule } from '../../util/app-material.module';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 export type BankForm = {
   option: FormControl<IPaymentOption | undefined>;
@@ -14,7 +14,8 @@ export type BankForm = {
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
-  imports: [AppMaterialModule, TranslateModule, ReactiveFormsModule, FormsModule, PaymentOptionSelectComponent],
+  imports: [TranslatePipe, ReactiveFormsModule, PaymentOptionSelectComponent, MatRadioGroup,
+    MatRadioButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BankComponent {

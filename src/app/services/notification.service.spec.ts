@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { INotification } from '../interfaces/notification';
+import { INotification } from '../notification/notification';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('NotificationService', () => {
   let service: NotificationService;
@@ -14,7 +15,7 @@ describe('NotificationService', () => {
   const mockNotification: INotification = {
     id: '1',
     message: 'message',
-    navigation: '/en-GB/test',
+    navigation: `/${DEFAULT_LOCALE}/test`,
     date: 1716800000,
     notDate: new Date(),
     read: false,
@@ -44,10 +45,10 @@ describe('NotificationService', () => {
   });
 
   it('should fetch notification pages with pagination params', () => {
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.and.returnValue(of({ unread: 5, page: mockPagination, workDay: [] }));
 
     service.getNotificationsPage(0, 'date', 'desc', 10).subscribe(result => {
-      expect(result).toEqual(mockPagination);
+      expect(result).toEqual({ unread: 5, page: mockPagination, workDay: [] });
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/notifications/pages', {

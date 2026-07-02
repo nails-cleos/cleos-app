@@ -19,40 +19,42 @@ export const createMatTableState = (
   const sortDirection = signal<SortDirection>(defaultDirection);
 
   effect((onCleanup) => {
-    const paginatorRef = paginator();
+    const p = paginator();
+    if (p) {
+      const sub = p.page.subscribe(({ pageIndex: next }) => {
+        if (pageIndex() !== next) {
+          pageIndex.set(next);
+        }
+      });
 
-    if (!paginatorRef) {
-      pageIndex.set(0);
-      return;
+      onCleanup(() => sub.unsubscribe());
     }
+  });
 
-    pageIndex.set(paginatorRef.pageIndex ?? 0);
+  effect(() => {
+    const p = paginator();
+    if (p) {
+      const current = pageIndex();
 
-    const sub = paginatorRef.page.subscribe(({ pageIndex: nextPageIndex }) => {
-      pageIndex.set(nextPageIndex);
-    });
-
-    onCleanup(() => sub.unsubscribe());
+      if (p.pageIndex !== current) {
+        p.pageIndex = current;
+      }
+    }
   });
 
   effect((onCleanup) => {
-    const sortRef = sort();
+    const s = sort();
+    if (s) {
+      sortActive.set(s.active || defaultActive);
+      sortDirection.set(s.direction || defaultDirection);
 
-    if (!sortRef) {
-      sortActive.set(defaultActive);
-      sortDirection.set(defaultDirection);
-      return;
+      const sub = s.sortChange.subscribe(({ active, direction }) => {
+        sortActive.set(active || defaultActive);
+        sortDirection.set(direction || defaultDirection);
+      });
+
+      onCleanup(() => sub.unsubscribe());
     }
-
-    sortActive.set(sortRef.active || defaultActive);
-    sortDirection.set(sortRef.direction || defaultDirection);
-
-    const sub = sortRef.sortChange.subscribe(({ active: nextActive, direction: nextDirection }) => {
-      sortActive.set(nextActive || defaultActive);
-      sortDirection.set(nextDirection || defaultDirection);
-    });
-
-    onCleanup(() => sub.unsubscribe());
   });
 
   const baseRequest = computed<MatTableBaseRequest>(() => ({
@@ -66,9 +68,9 @@ export const createMatTableState = (
     paginator()?.firstPage();
   };
 
-  const resetOn = (trigger: Signal<unknown>, onReset?: () => void) => effect(() => {
+  const resetOn = (trigger: Signal<unknown>, onReset: () => void) => effect(() => {
     if (trigger()) {
-      onReset?.();
+      onReset();
       resetPage();
     }
   });

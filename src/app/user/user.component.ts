@@ -1,70 +1,50 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { getUser, saveUser } from '../store/user.actions';
-import { IUser, User } from '../interfaces/user';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { IUser, IUserAll, User } from './user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';
-import { backendFormatDate, createDateFromString, newDate } from '../util/dates';
-import { fieldChange, validColorValidator, valueChange } from '../util/validators';
-import { createAddress } from '../util/helper';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { createDateFromString } from '../util/dates';
+import { validColorValidator } from '../util/validators';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
-import { SharedModule } from '../shared/shared.module';
 import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserState } from '../store/reducers/user.reducers';
-import {
-  getCurrentUserIdPipe,
-  getNavigationParamsPipe,
-  getSelectedUserPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/user.selectors';
-import { IError } from '../interfaces/common';
+import { ICommon, IError } from '../interfaces/common';
 import { ColorPickerComponent } from '../shared/color-picker/color-picker.component';
-import PlaceGeometry = google.maps.places.PlaceGeometry;
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { UserForm } from './user-form.types';
+import { UserStore } from '../store/user.store';
 import PlaceResult = google.maps.places.PlaceResult;
-
-type UserForm = {
-  role: FormControl<Role | undefined>,
-  displayName: FormControl<string>,
-  email: FormControl<string>,
-  lang: FormControl<string | undefined>;
-  phone: FormControl<string | undefined>,
-  dob: FormControl<Date | undefined>,
-  darkColor: FormControl<string>,
-  lightColor: FormControl<string>,
-  addressForm: FormGroup<GoogleMapForm>;
-}
+import PlaceGeometry = google.maps.places.PlaceGeometry;
 
 @Component({
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    NgIcon, ColorPickerComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, MatError, MatPrefix, BackButtonDirective,
+    NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon, ColorPickerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserComponent {
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  config = input.required<ICommon>();
+  user = input<IUserAll>();
+  role = input<Role>();
+
+  submitData = output<{ user: IUser; role?: Role }>();
+
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly translate: TranslateService = inject(TranslateService);
-
-  private userId$ = this.store.pipe(getCurrentUserIdPipe);
-  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
-  private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private navigationParams = toSignal(this.navigationParams$);
-  private userIdSignal = toSignal(this.userId$);
-  private subErrorsSignal = toSignal(this.subErrors$);
   private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
-
-  isAddModeSignal = computed(() => !this.userIdSignal());
-  userSignal = toSignal(this.selectedUser$);
 
   googleMapForm: FormGroup<GoogleMapForm> = this.formBuilder.group<GoogleMapForm>({
     address: this.formBuilder.control(undefined),
@@ -112,22 +92,15 @@ export class UserComponent {
   errors = signal<Record<string, unknown>>({});
 
   constructor() {
-    effect(() => {
-      const params = this.navigationParams();
-      this.getForm.role.setValue(params?.role);
-    });
+    effect(() => this.getForm.role.setValue(this.role()));
 
     effect(() => {
-      const user = this.userSignal();
+      const user = this.user();
       if (user) {
         this.form.patchValue({
+          ...user,
           lang: user.locale,
-          displayName: user.displayName,
-          email: user.email,
-          phone: user.phone,
           dob: user.dob ? createDateFromString(user.dob) : undefined,
-          darkColor: user.darkColor,
-          lightColor: user.lightColor,
         });
         this.googleMapForm.patchValue({
           address: user.address?.name,
@@ -140,7 +113,7 @@ export class UserComponent {
     });
 
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.userStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -152,13 +125,6 @@ export class UserComponent {
           }
         });
         this.errors.set(errorMap);
-      }
-    });
-
-    effect(() => {
-      const id = this.userIdSignal();
-      if (id) {
-        this.store.dispatch(getUser({ id }));
       }
     });
 
@@ -187,6 +153,10 @@ export class UserComponent {
     });
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   get getForm(): UserForm {
     return this.form.controls;
   }
@@ -195,36 +165,16 @@ export class UserComponent {
     if (this.form.invalid) {
       return;
     }
-    const userSignal = this.userSignal();
-    const user: IUser = new User();
-    user.locale = valueChange(this.getForm.lang.value, userSignal?.locale) || this.translate.getCurrentLang();
-    user.email = fieldChange(this.getForm.email, userSignal?.email);
-    user.displayName = fieldChange(this.getForm.displayName, userSignal?.displayName);
-    user.phone = fieldChange(this.getForm.phone, userSignal?.phone);
-    user.dob = fieldChange(this.getForm.dob, userSignal?.dob);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
+    const user = User.fromForm(
+      this.getForm,
+      this.user(),
+      this.translate.getCurrentLang(),
+      this.isProfessionalOrManager,
+      this.formattedAddress,
+      this.geometry?.location,
+    );
 
-    if (this.isProfessionalOrManager) {
-      if (this.getForm.lightColor.value) {
-        user.lightColor = this.getForm.lightColor.value;
-      }
-
-      if (this.getForm.darkColor.value) {
-        user.darkColor = this.getForm.darkColor.value;
-      }
-    }
-
-    user.address = createAddress(this.formattedAddress, this.geometry?.location, userSignal?.address);
-
-    const id = this.userIdSignal();
-    if (!id) {
-      this.store.dispatch(
-        saveUser({ user, role: this.getForm.role.value }),
-      );
-    } else {
-      user.id = id;
-      this.store.dispatch(saveUser({ user }));
-    }
+    this.submitData.emit({ user, role: this.getForm.role.value });
   }
 
   getAddress = (placeResult: PlaceResult): void => {

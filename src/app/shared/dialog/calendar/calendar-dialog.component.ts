@@ -1,8 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import {
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 type CalendarForm = {
   radio: FormControl<string>;
@@ -12,7 +20,8 @@ type CalendarForm = {
   selector: 'app-calendar-dialog',
   templateUrl: './calendar-dialog.component.html',
   styleUrls: ['./calendar-dialog.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslateModule],
+  imports: [MatIcon, MatButton, TranslatePipe, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatRadioGroup,
+    MatRadioButton, MatDialogActions, MatDialogClose],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarDialogComponent {

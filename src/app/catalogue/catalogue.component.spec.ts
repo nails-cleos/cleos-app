@@ -1,25 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueComponent } from './catalogue.component';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ICatalogueAll } from '../interfaces/catalogue';
-import { ITreatmentGroup, ITreatmentGroupAll } from '../interfaces/treatment';
-import { CatalogueState } from '../store/reducers/catalogue.reducers';
+import { signal } from '@angular/core';
+import { ICatalogueAll } from './catalogue';
+import { ICommon } from '../interfaces/common';
+import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
+import { NavigationService } from '../services/navigation.service';
+import { CatalogueStore } from '../store/catalogue.store';
+import { TreatmentStore } from '../store/treatment.store';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
   let fixture: ComponentFixture<CatalogueComponent>;
 
-  let catalogueId$: BehaviorSubject<string | null>;
-  let selectedCatalogue$: BehaviorSubject<ICatalogueAll | undefined>;
-  let subErrors$: BehaviorSubject<any>;
-  let allGroups$: BehaviorSubject<ITreatmentGroupAll[]>;
+  let catalogueStoreSpy: {
+    subErrors: ReturnType<typeof signal>;
+  };
 
-  let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let treatmentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllGroups: jasmine.Spy;
+  };
 
   const mockCatalogue: ICatalogueAll = {
     blob: undefined,
@@ -34,49 +35,35 @@ describe('CatalogueComponent', () => {
   };
 
   const mockGroup: ITreatmentGroupAll = { id: 'group1', name: 'Test Group' };
+  const config: ICommon = {
+    title: 'CATALOGUE.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
 
   beforeEach(async () => {
-    catalogueId$ = new BehaviorSubject<string | null>(null);
-    selectedCatalogue$ = new BehaviorSubject<ICatalogueAll | undefined>(undefined);
-    subErrors$ = new BehaviorSubject<any>([]);
-    allGroups$ = new BehaviorSubject<ITreatmentGroupAll[]>([]);
+    catalogueStoreSpy = {
+      subErrors: signal<any>(undefined),
+    };
+    treatmentStoreSpy = {
+      data: signal<any>([]),
+      loadAllGroups: jasmine.createSpy('loadGroups'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return catalogueId$.asObservable();
-        case 2:
-          return selectedCatalogue$.asObservable();
-        case 3:
-          return allGroups$.asObservable();
-        case 4:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
       imports: [CatalogueComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -84,22 +71,8 @@ describe('CatalogueComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be in add mode when catalogueId is null', () => {
-    catalogueId$.next(null);
-    fixture.detectChanges();
-
-    expect(component.isAddModeSignal()).toBeTrue();
-  });
-
-  it('should be in edit mode when catalogueId is set', () => {
-    catalogueId$.next('123');
-    fixture.detectChanges();
-
-    expect(component.isAddModeSignal()).toBeFalse();
-  });
-
   it('should patch form when selectedCatalogue emits a value', () => {
-    selectedCatalogue$.next(mockCatalogue);
+    fixture.componentRef.setInput('catalogue', mockCatalogue);
     fixture.detectChanges();
 
     expect(component.getForm.name.value).toBe(mockCatalogue.name!);
@@ -111,7 +84,7 @@ describe('CatalogueComponent', () => {
       { field: 'name', message: 'Name required' },
       { field: 'group', message: 'Group invalid' },
     ];
-    subErrors$.next(errors);
+    catalogueStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
@@ -121,7 +94,10 @@ describe('CatalogueComponent', () => {
   });
 
   it('should filter groups correctly using filteredGroupSignal', () => {
-    allGroups$.next([mockGroup, { id: '2', name: 'Another Group' }]);
+    treatmentStoreSpy.data.set({
+      kind: 'list',
+      value: [mockGroup, { id: '2', name: 'Another Group' }],
+    });
     (component.getForm.group as any).setValue('A');
     fixture.detectChanges();
 
@@ -131,6 +107,8 @@ describe('CatalogueComponent', () => {
   });
 
   it('should update form values correctly on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
     nameControl.markAsDirty();
@@ -150,26 +128,30 @@ describe('CatalogueComponent', () => {
     expect(component.form.valid).toBeTrue();
     component.submit();
 
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual({
-      catalogue: jasmine.objectContaining({
-        name: 'New Name',
-        home: true,
-        catalog: true,
-      }),
-      resizedImageDataUrl: 'data:image/jpeg;base64,AAA',
-      type: '[Catalogue] Create catalogue',
-    });
+    expect(emitSpy).toHaveBeenCalledWith(
+      {
+        catalogue: jasmine.objectContaining({
+          name: 'New Name',
+          home: true,
+          catalog: true,
+        }),
+        resizedImageDataUrl: 'data:image/jpeg;base64,AAA',
+      },
+    );
   });
 
   it('should not submit when form is invalid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     expect(component.form.valid).toBeFalse();
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should not submit when image is missing', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     expect(component.form.valid).toBeFalse();
 
     const nameControl = component.getForm.name;
@@ -189,7 +171,7 @@ describe('CatalogueComponent', () => {
     expect(component.form.valid).toBeTrue();
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('displayFnGroup should return group name', () => {

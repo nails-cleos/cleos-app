@@ -3,27 +3,29 @@ import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IReservation } from '../../../interfaces/reservation';
+import { IReservation } from '../../../reservation/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { deleteReservation, getPage } from '../../../store/reservation.actions';
+import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { ReservationTableComponent } from './reservation-table.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { IUser } from '../../../interfaces/user';
-import { IRoom } from '../../../interfaces/room';
-import { ITreatment } from '../../../interfaces/treatment';
+import { IUser } from '../../../user/user';
+import { IRoom } from '../../../room/room';
+import { ITreatment } from '../../../treatment/treatment';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
   let fixture: ComponentFixture<ReservationTableComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   const customer: IUser = {
@@ -60,11 +62,16 @@ describe('ReservationTableComponent', () => {
   let reservationList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     reservationList$ = new BehaviorSubject(mockPagination);
     response$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -73,13 +80,9 @@ describe('ReservationTableComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -96,33 +99,35 @@ describe('ReservationTableComponent', () => {
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ReservationTableComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReservationTableComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
     reservationList$.complete();
     response$.complete();
+    isLoading$.complete();
     breakpoint$.complete();
   });
 
@@ -212,7 +217,7 @@ describe('ReservationTableComponent', () => {
 
   it('should dispatch deleteReservation when dialog returns a result', () => {
     const item = mockReservation[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 

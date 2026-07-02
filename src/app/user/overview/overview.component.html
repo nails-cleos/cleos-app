@@ -37,8 +37,12 @@
                     </span>
                   </div>
                 } @else {
-                  <div class="ssc-head-line"></div>
-                  <div class="ssc-head-line"></div>
+                  <div class="ssc-line overview-skeleton overview-skeleton--hero-title"></div>
+                  <div class="overview-hero__meta">
+                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
+                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
+                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
+                  </div>
                 }
               </div>
             </div>
@@ -56,6 +60,9 @@
                   <mat-icon>edit</mat-icon>
                   {{ 'COMMON.BUTTON.EDIT' | translate }}
                 </button>
+              } @else {
+                <div class="ssc-head-line overview-skeleton overview-skeleton--button"></div>
+                <div class="ssc-head-line overview-skeleton overview-skeleton--button"></div>
               }
             </div>
           </div>
@@ -65,9 +72,17 @@
 
     <mat-card appearance="outlined" class="app-surface-section">
       <mat-card-content>
-        <div class="overview-card__eyebrow app-surface-eyebrow">Insights</div>
-
         <div class="overview-stats-grid">
+          @if (isLoadingSignal()) {
+            @for (skeleton of miniCardSkeletons; track skeleton) {
+              <mat-card appearance="outlined" class="overview-stat-card app-surface-item app-surface-item--section">
+                <mat-card-content class="overview-skeleton-card">
+                  <div class="ssc-line overview-skeleton overview-skeleton--stat-label"></div>
+                  <div class="ssc-line overview-skeleton overview-skeleton--stat-value"></div>
+                </mat-card-content>
+              </mat-card>
+            }
+          } @else {
           <mat-card appearance="outlined" class="overview-stat-card overview-stat-card--balance app-surface-item app-surface-item--section">
             <mat-card-content>
               <div class="overview-stat-card__icon overview-stat-card__icon--action">
@@ -85,12 +100,12 @@
               @if (account) {
                 <div class="overview-stat-card__balance app-surface-item__value">{{ account.balance | currency: account.currency.code }}</div>
               } @else {
-                <div class="ssc-square"></div>
+                <div class="ssc-line overview-skeleton overview-skeleton--stat-value"></div>
               }
             </mat-card-content>
           </mat-card>
 
-          @for (mc of miniCardData; track mc) {
+          @for (mc of miniCardData(); track mc) {
             <mat-card appearance="outlined" class="overview-stat-card app-surface-item app-surface-item--section">
               @if (!mc.error) {
                 <mat-card-content>
@@ -133,17 +148,34 @@
               }
             </mat-card>
           }
+          }
         </div>
       </mat-card-content>
     </mat-card>
 
     <mat-grid-list class="overview-chart-grid" [cols]="chartColumns()" rowHeight="430px" gutterSize="16px">
-      @for (chart of charts; track chart) {
+      @if (isLoadingSignal()) {
+        @for (skeleton of chartSkeletons; track skeleton) {
+          <mat-grid-tile>
+            <mat-card appearance="outlined" class="overview-chart-skeleton app-surface-section">
+              <mat-card-content>
+                <div class="ssc-line overview-skeleton overview-skeleton--chart-title"></div>
+                <div class="ssc-line overview-skeleton overview-skeleton--chart-subtitle"></div>
+                <div class="overview-chart-skeleton__body">
+                  <div class="ssc-square overview-skeleton overview-skeleton--chart"></div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </mat-grid-tile>
+        }
+      } @else {
+      @for (chart of charts(); track chart) {
         <mat-grid-tile>
           <app-card [chart]="chart" [title]="chart.title">
             <app-chart [chartSummary]="chart" [error]="errorSignal()" [locale]="language"></app-chart>
           </app-card>
         </mat-grid-tile>
+      }
       }
     </mat-grid-list>
 
@@ -156,6 +188,15 @@
             <app-google-map [latitudeMarker]="address.location.y"
                             [longitudeMarker]="address.location.x"
                             [markInfo]="'<b>' + address.name + '</b>'"></app-google-map>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @else if (isLoadingSignal()) {
+      <mat-card appearance="outlined" class="app-surface-section">
+        <mat-card-content>
+          <div class="ssc-head-line overview-skeleton overview-skeleton--map-title"></div>
+          <div class="overview-map overview-map--skeleton app-surface-item app-surface-item--section">
+            <div class="ssc-square overview-skeleton overview-skeleton--map"></div>
           </div>
         </mat-card-content>
       </mat-card>

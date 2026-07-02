@@ -4,26 +4,25 @@ import {
   computed,
   effect,
   inject,
+  input,
   signal,
   untracked,
   viewChild,
   viewChildren,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { IRoom, IRoomAll, IService } from '../../../interfaces/room';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { requireMatch } from '../../../util/validators';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
+import { IRoom, IRoomAll, IService } from '../../../room/room';
 import {
   IAvailableDTO,
-  IReservation,
   IReservationAll,
   IUpcomingAll,
   MAX_RESERVATION_CUSTOMER_MONTH,
   Reservation,
-} from '../../../interfaces/reservation';
+} from '../../../reservation/reservation';
 import {
-  API_LOCALE,
   createNewDate,
   Duration,
   filterDateRoom,
@@ -31,7 +30,6 @@ import {
   formatDateTwoDigit,
   formatFullDateTime,
   formatTime,
-  getCurrentTimeZone,
   getNowTimeZone,
   getTime,
   IDuration,
@@ -42,19 +40,16 @@ import {
   plusMonthDate,
   totalDuration,
 } from '../../../util/dates';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Router } from '@angular/router';
 import {
   cleanReservation,
   createReservation,
   customerSearchReservation,
-  getAllAdditionalByGroupId,
-  getAllTreatments,
   getEditReservation,
   updateReservationById,
-} from '../../../store/reservation.actions';
+} from '../../../store/actions/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import {
   createRoomOffice,
@@ -71,24 +66,18 @@ import {
   roomDetail,
   round,
 } from '../../../util/helper';
-import { DiscountType, IDiscount, IUserDiscount } from '../../../interfaces/discount';
+import { DiscountType, IDiscount, IUserDiscount } from '../../../discount/discount';
 import { isEqual } from 'date-fns';
-import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { IOffice, IOfficeAll } from '../../../interfaces/office';
-import { IStep, Step } from '../../../interfaces/step';
+import { IAdditionalAll } from '../../../additional/additional';
+import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { IOffice, IOfficeAll } from '../../../office/office';
 import { MatDialog } from '@angular/material/dialog';
 import { Role } from '../../../interfaces/token';
-import { IUser, IUserAll } from '../../../interfaces/user';
-import {
-  IPaymentOption,
-  PaymentPercentage,
-  PENALTY,
-} from '../../../interfaces/payment';
+import { IUser, IUserAll } from '../../../user/user';
+import { IPaymentOption, PaymentPercentage, PENALTY } from '../../../interfaces/payment';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { enableStep, getBackIndex, getIndex } from '../../../util/step';
-import { SharedModule } from '../../../shared/shared.module';
+import { enableStep, getBackIndex, getIndex, IStep, Step } from '../../../util/step';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { SortByPipe } from '../../../pipes/sort-by.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
@@ -99,15 +88,11 @@ import { GoogleMapComponent } from '../../../shared/google-map/google-map.compon
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import {
-  getAdditionalListPipe,
   getAvailableListPipe,
-  getCurrentReservationIdPipe,
   getCustomerReservationPipe,
   getMeNavigationParamsPipe,
-  getRoomsPipe,
   getSelectedReservationPipe,
   getSubErrorsPipe,
-  getTreatmentDiscountPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ToastService } from '../../../services/toast.service';
@@ -115,31 +100,36 @@ import { IError } from '../../../interfaces/common';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { BankForm } from '../../../shared/bank/bank.component';
 import { FirebaseService } from '../../../services/firebase.service';
-import { OfficeForm } from '../../../reservation/reservation-form.types';
+import {
+  createMeReservationErrors,
+  MeReservationAcceptForm,
+  MeReservationErrors,
+  MeReservationEventForm,
+  MeReservationFormField,
+  MeReservationForms,
+  MeReservationTreatmentForm,
+  OfficeForm,
+} from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
-import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { NavigationService } from '../../../services/navigation.service';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { AdditionalStore } from '../../../store/additional.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
-type TreatmentForm = {
-  treatment: FormControl<IService | undefined>;
-  discount: FormControl<string | undefined>;
-  startDate: FormControl<Date | undefined>;
-  group: FormControl<IGroupService | undefined>;
-};
-
-type EventForm = {
-  event: FormControl<Date | undefined>;
-};
-
-type AcceptForm = {
-  accept: FormControl<boolean>;
-  phone: FormControl<string | undefined>;
-};
-
 type AvailabilityData = { time: string; date: Date }
-
-type MeReservationField = keyof TreatmentForm | keyof EventForm | keyof BankForm | keyof AcceptForm | keyof OfficeForm;
 
 const ME_RESERVATION_ERROR_FIELDS = [
   'room',
@@ -154,50 +144,53 @@ const ME_RESERVATION_ERROR_FIELDS = [
   'percentage',
   'accept',
   'phone',
-] as const satisfies readonly MeReservationField[];
+] as const satisfies readonly MeReservationFormField[];
 
 @Component({
   selector: 'app-me-reservation',
   templateUrl: './me-reservation.component.html',
-  imports: [SharedModule, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe, PriceComponent,
-    PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
+    MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, DecimalPipe,
+    NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective,
+    CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
+    PriceComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
+    MatSelectionList, MatListOption, MatDivider, MatTabGroup, MatTab, MatCheckbox, MatSuffix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
+  id = input<string>();
+  rooms = input<IRoomAll[]>();
+
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly additionalStore = inject(AdditionalStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
   private readonly formErrorService = inject(ReservationFormErrorService);
 
   private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
-  private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
-  private rooms$ = this.store.pipe(getRoomsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private availableList$ = this.store.pipe(getAvailableListPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
-  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
-  private readonly roomsSignal = toSignal(this.rooms$);
+  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   private readonly customerReservationSignal = toSignal(this.customerReservation$);
   private readonly availableListSignal = toSignal(this.availableList$);
   private readonly subErrorsSignal = toSignal(this.subErrors$);
   private readonly authUserSignal = this.authUserService.authUser;
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -210,18 +203,21 @@ export class MeReservationComponent {
       },
     },
   );
-  private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange, {
+  private langChangeSignal = toSignal<LangChangeEvent>(this.translateService.onLangChange, {
     initialValue: undefined,
   });
   private readonly paymentOptions = computed(
     () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
   );
 
-  additionalListSignal = toSignal(this.additionalList$);
+  readonly additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
 
   labels = computed(() => {
     this.langChangeSignal();
-    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+    const phoneTranslations = this.translateService.instant('COMMON.USER.PHONE');
 
     return {
       mainLabel: '',
@@ -238,9 +234,9 @@ export class MeReservationComponent {
   private picker = viewChild<MatDatepicker<Date>>('picker');
   private additionalLists = viewChildren<MatSelectionList>('additional');
 
-  errors = signal<Partial<Record<MeReservationField, string>> & { schedule?: boolean }>({});
+  errors = signal<MeReservationErrors>(createMeReservationErrors());
 
-  treatmentForm: FormGroup<TreatmentForm> = this.formBuilder.group<TreatmentForm>({
+  treatmentForm: FormGroup<MeReservationTreatmentForm> = this.formBuilder.group<MeReservationTreatmentForm>({
     treatment: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
     }),
@@ -253,7 +249,7 @@ export class MeReservationComponent {
     }),
   });
 
-  eventGroup: FormGroup<EventForm> = this.formBuilder.group<EventForm>({
+  eventGroup: FormGroup<MeReservationEventForm> = this.formBuilder.group<MeReservationEventForm>({
     event: this.formBuilder.control(undefined, {
       validators: [Validators.required],
     }),
@@ -276,7 +272,7 @@ export class MeReservationComponent {
     percentage: this.formBuilder.control(undefined),
   });
 
-  acceptForm: FormGroup<AcceptForm> = this.formBuilder.group<AcceptForm>({
+  acceptForm: FormGroup<MeReservationAcceptForm> = this.formBuilder.group<MeReservationAcceptForm>({
     accept: this.formBuilder.control(false, {
       validators: [Validators.required],
     }),
@@ -285,7 +281,7 @@ export class MeReservationComponent {
     }),
   });
 
-  form = this.formBuilder.group({
+  form: FormGroup<MeReservationForms> = this.formBuilder.group<MeReservationForms>({
     officeForm: this.officeForm,
     treatmentForm: this.treatmentForm,
     eventGroup: this.eventGroup,
@@ -340,7 +336,7 @@ export class MeReservationComponent {
       })),
   );
 
-  offices = computed(() => Array.from(createRoomOffice(this.roomsSignal())?.values() || []));
+  offices = computed(() => Array.from(createRoomOffice(this.rooms())?.values() || []));
   filteredOfficeSignal = toSignal(
     this.getOfficeForm.office.valueChanges.pipe(
       startWith(''),
@@ -409,7 +405,7 @@ export class MeReservationComponent {
   private treatmentDiscount?: IDiscount;
   private hydratedReservationKey?: string;
   private hydratingEdit = false;
-  private readonly language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   smallScreen = computed(() => this.breakpointsSignal()?.matches);
 
@@ -429,7 +425,7 @@ export class MeReservationComponent {
         const key = createNewDate(date).toString();
 
         let dates: any = group.get(key) || [];
-        dates = [...dates, { time: getTime(date, this.dateFormat), date }];
+        dates = [...dates, { time: getTime(date, this.language), date }];
         group.set(key, dates);
 
         return group;
@@ -442,7 +438,6 @@ export class MeReservationComponent {
   activeStepIndex = signal(0);
   isPreview = false;
   isPayment = false;
-  dateFormat: string = this.translate.getCurrentLang();
 
   isEditing = false;
   canCreate = true;
@@ -451,7 +446,7 @@ export class MeReservationComponent {
   distance?: string;
   minDate: Date = getNowTimeZone();
   maxDate: Date = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
-  maxDateFormat: string = formatDateTwoDigit(this.maxDate, this.dateFormat);
+  maxDateFormat: string = formatDateTwoDigit(this.maxDate, this.language);
   date?: Date;
   endDate?: Date;
   totalDurationFormatted?: string;
@@ -460,6 +455,7 @@ export class MeReservationComponent {
   penalty = PENALTY;
 
   constructor() {
+    this.paymentStore.getOptions();
     const preview = new Step(5, 'preview', () => this.create());
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
@@ -483,7 +479,7 @@ export class MeReservationComponent {
     });
 
     effect(() => {
-      const reservationId = this.reservationIdSignal();
+      const reservationId = this.id();
       if (reservationId) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
@@ -524,11 +520,11 @@ export class MeReservationComponent {
       if (room) {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
-          const localDate = localeTimeZoneDate(this.translate.getCurrentLang(), now);
-          const timeZoneDate = localeTimeZoneDate(this.translate.getCurrentLang(), now, room.timeZone);
-          const warning = this.translate.instant('COMMON.TIME_ZONE.WARNING');
-          const localDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
-          const roomDateLabel = this.translate.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
+          const localDate = localeTimeZoneDate(this.language, now);
+          const timeZoneDate = localeTimeZoneDate(this.language, now, room.timeZone);
+          const warning = this.translateService.instant('COMMON.TIME_ZONE.WARNING');
+          const localDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
+          const roomDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
           const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
           const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
           toastRef.onAction().subscribe(() => {
@@ -663,7 +659,7 @@ export class MeReservationComponent {
         }
         this.hydratedReservationKey = reservationKey;
         if (reservation.paymentRequired) {
-          const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
+          const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
           this.canNotContinue(message, 'update');
         } else {
           this.setData(reservation);
@@ -681,8 +677,8 @@ export class MeReservationComponent {
       if (customerReservation?.upcoming && customerReservation.upcoming.length >=
         MAX_UPCOMING_RESERVATION) {
         const dates = customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
-          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.translate.getCurrentLang()));
-        const message = this.translate.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
+          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.language));
+        const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
           { date1: dates[0], date2: dates[1], date3: dates[2] });
         this.canNotContinue(message, 'create');
       } else {
@@ -838,24 +834,28 @@ export class MeReservationComponent {
     return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
   }
 
-  get getTreatmentForm(): TreatmentForm {
-    return this.treatmentForm.controls;
+  private get getForm(): MeReservationForms {
+    return this.form.controls;
+  }
+
+  get getTreatmentForm(): MeReservationTreatmentForm {
+    return this.getForm.treatmentForm.controls;
   }
 
   get getOfficeForm(): OfficeForm {
-    return this.officeForm.controls;
+    return this.getForm.officeForm.controls;
   }
 
-  get getEventForm(): EventForm {
-    return this.eventGroup.controls;
+  get getEventForm(): MeReservationEventForm {
+    return this.getForm.eventGroup.controls;
   }
 
-  get getAcceptForm(): AcceptForm {
-    return this.acceptForm.controls;
+  get getAcceptForm(): MeReservationAcceptForm {
+    return this.getForm.acceptForm.controls;
   }
 
   get getTypeForm(): BankForm {
-    return this.typeForm.controls;
+    return this.getForm.typeForm.controls;
   }
 
   get paymentToPay(): number {
@@ -943,32 +943,25 @@ export class MeReservationComponent {
     if (this.acceptForm.invalid) {
       return;
     }
-    const reservation: IReservation = new Reservation();
-    reservation.customerId = this.customerId();
-    reservation.roomId = this.getOfficeForm.room.value?.id;
-    reservation.professionalId = this.getOfficeForm.professional.value?.id;
-    if (this.date) {
-      reservation.start = this.date.toLocaleString(API_LOCALE);
-      reservation.timeZone = getCurrentTimeZone();
-    }
-    reservation.additionalIds = this.additionalSelected()?.map(value => value.id);
-    reservation.phone = this.getAcceptForm.phone.value;
-
     const role = Role.customer;
     const option = this.getTypeForm.option?.value;
+    let payment = undefined;
     if (option && option.type.toLowerCase() !== 'account') {
       const percentage = this.getTypeForm.percentage?.value || PaymentPercentage.total;
 
-      reservation.payment = { type: option.type, percentage };
+      payment = { type: option.type, percentage };
     }
+    const reservation = Reservation.fromMeForm(
+      this.getForm,
+      this.customerId(),
+      this.date,
+      this.additionalSelected()?.map(value => value.id),
+      payment,
+      this.isEditing ? this.reservation : undefined,
+    );
     if (this.isEditing && this.reservation) {
-      reservation.id = this.reservation.id;
-      reservation.treatmentId = valueChange(this.getTreatmentForm.treatment.value?.id, this.reservation.treatment.id);
-
       this.store.dispatch(updateReservationById({ id: this.reservation.id, reservation, role }));
     } else {
-      reservation.treatmentId = this.getTreatmentForm.treatment.value?.id;
-      reservation.discountId = this.getTreatmentForm.discount.value;
       this.store.dispatch(createReservation({ reservation, role }));
     }
   }
@@ -1015,7 +1008,7 @@ export class MeReservationComponent {
     }
     const additionalSelected = this.additionalSelected();
     const duration = totalDuration(treatment, additionalSelected);
-    this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.dateFormat);
+    this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.language);
 
     this.store.dispatch(
       customerSearchReservation({
@@ -1113,7 +1106,7 @@ export class MeReservationComponent {
   };
 
   openDialog = (reservationDate?: Date): void => openDialog(
-    this.room!, this.dateFormat, this.translate, this.dialog, reservationDate,
+    this.room!, this.language, this.translateService, this.dialog, reservationDate,
   );
 
   myFilter = (d: Date | null): boolean => filterDateRoom(d, this.getOfficeForm.room.value);
@@ -1129,7 +1122,7 @@ export class MeReservationComponent {
   displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
 
   dateNoContent = (date?: Date): string => formatDateName(
-    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.translate.getCurrentLang(), this.measure,
+    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.language, this.measure,
   );
 
   selectDate = (datetime: AvailabilityData): void => {
@@ -1149,8 +1142,8 @@ export class MeReservationComponent {
 
   formatKey = (key: string): string => {
     const date = newDate(key);
-    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.translate.getCurrentLang())
-      : formatDateName(date, this.translate.getCurrentLang(), this.measure);
+    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.language)
+      : formatDateName(date, this.language, this.measure);
 
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   };
@@ -1161,9 +1154,9 @@ export class MeReservationComponent {
 
   setDistance = ($event: number): void => {
     this.distance = $event > 999 ?
-      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
+      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
         { distance: round($event / 1000) }) :
-      this.translate.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
+      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
         { distance: round($event) });
   };
 
@@ -1210,7 +1203,7 @@ export class MeReservationComponent {
   };
 
   private getTreatmentList = (roomId: string): void => {
-    this.store.dispatch(getAllTreatments({ roomId }));
+    this.treatmentStore.getAllTreatments(roomId);
   };
 
   private shouldSyncAdditionalSelection = (current: IAdditionalAll[], next: IAdditionalAll[]): boolean => {
@@ -1236,7 +1229,7 @@ export class MeReservationComponent {
   private getAdditionalList = (): void => {
     const roomId = this.getOfficeForm.room.value!.id;
     const groupId = this.groupId || this.getTreatmentForm.group.value!.id;
-    this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId }));
+    this.additionalStore.loadAllByGroupId(roomId, groupId);
   };
 
   private canNotContinue = (message: string, type: string): void => {
@@ -1250,7 +1243,7 @@ export class MeReservationComponent {
     const toastRef = this.toastService.show(message, 'error', 5000);
     toastRef.onDismiss().subscribe(() => {
       this.store.dispatch(cleanReservation());
-      this.router.navigate([this.language, 'me', 'reservations']);
+      this.navigationService.navigate(['me', 'reservations']);
     });
   };
 
@@ -1301,7 +1294,7 @@ export class MeReservationComponent {
     this.roomList.set(reservation.room.office.rooms);
     this.professionalList.set(reservation.room.professionals);
     this.getEventForm.event.setValue(date, { emitEvent: false });
-    this.time = getTime(date, this.dateFormat);
+    this.time = getTime(date, this.language);
     this.getOfficeForm.office.setValue(reservation.room.office, { emitEvent: false });
     this.getOfficeForm.room.setValue(reservation.room, { emitEvent: false });
     this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });
@@ -1376,7 +1369,7 @@ export class MeReservationComponent {
   private applySubErrors = (subErrors: IError[]): void => {
     const state = this.formErrorService.createErrorState(subErrors, {
       allowedFields: ME_RESERVATION_ERROR_FIELDS,
-      createErrors: () => ({} as Partial<Record<MeReservationField, string>> & { schedule?: boolean }),
+      createErrors: createMeReservationErrors,
       defaultStepIndex: 0,
       stepByField: { startDate: 1 },
     });
@@ -1390,16 +1383,16 @@ export class MeReservationComponent {
         this.getOfficeForm[field as keyof OfficeForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getTreatmentForm) {
-        this.getTreatmentForm[field as keyof TreatmentForm]?.setErrors({ incorrect: true });
+        this.getTreatmentForm[field as keyof MeReservationTreatmentForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getEventForm) {
-        this.getEventForm[field as keyof EventForm]?.setErrors({ incorrect: true });
+        this.getEventForm[field as keyof MeReservationEventForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getTypeForm) {
         this.getTypeForm[field as keyof BankForm]?.setErrors({ incorrect: true });
       }
       if (field in this.getAcceptForm) {
-        this.getAcceptForm[field as keyof AcceptForm]?.setErrors({ incorrect: true });
+        this.getAcceptForm[field as keyof MeReservationAcceptForm]?.setErrors({ incorrect: true });
       }
     });
 

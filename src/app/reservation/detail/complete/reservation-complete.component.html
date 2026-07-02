@@ -9,7 +9,7 @@
         <div class="app-detail-meta">
           <span class="app-detail-chip">
             <mat-icon>schedule</mat-icon>
-            {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
+            {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
           </span>
           @if (totalTime(); as totalTime) {
             <span class="app-detail-chip" [ngClass]="{'complete-chip--invalid': !isValidTime()}">
@@ -104,7 +104,7 @@
             <input [formControl]="getForm.startTime" [format]="24" [timepicker]="tStart" matInput name="start"
                    readonly required class="complete-time-input"/>
             <span matPrefix class="bold complete-time-prefix">
-              {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
+              {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
             </span>
             <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
             <app-timepicker #tStart (timeSet)="timeChange($event, startDate)"></app-timepicker>
@@ -118,7 +118,7 @@
             <input [formControl]="getForm.endTime" [format]="24" [timepicker]="tEnd" matInput name="end" readonly
                    required class="complete-time-input"/>
             <span matPrefix class="bold complete-time-prefix">
-              {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:dateFormat }}
+              {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
             </span>
             <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
             <app-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></app-timepicker>
@@ -229,12 +229,14 @@
       </button>
     </div>
   } @else {
-    <section class="app-surface-section">
-      <div class="complete-skeleton">
-        <div class="app-surface-skeleton-spacer"></div>
-        <div class="ssc-square mb"></div>
-        <div class="app-surface-skeleton-spacer"></div>
-      </div>
-    </section>
+    <app-reservation-detail-skeleton
+      [showGhostChip]="false"
+      [showFab]="false"
+      [showHeroSummary]="false"
+      [showNoteSection]="false"
+      [showPaymentSection]="false"
+      [showHistorySection]="false"
+      [footerButtonCount]="2"
+    />
   }
 </form>

@@ -1,8 +1,16 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AppMaterialModule } from '../../util/app-material.module';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 type NoteForm = {
   note: FormControl<string | undefined>,
@@ -19,7 +27,8 @@ type NoteDialogData = {
   selector: 'app-add-note-dialog-component',
   templateUrl: './add-note-dialog.component.html',
   styleUrls: ['./add-note-dialog.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, ReactiveFormsModule, MatDialogTitle,
+    MatDialogContent, MatHint, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddNoteDialogComponent {

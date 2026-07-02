@@ -2,15 +2,14 @@ import { inject } from '@angular/core';
 import { HttpEvent, HttpHandlerFn, HttpRequest } from '@angular/common/http';
 import { Observable, retry, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
-import { reLogin } from '../store/auth.actions';
 
 import { genericRetryStrategy } from '../util/rxjs';
 import { AuthUserService } from '../services/auth-user.service';
+import { AuthStore } from '../store/auth.store';
 
 export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthUserService);
-  const store = inject(Store);
+  const authStore = inject(AuthStore);
 
   return next(req).pipe(retry({
     count: 3,
@@ -28,12 +27,12 @@ export const errorInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn)
     }
     if (err.status === 401) {
       if (authService.authUser().isAuthenticated) {
-        store.dispatch(reLogin());
+        authStore.reLogin();
       } else {
-        return throwError(err);
+        return throwError(() => err);
       }
     }
 
-    return throwError(err);
+    return throwError(() => err);
   }));
 };

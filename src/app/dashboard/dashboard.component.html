@@ -1,6 +1,6 @@
 @let mapDashboard = dashboardMapSignal();
 @let selectedDashboard = getForm.selectedDash.value;
-@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):dateFormat;
+@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):language;
 @let cardLayout = cardLayoutSignal();
 
 <div class="dashboard-shell app-surface-canvas app-surface-stack">
@@ -119,7 +119,7 @@
                                (beforeViewRender)="beforeMonthViewRender($event)"
                                [activeDayIsOpen]="activeDayIsOpen"
                                [events]="calendar.calendarEvents"
-                               [locale]="dateFormat"
+                               [locale]="language"
                                [viewDate]="viewDate()"></mwl-calendar-month-view>
     </div>
 
@@ -139,6 +139,13 @@
     </div>
 
     <mat-grid-list class="dashboard-grid" [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
+      @if (isLoading()) {
+        @for (skeleton of miniCardSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+            <app-mini-card [title]="''" [isLoading]="true"></app-mini-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (mc of miniCardData; track mc.title) {
         <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
           <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
@@ -151,14 +158,23 @@
           </app-mini-card>
         </mat-grid-tile>
       }
+      }
 
+      @if (isLoading()) {
+        @for (skeleton of chartSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+            <app-card></app-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (chart of charts; track chart.title) {
         <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
           <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
             <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading()"
-                       [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
+                       [locale]="language" [timeZone]="timeZone"></app-chart>
           </app-card>
         </mat-grid-tile>
+      }
       }
 
       @if (roomId || professionalId) {

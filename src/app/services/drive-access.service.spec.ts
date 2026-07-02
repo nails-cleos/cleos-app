@@ -1,46 +1,41 @@
 import { TestBed } from '@angular/core/testing';
 import { DriveAccessService } from './drive-access.service';
-import { Store } from '@ngrx/store';
 import { signal } from '@angular/core';
-import { BehaviorSubject, of } from 'rxjs';
-import { GoogleAuthProvider } from 'firebase/auth';
+import { AuthStore } from '../store/auth.store';
 
 describe('DriveAccessService', () => {
   let service: DriveAccessService;
-  let storeSpy: jasmine.SpyObj<Store>;
-  let driveToken$: BehaviorSubject<any>;
+
+  let authStoreSpy: {
+    driveToken: ReturnType<typeof signal>;
+    getDriveToken: jasmine.Spy;
+  };
 
   beforeEach(() => {
-    driveToken$ = new BehaviorSubject<any>(undefined);
-    storeSpy = jasmine.createSpyObj<Store>('Store', ['pipe', 'dispatch']);
-
-    storeSpy.pipe.and.returnValue(of(driveToken$.asObservable()));
+    authStoreSpy = {
+      driveToken: signal(undefined),
+      getDriveToken: jasmine.createSpy('getDriveToken'),
+    };
 
     TestBed.configureTestingModule({
       providers: [
         DriveAccessService,
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
       ],
     });
 
     service = TestBed.inject(DriveAccessService);
   });
 
-  afterEach(() => {
-    storeSpy.dispatch.calls.reset();
-  });
-
   it('should not dispatch when credential has no access token', async () => {
-    spyOn(GoogleAuthProvider, 'credentialFromResult').and.returnValue(null);
-
     service['requestDriveAccess']();
     await Promise.resolve();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(authStoreSpy.getDriveToken).toHaveBeenCalled();
   });
 
   it('should NOT request access if token already exists', () => {
-    driveToken$.next('existing-token');
+    authStoreSpy.driveToken.set('existing-token');
     (service as any).driveTokenSignal = signal('existing-token');
 
     const spy = spyOn<any>(service, 'requestDriveAccess');

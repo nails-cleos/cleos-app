@@ -1,57 +1,44 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, Signal } from '@angular/core';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, Signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { combineLatestWith } from 'rxjs';
-import { getAccountByCustomerId, updateAccount } from '../../store/account.actions';
-import { IAccountAll, ITransaction, Transaction } from '../../interfaces/account';
-import { ICurrency, ICurrencyAll } from '../../interfaces/currency';
+import { BalanceForm, IAccountAll, Transaction } from '../account';
+import { ICurrency, ICurrencyAll } from '../../currency/currency';
 import { map, startWith } from 'rxjs/operators';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { requireMatch } from '../../util/validators';
 import { AuthUserService } from '../../services/auth-user.service';
 import { getLocale } from '../../util/helper';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
-import {
-  getCurrentCustomerIdPipe,
-  getAccountResponsePipe,
-  getSelectedAccountPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/account.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../../interfaces/common';
-import { AccountState } from '../../store/reducers/account.reducers';
-
-type BalanceForm = {
-  currency: FormControl<ICurrencyAll | undefined>;
-  gift: FormControl<number>;
-};
+import { AccountStore } from '../../store/account.store';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatOption } from '@angular/material/core';
+import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-account',
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
-  imports: [SharedModule, BalanceComponent, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
+    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BalanceComponent,
+    BackButtonDirective, SkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccountComponent {
-  private readonly store: Store<AccountState> = inject(Store<AccountState>);
+  customerId = input<string>();
+
+  private readonly accountStore = inject(AccountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private customerId$ = this.store.pipe(getCurrentCustomerIdPipe);
-  private selectedAccount$ = this.store.pipe(getSelectedAccountPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getAccountResponsePipe);
-
-  private customerIdSignal = toSignal(this.customerId$);
-  private selectedAccountSignal = toSignal(this.selectedAccount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
   private authUserSignal = this.authUserService.authUser;
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
@@ -65,7 +52,7 @@ export class AccountComponent {
   });
 
   accountSignal = computed(() => {
-    const account = this.selectedAccountSignal();
+    const account = this.accountStore.selected();
     if (account) {
       this.form.patchValue(account);
     }
@@ -76,7 +63,7 @@ export class AccountComponent {
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.selectedAccount$),
+      combineLatestWith(toObservable(this.accountStore.selected)),
       map(([name, account]) => {
         if (name) {
           return this.filterCurrency(name, account);
@@ -88,13 +75,14 @@ export class AccountComponent {
   );
   userId = computed(() => this.authUserSignal()?.customerId);
   errors = signal<Record<string, unknown>>({});
-  showAdd = computed(() => this.hasAdminRole() && this.customerIdSignal() !== this.userId());
+  showAdd = computed(() => this.hasAdminRole() && this.customerId() !== this.userId());
+  isLoading = computed(() => this.accountStore.isLoading());
 
-  language: string = getLocale(this.translate.getCurrentLang()).language;
+  language: string = getLocale(this.navigationService.language).language;
 
   constructor() {
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.accountStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -110,19 +98,20 @@ export class AccountComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
+      if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
-          this.router.navigate([this.language, 'users', this.customerIdSignal(), 'overview']);
+          this.navigationService.navigate(['users', this.customerId(), 'overview']);
         } else {
-          this.router.navigate([this.language, 'me', 'overview']);
+          this.navigationService.navigate(['me', 'overview']);
         }
       }
     });
 
     effect(() => {
-      const customerId = this.customerIdSignal();
+      const customerId = this.customerId();
       if (customerId) {
-        this.store.dispatch(getAccountByCustomerId({ customerId }));
+        this.accountStore.clean();
+        this.accountStore.loadAccountByCustomerId(customerId);
       }
     });
   }
@@ -131,18 +120,21 @@ export class AccountComponent {
     return this.form.controls;
   }
 
+  get navigation(): string[] {
+    const account = this.accountSignal();
+    if (account && this.userId() !== account.customer.id) {
+      return ['/', this.language, 'users', account.customer.id, 'overview'];
+    }
+    return ['/', this.language, 'me', 'overview'];
+  }
+
   submit(): void {
     const id = this.accountSignal()?.id;
-    const customerId = this.customerIdSignal();
+    const customerId = this.customerId();
     if (this.form.invalid || !id || !customerId) {
       return;
     }
-    const transaction: ITransaction = new Transaction();
-    transaction.customerId = customerId;
-    transaction.currencyId = valueChange(this.getForm.currency.value, this.accountSignal()?.currency)?.id;
-    transaction.gift = this.getForm.gift.value;
-    this.store.dispatch(updateAccount({ id, transaction, customerId }));
-    return;
+    this.accountStore.updateAccount(id, Transaction.fromForm(this.getForm, customerId, this.accountSignal()));
   }
 
   displayCurrencyFn = (currency: ICurrencyAll): string => currency ? currency.code : '';

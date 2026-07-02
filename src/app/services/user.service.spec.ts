@@ -3,11 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { UserService } from './user.service';
-import { IOverview, IUserAll } from '../interfaces/user';
+import { IOverview, IUserAll } from '../user/user';
 import { Role, Token } from '../interfaces/token';
-import { Pagination } from '../interfaces/pagination';
-import { IRoomAll } from '../interfaces/room';
-import { ICustomerLastReservation } from '../interfaces/reservation';
+import { Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import { IRoomAll } from '../room/room';
+import { ICustomerLastReservation } from '../reservation/reservation';
 import { IApiResponse } from '../interfaces/common';
 
 describe('UserService', () => {
@@ -23,7 +23,7 @@ describe('UserService', () => {
     phone: '+1234567890',
     enabled: true,
     verified: true,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAAA',
     timeZone: 'Europa/Amsterdam',
   };
 
@@ -168,7 +168,7 @@ describe('UserService', () => {
     it('should create customer when role is customer', () => {
       spyOn(service, 'createCustomer').and.returnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, Role.customer).subscribe(result => {
+      service.saveUser(mockUser, undefined, Role.customer).subscribe(result => {
         expect(result.response).toEqual(mockApiResponse);
         expect(result.key).toBe('USER.CUSTOMER');
       });
@@ -179,7 +179,7 @@ describe('UserService', () => {
     it('should add manager when role is manager', () => {
       spyOn(service, 'addManager').and.returnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, Role.manager).subscribe(result => {
+      service.saveUser(mockUser, undefined, Role.manager).subscribe(result => {
         expect(result.response).toEqual(mockApiResponse);
         expect(result.key).toBe('USER.MANAGER');
       });
@@ -190,7 +190,7 @@ describe('UserService', () => {
     it('should add professional when role is professional', () => {
       spyOn(service, 'addProfessional').and.returnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, Role.professional).subscribe(result => {
+      service.saveUser(mockUser, undefined, Role.professional).subscribe(result => {
         expect(result.response).toEqual(mockApiResponse);
         expect(result.key).toBe('USER.PROFESSIONAL');
       });
@@ -201,12 +201,12 @@ describe('UserService', () => {
     it('should update user when no role specified', () => {
       spyOn(service, 'updateUser').and.returnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser).subscribe(result => {
+      service.saveUser(mockUser, mockUser.id).subscribe(result => {
         expect(result.response).toEqual(mockApiResponse);
         expect(result.key).toBe('USER.UPDATED.MESSAGE');
       });
 
-      expect(service.updateUser).toHaveBeenCalledWith(mockUser);
+      expect(service.updateUser).toHaveBeenCalledWith(mockUser.id, mockUser);
     });
   });
 
@@ -218,7 +218,7 @@ describe('UserService', () => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/user-123');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/user-123', { ...skipLoadingOverlay() });
     });
   });
 
@@ -230,7 +230,7 @@ describe('UserService', () => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/me');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/me', { ...skipLoadingOverlay() });
     });
   });
 
@@ -238,7 +238,7 @@ describe('UserService', () => {
     it('should update user', () => {
       httpSpy.patch.and.returnValue(of(mockApiResponse));
 
-      service.updateUser(mockUser).subscribe(result => {
+      service.updateUser(mockUser.id, mockUser).subscribe(result => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -297,7 +297,7 @@ describe('UserService', () => {
         expect(result).toEqual(mockOverview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/reservations');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/reservations', { ...skipLoadingOverlay() });
     });
 
     it('should get current customer overview when id is null', () => {
@@ -307,7 +307,7 @@ describe('UserService', () => {
         expect(result).toEqual(mockOverview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/me/reservations');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/me/reservations', { ...skipLoadingOverlay() });
     });
   });
 
@@ -380,7 +380,7 @@ describe('UserService', () => {
         expect(result).toEqual(professionals);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals', { ...skipLoadingOverlay() });
     });
   });
 
@@ -393,7 +393,7 @@ describe('UserService', () => {
         expect(result).toEqual(managers);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/managers');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/managers', { ...skipLoadingOverlay() });
     });
   });
 
@@ -406,7 +406,7 @@ describe('UserService', () => {
         expect(result).toEqual(customers);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers', { ...skipLoadingOverlay() });
     });
   });
 
@@ -418,7 +418,7 @@ describe('UserService', () => {
         expect(result).toEqual(mockCustomerInfo);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/info');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/info', { ...skipLoadingOverlay() });
     });
   });
 
@@ -473,7 +473,7 @@ describe('UserService', () => {
         expect(result).toEqual(rooms);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals/prof-123/rooms');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals/prof-123/rooms', { ...skipLoadingOverlay() });
     });
   });
 

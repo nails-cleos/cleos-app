@@ -1,10 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IPrice } from '../../../interfaces/treatment';
-import { ICurrencyAll } from '../../../interfaces/currency';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { IPrice } from '../../../treatment/treatment';
+import { ICurrencyAll } from '../../../currency/currency';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { PENALTY } from '../../../interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 type CustomerEditData = {
   price: IPrice;
@@ -16,7 +23,7 @@ type CustomerEditData = {
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, MatButton, TranslatePipe, MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerEditDialogComponent {

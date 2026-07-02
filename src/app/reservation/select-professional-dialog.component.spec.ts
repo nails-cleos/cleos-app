@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 
 describe('SelectProfessionalDialogComponent', () => {
   let component: SelectProfessionalDialogComponent;

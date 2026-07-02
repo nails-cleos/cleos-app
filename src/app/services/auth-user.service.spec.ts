@@ -3,8 +3,9 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 import { AuthUserService } from './auth-user.service';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { Role } from '../interfaces/token';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('AuthUserService', () => {
   let service: AuthUserService;
@@ -29,7 +30,7 @@ describe('AuthUserService', () => {
     id: 'admin-123',
     displayName: 'Admin User',
     email: 'admin@example.com',
-    locale: 'en-GB',
+    locale: DEFAULT_LOCALE,
     timeZone: 'Europe/London',
     authorities: [
       { authority: Role.admin },
@@ -81,7 +82,7 @@ describe('AuthUserService', () => {
     service = TestBed.inject(AuthUserService);
     cookieConsentService = TestBed.inject(NgcCookieConsentService) as jasmine.SpyObj<NgcCookieConsentService>;
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
   });
 
   it('should be created', () => {
@@ -156,7 +157,7 @@ describe('AuthUserService', () => {
       expect(result.userId).toBe('admin-123');
       expect(result.email).toBe('admin@example.com');
       expect(result.displayName).toBe('Admin User');
-      expect(result.locale).toBe('en-GB');
+      expect(result.locale).toBe(DEFAULT_LOCALE);
       expect(result.showCash).toBeFalse();
       expect(result.referralMax).toBe(3);
       expect(result.theme).toBe('dark-theme');
@@ -270,7 +271,7 @@ describe('AuthUserService', () => {
 
   describe('cookieConsent', () => {
     beforeEach(() => {
-      translateService.setTranslation('en-GB', {
+      translateService.setTranslation(DEFAULT_LOCALE, {
         COOKIE: {
           HEADER: 'Cookie Header',
           MESSAGE: 'Cookie Message',

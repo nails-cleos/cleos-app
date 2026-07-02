@@ -1,16 +1,14 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { signupSuccess } from '../../store/auth.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { ToastService } from '../../services/toast.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getAuthErrorPipe, getAuthResponsePipe } from '../../store/selectors/auth.selectors';
-import { AuthState } from '../../store/reducers/auth.reducers';
 import { FirebaseService } from '../../services/firebase.service';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { AuthStore } from '../../store/auth.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type ForgotPasswordForm = {
   email: FormControl<string>;
@@ -20,31 +18,29 @@ type ForgotPasswordForm = {
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
-  private readonly store: Store<AuthState> = inject(Store<AuthState>);
+  private readonly authStore = inject(AuthStore);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly firebaseService = inject(FirebaseService);
 
-  private error$ = this.store.pipe(getAuthErrorPipe);
-  private response$ = this.store.pipe(getAuthResponsePipe);
-
-  private errorSignal = toSignal(this.error$);
-  private responseSignal = toSignal(this.response$);
+  private errorSignal = this.authStore.error;
+  private responseSignal = this.authStore.response;
 
   form: FormGroup<ForgotPasswordForm> = this.formBuilder.group<ForgotPasswordForm>({
     email: this.formBuilder.control('', {
       validators: [Validators.required],
     }),
   });
-  language: string = this.translate.getCurrentLang();
 
   constructor() {
+    this.authStore.clean();
     effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
@@ -57,7 +53,7 @@ export class ForgotPasswordComponent {
       if (response?.message) {
         const actionType = 'button';
         const toastRef = this.toastService.show(response.message, response.toastType, 5000, { actionType });
-        toastRef.onAction().subscribe(() => this.router.navigate([this.language, 'auth']));
+        toastRef.onAction().subscribe(() => this.navigationService.navigate(['auth']));
       }
     });
   }
@@ -68,8 +64,8 @@ export class ForgotPasswordComponent {
 
   forgotPassword(): void {
     this.firebaseService.sendPasswordResetEmail(this.getForm.email.value.trim()).then(() => {
-      const message = this.translate.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
-      this.store.dispatch(signupSuccess({ message }));
-    }).catch(e => console.error(`Error sending reset password. ${e}`));
+      const message = this.translateService.instant('AUTH.FORGOT_PASSWORD.MESSAGE');
+      this.authStore.signupSuccess({ message });
+    }).catch(e => console.error(`Error sending reset password. ${ e }`));
   }
 }

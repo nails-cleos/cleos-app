@@ -1,5 +1,5 @@
 import { getProfessionalColor, lightenDarkenColor, createEventColor } from './color';
-import { ColorEvent } from '../interfaces/dashboard';
+import { ColorEvent } from '../dashboard/dashboard';
 
 describe('Color Utils', () => {
 

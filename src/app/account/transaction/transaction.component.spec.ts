@@ -1,31 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
 import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { IAccountAll, ITransaction } from '../../interfaces/account';
+import { IAccountAll, ITransaction } from '../account';
 import { IPaymentOption } from '../../interfaces/payment';
-import { createTransaction, getAccount } from '../../store/account.actions';
-import { AccountState } from '../../store/reducers/account.reducers';
 import { signal } from '@angular/core';
+import { NavigationService } from '../../services/navigation.service';
+import { provideAppIcons } from '../../util/app-icons.provider';
+import { AccountStore } from '../../store/account.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { PaymentStore } from '../../store/payment.store';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
   let fixture: ComponentFixture<TransactionComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let accountId$: BehaviorSubject<string | null>;
-  let selectedAccount$: BehaviorSubject<IAccountAll | undefined>;
-  let subErrors$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
+  let selectedAccountSignal: ReturnType<typeof signal<IAccountAll | undefined>>;
+  let subErrorsSignal: ReturnType<typeof signal<any>>;
+  let responseSignal: ReturnType<typeof signal<any>>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<AccountState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
+  let accountStoreSpy: jasmine.SpyObj<any>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   const mockAccount: IAccountAll = {
@@ -48,98 +50,70 @@ describe('TransactionComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    const paymentOptions = [{
+      type: 'CASH',
+      label: 'Cash',
+      enabled: true,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'cash',
+    }, {
+      type: 'TRANSFER',
+      label: 'Transfer',
+      enabled: true,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'transfer',
+    }, {
+      type: 'MOLLIE',
+      label: 'Mollie',
+      enabled: true,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    }];
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     authUserSignal.set(initialAuthUser);
-    accountId$ = new BehaviorSubject<any>(null);
-    selectedAccount$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-      {
-        type: 'TRANSFER',
-        label: 'Transfer',
-        enabled: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'transfer',
-      },
-      {
-        type: 'MOLLIE',
-        label: 'Mollie',
-        enabled: true,
-        default: false,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-      },
-    ]);
+    selectedAccountSignal = signal<any>(undefined);
+    subErrorsSignal = signal<any>(undefined);
+    responseSignal = signal<any>(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadAccount', 'createTransaction'], {
+      selected: selectedAccountSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+      response: responseSignal.asReadonly(),
+    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return accountId$.asObservable();
-        case 2:
-          return selectedAccount$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        case 4:
-          return response$.asObservable();
-        case 5:
-          return paymentOptions$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
     });
 
     await TestBed.configureTestingModule({
       imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: AccountStore, useValue: accountStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideAppIcons(),
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(TransactionComponent);
     component = fixture.componentInstance;
 
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    accountId$.complete();
-    selectedAccount$.complete();
-    subErrors$.complete();
-    response$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -148,7 +122,7 @@ describe('TransactionComponent', () => {
 
   it('should initialize with default values', () => {
     expect(component.amountMin).toBe(100);
-    expect(component.language).toBe('en-GB');
+    expect(component.language).toBe(DEFAULT_LOCALE);
     expect(component.types().map(option => option.type)).toEqual(['CASH', 'TRANSFER']);
     expect(component.errors()).toEqual({});
   });
@@ -174,17 +148,19 @@ describe('TransactionComponent', () => {
     expect(amountControl.hasError('min')).toBeFalse();
   });
 
-  it('should dispatch getAccount when accountId signal emits an id', () => {
-    storeSpy.dispatch.calls.reset();
-    accountId$.next('account-123');
+  it('should load the account and payment options when accountId signal emits an id', () => {
+    paymentStoreSpy.getOptions.calls.reset();
+    fixture.componentRef.setInput('id', 'account-123');
 
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAccount({ id: 'account-123' }));
+    expect(accountStoreSpy.clean).toHaveBeenCalled();
+    expect(accountStoreSpy.loadAccount).toHaveBeenCalledWith('account-123');
+    expect(paymentStoreSpy.getOptions).toHaveBeenCalled();
   });
 
   it('should react to selectedAccount updates (accountSignal)', () => {
-    selectedAccount$.next(mockAccount);
+    selectedAccountSignal.set(mockAccount);
     fixture.detectChanges();
 
     expect(component.accountSignal()?.id).toBe('account-123');
@@ -213,7 +189,7 @@ describe('TransactionComponent', () => {
       { field: 'amount', message: 'Amount is invalid' },
       { field: 'option', message: 'Type is required' },
     ];
-    subErrors$.next(errors);
+    subErrorsSignal.set(errors);
     fixture.detectChanges();
 
     const currentErrors = component.errors();
@@ -225,33 +201,34 @@ describe('TransactionComponent', () => {
   });
 
   it('should navigate to appropriate route when response arrives (admin)', () => {
-    selectedAccount$.next(mockAccount);
+    selectedAccountSignal.set(mockAccount);
     authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
 
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'customer-123', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'customer-123', 'overview']);
   });
 
   it('should navigate to me overview when response arrives (not admin)', () => {
     authUserSignal.update(prev => ({ ...prev, hasAdminRole: false }));
 
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
   });
 
   it('should not submit when form is invalid', () => {
-    storeSpy.dispatch.calls.reset();
+    accountStoreSpy.createTransaction.calls.reset();
     component.submit();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(accountStoreSpy.createTransaction).not.toHaveBeenCalled();
   });
 
   it('should dispatch createTransaction for selected payment option', () => {
-    accountId$.next('account-123');
-    selectedAccount$.next(mockAccount);
+    fixture.componentRef.setInput('id', 'account-123');
+    selectedAccountSignal.set(mockAccount);
+    fixture.detectChanges();
 
     component.bankForm.patchValue({
       option: { type: 'CASH', icon: 'cash' } as IPaymentOption,
@@ -264,24 +241,23 @@ describe('TransactionComponent', () => {
 
     component.submit();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      createTransaction({
-        id: 'account-123',
-        transaction: {
-          customerId: 'customer-123',
-          amount: 200,
-          paymentRequest: {
-            type: 'CASH',
-            transfer: 'test-transfer',
-          },
-        } as ITransaction,
-      }),
+    expect(accountStoreSpy.createTransaction).toHaveBeenCalledWith(
+      'account-123',
+      {
+        customerId: 'customer-123',
+        amount: 200,
+        paymentRequest: {
+          type: 'CASH',
+          transfer: 'test-transfer',
+        },
+      } as ITransaction,
     );
   });
 
   it('should dispatch createTransaction for another payment option', () => {
-    accountId$.next('account-123');
-    selectedAccount$.next(mockAccount);
+    fixture.componentRef.setInput('id', 'account-123');
+    selectedAccountSignal.set(mockAccount);
+    fixture.detectChanges();
 
     const paymentOption = { label: 'Test Payment', type: 'PAYPAL' } as IPaymentOption;
 
@@ -294,40 +270,38 @@ describe('TransactionComponent', () => {
       transfer: 'test-transfer',
     });
 
-    storeSpy.dispatch.calls.reset();
+    accountStoreSpy.createTransaction.calls.reset();
 
     component.submit();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      createTransaction({
-        id: 'account-123',
-        transaction: {
-          customerId: 'customer-123',
-          amount: 300,
-          paymentRequest: {
-            type: 'PAYPAL',
-            transfer: 'test-transfer',
-          },
-        } as ITransaction,
-      }),
+    expect(accountStoreSpy.createTransaction).toHaveBeenCalledWith(
+      'account-123',
+      {
+        customerId: 'customer-123',
+        amount: 300,
+        paymentRequest: {
+          type: 'PAYPAL',
+          transfer: 'test-transfer',
+        },
+      } as ITransaction,
     );
   });
 
   it('should leave errors when response clears (errors persist until next submission)', () => {
-    subErrors$.next([{ field: 'amount', message: 'Amount is invalid' }]);
+    subErrorsSignal.set([{ field: 'amount', message: 'Amount is invalid' }]);
     fixture.detectChanges();
 
     expect((component.errors() as any)['amount']).toBe('Amount is invalid');
 
-    response$.next({ success: true });
+    responseSignal.set({ success: true });
 
     expect((component.errors() as any)['amount']).toBe('Amount is invalid');
   });
 
   it('should handle empty selector emissions gracefully', () => {
-    selectedAccount$.next(undefined);
-    subErrors$.next(undefined);
-    response$.next(undefined);
+    selectedAccountSignal.set(undefined);
+    subErrorsSignal.set(undefined);
+    responseSignal.set(undefined);
 
     expect(component.accountSignal()).toBeUndefined();
     expect(component.optionsSignal().map(option => option.type)).toEqual(['CASH', 'TRANSFER', 'MOLLIE']);

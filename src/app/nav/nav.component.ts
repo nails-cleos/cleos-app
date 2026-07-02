@@ -1,13 +1,10 @@
 import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ActivatedRoute, NavigationStart, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { IUser, User } from '../interfaces/user';
-import { logOut, redirect } from '../store/auth.actions';
-import { getNotificationsPage, readNotification } from '../store/notification.actions';
-import { updateMyUser } from '../store/user.actions';
-import { INotification } from '../interfaces/notification';
-import { TranslateService } from '@ngx-translate/core';
+import { IUser, User } from '../user/user';
+import { INotification } from '../notification/notification';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
 import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
 import { NavigationService } from '../services/navigation.service';
@@ -18,37 +15,54 @@ import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/them
 import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
-import { newDateTimestamp } from '../util/dates';
-import { SharedModule } from '../shared/shared.module';
+import { DEFAULT_LOCALE, newDateTimestamp } from '../util/dates';
 import { MenuItemComponent } from './menu-item/menu-item.component';
 import { ErrorComponent } from '../shared/error/error.component';
 import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getIsAuthenticatedPipe, getMenusPipe, getRedirectPipe, getUserPipe } from '../store/selectors/auth.selectors';
-import { getDataDeletedPipe, getDataReadPipe, getNotificationsPipe } from '../store/selectors/notification.selectors';
 import { of } from 'rxjs';
-import { selectGlobalError, selectGlobalIsLoading, selectGlobalResponse } from '../store/selectors/global.selectors';
+import { selectGlobalError, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
-import { clearGlobalError, clearGlobalResponse } from '../store/global.actions';
+import { clearGlobalError, clearGlobalResponse } from '../store/actions/global.actions';
+import { GLOBAL_FEEDBACK_SOURCE, GlobalFeedbackSource } from '../store/global-feedback-source';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DatePipe, UpperCasePipe } from '@angular/common';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/material/sidenav';
+import { AvatarComponent } from '../shared/avatar/avatar.component';
+import { MatToolbar } from '@angular/material/toolbar';
+import { MatBadge } from '@angular/material/badge';
+import { UserStore } from '../store/user.store';
+import { NotificationStore } from '../store/notification.store';
+import { AuthStore } from '../store/auth.store';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [SharedModule, MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent],
+  imports: [MatIcon, MatListItem, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
+    MatTooltip, MatListItemIcon, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatProgressSpinner, MatDrawerContainer,
+    MatDrawer, AvatarComponent, UpperCasePipe, MatDivider, MatNavList, MatDrawerContent, MatToolbar, MatBadge],
 })
 export class NavComponent {
   private readonly elementRef: ElementRef = inject(ElementRef);
   private readonly env: EnvService = inject(EnvService);
   private readonly tokenService: TokenService = inject(TokenService);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly store: Store = inject(Store);
+  private readonly authStore = inject(AuthStore);
+  private readonly notificationStore = inject(NotificationStore);
   private readonly messagingService: MessagingService = inject(MessagingService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly navigationService: NavigationService = inject(NavigationService);
@@ -57,18 +71,12 @@ export class NavComponent {
   private readonly themeService: ThemeService = inject(ThemeService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly seoService: SeoService = inject(SeoService);
-  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly loadingService = inject(LoadingOverlayService);
+  private readonly feedbackSources = inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
+  private readonly userStore = inject(UserStore);
 
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
-  private isAuthenticated$ = this.store.pipe(getIsAuthenticatedPipe);
-  private user$ = this.store.pipe(getUserPipe);
-  private menus$ = this.store.pipe(getMenusPipe);
-  private redirect$ = this.store.pipe(getRedirectPipe);
-  private dataDeleted$ = this.store.pipe(getDataDeletedPipe);
-  private dataRead$ = this.store.pipe(getDataReadPipe);
-  private notification$ = this.store.pipe(getNotificationsPipe);
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -85,22 +93,22 @@ export class NavComponent {
 
   title = this.env.title;
 
-  private isAuthenticatedSignal = toSignal(this.isAuthenticated$);
-  private redirectSignal = toSignal(this.redirect$);
-  private menuItemsSignal = toSignal(this.menus$);
-  private dataDeletedSignal = toSignal(this.dataDeleted$);
-  private dataReadSignal = toSignal(this.dataRead$);
-  private notificationSignal = toSignal(this.notification$);
+  private isAuthenticatedSignal = this.authStore.isAuthenticated;
+  private redirectSignal = this.authStore.redirect;
+  private menuItemsSignal = this.authStore.menus;
+  private notificationSignal = computed(() => this.notificationStore.data());
+  private dataDeletedSignal = computed(() => this.notificationStore.dataDeleted());
+  private dataReadSignal = computed(() => this.notificationStore.dataRead());
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
-  private globalIsLoadingSignal = toSignal(this.store.select(selectGlobalIsLoading), { initialValue: true });
   private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
   private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
+  private readonly feedbackResponse = computed(() => this.findFeedbackSource(source => source.response()));
+  private readonly feedbackError = computed(() => this.findFeedbackSource(source => source.error()));
 
-  currentUserSignal = toSignal(this.user$);
+  currentUserSignal = this.authStore.user;
 
   private authUserSignal = this.authUserService.authUser;
   private isAuthorized = computed(() => this.isAuthenticatedSignal() ?? false);
-  private readonly response = computed(() => this.globalResponseSignal());
   private readonly isBlockingPageError = (error?: { status?: string }) =>
     ['NOT_FOUND', 'SERVER_ERROR'].includes(error?.status || '');
 
@@ -111,16 +119,17 @@ export class NavComponent {
   isManager = computed(() => this.authUserSignal()?.isManager ?? false);
   menuItems = computed(() => this.menuItemsSignal() || []);
 
-  readonly language = computed(() => {
+  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
+
+  readonly languageSignal = computed(() => {
     const user = this.currentUserSignal();
 
-    return getLocale(
-      user?.locale || this.route.snapshot.paramMap.get('lang') || this.translate.getCurrentLang()).language;
+    return getLocale(user?.locale || this.language()).language;
   });
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
   pageError = computed(() => {
-    const error = this.globalErrorSignal();
+    const error = this.globalErrorSignal() ?? this.feedbackError()?.value;
     return this.isBlockingPageError(error) ? error : undefined;
   });
   notifications = signal<INotification[]>([]);
@@ -130,8 +139,7 @@ export class NavComponent {
 
   readonly loading = this.loadingService.isLoading;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  image?: string;
+  image = signal<string | undefined>(undefined);
   initials?: string;
   plusNotification?: string;
   incomplete = false;
@@ -140,34 +148,34 @@ export class NavComponent {
   private cssClass?: string;
 
   constructor() {
-    this.navigationService.subscribe();
-    this.authUserService.cookieConsent(this.translate);
+    this.authUserService.cookieConsent(this.translateService);
     this.router.events.subscribe(event => {
-      if (event instanceof NavigationStart && this.isBlockingPageError(this.globalErrorSignal())) {
-        this.store.dispatch(clearGlobalError());
+      if (event instanceof NavigationStart) {
+        const globalError = this.globalErrorSignal();
+        const feedbackError = this.findFeedbackSource(source => source.error());
+
+        if (this.isBlockingPageError(globalError)) {
+          this.store.dispatch(clearGlobalError());
+        } else if (this.isBlockingPageError(feedbackError?.value)) {
+          feedbackError?.source.clearError();
+        }
       }
     });
 
-    const meta = this.translate.instant('DASHBOARD.META');
+    const meta = this.translateService.instant('DASHBOARD.META');
     this.seoService.setMetaDescription(meta.CONTENT);
     this.seoService.setMetaTitle(meta.TITLE);
 
     effect(() => {
-      if (this.globalIsLoadingSignal()) {
-        this.loadingService.show();
-      } else {
-        this.loadingService.hide();
-      }
-    });
-
-    effect(() => {
-      const response = this.response();
+      const globalResponse = this.globalResponseSignal();
+      const feedbackResponse = this.feedbackResponse();
+      const response = globalResponse ?? feedbackResponse?.value;
       if (!response) {
         return;
       }
 
       if (response.redirect) {
-        this.router.navigate([`/${ this.language() }/${ response.redirect }`]);
+        this.navigationService.navigate([response.redirect]);
       }
 
       if (response.blob) {
@@ -186,15 +194,19 @@ export class NavComponent {
         const options = this.getToastOptions(response);
         this.toastService.show(response.message, response.toastType, 5000, options);
         if (response.reload) {
-          this.navigationService.reload(this.router.url.split('/'));
+          this.navigationService.reload();
         }
       }
 
-      this.store.dispatch(clearGlobalResponse());
+      if (globalResponse) {
+        this.store.dispatch(clearGlobalResponse());
+      }
     });
 
     effect(() => {
-      const err = this.globalErrorSignal();
+      const globalError = this.globalErrorSignal();
+      const feedbackError = this.feedbackError();
+      const err = globalError ?? feedbackError?.value;
       if (!err?.message) {
         return;
       }
@@ -202,7 +214,11 @@ export class NavComponent {
       this.toastService.show(err.message, 'error');
 
       if (!this.isBlockingPageError(err)) {
-        this.store.dispatch(clearGlobalError());
+        if (globalError) {
+          this.store.dispatch(clearGlobalError());
+        } else {
+          feedbackError?.source.clearError();
+        }
       }
     });
 
@@ -221,7 +237,7 @@ export class NavComponent {
           this.tokenService.setUser = user;
           this.incomplete = !user.completed;
           this.initials = getDisplayNameInitials(user);
-          this.image = getUserImage(user);
+          this.image.set(getUserImage(user));
           this.messagingService.requestPermission(user);
           this.resetTheme(user.theme);
         }
@@ -256,15 +272,17 @@ export class NavComponent {
     effect(() => {
       const isAuthorized = this.isAuthorized();
       const redirectSignal = this.redirectSignal();
-      const language = this.language();
+      const language = this.languageSignal();
       if (isAuthorized) {
-        this.store.dispatch(getNotificationsPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE }));
+        this.notificationStore.loadPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
+      } else {
+        this.navigationService.resetConfig(language);
       }
       if (this.router.url === `/${ language }`) {
         if (isAuthorized && !redirectSignal) {
-          this.store.dispatch(redirect());
+          this.authStore.authRedirect();
         } else {
-          this.router.navigate(['/', language, 'home']);
+          this.navigationService.navigate(['home']);
         }
       }
     });
@@ -340,11 +358,11 @@ export class NavComponent {
   }
 
   goToHome() {
-    this.router.navigate([this.language(), 'home']);
+    this.navigationService.navigate(['home']);
   }
 
   logout() {
-    this.store.dispatch(logOut());
+    this.authStore.logOut();
   }
 
   changeTheme() {
@@ -352,12 +370,14 @@ export class NavComponent {
     const theme = getThemeName(this.isDarkMode());
     this.resetTheme(theme);
     this.authUserService.updateMode(this.isDarkMode());
-    const user: IUser = new User();
-    user.theme = theme;
-    const redirectUrl = this.router.url;
-    const message = this.translate.instant(
-      `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
-    this.store.dispatch(updateMyUser({ user, redirectUrl, message }));
+    if (this.isAuthorized()) {
+      const user: IUser = new User();
+      user.theme = theme;
+      const redirectUrl = this.router.url;
+      const message = this.translateService.instant(
+        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
+      this.userStore.updateMyUser(user, redirectUrl, message);
+    }
   }
 
   notification = (notification: INotification): void => {
@@ -377,7 +397,7 @@ export class NavComponent {
         }
         return value;
       }));
-      this.store.dispatch(readNotification({ id: notification.id }));
+      this.notificationStore.readNotification(notification.id);
     }
   };
 
@@ -407,9 +427,23 @@ export class NavComponent {
 
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
-      return { actionType: 'link', action: `/${ this.language() }/${ res.path }` };
+      // TODO if we change the href link we need to remove the language here.
+      return { actionType: 'link', action: `/${ this.languageSignal() }/${ res.path }` };
     }
     return { actionType: 'none' };
+  };
+
+  private findFeedbackSource = <T>(
+    read: (source: GlobalFeedbackSource) => T | undefined,
+  ): { source: GlobalFeedbackSource; value: T } | undefined => {
+    for (const source of this.feedbackSources) {
+      const value = read(source);
+      if (value !== undefined) {
+        return { source, value };
+      }
+    }
+
+    return undefined;
   };
 
   toggleMenu = (menu: 'notifications' | 'workday' | 'settings'): void => {

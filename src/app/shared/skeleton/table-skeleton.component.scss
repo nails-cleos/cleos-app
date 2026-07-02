@@ -1,0 +1,31 @@
+.app-table-skeleton-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.app-table-skeleton-table th,
+.app-table-skeleton-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.app-table-skeleton-line {
+  width: 100%;
+  min-width: 3rem;
+}
+
+.app-table-skeleton-line--header {
+  width: 60%;
+}
+
+.app-table-skeleton-paginator {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 1rem 1rem;
+}
+
+.app-table-skeleton-line--paginator {
+  width: 12rem;
+  max-width: 100%;
+}

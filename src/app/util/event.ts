@@ -1,4 +1,4 @@
-import { IAvailability, IRoomAll } from '../interfaces/room';
+import { IAvailability, IRoomAll } from '../room/room';
 import { CalendarEvent } from 'angular-calendar';
 import {
   createDate,
@@ -17,7 +17,7 @@ import { ByWeekday, Frequency, RRule } from 'rrule';
 import { isSameDay, isToday } from 'date-fns';
 import { createEventColor } from './color';
 import { FrequencyEnum } from './helper';
-import { IDay } from '../interfaces/reservation';
+import { IDay } from '../reservation/reservation';
 
 export const LUNCH = 'LUNCH';
 export const OUT_OF_WORK = 'OUT_OF_WORK';

@@ -1,6 +1,6 @@
 import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.js';
-import { IChart } from '../interfaces/dashboard';
-import { ICurrency } from '../interfaces/currency';
+import { IChart } from '../dashboard/dashboard';
+import { ICurrency } from '../currency/currency';
 import { numberFormat } from './numbers';
 import { getNowTimeZone, newDateTimestamp, secondsToHHMM } from './dates';
 

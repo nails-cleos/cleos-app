@@ -1,16 +1,23 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, WritableSignal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { Store } from '@ngrx/store';
 import {
   completeReservation,
-  getAllAdditionalByGroupId,
-  getAllTreatments,
   getReservation,
   reservationFindPayments,
-} from '../../../store/reservation.actions';
-import { IExtras } from '../../../interfaces/reservation';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../interfaces/treatment';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
+} from '../../../store/actions/reservation.actions';
+import { IExtras } from '../../reservation';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { requireMatch, valueChange } from '../../../util/validators';
 import { IPaymentOption } from '../../../interfaces/payment';
 import {
@@ -22,16 +29,22 @@ import {
   newExtra,
   newPrice,
 } from '../../../util/helper';
-import { API_LOCALE, getDiffTime, getNowTimeZone, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
+import {
+  DEFAULT_LOCALE,
+  getDiffTime,
+  getNowTimeZone,
+  getTime,
+  getTimeNumber,
+  newDateTimestamp,
+} from '../../../util/dates';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
-import { IAdditionalAll } from '../../../interfaces/additional';
-import { MatListOption } from '@angular/material/list';
-import { IService } from '../../../interfaces/room';
-import { IColorAll } from '../../../interfaces/color';
+import { IAdditionalAll } from '../../../additional/additional';
+import { MatListOption, MatSelectionList } from '@angular/material/list';
+import { IService } from '../../../room/room';
+import { IColorAll } from '../../../color/color';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
@@ -41,15 +54,26 @@ import { PricePreviewComponent } from '../../../shared/price-preview/price-previ
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import {
-  getAdditionalListPipe,
-  getCurrentCompleteReservationPipe,
+  getNavigationParamsPipe,
   getPaymentsPipe,
   getSelectedReservationPipe,
-  getTreatmentDiscountPipe,
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { ReservationDetailSkeletonComponent } from '../reservation-detail-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { AdditionalStore } from '../../../store/additional.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -65,35 +89,46 @@ type ReservationCompleteForm = {
   selector: 'app-reservation-complete',
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe, FormFieldAdderComponent,
-    PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective],
+  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule,
+    TranslatePipe, DecimalPipe, NgClass, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    BackButtonDirective, CurrencySymbolPipe, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe,
+    FormFieldAdderComponent, PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective,
+    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox, MatSuffix,
+    ReservationDetailSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {
+  id = input<string>();
+  roomId = input<string>();
+  customerId = input<string>();
+
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly treatmentStore = inject(TreatmentStore);
+  private readonly additionalStore = inject(AdditionalStore);
+  private readonly paymentStore = inject(PaymentStore);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private completeReservation$ = this.store.pipe(getCurrentCompleteReservationPipe);
+  private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
-  private treatmentDiscount$ = this.store.pipe(getTreatmentDiscountPipe);
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
-  private readonly completeReservationSignal = toSignal(this.completeReservation$);
-  private readonly treatmentDiscountSignal = toSignal(this.treatmentDiscount$);
+  private readonly reservationParamsSignal = toSignal(this.reservationParams$);
+  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly paymentsSignal = toSignal(this.payments$);
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   readonly selectedReservationSignal = toSignal(this.selectedReservation$);
-  readonly additionalListSignal = toSignal(this.additionalList$);
+  readonly additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
 
-  private readonly isDashboard = computed(() => this.completeReservationSignal()?.isDashboard ?? false);
-  private readonly reservationId = computed(() => this.completeReservationSignal()?.reservationId);
-  private readonly roomId = computed(() => this.completeReservationSignal()?.roomId);
-  private readonly customerId = computed(() => this.completeReservationSignal()?.customerId);
+  private readonly isDashboard = computed(() => this.reservationParamsSignal()?.isDashboard ?? false);
+
+  readonly language = this.navigationService.language;
 
   startDate: Date = getNowTimeZone();
   endDate: Date = getNowTimeZone();
@@ -110,7 +145,7 @@ export class ReservationCompleteComponent {
     startTime: this.formBuilder.control('', {
       validators: [Validators.required],
     }),
-    endTime: this.formBuilder.control(getTime(this.endDate, this.translate.getCurrentLang()), {
+    endTime: this.formBuilder.control(getTime(this.endDate, this.language), {
       validators: [Validators.required],
     }),
     color: this.formBuilder.control(undefined, {
@@ -184,7 +219,6 @@ export class ReservationCompleteComponent {
     return !!time && !time.includes('-');
   });
 
-  dateFormat: string = this.translate.getCurrentLang();
   split: boolean = false;
   isValid: boolean = true;
   isValidSplit = signal(true);
@@ -193,11 +227,12 @@ export class ReservationCompleteComponent {
   private currentSplitData?: IExtras[];
 
   constructor() {
+    this.paymentStore.getOptions();
     effect(() => {
       const reservation = this.selectedReservationSignal();
       if (reservation) {
         this.startDate = newDateTimestamp(reservation.startedTimestamp, reservation.room.timeZone);
-        this.getForm.startTime.setValue(getTime(this.startDate, this.translate.getCurrentLang()));
+        this.getForm.startTime.setValue(getTime(this.startDate, this.language));
         const endDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
         this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
         this.price.set(getPrice(reservation, this.payments()));
@@ -213,7 +248,7 @@ export class ReservationCompleteComponent {
     });
 
     effect(() => {
-      const id = this.reservationId();
+      const id = this.id();
       if (!id) {
         return;
       }
@@ -225,7 +260,7 @@ export class ReservationCompleteComponent {
       const roomId = this.roomId();
       const customerId = this.customerId();
       if (roomId) {
-        this.store.dispatch(getAllTreatments({ roomId, customerId }));
+        this.treatmentStore.getAllTreatments(roomId, customerId);
       }
     });
 
@@ -244,7 +279,7 @@ export class ReservationCompleteComponent {
       if (!roomId) {
         return;
       }
-      this.store.dispatch(getAllAdditionalByGroupId({ roomId, groupId: group.id }));
+      this.additionalStore.loadAllByGroupId(roomId, group.id);
     });
 
     effect(() => {
@@ -312,8 +347,8 @@ export class ReservationCompleteComponent {
 
   complete(): void {
     if (!this.isValid) {
-      const title = this.translate.instant('COMMON.COMPLETE.TITLE');
-      const content = this.translate.instant('COMMON.COMPLETE.CONTENT');
+      const title = this.translateService.instant('COMMON.COMPLETE.TITLE');
+      const content = this.translateService.instant('COMMON.COMPLETE.CONTENT');
       const dialogRef = this.dialog.open(DialogComponent, {
         data: { title, content, value: this.selectedReservationSignal() },
       });
@@ -419,8 +454,8 @@ export class ReservationCompleteComponent {
           additionalIds: this.additionalSelected().map(additional => additional.id),
           transfer: this.getForm.transfer.value,
           color: this.getForm.color.value?.id,
-          startDateTime: this.startDate.toLocaleString(API_LOCALE),
-          endDateTime: this.endDate.toLocaleString(API_LOCALE),
+          startDateTime: this.startDate.toLocaleString(DEFAULT_LOCALE),
+          endDateTime: this.endDate.toLocaleString(DEFAULT_LOCALE),
           extras: this.currentExtraData,
           split: splitData,
           pointOfSale: true,

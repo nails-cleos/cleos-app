@@ -1,18 +1,20 @@
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { HttpErrorResponse, HttpHandlerFn, HttpRequest } from '@angular/common/http';
-import { Store } from '@ngrx/store';
 import { firstValueFrom, throwError } from 'rxjs';
 
 import { AuthUserService } from '../services/auth-user.service';
-import { reLogin } from '../store/auth.actions';
 import { errorInterceptor } from './error-interceptor';
+import { AuthStore } from '../store/auth.store';
 
 describe('errorInterceptor', () => {
   let isAuthenticated = false;
   let authUserServiceMock: {
     authUser: jasmine.Spy<() => { isAuthenticated: boolean }>;
   };
-  let storeSpy: jasmine.SpyObj<Store>;
+
+  let authStoreSpy: {
+    reLogin: jasmine.Spy;
+  };
 
   const runWithError = async (error: unknown): Promise<unknown> => {
     const req = new HttpRequest('GET', '/v1/test');
@@ -27,16 +29,18 @@ describe('errorInterceptor', () => {
   };
 
   beforeEach(() => {
+    authStoreSpy = {
+      reLogin: jasmine.createSpy('reLogin'),
+    };
     isAuthenticated = false;
     authUserServiceMock = {
       authUser: jasmine.createSpy('authUser').and.callFake(() => ({ isAuthenticated })),
     };
-    storeSpy = jasmine.createSpyObj<Store>('Store', ['dispatch']);
 
     TestBed.configureTestingModule({
       providers: [
         { provide: AuthUserService, useValue: authUserServiceMock as unknown as AuthUserService },
-        { provide: Store, useValue: storeSpy },
+        { provide: AuthStore, useValue: authStoreSpy },
       ],
     });
   });
@@ -68,7 +72,7 @@ describe('errorInterceptor', () => {
       },
     });
     expect(completed).toBeTrue();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
   }));
 
   it('should dispatch reLogin on 401 when user is authenticated', async () => {
@@ -76,7 +80,7 @@ describe('errorInterceptor', () => {
     const error = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
     const result = await runWithError(error);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(reLogin());
+    expect(authStoreSpy.reLogin).toHaveBeenCalled();
     expect(result).toBe(error);
   });
 
@@ -85,7 +89,7 @@ describe('errorInterceptor', () => {
     const error = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
     const result = await runWithError(error);
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
     expect(result).toBe(error);
   });
 
@@ -93,7 +97,7 @@ describe('errorInterceptor', () => {
     const error = new HttpErrorResponse({ status: 400, statusText: 'Bad Request' });
     const result = await runWithError(error);
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
     expect(result).toBe(error);
   });
 });

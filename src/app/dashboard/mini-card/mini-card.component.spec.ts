@@ -3,14 +3,23 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MiniCardComponent } from './mini-card.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { IError } from '../../interfaces/common';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MiniCardComponent', () => {
   let component: MiniCardComponent;
   let fixture: ComponentFixture<MiniCardComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     await TestBed.configureTestingModule({
       imports: [MiniCardComponent, TranslateModule.forRoot()],
+      providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MiniCardComponent);
@@ -58,5 +67,6 @@ describe('MiniCardComponent', () => {
     expect(component.isProjection()).toBeFalse();
     expect(component.isLoading()).toBeFalse();
     expect(component.error()).toEqual({ message: 'Error occurred' } as IError);
+    expect(component.language).toEqual(DEFAULT_LOCALE);
   });
 });

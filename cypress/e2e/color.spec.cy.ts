@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Color with ${ name }`, () => {
@@ -12,7 +13,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -27,7 +28,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/colors').as('saveColor');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
-      cy.get('tr').contains('No Color');
+      cy.contains('.no-content', 'No Color', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/colors/add');
       cy.get('.app-surface-eyebrow').contains('Add color');
@@ -50,6 +51,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockColors(true, undefined, 'deb71da5-4ded-4e94-89c2-44036ea00451');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedColor').then((color: any) => {
         // Updates

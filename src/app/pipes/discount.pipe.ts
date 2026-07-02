@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { DiscountType } from '../interfaces/discount';
+import { DiscountType } from '../discount/discount';
 import { currencySymbol } from '../util/helper';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 
 @Pipe({
   name: 'discount',

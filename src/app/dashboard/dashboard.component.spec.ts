@@ -1,25 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardComponent } from './dashboard.component';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { signal } from '@angular/core';
-import { IDashboard } from '../interfaces/dashboard';
-import { ICurrencyAll } from '../interfaces/currency';
-import { getNowTimeZone } from '../util/dates';
+import { IDashboard } from './dashboard';
+import { ICurrencyAll } from '../currency/currency';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { endOfMonth, startOfMonth } from 'date-fns';
-import { States } from '../interfaces/reservation';
+import { States } from '../reservation/reservation';
 import { FrequencyEnum } from '../util/helper';
+import { provideAppCalendar } from '../util/adapter/app-date.provider';
+import { DashboardStore } from '../store/dashboard.store';
+import { Store } from '@ngrx/store';
+import { BehaviorSubject } from 'rxjs';
+import { NavigationService } from '../services/navigation.service';
 
-describe('DashComponent', () => {
+describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let navigationParams$: BehaviorSubject<any>;
-  let dashboardMap$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
+  let dashboardStoreSpy: {
+    data: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    getEvents: jasmine.Spy;
+    getCards: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   const mockMiniCardSummaries = [
@@ -54,48 +64,46 @@ describe('DashComponent', () => {
     notes: [],
   };
 
-
-  let storeSpy: jasmine.SpyObj<Store<any>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
   beforeEach(async () => {
-    navigationParams$ = new BehaviorSubject(undefined);
-    dashboardMap$ = new BehaviorSubject(undefined);
-    error$ = new BehaviorSubject(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    history.replaceState({}, '');
+    dashboardStoreSpy = {
+      data: signal<any>(undefined),
+      error: signal<any>(undefined),
+      isLoading: signal<any>(undefined),
+      getEvents: jasmine.createSpy('getEvents'),
+      getCards: jasmine.createSpy('getCards'),
+      clean: jasmine.createSpy('clean'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return dashboardMap$.asObservable();
-        case 3:
-          return error$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    storeSpy.pipe.and.callFake(() => new BehaviorSubject(undefined).asObservable());
+    storeSpy.select.and.returnValue(new BehaviorSubject(false).asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        provideAppCalendar(),
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
 
-    const translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
@@ -109,7 +117,7 @@ describe('DashComponent', () => {
     component.getForm.selectedDash.setValue(roomName);
     const record: Record<string, IDashboard> = {};
     record[roomName] = { miniCardSummaries: mockMiniCardSummaries, currency };
-    dashboardMap$.next(record);
+    dashboardStoreSpy.data.set(record);
 
     fixture.detectChanges();
 
@@ -127,7 +135,7 @@ describe('DashComponent', () => {
     const roomName = 'Test Room';
     const record: Record<string, IDashboard> = {};
     record[roomName] = { chartSummaries: mockChartSummaries, currency, primary: true };
-    dashboardMap$.next(record);
+    dashboardStoreSpy.data.set(record);
 
     fixture.detectChanges();
 
@@ -252,13 +260,13 @@ describe('DashComponent', () => {
 
     component.getForm.selectedDash.setValue(roomName);
 
-    dashboardMap$.next(record);
+    dashboardStoreSpy.data.set(record);
     fixture.detectChanges();
 
-    expect(component.charts.length).toBe(8);
-
-    component.charts.forEach(chart => {
-      expect(Object.keys(chart).length).toBe(0);
+    expect(component.charts.length).toBe(0);
+    expect(component.miniCardData.length).toBe(4);
+    component.miniCardData.forEach(card => {
+      expect(card.error?.status).toBe('NO_CONTENT');
     });
 
     expect(component.miniCardData.length).toBe(4);
@@ -502,7 +510,7 @@ describe('DashComponent', () => {
     component.calendar.calendarEnd = endOfMonth(start);
 
     const noteDate = new Date();
-    noteDate.setFullYear(start.getFullYear(), start.getMonth() -1, 25);
+    noteDate.setFullYear(start.getFullYear(), start.getMonth() - 1, 25);
 
     component.calendarSummary = {
       reservations: [],

@@ -1,49 +1,36 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { getTransaction } from '../../../store/account.actions';
-import { TranslateService } from '@ngx-translate/core';
-import { notifyPayment, paymentSend } from '../../../store/payment.actions';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { newDateTimestamp } from '../../../util/dates';
-import { SharedModule } from '../../../shared/shared.module';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import {
-  getCurrentAccountIdPipe,
-  getCurrentTransactionIdPipe,
-  getAccountResponsePipe,
-  getSelectedTransactionPipe,
-  getSubErrorsPipe,
-} from '../../../store/selectors/account.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AccountState } from '../../../store/reducers/account.reducers';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
+import { AccountStore } from '../../../store/account.store';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, DecimalPipe, RouterLink, DatePipe,
+    BackButtonDirective, BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionDetailComponent {
-  private readonly store: Store<AccountState | PaymentState> = inject(Store<AccountState | PaymentState>);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  id = input<string>();
+  transactionId = input<string>();
 
-  private accountId$ = this.store.pipe(getCurrentAccountIdPipe);
-  private transactionId$ = this.store.pipe(getCurrentTransactionIdPipe);
-  private selectedTransaction$ = this.store.pipe(getSelectedTransactionPipe);
-  private response$ = this.store.pipe(getAccountResponsePipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private readonly paymentStore = inject(PaymentStore);
+  private readonly accountStore = inject(AccountStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private accountIdSignal = toSignal(this.accountId$);
-  private transactionIdSignal = toSignal(this.transactionId$);
-  private selectedTransactionSignal = toSignal(this.selectedTransaction$);
-  private responseSignal = toSignal(this.response$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private responseSignal = this.paymentStore.response;
+  private subErrorsSignal = this.paymentStore.subErrors;
 
   transactionSignal = computed(() => {
-    const transaction = this.selectedTransactionSignal();
+    const transaction = this.accountStore.selectedTransaction();
     if (transaction) {
       return Object.assign(
         {}, transaction, { date: newDateTimestamp(transaction.payment?.timestamp) },
@@ -52,43 +39,42 @@ export class TransactionDetailComponent {
     return transaction;
   });
 
-  dateFormat = this.translate.getCurrentLang();
-  step?: number = this.router.currentNavigation()?.extras.state?.step;
-  language = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
+
+  step?: number = history.state?.step;
 
   constructor() {
     effect(() => {
-      const id = this.accountIdSignal();
-      const transactionId = this.transactionIdSignal();
+      const id = this.id();
+      const transactionId = this.transactionId();
       if (id && transactionId) {
-        this.store.dispatch(getTransaction({ id, transactionId }));
+        this.accountStore.clean();
+        this.accountStore.loadTransaction(id, transactionId);
       }
     });
 
     effect(() => {
       const path = this.responseSignal()?.path;
       if (path) {
-        this.router.navigate([`${this.language}/${path}`]);
+        this.navigationService.navigate([path]);
       } else if (this.subErrorsSignal()?.[0]?.message) {
-        this.router.navigate([this.language, 'me', 'transaction', this.transactionIdSignal(), 'payment']);
+        this.navigationService.navigate(['me', 'transaction', this.transactionId(), 'payment']);
       }
     });
   }
 
   pay(): void {
-    this.store.dispatch(paymentSend({ link: this.transactionSignal()?.payment?.paymentURL }));
+    window.open(this.transactionSignal()?.payment?.paymentURL, '_self');
   }
 
   notify(): void {
     const transaction = this.transactionSignal()!;
-    this.store.dispatch(
-      notifyPayment({
-        id: transaction.payment!.id!,
-        path: 'transaction',
-        resourceId: transaction.id!,
-        preferenceId: transaction.payment!.preferenceId!,
-        paymentType: transaction.payment!.type!,
-      }),
+    this.paymentStore.notify(
+      transaction.payment!.id!,
+      'transaction',
+      transaction.id!,
+      transaction.payment!.preferenceId!,
+      transaction.payment!.type!,
     );
   }
 }

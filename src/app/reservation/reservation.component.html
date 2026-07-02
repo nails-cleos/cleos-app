@@ -18,9 +18,9 @@
         @if (event?.meta?.isReservation) {
           <div class="calendar-tooltip-card">
             <div class="calendar-tooltip-card__time">
-              {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:dateFormat }}
+              {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:language }}
               -
-              {{ event.end | date:'HH:mm':event.meta?.timeZone:dateFormat }}
+              {{ event.end | date:'HH:mm':event.meta?.timeZone:language }}
             </div>
             <div class="calendar-tooltip-card__row">
               <span>{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
@@ -103,7 +103,7 @@
               <div class="booking-summary__slots">
                 @for (slot of summaryDateTimes; track $index) {
                   <span class="booking-summary__slot app-detail-chip">
-                    {{ slot.date | date:'EEE d MMM':currentRoom?.timeZone:dateFormat }}
+                    {{ slot.date | date:'EEE d MMM':currentRoom?.timeZone:language }}
                     @if (slot.start) {
                       <span> · {{ slot.start }}</span>
                     }
@@ -225,7 +225,9 @@
           }
         </div>
 
-        @if (customerInfo(); as customerInfo) {
+        @if (isLoading()) {
+          <app-skeleton [lines]="2" [buttons]="0"/>
+        } @else if (customerInfo(); as customerInfo) {
           <div class="support-card app-surface-section">
             <div class="support-card__header">
               <mat-icon>history</mat-icon>
@@ -275,8 +277,13 @@
         description: 'RESERVATION.FLOW.STEPS.ROOM'
       }"></ng-container>
 
-      @let currentOffices = offices();
-      @if (!currentOffices?.length) {
+      @if (isLoading()) {
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+        <div class="field-grid field-grid--triple">
+          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
+          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
+        </div>
+      } @else if (!offices().length) {
         <div class="empty-state">
           <mat-icon>storefront</mat-icon>
           <div class="empty-state__title">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
@@ -284,7 +291,7 @@
       } @else {
         <div class="app-surface-section">
           <div class="field-grid field-grid--triple">
-            @if (currentOffices) {
+            @if (offices()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
                 <input (keydown)="keyDownOffice($event)" [formControl]="getOfficeForm.office"
@@ -416,8 +423,10 @@
         description: 'RESERVATION.FLOW.STEPS.TREATMENT'
       }"></ng-container>
 
-      @let currentGroups = groups();
-      @if (!currentGroups?.length) {
+      @if (isLoading()) {
+        <app-skeleton [showTitle]="false" [lines]="0" [buttons]="0" [boxes]="1"/>
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+      } @else if (!groups()?.length) {
         <div class="empty-state">
           <mat-icon>spa</mat-icon>
           <div class="empty-state__title">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
@@ -473,7 +482,7 @@
 
         <div class="app-surface-section">
           <div class="field-grid field-grid--double">
-            @if (currentGroups) {
+            @if (groups()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
                 <input (keydown)="keyDownGroup($event)" [formControl]="getTreatmentForm.group"
@@ -634,9 +643,8 @@
           </div>
         }
       } @else {
-        <div class="loading-card">
-          <div class="ssc-line"></div>
-        </div>
+        <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [descriptionLines]="1"
+                                [showMedia]="false"></app-card-list-skeleton>
       }
     </div>
   </ng-template>
@@ -802,7 +810,7 @@
             <div class="support-card__header">
               <mat-icon>event</mat-icon>
               <div>
-                <h3>{{ dataEvent.key | date:'fullDate':getOfficeForm.room.value?.timeZone:dateFormat }}</h3>
+                <h3>{{ dataEvent.key | date:'fullDate':getOfficeForm.room.value?.timeZone:language }}</h3>
                 <p>{{ 'RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</p>
               </div>
             </div>
@@ -818,7 +826,7 @@
               [daysInWeek]="screenConfig.daysInWeek"
               [events]="dataEvent.value.calendarEvents"
               [hourSegments]="4"
-              [locale]="dateFormat"
+              [locale]="language"
               [refresh]="refresh"
               [tooltipTemplate]="calendarTooltip"
               [viewDate]="dataEvent.value.viewDate"
@@ -920,7 +928,7 @@
                 @for (eventGroup of events.value; track eventGroup.event?.id || $index) {
                   @if (eventGroup.event) {
                     <span class="booking-summary__slot app-detail-chip">
-                      {{ eventGroup.event.start | date:'EEE d MMM, HH:mm':getOfficeForm.room.value?.timeZone:dateFormat }}
+                      {{ eventGroup.event.start | date:'EEE d MMM, HH:mm':getOfficeForm.room.value?.timeZone:language }}
                       @if (showTimeZone) {
                         <button (click)="openDialog(eventGroup.event.start)" class="summary-slot-button" mat-icon-button
                                 type="button">

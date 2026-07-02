@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { getQuarterSummary } from '../../store/dashboard.actions';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   IMonthSummary,
   ISummaryRoom,
@@ -9,31 +8,31 @@ import {
   MonthSummary,
   SummaryTotals,
   Total,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map } from 'rxjs/operators';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { RouterLink } from '@angular/router';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { dateMonthYear, getDateQuarter, getNowTimeZone } from '../../util/dates';
 import { AuthUserService } from '../../services/auth-user.service';
 import { allElementsHaveSameKeyFilterValue, currencySymbol, getCurrencyFromRoom } from '../../util/helper';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { ICurrencyAll } from '../../currency/currency';
 import { createQuarterSummary } from '../../util/report';
 import fs from 'file-saver';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { QuarterComponent } from './quarter/quarter.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getQuarterNavigationParamsPipe,
-  getQuarterSummaryMapPipe,
-  isDashboardLoadingPipe,
-} from '../../store/selectors/dashboard.selectors';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
-import { DateAdapter } from '@angular/material/core';
-import { YearAdapter } from '../../util/adapter/year.adapter';
+import { MatOption } from '@angular/material/core';
+import { provideYearDateAdapter } from '../../util/adapter/app-date.provider';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatButton } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { KeyValuePipe } from '@angular/common';
+import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type QuarterSummaryForm = {
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
@@ -45,26 +44,23 @@ type QuarterSummaryForm = {
   selector: 'app-quarter-summary',
   templateUrl: './quarter-summary.component.html',
   styleUrls: ['./quarter-summary.component.scss'],
-  imports: [SharedModule, QuarterComponent, TotalSummaryComponent],
-  providers: [{ provide: DateAdapter, useClass: YearAdapter }],
+  imports: [QuarterComponent, TotalSummaryComponent, MatFormField, MatLabel, MatInput, MatDatepicker,
+    MatDatepickerInput, MatDatepickerToggle, MatSelect, MatOption, MatButton, MatIcon, MatSuffix,
+    ReactiveFormsModule, TranslatePipe, KeyValuePipe, RouterLink],
+  providers: [...provideYearDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuarterSummaryComponent {
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
-  private readonly router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly dashboardStore = inject(DashboardStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private quarterSummaryMap$ = this.store.pipe(getQuarterSummaryMapPipe);
-  private navigationParams$ = this.store.pipe(getQuarterNavigationParamsPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
-
   private now = getNowTimeZone();
 
   private authUserSignal = this.authUserService.authUser;
-  private navigationParams = toSignal(this.navigationParams$);
 
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
 
@@ -80,7 +76,7 @@ export class QuarterSummaryComponent {
   private selectedQuarterSignal = toSignal(this.getForm.selectedQuarter.valueChanges);
   private selectedRoomSignal = toSignal(this.getForm.selectedRoom.valueChanges);
 
-  quarterSummaryMapSignal = toSignal(this.quarterSummaryMap$);
+  quarterSummaryMapSignal = this.dashboardStore.quarterSummaryMap;
   isHandset = toSignal(
     this.breakpointObserver.observe([
       Breakpoints.XSmall,
@@ -97,18 +93,18 @@ export class QuarterSummaryComponent {
   quarter = signal<number>(getDateQuarter(getNowTimeZone()));
   year = signal<number>(getNowTimeZone().getFullYear());
   quarterSummaryTotals = signal<ISummaryTotals>(new SummaryTotals());
-  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
-  readonly language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
-    // Effect to handle navigation params
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params) {
+      const stateYear = history.state?.year;
+      const stateQuarter = history.state?.quarter;
+      if (stateYear && stateQuarter) {
         const now = getNowTimeZone();
-        const year = params.year || now.getFullYear();
-        const quarter = params.quarter || getDateQuarter(now);
+        const year = stateYear || now.getFullYear();
+        const quarter = stateQuarter || getDateQuarter(now);
         this.year.set(year);
         this.quarter.set(quarter);
         this.getForm.date.setValue(dateMonthYear(0, year));
@@ -224,7 +220,7 @@ export class QuarterSummaryComponent {
   }
 
   goBack(): void {
-    this.router.navigate([this.language, 'dashboard', 'year', 'summary'], { state: { year: this.year() } });
+    this.navigationService.navigate(['dashboard', 'year', 'summary'], { state: { year: this.year() } });
     return;
   }
 
@@ -244,7 +240,7 @@ export class QuarterSummaryComponent {
       const quarter = this.selectedQuarterSignal() || getDateQuarter(getNowTimeZone());
       const year = this.year() || now.getFullYear();
       const workbook = createQuarterSummary(quarter, year, monthSummariesValue, this.quarterSummaryTotals(),
-        currencySymbol(this.currencySignal()), this.translate);
+        currencySymbol(this.currencySignal()), this.translateService);
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone();
@@ -254,7 +250,7 @@ export class QuarterSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `Report_Q${quarter}_${year}.xlsx`);
+        fs.saveAs(blob, `Report_Q${ quarter }_${ year }.xlsx`);
       });
     }
   };
@@ -277,7 +273,7 @@ export class QuarterSummaryComponent {
     this.reset();
     this.year.set(year);
     this.quarter.set(quarter);
-    this.store.dispatch(getQuarterSummary({ year, quarter }));
+    this.dashboardStore.getQuarterSummary(year, quarter);
   };
 
   private reset = (): void => {

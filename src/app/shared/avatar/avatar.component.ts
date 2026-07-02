@@ -21,16 +21,16 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   },
 })
 export class AvatarComponent {
-  src = input<string | null | undefined>();
-  initials = input<string | null | undefined>('');
+  src = input<string>();
+  initials = input<string>();
   alt = input('profile');
 
   size = input('40px');
   radius = input('50%');
   border = input('1px solid var(--app-surface-card-border)');
-  placeholderBorder = input<string | null | undefined>();
+  placeholderBorder = input<string>();
   background = input('var(--app-chip-ghost-bg)');
-  placeholderBackground = input<string | null | undefined>();
+  placeholderBackground = input<string>();
   boxShadow = input('none');
   color = input('var(--app-surface-text)');
   initialsSize = input('1rem');

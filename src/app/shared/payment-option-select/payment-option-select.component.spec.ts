@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { PaymentOptionSelectComponent } from './payment-option-select.component';
 import { IPaymentOption } from '../../interfaces/payment';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('PaymentOptionSelectComponent', () => {
   let component: PaymentOptionSelectComponent;
@@ -46,6 +47,7 @@ describe('PaymentOptionSelectComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PaymentOptionSelectComponent, TranslateModule.forRoot()],
+      providers: [provideAppIcons()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentOptionSelectComponent);

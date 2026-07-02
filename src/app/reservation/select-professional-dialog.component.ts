@@ -1,13 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../interfaces/user';
+import { IUser, IUserAll } from '../user/user';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../util/validators';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AppMaterialModule } from '../util/app-material.module';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type ProfessionalForm = {
   professional: FormControl<IUserAll | undefined>;
@@ -21,7 +31,8 @@ export type ProfessionalDialogData = {
 @Component({
   selector: 'app-select-professional-dialog-component',
   templateUrl: './select-professional-dialog.component.html',
-  imports: [AppMaterialModule, TranslatePipe, ReactiveFormsModule],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectProfessionalDialogComponent {

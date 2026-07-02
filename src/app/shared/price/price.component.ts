@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { IPrice } from '../../interfaces/treatment';
-import { ICurrency } from '../../interfaces/currency';
+import { IPrice } from '../../treatment/treatment';
+import { ICurrency } from '../../currency/currency';
 import { FormGroup } from '@angular/forms';
 import { IPaymentOption } from '../../interfaces/payment';
 import { BankComponent, BankForm } from '../bank/bank.component';

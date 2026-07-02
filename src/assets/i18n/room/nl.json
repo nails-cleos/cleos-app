@@ -138,6 +138,7 @@
     "TITLE": "Uitgave toevoegen",
     "CREATED": "Uitgave {{invoice}} aangemaakt",
     "DETAIL": "Uitgave bijwerken",
+    "CREATE_ANOTHER": "Nog een uitgave maken",
     "LIST": {
       "COLUMN": {
         "INVOICE": "Factuur",

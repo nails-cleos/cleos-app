@@ -1,37 +1,37 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuItemComponent } from './menu-item.component';
-import { Router } from '@angular/router';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
   let fixture: ComponentFixture<MenuItemComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpoint$: Subject<BreakpointState>;
 
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new Subject<BreakpointState>();
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [MenuItemComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MenuItemComponent);
     component = fixture.componentInstance;
@@ -48,7 +48,7 @@ describe('MenuItemComponent', () => {
   });
 
   it('should set language from TranslateService', () => {
-    expect(component.language).toBe('en-GB');
+    expect(component.language).toBe(DEFAULT_LOCALE);
   });
 
   it('should call router.navigate and drawer.toggle when navigate is called', () => {
@@ -58,13 +58,13 @@ describe('MenuItemComponent', () => {
     component.navigate(menu, drawer);
 
     expect(drawer.toggle).toHaveBeenCalled();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'dashboard', 'home']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'home']);
   });
 
   it('should call router.navigate without drawer when drawer is not provided', () => {
     const menu = { path: 'settings/account' } as any;
     component.navigate(menu);
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'settings', 'account']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['settings', 'account']);
   });
 
   describe('toggleSubMenu', () => {

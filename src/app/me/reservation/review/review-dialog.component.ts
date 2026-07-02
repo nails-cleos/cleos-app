@@ -1,35 +1,46 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
 import { getPrice } from '../../../util/helper';
-import { IReview } from '../../../interfaces/review';
-import { IReservationAll } from '../../../interfaces/reservation';
-import { IPrice } from '../../../interfaces/treatment';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { IReview } from '../list/review';
+import { IReservationAll } from '../../../reservation/reservation';
+import { IPrice } from '../../../treatment/treatment';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { RoomNamePipe } from '../../../pipes/room-name.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { AppMaterialModule } from '../../../util/app-material.module';
 import { FirebaseService } from '../../../services/firebase.service';
+import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatDivider } from '@angular/material/list';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
   styleUrls: ['./review-dialog.component.scss'],
-  imports: [RoomNamePipe, RatingComponent, AppMaterialModule, TranslatePipe, DatePipe, DecimalPipe,
-    ReactiveFormsModule],
+  imports: [RoomNamePipe, RatingComponent, MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe,
+    DecimalPipe, DatePipe, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDivider, MatHint,
+    MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewDialogComponent {
   private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(MatDialogRef<ReviewDialogComponent>);
   private readonly data = inject<IReservationAll>(MAT_DIALOG_DATA);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly firebaseService = inject(FirebaseService);
 
   reservation?: IReservationAll;
   end?: Date;
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   price: IPrice = getPrice(this.data);
   rating = -1;

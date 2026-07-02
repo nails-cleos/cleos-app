@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { Router } from '@angular/router';
 import { MonthSummaryComponent } from './month-summary.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import {
@@ -14,24 +11,28 @@ import {
   ISummaryRoom,
   SummaryType,
   TotalType,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import { MatDatepicker } from '@angular/material/datepicker';
 import fs from 'file-saver';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
   let fixture: ComponentFixture<MonthSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<DashboardState>>;
-  let navigateSpy: jasmine.Spy;
+  let dashboardStoreSpy: {
+    monthlySummaryMap: ReturnType<typeof signal>;
+    updateMonthlySummary: jasmine.Spy;
+    getMonthlySummary: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+
   let saveAsSpy: jasmine.Spy;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-
-  let monthlySummaryMap$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
 
   const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, showCash: true, displayName: 'Test User' });
 
@@ -74,45 +75,32 @@ describe('MonthSummaryComponent', () => {
   };
 
   beforeEach(async () => {
-    monthlySummaryMap$ = new BehaviorSubject<any>(undefined);
-    navigationParams$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<any>(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    history.replaceState({}, '');
+    dashboardStoreSpy = {
+      monthlySummaryMap: signal<any>(undefined),
+      updateMonthlySummary: jasmine.createSpy('updateMonthlySummary'),
+      getMonthlySummary: jasmine.createSpy('getMonthlySummary'),
+      clean: jasmine.createSpy('clean'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return monthlySummaryMap$.asObservable();
-        case 2:
-          return navigationParams$.asObservable();
-        case 3:
-          return isLoading$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
     });
 
     await TestBed.configureTestingModule({
       imports: [MonthSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
       ],
     }).compileComponents();
 
-    // Spy router.navigate
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
-    // Make sure translate has a language so component.language is meaningful
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(MonthSummaryComponent);
     component = fixture.componentInstance;
@@ -121,11 +109,6 @@ describe('MonthSummaryComponent', () => {
     saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
       // no-op
     });
-  });
-
-  afterEach(() => {
-    monthlySummaryMap$.complete();
-    navigationParams$.complete();
   });
 
   it('should create', () => {
@@ -141,12 +124,14 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should set date and step from navigation params', () => {
-      const mockParams = {
+      history.pushState({
         step: 1,
-        date: '01-2024',
-      };
+        date: new Date(2024, 0, 15),
+      }, '', '/...');
 
-      navigationParams$.next(mockParams);
+      fixture = TestBed.createComponent(MonthSummaryComponent);
+      component = fixture.componentInstance;
+
       fixture.detectChanges();
 
       expect(component.stepSignal()).toBe(1);
@@ -183,13 +168,13 @@ describe('MonthSummaryComponent', () => {
     it('should navigate to quarter summary with year and quarter when date is set', () => {
       component.getForm.date.setValue(new Date(2024, 0, 15));
       component.goBack();
-      expect(navigateSpy).toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).toHaveBeenCalled();
     });
 
     it('should navigate to quarter summary without state when date is undefined', () => {
       component.getForm.date.setValue(undefined as any);
       component.goBack();
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard', 'quarter', 'summary']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'quarter', 'summary']);
     });
   });
 
@@ -318,44 +303,42 @@ describe('MonthSummaryComponent', () => {
         summaryExpenses: [],
         summaryCashSale: [],
       }]]);
-      monthlySummaryMap$.next(summaryMap);
+      dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
     });
 
     it('should dispatch updateMonthlySummary action for payment type', () => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.calls.reset();
 
       const totalTypes = new TotalType(SummaryType.payment);
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
 
       component.updateMonthlySummary(totalTypes, summaries);
-      isLoading$.next(true);
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
-      expect(component.isLoading()).toBeTrue();
+      expect(dashboardStoreSpy.updateMonthlySummary).toHaveBeenCalled();
     });
 
     it('should dispatch updateMonthlySummary action for expense type', () => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.calls.reset();
 
       const totalTypes = new TotalType(SummaryType.expense, Object.values(ExpenseType));
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
 
       component.updateMonthlySummary(totalTypes, summaries);
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(dashboardStoreSpy.updateMonthlySummary).toHaveBeenCalled();
     });
 
     it('should dispatch updateMonthlySummary action for cash type', () => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.calls.reset();
 
       const totalTypes = new TotalType(SummaryType.cash);
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
 
       component.updateMonthlySummary(totalTypes, summaries);
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(dashboardStoreSpy.updateMonthlySummary).toHaveBeenCalled();
     });
   });
 
@@ -457,12 +440,10 @@ describe('MonthSummaryComponent', () => {
         summaryCashSale: [],
       }]]);
 
-      monthlySummaryMap$.next(summaryMap);
-      isLoading$.next(false);
+      dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
 
       expect(component.getForm.selectedRoom.value).toBe(mockRoom);
-      expect(component.isLoading()).toBeFalse();
     });
 
     it('should set primary room when multiple rooms with same currency', () => {
@@ -472,7 +453,7 @@ describe('MonthSummaryComponent', () => {
         [room2, { summarySale: [], summaryExpenses: [], summaryCashSale: [] }],
       ]);
 
-      monthlySummaryMap$.next(summaryMap);
+      dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
 
       expect(component.primaryRoom).toBe(mockRoom);
@@ -481,12 +462,12 @@ describe('MonthSummaryComponent', () => {
 
   describe('Date Signal Effects', () => {
     it('should dispatch getMonthlySummary when date changes', () => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.getMonthlySummary.calls.reset();
 
       component.getForm.date.setValue(new Date(2024, 5, 1));
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(dashboardStoreSpy.getMonthlySummary).toHaveBeenCalled();
     });
   });
 
@@ -542,7 +523,7 @@ describe('MonthSummaryComponent', () => {
 
   describe('exportToExcel method', () => {
     it('should export payment type to Excel', fakeAsync(() => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.calls.reset();
 
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,
@@ -571,13 +552,13 @@ describe('MonthSummaryComponent', () => {
         summaryExpenses: [],
         summaryCashSale: [],
       }]]);
-      monthlySummaryMap$.next(summaryMap);
+      dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
 
       component.exportToExcel('TITLE', totalTypes, values, data);
       tick();
 
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(dashboardStoreSpy.updateMonthlySummary).toHaveBeenCalled();
       expect(saveAsSpy).toHaveBeenCalledTimes(1);
 
       const lastCallArgs = saveAsSpy.calls.mostRecent().args;
@@ -590,7 +571,7 @@ describe('MonthSummaryComponent', () => {
     }));
 
     it('should not export when data is empty', () => {
-      storeSpy.dispatch.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.calls.reset();
 
       const totalTypes = new TotalType(SummaryType.payment);
       const values = [{ id: 'summary-1', gross: 100, btw: 20 }];
@@ -600,7 +581,7 @@ describe('MonthSummaryComponent', () => {
 
       component.exportToExcel('TITLE', totalTypes, values, data);
 
-      expect(storeSpy.dispatch).not.toHaveBeenCalled();
+      expect(dashboardStoreSpy.updateMonthlySummary).not.toHaveBeenCalled();
       expect(saveAsSpy).not.toHaveBeenCalled();
     });
   });

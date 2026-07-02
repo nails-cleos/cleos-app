@@ -1,41 +1,32 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Color, IColor } from '../interfaces/color';
-import { createColor, getColor, updateColor } from '../store/color.actions';
-import { fieldChange, valueChange } from '../util/validators';
-import { SharedModule } from '../shared/shared.module';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Color, ColorForm, IColor, IColorAll } from './color';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { getCurrentColorIdPipe, getSelectedColorPipe, getSubErrorsPipe } from '../store/selectors/color.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
-import { ColorState } from '../store/reducers/color.reducers';
-
-type ColorForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-}
+import { ICommon, IError } from '../interfaces/common';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ColorStore } from '../store/color.store';
 
 @Component({
-  selector: 'app-colors',
+  selector: 'app-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
+    BackButtonDirective, BackButtonDirective, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorComponent {
-  private readonly store: Store<ColorState> = inject(Store<ColorState>);
+  config = input.required<ICommon>();
+  color = input<IColorAll | undefined>();
+
+  submitData = output<IColor>();
+
+  private readonly colorStore = inject(ColorStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private colorId$ = this.store.pipe(getCurrentColorIdPipe);
-  private selectedColor$ = this.store.pipe(getSelectedColorPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private colorIdSignal = toSignal(this.colorId$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  colorSignal = toSignal(this.selectedColor$);
-  isAddModeSignal = computed(() => !this.colorIdSignal());
+  private subErrorsSignal = this.colorStore.subErrors;
   errors = signal<Record<string, unknown>>({});
 
   form: FormGroup<ColorForm> = this.formBuilder.group<ColorForm>({
@@ -47,8 +38,8 @@ export class ColorComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.colorSignal();
-      if (selected?.id) {
+      const selected = this.color();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -68,13 +59,9 @@ export class ColorComponent {
         this.errors.set(errorMap);
       }
     });
-
-    effect(() => {
-      const id = this.colorIdSignal();
-      if (id) {
-        this.store.dispatch(getColor({ id }));
-      }
-    });
+  }
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): ColorForm {
@@ -86,17 +73,6 @@ export class ColorComponent {
       return;
     }
 
-    const colorSignal = this.colorSignal();
-    const color: IColor = new Color();
-    color.name = fieldChange(this.getForm.name, colorSignal?.name);
-    color.description = valueChange(this.getForm.description.value, colorSignal?.description);
-
-    const id = this.colorIdSignal();
-    if (!id) {
-      this.store.dispatch(createColor({ color }));
-    } else {
-      this.store.dispatch(updateColor({ id, color }));
-    }
-    return;
+    this.submitData.emit(Color.fromForm(this.getForm, this.color()));
   }
 }

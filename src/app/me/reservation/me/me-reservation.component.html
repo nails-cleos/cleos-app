@@ -68,9 +68,9 @@
             @if (appointmentStart) {
               <div class="booking-summary__slots">
                 <span class="booking-summary__slot app-detail-chip">
-                  {{ appointmentStart | date:'EEE d MMM, HH:mm':currentRoom?.timeZone:dateFormat }}
+                  {{ appointmentStart | date:'EEE d MMM, HH:mm':currentRoom?.timeZone:language }}
                   @if (appointmentEnd) {
-                    <span> - {{ appointmentEnd | date:'HH:mm':currentRoom?.timeZone:dateFormat }}</span>
+                    <span> - {{ appointmentEnd | date:'HH:mm':currentRoom?.timeZone:language }}</span>
                   }
                   @if (showTimeZone) {
                     <button (click)="openDialog(appointmentStart)" class="summary-slot-button" mat-icon-button
@@ -684,7 +684,7 @@
               @if (appointmentStart) {
                 <div class="booking-summary__slots">
                   <span class="booking-summary__slot app-detail-chip">
-                    {{ appointmentStart | date:'EEE d MMM, HH:mm':room?.timeZone:dateFormat }}
+                    {{ appointmentStart | date:'EEE d MMM, HH:mm':room?.timeZone:language }}
                     @if (showTimeZone) {
                       <button (click)="openDialog(appointmentStart)" class="summary-slot-button" mat-icon-button
                               type="button">

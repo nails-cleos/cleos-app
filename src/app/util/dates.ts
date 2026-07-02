@@ -1,4 +1,4 @@
-import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../interfaces/room';
+import { IAvailability, IAvailabilityAll, IRoom, IRoomAll, IService } from '../room/room';
 import {
   addDays,
   addMinutes,
@@ -17,12 +17,12 @@ import {
   subWeeks,
 } from 'date-fns';
 import { RRule, Weekday } from 'rrule';
-import { IReservation, IReservationAll } from '../interfaces/reservation';
-import { ITreatmentAll } from '../interfaces/treatment';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IReservation, IReservationAll } from '../reservation/reservation';
+import { ITreatmentAll } from '../treatment/treatment';
+import { IAdditionalAll } from '../additional/additional';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
-export const API_LOCALE = 'en-GB';
+export const DEFAULT_LOCALE = 'en-GB';
 
 export interface IDuration {
   hour: number;
@@ -352,7 +352,7 @@ export const getMinMaxDate = (day: number, date: any, rooms: IRoomAll[]): any =>
   return { minDate: createNewDate(date), maxDate, roomAvailability };
 };
 
-export const getTime = (date: Date, locale: string = API_LOCALE): string => date.toLocaleTimeString(locale, {
+export const getTime = (date: Date, locale: string = DEFAULT_LOCALE): string => date.toLocaleTimeString(locale, {
   hour: '2-digit', minute: '2-digit',
 });
 
@@ -396,7 +396,7 @@ export const monthTitle = (date: Date, locale: string, measure: 'long' | 'short'
     month: measure,
   }).replace(/^\w/, (c) => c.toUpperCase());
 
-export const invoiceTitle = (date: Date): string => date.toLocaleDateString(API_LOCALE, {
+export const invoiceTitle = (date: Date): string => date.toLocaleDateString(DEFAULT_LOCALE, {
   year: 'numeric', month: '2-digit', day: '2-digit',
 });
 
@@ -424,21 +424,21 @@ export const backendFormatDate = (date?: Date): string | undefined => {
   return date;
 };
 
-export const exportFormatDate = (date: Date, locale: string = API_LOCALE, timeZone: string = getCurrentTimeZone()):
+export const exportFormatDate = (date: Date, locale: string = DEFAULT_LOCALE, timeZone: string = getCurrentTimeZone()):
   string => date.toLocaleDateString(locale, {
   day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone,
 }).replace(/\//g, '-').replace(',', '');
 
-export const invoiceFormat = (date: Date, locale: string = API_LOCALE): string => date.toLocaleDateString(locale, {
+export const invoiceFormat = (date: Date, locale: string = DEFAULT_LOCALE): string => date.toLocaleDateString(locale, {
   year: 'numeric', month: '2-digit',
 }).replace(/\//g, '-').replace(',', '');
 
-export const formatDuration = (duration: string, locale: string = API_LOCALE): string => {
+export const formatDuration = (duration: string, locale: string = DEFAULT_LOCALE): string => {
   const d: IDuration = convertDuration(duration);
   return formatTime(d, undefined, locale);
 };
 
-export const formatTime = (duration: IDuration, timeZone?: string, locale: string = API_LOCALE): string =>
+export const formatTime = (duration: IDuration, timeZone?: string, locale: string = DEFAULT_LOCALE): string =>
   getTime(createDate(timeZone, duration.hour, duration.minute), locale);
 
 export const getNowTimeZone = (timeZone: string = getCurrentTimeZone()): Date => newDateTimestamp(new Date(), timeZone);

@@ -1,57 +1,79 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationComponent } from './reservation.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IUserAll } from '../interfaces/user';
-import { IRoomAll, ServiceType } from '../interfaces/room';
-import { IOfficeAll } from '../interfaces/office';
-import { IAdditionalAll } from '../interfaces/additional';
+import { IUserAll } from '../user/user';
+import { IRoomAll, ServiceType } from '../room/room';
+import { IOfficeAll } from '../office/office';
+import { IAdditionalAll } from '../additional/additional';
 import { IPaymentOption } from '../interfaces/payment';
-import { IGroupService, ITreatment, ITreatmentAll, Price } from '../interfaces/treatment';
-import { DiscountType, IUserDiscount } from '../interfaces/discount';
+import { IGroupService, ITreatment, ITreatmentAll, Price } from '../treatment/treatment';
+import { DiscountType, IUserDiscount } from '../discount/discount';
 import { DataEvent } from '../util/event';
-import { Duration, getTime, newDateTimestamp } from '../util/dates';
+import { DEFAULT_LOCALE, Duration, getTime, newDateTimestamp } from '../util/dates';
 import { addMonths } from 'date-fns';
-import { MAX_RESERVATION_MONTH } from '../interfaces/reservation';
+import { MAX_RESERVATION_MONTH } from './reservation';
 import { provideHttpClient } from '@angular/common/http';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { NavigationService } from '../services/navigation.service';
+import { ToastService } from '../services/toast.service';
+import { UserStore } from '../store/user.store';
+import { RoomStore } from '../store/room.store';
+import { TreatmentStore } from '../store/treatment.store';
+import { AdditionalStore } from '../store/additional.store';
+import { PaymentStore } from '../store/payment.store';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
+
+  let userStoreSpy: {
+    customers: ReturnType<typeof signal>;
+    customerInfo: ReturnType<typeof signal>;
+    getCustomerInformation: jasmine.Spy;
+  };
+  let roomStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAll: jasmine.Spy;
+  };
+  let treatmentStoreSpy: {
+    treatmentDiscount: ReturnType<typeof signal>;
+    getAllTreatments: jasmine.Spy;
+  };
+  let additionalStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllByGroupId: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
 
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
-  let reservationId$: BehaviorSubject<any>;
-  let customers$: BehaviorSubject<any>;
-  let customerInfo$: BehaviorSubject<any>;
-  let rooms$: BehaviorSubject<any>;
-  let treatmentDiscount$: BehaviorSubject<any>;
-  let additionalList$: BehaviorSubject<any>;
-  let selectedReservation$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   let storeSpy: jasmine.SpyObj<Store>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
 
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
 
   const mockCustomer: IUserAll = {
     authorities: [],
@@ -134,45 +156,62 @@ describe('ReservationComponent', () => {
   });
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    userStoreSpy = {
+      customers: signal<any>(undefined),
+      customerInfo: signal<any>(undefined),
+      getCustomerInformation: jasmine.createSpy('getCustomerInformation'),
+    };
+    roomStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadCustomers'),
+    };
+    treatmentStoreSpy = {
+      treatmentDiscount: signal<any>(undefined),
+      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+    };
+    additionalStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+    };
+    paymentStoreSpy = {
+      options: signal([
+        {
+          type: 'CASH',
+          label: 'Cash',
+          enabled: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'cash',
+        },
+      ]),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
-    reservationId$ = new BehaviorSubject(undefined);
-    customers$ = new BehaviorSubject(undefined);
-    customerInfo$ = new BehaviorSubject(undefined);
-    rooms$ = new BehaviorSubject(undefined);
-    treatmentDiscount$ = new BehaviorSubject(undefined);
-    additionalList$ = new BehaviorSubject(undefined);
-    selectedReservation$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-    ]);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     matches$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
     });
     snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
+    });
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => of(void 0),
+      onDismiss: () => of(void 0),
     });
 
     let pipeCallIndex = 0;
@@ -182,57 +221,41 @@ describe('ReservationComponent', () => {
         case 1:
           return navigationParams$.asObservable();
         case 2:
-          return reservationId$.asObservable();
-        case 3:
-          return customers$.asObservable();
-        case 4:
-          return customerInfo$.asObservable();
-        case 5:
-          return rooms$.asObservable();
-        case 6:
-          return treatmentDiscount$.asObservable();
-        case 7:
-          return additionalList$.asObservable();
-        case 8:
-          return selectedReservation$.asObservable();
-        case 9:
           return calendar$.asObservable();
-        case 10:
+        case 3:
           return subErrors$.asObservable();
-        case 11:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
     });
-
-    reservationId$.next('test-reservation-id');
-
-    routerSpy.currentNavigation.and.returnValue(null);
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: UserStore, useValue: userStoreSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        { provide: MatDialog, useValue: dialogSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
       ],
     }).compileComponents();
 
     storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
-    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ReservationComponent);
     component = fixture.componentInstance;
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   it('should create', () => {
@@ -259,7 +282,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should initialize with signals', () => {
-      reservationId$.next(undefined);
+      fixture.componentRef.setInput('id', undefined);
       fixture.detectChanges();
       expect(component.isEditing()).toBeFalse();
       expect(component.isAdmin()).toBeFalse();
@@ -449,7 +472,8 @@ describe('ReservationComponent', () => {
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(navigationServiceSpy.navigate)
+        .toHaveBeenCalledWith(['users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
     });
   });
 
@@ -479,60 +503,75 @@ describe('ReservationComponent', () => {
     });
 
     it('should dispatch CreateReservation action when creating a new reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
+
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include customer ID in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
+
       component.create();
-      const dispatchCall = storeSpy.dispatch.calls.mostRecent();
-      expect(dispatchCall).toBeDefined();
+      expect(emitSpy.calls.mostRecent().args[0].reservation.customerId).toBe(mockCustomer.id);
     });
 
     it('should include additional services in reservation', () => {
       const mockAdditional: IAdditionalAll[] = [
         { key: 'add-1', id: 'add-1', name: 'Additional 1', price: 20, duration: '30M', type: ServiceType.additional },
       ];
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.additionalSelected.set(mockAdditional);
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include payment information when amount and type are provided', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.amount.setValue(150);
       component.getConfigurationForm.option.setValue(cashPaymentOption);
       component.getConfigurationForm.transfer.setValue('REF123');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include customer change flag in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.customerChange.setValue(true);
       component.getConfigurationForm.reference.setValue('Test reference');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should include note in reservation', () => {
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.note.setValue('Test note');
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should dispatch UpdateReservationById when editing existing reservation', () => {
-      component.isEditing.set(true);
-      selectedReservation$.next({
+      fixture.componentRef.setInput('isEditing', true);
+      fixture.componentRef.setInput('reservation', {
         id: 'reservation-1',
         customer: mockCustomer,
         treatment: mockTreatment,
         room: mockRoom,
         professional: mockRoom.professionals![0],
         timestamp: new Date('2026-04-16T08:00:00Z').getTime() / 1000,
-      });
+      } as any);
       fixture.detectChanges();
 
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       component.create();
-      expect(storeSpy.dispatch).toHaveBeenCalled();
+      expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should not dispatch action if no dates are provided', () => {
@@ -629,7 +668,7 @@ describe('ReservationComponent', () => {
 
     it('should use the selected reservation as summary fallback and derive summary totals', () => {
       const reservation = createEditReservation();
-      selectedReservation$.next(reservation);
+      fixture.componentRef.setInput('reservation', reservation as any);
       fixture.detectChanges();
 
       component.price.set(new Price());
@@ -736,7 +775,7 @@ describe('ReservationComponent', () => {
 
     it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
       component.currentStepIndex.set(0);
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
@@ -747,8 +786,8 @@ describe('ReservationComponent', () => {
 
     it('should use the admin editing default step for unmapped sub errors', () => {
       component.currentStepIndex.set(0);
-      component.isEditing.set(true);
-      authUserSignal.update(prev => ({ ...prev, isAdmin: true }));
+      fixture.componentRef.setInput('isEditing', true);
+      fixture.componentRef.setInput('isAdmin', true);
       spyOn(document, 'querySelector').and.returnValue(null);
 
       component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
@@ -839,7 +878,7 @@ describe('ReservationComponent', () => {
   describe('Edit Hydration', () => {
     it('should hydrate the edit reservation into the form state', async () => {
       const reservation = createEditReservation();
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
 
       component['setData'](reservation as any);
       await Promise.resolve();
@@ -860,9 +899,9 @@ describe('ReservationComponent', () => {
 
     it('should reuse the first date-time control when hydrating edit data', async () => {
       const reservation = createEditReservation();
-      component.isEditing.set(true);
+      fixture.componentRef.setInput('isEditing', true);
       const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
-      const expectedStart = getTime(expectedDate, component['dateFormat']);
+      const expectedStart = getTime(expectedDate, component['language']);
 
       component['setData'](reservation as any);
       await Promise.resolve();
@@ -1098,15 +1137,15 @@ describe('ReservationComponent', () => {
       component['professionalId'].set('professional-1');
       component['totalDuration'] = new Duration(1);
 
-      dialogSpy.and.callFake((_: any, config: any) => {
+      dialogSpy.open.and.callFake((_: any, config: any) => {
         return {
           afterClosed: () => of({ value: config.data.value }),
-        };
+        } as any;
       });
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           data: {
@@ -1137,15 +1176,15 @@ describe('ReservationComponent', () => {
       component['totalDuration'] = new Duration(1);
       matches$.next({ matches: true });
 
-      dialogSpy.and.callFake((_: any, config: any) => {
+      dialogSpy.open.and.callFake((_: any, config: any) => {
         return {
           afterClosed: () => of({ value: config.data.value, professional: mockProfessional }),
-        };
+        } as any;
       });
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           disableClose: true,
@@ -1155,7 +1194,7 @@ describe('ReservationComponent', () => {
           },
         });
 
-      expect(dialogSpy).toHaveBeenCalledWith(
+      expect(dialogSpy.open).toHaveBeenCalledWith(
         jasmine.any(Function),
         {
           data: {
@@ -1185,7 +1224,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(nextMonday, 'CREATED', 'invalid-key');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
 
     it('should not set the segment if date is older than today', () => {
@@ -1197,7 +1236,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(oldDate, 'CREATED', 'event');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
 
     it('should not set the segment if date is after max reservation date', () => {
@@ -1208,7 +1247,7 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(invalidDate, 'CREATED', 'event');
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
   });
 
@@ -1390,7 +1429,7 @@ describe('ReservationComponent', () => {
     it('should fallback to selected reservation (customer)', () => {
       component.getCustomerForm.customer.setValue(undefined);
       const reservation = createEditReservation();
-      selectedReservation$.next({
+      fixture.componentRef.setInput('reservation', {
         ...reservation,
         customer: { ...reservation.customer, id: 'c2' },
       } as any);
@@ -1433,7 +1472,7 @@ describe('ReservationComponent', () => {
     it('should fallback to reservation additionals', () => {
       component.additionalSelected.set([]);
       const reservation = createEditReservation();
-      selectedReservation$.next(reservation);
+      fixture.componentRef.setInput('reservation', reservation as any);
       fixture.detectChanges();
 
       expect(component.summaryAdditionals).toEqual(reservation.additional);
@@ -1441,7 +1480,7 @@ describe('ReservationComponent', () => {
 
     it('should return empty array when nothing exists', () => {
       component.additionalSelected.set([]);
-      selectedReservation$.next(undefined);
+      fixture.componentRef.setInput('reservation', undefined);
       fixture.detectChanges();
 
       expect(component.summaryAdditionals).toEqual([]);
@@ -1457,7 +1496,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should return empty array if no reservation', () => {
-      selectedReservation$.next(undefined);
+      fixture.componentRef.setInput('reservation', undefined);
       fixture.detectChanges();
 
       expect(component.summaryDateTimes).toEqual([]);
@@ -1466,11 +1505,11 @@ describe('ReservationComponent', () => {
     it('should build date from reservation timestamp when no current dates', () => {
       const reservation = createEditReservation();
 
-      selectedReservation$.next({
+      fixture.componentRef.setInput('reservation', {
         ...reservation,
         timestamp: 1700000000,
         room: { timeZone: 'Europe/Amsterdam' },
-      });
+      } as any);
       fixture.detectChanges();
 
       const result = component.summaryDateTimes;

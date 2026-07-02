@@ -1,47 +1,48 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Store } from '@ngrx/store';
 import { getDisplayNameInitials, getUserImage } from '../../util/helper';
-import { getCustomerOverview } from '../../store/user.actions';
-import { Router } from '@angular/router';
-import { IReservationOverview } from '../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
-import { IChart } from '../../interfaces/dashboard';
+import { IReservationOverview } from '../../reservation/reservation';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { IChart } from '../../dashboard/dashboard';
 import { formatDateTime, newDateTimestamp } from '../../util/dates';
-import { IAccountAll } from '../../interfaces/account';
-import { IUserAll } from '../../interfaces/user';
+import { IAccountAll } from '../../account/account';
+import { IUserAll } from '../user';
 import { AuthUserService } from '../../services/auth-user.service';
-import { SharedModule } from '../../shared/shared.module';
 import { ErrorComponent } from '../../shared/error/error.component';
 import { CardComponent } from '../../shared/card/card.component';
 import { ChartComponent } from '../../shared/chart/chart.component';
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UserState } from '../../store/reducers/user.reducers';
-import { getCurrentUserIdPipe, getOverviewPipe, getUserErrorPipe } from '../../store/selectors/user.selectors';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatMiniFabButton } from '@angular/material/button';
+import { CurrencyPipe } from '@angular/common';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
+import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  imports: [SharedModule, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, CurrencyPipe, BackButtonDirective, MatCard,
+    MatCardContent, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective,
+    AvatarComponent, MatMiniFabButton, MatGridList, MatGridTile],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewComponent {
-  private breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private store: Store<UserState> = inject(Store<UserState>);
-  private translate: TranslateService = inject(TranslateService);
-  private router: Router = inject(Router);
-  private authUserService: AuthUserService = inject(AuthUserService);
+  id = input<string>();
+
+  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly userStore = inject(UserStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private userId$ = this.store.pipe(getCurrentUserIdPipe);
-  private overview$ = this.store.pipe(getOverviewPipe);
-  private error$ = this.store.pipe(getUserErrorPipe);
-
   private authUserSignal = this.authUserService.authUser;
-  private userIdSignal = toSignal(this.userId$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -55,19 +56,22 @@ export class OverviewComponent {
   );
 
   private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
-  private userId = computed(() => this.userIdSignal());
+  private userId = computed(() => this.id() ?? 'me');
 
-  overviewSignal = toSignal(this.overview$);
-  errorSignal = toSignal(this.error$);
+  overviewSignal = this.userStore.overview;
+  errorSignal = this.userStore.error;
+  isLoadingSignal = this.userStore.isLoading;
 
   image: any;
   initials?: string;
 
-  miniCardData: IReservationOverview[] = [{} as IReservationOverview, {} as IReservationOverview];
-  charts: IChart[] = [{} as IChart, {} as IChart];
+  miniCardData = signal<IReservationOverview[]>([]);
+  charts = signal<IChart[]>([]);
+  readonly miniCardSkeletons = Array.from({ length: 4 }, (_, index) => index);
+  readonly chartSkeletons = Array.from({ length: 2 }, (_, index) => index);
 
   upcoming: number[] = [];
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   layoutSignal = computed(() => {
     if (this.breakpointsSignal().matches) {
@@ -92,10 +96,11 @@ export class OverviewComponent {
   chartColumns = computed(() => this.breakpointsSignal().matches ? 1 : 2);
 
   constructor() {
+    this.userStore.clean();
     effect(() => {
       const id = this.userId();
       if (id) {
-        this.store.dispatch(getCustomerOverview({ id }));
+        this.userStore.loadOverview(id);
       }
     });
 
@@ -108,18 +113,22 @@ export class OverviewComponent {
           this.upcoming = overview.upcomingList;
         }
         if (overview.miniCardOverview) {
-          this.miniCardData = overview.miniCardOverview?.map((ro: IReservationOverview) => {
+          this.miniCardData.set(overview.miniCardOverview?.map((ro: IReservationOverview) => {
             if (ro.primaryId || ro.secondaryId) {
               return Object.assign({}, ro, {
                 link: (id: string | undefined) => !id ||
-                  this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]),
+                  this.navigationService.navigate(['reservation', id]),
               });
             }
             return ro;
-          });
+          }));
+        } else {
+          this.miniCardData.set([]);
         }
         if (overview.chartOverview?.length) {
-          this.charts = overview.chartOverview;
+          this.charts.set(overview.chartOverview);
+        } else {
+          this.charts.set([]);
         }
       }
     });
@@ -134,14 +143,14 @@ export class OverviewComponent {
   }
 
   goTo() {
-    this.router.navigate(['/', this.language, 'accounts', this.account?.id, 'transactions', 'view']);
+    this.navigationService.navigate(['accounts', this.account?.id, 'transactions', 'view']);
   }
 
   goToProfile() {
     if (this.hasAdminRole()) {
-      this.router.navigate(['/', this.language, 'users', this.customer?.id]);
+      this.navigationService.navigate(['users', this.customer?.id]);
     } else {
-      this.router.navigate(['/', this.language, 'auth', 'profile']);
+      this.navigationService.navigate(['auth', 'profile']);
     }
   }
 
@@ -149,14 +158,14 @@ export class OverviewComponent {
     let message: string;
     if (this.upcoming.length === 1) {
       const date = formatDateTime(newDateTimestamp(this.upcoming[0]), this.language);
-      message = this.translate.instant('WHATSAPP.SEND.APPROVE', { date });
+      message = this.translateService.instant('WHATSAPP.SEND.APPROVE', { date });
     } else {
-      message = this.translate.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
+      message = this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
       this.upcoming.forEach(r => {
         const date = formatDateTime(newDateTimestamp(r), this.language);
-        message += this.translate.instant('WHATSAPP.SEND.FOLLOWINGS.VALUE', { date });
+        message += this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.VALUE', { date });
       });
-      message += this.translate.instant('WHATSAPP.SEND.ATTENTION');
+      message += this.translateService.instant('WHATSAPP.SEND.ATTENTION');
     }
     const userPhone = this.customer?.phone;
     window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');

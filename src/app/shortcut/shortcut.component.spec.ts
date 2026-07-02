@@ -2,70 +2,56 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShortcutComponent } from './shortcut.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subject } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { NavigationService } from '../services/navigation.service';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('ShortcutComponent', () => {
   let component: ShortcutComponent;
   let fixture: ComponentFixture<ShortcutComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let paramMap$: Subject<ParamMap>;
-
-  let navigateServiceSpy: jasmine.SpyObj<NavigationService>;
-  let navigateSpy: jasmine.Spy;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let paramMapSpy: jasmine.SpyObj<ParamMap>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
-    paramMap$ = new Subject();
-
-    paramMapSpy = jasmine.createSpyObj('ParamMap', ['get']);
-    navigateServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      paramMap: paramMap$.asObservable(),
     });
 
     await TestBed.configureTestingModule({
       imports: [ShortcutComponent, TranslateModule.forRoot()],
       providers: [
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: NavigationService, useValue: navigateServiceSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ShortcutComponent);
     component = fixture.componentInstance;
 
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
-
     fixture.detectChanges();
   });
 
-  afterEach(async () => {
-  });
+  const setShortcut = (key: 'calendar' | 'dashboard' | 'reservation') => {
+    fixture.componentRef.setInput('key', key);
+    fixture.detectChanges();
+    navigationServiceSpy.navigate.calls.reset();
+  };
 
   it('should create', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-
     expect(component).toBeTruthy();
   });
 
-  it('should navigate to /en-GB/events if user is room admin and shortcut calendar', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /events if user is room admin and shortcut calendar', () => {
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -78,13 +64,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard', 'events']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'events']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/reservation/calendar if user is admin', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /reservation/calendar if user is admin', () => {
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -97,13 +82,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', 'calendar']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/reservation/calendar if user is manager', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /reservation/calendar if user is manager', () => {
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -116,13 +100,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', 'calendar']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/reservation/calendar if user is professional', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /reservation/calendar if user is professional', () => {
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -135,13 +118,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation', 'calendar']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', 'calendar']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/me/reservations if user is customer', () => {
-    paramMapSpy.get.and.returnValue('calendar');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /me/reservations if user is customer', () => {
+    setShortcut('calendar');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -154,13 +136,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservations']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservations']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/events if user is room admin', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /events if user is room admin', () => {
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -173,13 +154,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard', 'events']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'events']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/dashboard if user is admin', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /dashboard if user is admin', () => {
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -192,13 +172,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/dashboard if user is manager', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /dashboard if user is manager', () => {
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -211,13 +190,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/dashboard if user is professional', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /dashboard if user is professional', () => {
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -230,13 +208,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'dashboard']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/me/overview if user is customer', () => {
-    paramMapSpy.get.and.returnValue('dashboard');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /me/overview if user is customer', () => {
+    setShortcut('dashboard');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -249,13 +226,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'overview']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/reservation if user is not customer', () => {
-    paramMapSpy.get.and.returnValue('reservation');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /reservation if user is not customer', () => {
+    setShortcut('reservation');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -268,13 +244,12 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 
-  it('should navigate to /en-GB/me/reservation if user is customer', () => {
-    paramMapSpy.get.and.returnValue('reservation');
-    paramMap$.next(paramMapSpy);
+  it('should navigate to /me/reservation if user is customer', () => {
+    setShortcut('reservation');
 
     authUserSignal.update(prev => ({
       ...prev,
@@ -287,7 +262,7 @@ describe('ShortcutComponent', () => {
 
     fixture.detectChanges();
 
-    expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation']);
-    expect(navigateSpy).toHaveBeenCalledTimes(1);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledTimes(1);
   });
 });

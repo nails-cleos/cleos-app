@@ -4,40 +4,41 @@ import {
   ISorted,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Store } from '@ngrx/store';
-import { IAdditionalAll } from '../../interfaces/additional';
-import { SharedModule } from '../../shared/shared.module';
-import { getAdditionalList, sortAdditional } from '../../store/additional.actions';
-import { getAdditionalListPipe, getAdditionalResponsePipe } from '../../store/selectors/additional.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AdditionalState } from '../../store/reducers/additional.reducers';
+import { IAdditionalAll } from '../additional';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AdditionalStore } from '../../store/additional.store';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-sorting',
   templateUrl: './additional-sorting.component.html',
   styleUrls: ['./additional-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent],
+  imports: [DragDropSortingComponent, TranslatePipe, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalSortingComponent {
-  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
+  private readonly additionalStore = inject(AdditionalStore);
 
-  private additionalList$ = this.store.pipe(getAdditionalListPipe);
-  private response$ = this.store.pipe(getAdditionalResponsePipe);
-
-  private additionalListSignal = toSignal(this.additionalList$);
-  private responseSignal = toSignal(this.response$);
+  private additionalListSignal = computed(() => {
+    const data = this.additionalStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
+  private responseSignal = this.additionalStore.response;
 
   itemsSignal = computed(() => this.additionalListSignal()?.map(
     (iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)));
+  isLoading = this.additionalStore.isLoading;
 
   constructor() {
+    this.additionalStore.clean();
+    this.additionalStore.loadList();
     effect(() => {
       if (this.responseSignal()) {
-        this.store.dispatch(getAdditionalList());
+        this.additionalStore.clearResponse();
+        this.additionalStore.loadList();
       }
     });
   }
 
-  sorted = (additionalList: ISorted[]): void => this.store.dispatch(sortAdditional({ additionalList }));
+  sorted = (additionalList: ISorted[]): void => this.additionalStore.sort(additionalList);
 }

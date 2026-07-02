@@ -1,15 +1,16 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IPrice } from '../../interfaces/treatment';
+import { IPrice } from '../../treatment/treatment';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { MatListItem, MatListItemIcon } from '@angular/material/list';
 
 @Component({
   selector: 'app-price-preview',
   templateUrl: './price-preview.component.html',
   styleUrls: ['./price-preview.component.scss'],
-  imports: [AppMaterialModule, CurrencySymbolPipe, TranslatePipe, DecimalPipe],
+  imports: [MatIcon, MatListItem, TranslatePipe, DecimalPipe, MatListItemIcon, CurrencySymbolPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PricePreviewComponent {

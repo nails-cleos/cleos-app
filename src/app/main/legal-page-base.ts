@@ -2,23 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { effect, ElementRef, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { NavigationEnd, Router } from '@angular/router';
-import {
-  catchError,
-  concatMap,
-  defaultIfEmpty,
-  distinctUntilChanged,
-  filter,
-  from,
-  map,
-  Observable,
-  of,
-  startWith,
-  take,
-} from 'rxjs';
-import { goTo } from '../util/animation';
+import { catchError, concatMap, defaultIfEmpty, filter, from, map, Observable, of, take } from 'rxjs';
 import { getLocale } from '../util/helper';
 import { EnvService } from '../services/env.service';
+import { DEFAULT_LOCALE } from '../util/dates';
+import { MainContentService } from '../services/main-content.service';
+import { NavigationService } from '../services/navigation.service';
 
 export interface LegalPageConfig {
   routeSegment: string;
@@ -28,10 +17,11 @@ export interface LegalPageConfig {
 
 export abstract class LegalPageBase {
   protected readonly env: EnvService = inject(EnvService);
-  protected readonly router: Router = inject(Router);
   protected readonly http: HttpClient = inject(HttpClient);
   protected readonly sanitizer: DomSanitizer = inject(DomSanitizer);
   protected readonly host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
+  private readonly mainContent = inject(MainContentService);
+  private readonly navigationService = inject(NavigationService);
 
   readonly url = this.env.appServer;
   readonly title = this.env.title;
@@ -39,16 +29,11 @@ export abstract class LegalPageBase {
 
   readonly legalContent = signal<SafeHtml>(this.sanitizer.bypassSecurityTrustHtml(''));
 
-  private readonly language$ = this.router.events.pipe(
-    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
-    startWith(undefined),
-    map(() => this.currentLanguageFromUrl(this.router.url)),
-    distinctUntilChanged(),
-  );
-
-  private readonly language = toSignal(this.language$, { initialValue: 'en-GB' });
+  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
 
   protected constructor(private readonly config: LegalPageConfig) {
+    this.mainContent.configure(false, 'open');
+
     effect((onCleanup) => {
       const lang = this.language();
       const sub = this.loadContent(lang).subscribe((html) => this.legalContent.set(html));
@@ -57,12 +42,7 @@ export abstract class LegalPageBase {
 
     effect(() => {
       this.legalContent();
-      setTimeout(() => {
-        const fragment = this.router.parseUrl(this.router.url).fragment;
-        if (fragment) {
-          this.scrollToAnchor(fragment);
-        }
-      });
+      setTimeout(() => this.navigationService.scrollToAnchor(this.host.nativeElement));
     });
   }
 
@@ -85,10 +65,10 @@ export abstract class LegalPageBase {
     event.preventDefault();
     event.stopPropagation();
 
-    this.router.navigate(['/', this.language(), 'home', this.config.routeSegment], {
+    this.navigationService.navigate(['home', this.config.routeSegment], {
       fragment: id,
       replaceUrl: true,
-    }).then(() => this.scrollToAnchor(id));
+    }, () => this.navigationService.scrollToAnchor(this.host.nativeElement, id));
   }
 
   protected replaceEnvPlaceholders(content: string, language: string): string {
@@ -103,9 +83,9 @@ export abstract class LegalPageBase {
     const locale = getLocale(lang).language;
     const languageOnly = locale.split('-')[0];
     const files = Array.from(new Set([
-      `assets/legal/${this.config.fileName}.${locale}.html`,
-      `assets/legal/${this.config.fileName}.${languageOnly}.html`,
-      `assets/legal/${this.config.fileName}.en-GB.html`,
+      `assets/legal/${ this.config.fileName }.${ locale }.html`,
+      `assets/legal/${ this.config.fileName }.${ languageOnly }.html`,
+      `assets/legal/${ this.config.fileName }.${ DEFAULT_LOCALE }.html`,
     ]));
 
     return from(files).pipe(
@@ -142,28 +122,5 @@ export abstract class LegalPageBase {
     }
 
     return decodeURIComponent(parsedHref.hash.substring(1));
-  }
-
-  private scrollToAnchor(id: string) {
-    const anchorId = id.trim();
-    if (!anchorId) {
-      return;
-    }
-
-    const hostElement = this.host.nativeElement;
-    const target = hostElement.querySelector<HTMLElement>(`#${id}`);
-    if (target) {
-      goTo(target);
-    }
-  }
-
-  private currentLanguageFromUrl(url: string): string {
-    const path = this.currentPathFromUrl(url);
-    const lang = path.split('/').filter(Boolean)[0];
-    return getLocale(lang).language;
-  }
-
-  private currentPathFromUrl(url: string): string {
-    return url.split('?')[0].split('#')[0];
   }
 }

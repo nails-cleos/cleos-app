@@ -2,28 +2,18 @@ import { createFeatureSelector, createSelector, select } from '@ngrx/store';
 import { filter, pipe } from 'rxjs';
 import {
   IAvailableDTO,
-  ICustomerLastReservation,
   ICustomerReservation,
   IReservationAll,
   IRoomReservation,
   ITracking,
   IUpcomingAll,
-} from '../../interfaces/reservation';
+} from '../../reservation/reservation';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { RESERVATION_FEATURE_KEY, ReservationState } from '../reducers/reservation.reducers';
-import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoomAll } from '../../interfaces/room';
-import { IUserAll } from '../../interfaces/user';
-import { IAdditionalAll } from '../../interfaces/additional';
 import { IPaymentAll } from '../../interfaces/payment';
-import { IReview } from '../../interfaces/review';
-import { IColorAll } from '../../interfaces/color';
-import {
-  CurrentCompleteReservationParams,
-  DetailReservationParams,
-  MeReservationParams,
-  ReservationParams,
-} from '../reservation.models';
+import { IReview } from '../../me/reservation/list/review';
+import { IColorAll } from '../../color/color';
+import { DetailReservationParams, MeReservationParams, ReservationParams } from '../../util/models/reservation.models';
 
 const selectReservationState = createFeatureSelector<ReservationState>(RESERVATION_FEATURE_KEY);
 
@@ -40,15 +30,6 @@ const selectCustomerReservationData = createSelector(
 export const getCustomerReservationPipe = pipe(
   select(selectCustomerReservationData),
   filter((val): val is ICustomerReservation => val !== undefined),
-);
-
-const selectCurrentReservationId = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.currentReservationId,
-);
-export const getCurrentReservationIdPipe = pipe(
-  select(selectCurrentReservationId),
-  filter((val): val is string => val !== undefined),
 );
 
 const selectMeNavigationParams = createSelector(
@@ -69,33 +50,6 @@ const selectNavigationParams = createSelector(
 export const getNavigationParamsPipe = pipe(
   select(selectNavigationParams),
   filter((val): val is ReservationParams => val !== undefined),
-);
-
-const selectAdditionalList = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.additional,
-);
-export const getAdditionalListPipe = pipe(
-  select(selectAdditionalList),
-  filter((val): val is IAdditionalAll[] => val !== undefined),
-);
-
-const selectTreatmentDiscount = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.treatmentDiscount,
-);
-export const getTreatmentDiscountPipe = pipe(
-  select(selectTreatmentDiscount),
-  filter((val): val is ITreatmentDiscountDTO => val !== undefined),
-);
-
-const selectRooms = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.rooms,
-);
-export const getRoomsPipe = pipe(
-  select(selectRooms),
-  filter((val): val is IRoomAll[] => val !== undefined),
 );
 
 const selectedReservation = createSelector(
@@ -132,15 +86,6 @@ const selectPayments = createSelector(
 export const getPaymentsPipe = pipe(
   select(selectPayments),
   filter((val): val is IPaymentAll[] => val !== undefined),
-);
-
-const selectCurrentCompleteReservation = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state?.currentCompleteReservation,
-);
-export const getCurrentCompleteReservationPipe = pipe(
-  select(selectCurrentCompleteReservation),
-  filter((val): val is CurrentCompleteReservationParams => val !== undefined),
 );
 
 const selectTracking = createSelector(
@@ -193,24 +138,6 @@ const selectFilteredReservations = createSelector(
   (state: ReservationState) => state.filter,
 );
 export const getFilteredReservationsPipe = pipe(select(selectFilteredReservations));
-
-const selectCustomers = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state.customers,
-);
-export const getCustomersPipe = pipe(
-  select(selectCustomers),
-  filter((val): val is IUserAll[] => val !== undefined),
-);
-
-const selectCustomerInfo = createSelector(
-  selectReservationState,
-  (state: ReservationState) => state.customer,
-);
-export const getCustomerInfoPipe = pipe(
-  select(selectCustomerInfo),
-  filter((val): val is ICustomerLastReservation => val !== undefined),
-);
 
 const selectSubErrors = createSelector(
   selectReservationState,

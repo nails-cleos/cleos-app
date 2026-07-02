@@ -1,5 +1,5 @@
-import { IReservationAll } from './reservation';
-import { ITransaction } from './account';
+import { IReservationAll } from '../reservation/reservation';
+import { ITransaction } from '../account/account';
 
 export const PENALTY = 50;
 

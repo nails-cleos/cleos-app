@@ -1,56 +1,83 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NavigationEnd, Router } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
-import { IUser, User } from '../interfaces/user';
-import { updateMyUser } from '../store/user.actions';
-import { setLanguage } from '../store/i18n.actions';
-import { I18NState } from '../store/reducers/i18n.reducers';
+import { UserStore } from '../store/user.store';
+import { DEFAULT_LOCALE } from '../util/dates';
+import { ElementRef, signal } from '@angular/core';
+import { I18NStore } from '../store/i18n.store';
+import { SeoService } from './seo.service';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { ThemeService } from 'ng2-charts';
+import { CookieService } from 'ngx-cookie-service';
+import { DateAdapter } from '@angular/material/core';
 
 describe('NavigationService', () => {
   let service: NavigationService;
-  let storeSpy: jasmine.SpyObj<Store<I18NState>>;
+  let i18nStoreSpy: {
+    language: ReturnType<typeof signal>;
+    setLanguage: jasmine.Spy;
+  };
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
+  let seoSpy: jasmine.SpyObj<SeoService>;
+  let overlayContainerSpy: jasmine.SpyObj<OverlayContainer>;
+  let themeServiceSpy: jasmine.SpyObj<ThemeService>;
+  let cookieServiceSpy: jasmine.SpyObj<CookieService>;
   let routerSpy: jasmine.SpyObj<Router>;
   let routerEventsSubject: Subject<any>;
 
-  let lang: BehaviorSubject<any>;
-
-  const mockUser: IUser = {
-    id: 'user-123',
-    displayName: 'Test User',
-    email: 'test@example.com',
-    locale: 'en-GB',
-  };
-
   beforeEach(() => {
     sessionStorage.clear();
-    lang = new BehaviorSubject('en-GB');
     routerEventsSubject = new Subject();
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    i18nStoreSpy = {
+      language: signal(DEFAULT_LOCALE),
+      setLanguage: jasmine.createSpy('setLanguage'),
+    };
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl'], {
       events: routerEventsSubject.asObservable(),
       url: '/test/path',
+      parseUrl: jasmine.createSpy('parseUrl').and.callFake((url: string) => {
+        const hashIndex = url.indexOf('#');
+        return { fragment: hashIndex >= 0 ? decodeURIComponent(url.substring(hashIndex + 1)) : null };
+      }),
     });
+    overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
+    themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
+    seoSpy = jasmine.createSpyObj('SeoService', ['setMetaDescription', 'setMetaTitle']);
+    cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
 
-    // Mock router methods to return promises
+    cookieServiceSpy.get.and.returnValue('light-theme');
+    overlayContainerSpy.getContainerElement.and.returnValue(document.createElement('div'));
+
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
-    storeSpy.pipe.and.returnValue(lang.asObservable());
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
       providers: [
         NavigationService,
-        { provide: Store, useValue: storeSpy },
+        { provide: I18NStore, useValue: i18nStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
+        { provide: SeoService, useValue: seoSpy },
+        { provide: OverlayContainer, useValue: overlayContainerSpy },
+        { provide: CookieService, useValue: cookieServiceSpy },
+        { provide: ThemeService, useValue: themeServiceSpy },
+        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
         { provide: Router, useValue: routerSpy },
+        {
+          provide: ElementRef,
+          useValue: new ElementRef(document.createElement('div')),
+        },
       ],
     });
+
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, { META: { CONTENT: 'desc', TITLE: 'title' } });
 
     service = TestBed.inject(NavigationService);
   });
@@ -71,10 +98,16 @@ describe('NavigationService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('subscribe', () => {
-    it('should subscribe to router events', () => {
-      service.subscribe();
+  it('should call seoService and reset theme when authUser emits', () => {
+    service.resetConfig('es');
 
+    expect(seoSpy.setMetaDescription).toHaveBeenCalledWith('desc');
+    expect(seoSpy.setMetaTitle).toHaveBeenCalledWith('title');
+    expect(i18nStoreSpy.setLanguage).toHaveBeenCalledWith('es');
+  });
+
+  describe('constructor', () => {
+    it('should subscribe to router events on creation', () => {
       const navigationEndEvent = new NavigationEnd(1, '/test/path', '/test/path');
       routerEventsSubject.next(navigationEndEvent);
 
@@ -83,8 +116,6 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment success URLs to history', () => {
-      service.subscribe();
-
       const paymentSuccessEvent = new NavigationEnd(1, '/payment/success?token=123', '/payment/success?token=123');
       routerEventsSubject.next(paymentSuccessEvent);
 
@@ -92,8 +123,6 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment failure URLs to history', () => {
-      service.subscribe();
-
       const paymentFailureEvent = new NavigationEnd(1, '/payment/failure?error=1', '/payment/failure?error=1');
       routerEventsSubject.next(paymentFailureEvent);
 
@@ -101,21 +130,17 @@ describe('NavigationService', () => {
     });
 
     it('should not add payment status callback routes to history', () => {
-      service.subscribe();
-
       const paymentStatusEvent = new NavigationEnd(
         1,
-        '/en-GB/me/reservation/res-1/payment/approved',
-        '/en-GB/me/reservation/res-1/payment/approved',
+        `/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`,
+        `/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`,
       );
       routerEventsSubject.next(paymentStatusEvent);
 
-      expect((service as any).history).not.toContain('/en-GB/me/reservation/res-1/payment/approved');
+      expect((service as any).history).not.toContain(`/${ DEFAULT_LOCALE }/me/reservation/res-1/payment/approved`);
     });
 
     it('should ignore non-NavigationEnd events', () => {
-      service.subscribe();
-
       const otherEvent = { id: 1, url: '/test' };
       routerEventsSubject.next(otherEvent);
 
@@ -123,12 +148,19 @@ describe('NavigationService', () => {
     });
 
     it('should avoid duplicate consecutive entries', () => {
-      service.subscribe();
-
       routerEventsSubject.next(new NavigationEnd(1, '/test/path', '/test/path'));
       routerEventsSubject.next(new NavigationEnd(2, '/test/path', '/test/path'));
 
       expect((service as any).history).toEqual(['/test/path']);
+    });
+
+    it('should keep subscribe as a safe no-op after construction', () => {
+      service.subscribe();
+
+      routerEventsSubject.next(new NavigationEnd(1, '/page-1', '/page-1'));
+      routerEventsSubject.next(new NavigationEnd(2, '/page-1', '/page-1'));
+
+      expect((service as any).history).toEqual(['/test/path', '/page-1']);
     });
   });
 
@@ -161,23 +193,25 @@ describe('NavigationService', () => {
     });
 
     it('should navigate to parent route when no previous history is available', () => {
-      (service as any).history = ['/last-page'];
-      setRouterUrl('/en-GB/colors/123');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
+      setRouterUrl(`/${ DEFAULT_LOCALE }/colors/123`);
 
       service.back();
 
       expect((service as any).history).toEqual([]);
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/colors', { state: { date: undefined, step: 0 } });
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/colors`, { state: { date: undefined, step: 0 } });
       expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should fallback to language root when current route has no parent segment', () => {
-      (service as any).history = [];
-      setRouterUrl('/en-GB');
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
+      setRouterUrl(`/${ DEFAULT_LOCALE }`);
 
       service.back();
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB', { state: { date: undefined, step: 0 } });
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }`, { state: { date: undefined, step: 0 } });
     });
 
     it('should read persisted history when in-memory history is empty after reload', () => {
@@ -193,186 +227,60 @@ describe('NavigationService', () => {
 
     it('should sync current route before going back when current page was not persisted', () => {
       (service as any).history = [];
-      setRouterUrl('/en-GB/colors/123');
-      sessionStorage.setItem('cleos-navigation-history', JSON.stringify(['/en-GB/colors']));
-
-      service.back();
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/colors', { state: { date: undefined, step: 0 } });
-      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/en-GB/colors']);
-    });
-
-    it('should fallback to parent route when history is empty', () => {
-      (service as any).history = [];
-      setRouterUrl('/en-GB/rooms/room-1/expenses/add');
+      setRouterUrl(`/${ DEFAULT_LOCALE }/colors/123`);
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([`/${ DEFAULT_LOCALE }/colors`]));
 
       service.back();
 
       expect(routerSpy.navigateByUrl)
-        .toHaveBeenCalledWith('/en-GB/rooms/room-1/expenses', { state: { date: undefined, step: 0 } });
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/colors`, { state: { date: undefined, step: 0 } });
+      expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]'))
+        .toEqual([`/${ DEFAULT_LOCALE }/colors`]);
+    });
+
+    it('should fallback to parent route when history is empty', () => {
+      sessionStorage.setItem('cleos-navigation-history', JSON.stringify([]));
+      setRouterUrl(`/${ DEFAULT_LOCALE }/rooms/room-1/expenses/add`);
+
+      service.back();
+
+      expect(routerSpy.navigateByUrl)
+        .toHaveBeenCalledWith(`/${ DEFAULT_LOCALE }/rooms/room-1/expenses`, { state: { date: undefined, step: 0 } });
     });
   });
 
   describe('reload', () => {
-    it('should reload with all parameters', (done) => {
-      const url = ['/dashboard', 'profile'];
+    it('should navigate with filtered URL segments', () => {
+      const url = ['/dashboard', '', 'profile'];
       const data = { userId: '123' };
       const queryParams = { tab: 'settings' };
-      const reloadURL = '/auth/reload';
-      const lang = 'es';
 
-      service.reload(url, data, queryParams, reloadURL, lang);
+      service.reload(url, data, queryParams);
 
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/es/auth/reload', { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard', 'profile'], {
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        ['/dashboard', 'profile'],
+        {
           state: data,
           queryParams,
-        });
-        done();
-      }, 0);
-    });
-
-    it('should reload with default reloadURL and current language', (done) => {
-      const url = ['/dashboard'];
-
-      service.reload(url);
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/auth/redirect', { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard'], {
-          state: undefined,
-          queryParams: undefined,
-        });
-        done();
-      }, 0);
-    });
-
-    it('should filter out empty paths from URL array', (done) => {
-      const url = ['/dashboard', '', 'profile', null as any, 'settings'];
-
-      service.reload(url);
-
-      expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/en-GB/auth/redirect', { skipLocationChange: true });
-
-      setTimeout(() => {
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard', 'profile', 'settings'], {
-          state: undefined,
-          queryParams: undefined,
-        });
-        done();
-      }, 0);
-    });
-  });
-
-  describe('reloadPage', () => {
-    it('should navigate to URL when provided', () => {
-      const url = '/custom/path';
-
-      // Spy on the method to avoid actual page reload during test
-      spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || '/en-GB');
-      });
-
-      service.reloadPage(url);
-
-      expect(service.reloadPage).toHaveBeenCalledWith(url);
-    });
-
-    it('should use default URL when none provided', () => {
-      // Spy on the method to avoid actual page reload during test
-      spyOn(service, 'reloadPage').and.callFake((testUrl?: string) => {
-        routerSpy.navigateByUrl(testUrl || '/en-GB');
-      });
-
-      service.reloadPage();
-
-      expect(service.reloadPage).toHaveBeenCalledWith();
-    });
-  });
-
-  describe('attachLang', () => {
-    it('should return current language when no change needed', () => {
-      const result = service.attachLang('en');
-
-      expect(result).toBe('en-GB');
-      expect(storeSpy.dispatch).not.toHaveBeenCalled();
-    });
-
-    it('should dispatch language change when language differs', () => {
-      const result = service.attachLang('es', mockUser);
-
-      expect(result).toBe('es');
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-    });
-
-    it('should update user language when user locale differs from new language', () => {
-      const userWithDifferentLocale = { ...mockUser, locale: 'fr-FR' };
-
-      service.attachLang('es', userWithDifferentLocale);
-      const updatedUser: IUser = new User();
-      updatedUser.locale = 'es';
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
+        },
       );
     });
 
-    it('should not update user when user locale matches new language', () => {
-      const userWithSameLocale = { ...mockUser, locale: 'es-ES' };
+    it('should handle empty params', () => {
+      service.reload(['/home']);
 
-      service.attachLang('es', userWithSameLocale);
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1); // Only language change, not user update
-    });
-
-    it('should handle null language parameter', () => {
-      const result = service.attachLang(undefined);
-
-      expect(result).toBe('en-GB'); // Default language from getLocale mock
-    });
-
-    it('should not update user when current user is not provided', () => {
-      service.attachLang('es');
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledTimes(1);
-    });
-
-    it('should handle user without locale', () => {
-      const userWithoutLocale = { ...mockUser, locale: undefined };
-
-      service.attachLang('es', userWithoutLocale);
-      const updatedUser: IUser = new User();
-      updatedUser.locale = 'es';
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(setLanguage({ language: 'es' }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        updateMyUser({ user: updatedUser, redirectUrl: '/test/path' }),
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        ['/home'],
+        {
+          state: undefined,
+          queryParams: undefined,
+        },
       );
-    });
-
-    it('should create User object with correct language', () => {
-      let capturedUser: IUser;
-      storeSpy.dispatch.and.callFake((action: any) => {
-        capturedUser = action.user;
-        return undefined as any;
-      });
-
-      service.attachLang('es', mockUser);
-
-      expect(capturedUser!.locale).toBe('es');
     });
   });
 
   describe('navigation history management', () => {
     it('should maintain history correctly through multiple navigations', () => {
-      service.subscribe();
-
       // Add multiple navigation events
       routerEventsSubject.next(new NavigationEnd(1, '/page1', '/page1'));
       routerEventsSubject.next(new NavigationEnd(2, '/page2', '/page2'));
@@ -393,6 +301,100 @@ describe('NavigationService', () => {
       service.back();
       expect((service as any).history).toEqual(['/page1']);
       expect(JSON.parse(sessionStorage.getItem('cleos-navigation-history') || '[]')).toEqual(['/page1']);
+    });
+  });
+
+  describe('navigate', () => {
+    it('should navigate using language-prefixed path and call callback when provided', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+      const path = ['home', 'profile'];
+      const extras = { queryParams: { tab: 'info' } } as any;
+
+      service.navigate(path, extras, callback);
+
+      tick();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(
+        [`/${DEFAULT_LOCALE}/home/profile`],
+        extras,
+      );
+
+      expect(callback).toHaveBeenCalled();
+    }));
+
+    it('should navigate to current url when path is undefined', fakeAsync(() => {
+      const callback = jasmine.createSpy('callback');
+
+      setRouterUrl('/current/page');
+
+      service.navigate(undefined, undefined, callback);
+
+      tick();
+
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/current/page']);
+      expect(callback).toHaveBeenCalled();
+    }));
+
+    it('should not throw if callback is not provided', fakeAsync(() => {
+      expect(() => {
+        service.navigate(['test']);
+        tick();
+      }).not.toThrow();
+
+      expect(routerSpy.navigate).toHaveBeenCalled();
+    }));
+  });
+
+  describe('scrollToAnchor', () => {
+    let hostElement: jasmine.SpyObj<HTMLElement>;
+    let element: HTMLElement;
+    let scrollSpy: jasmine.Spy;
+
+    beforeEach(() => {
+      hostElement = jasmine.createSpyObj('HTMLElement', ['querySelector']);
+
+      element = document.createElement('div');
+      element.id = 'section1';
+
+      scrollSpy = spyOn(element, 'scrollIntoView');
+
+      hostElement.querySelector.and.returnValue(element as any);
+    });
+
+    it('should scroll to trimmed id when provided', () => {
+      service.scrollToAnchor(hostElement, '  section1  ');
+
+      expect(scrollSpy).toHaveBeenCalledWith({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest',
+      });
+    });
+
+    it('should use router fragment when id is not provided', () => {
+      setRouterUrl('/page#section1');
+
+      service.scrollToAnchor(hostElement);
+
+      expect(scrollSpy).toHaveBeenCalled();
+    });
+
+    it('should do nothing when no anchor is found', () => {
+      hostElement.querySelector.and.returnValue(null);
+
+      service.scrollToAnchor(hostElement, 'missing');
+
+      expect(hostElement.querySelector).toHaveBeenCalledWith('#missing');
+      expect(scrollSpy).not.toHaveBeenCalled();
+    });
+
+    it('should return early when no id and no fragment exist', () => {
+      setRouterUrl('/page');
+
+      service.scrollToAnchor(hostElement);
+
+      expect(hostElement.querySelector).not.toHaveBeenCalled();
+      expect(scrollSpy).not.toHaveBeenCalled();
     });
   });
 });

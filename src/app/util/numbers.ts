@@ -1,10 +1,10 @@
-import { API_LOCALE } from './dates';
-import { ICurrency } from '../interfaces/currency';
+import { DEFAULT_LOCALE } from './dates';
+import { ICurrency } from '../currency/currency';
 
 export const numberFormat = (
   value: number | string,
   currency?: ICurrency,
-  locale: string = API_LOCALE,
+  locale: string = DEFAULT_LOCALE,
 ) => new Intl.NumberFormat(locale, currency ? { maximumFractionDigits: 2, currency: currency.code, style: 'currency' } :
   { maximumFractionDigits: 2 }).format(Number(value));
 

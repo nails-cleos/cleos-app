@@ -1,73 +1,58 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
-import { IPaymentAll } from '../../interfaces/payment';
-import { PaymentState } from '../../store/reducers/payment.reducers';
-import { cleanPayment } from '../../store/payment.actions';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
+import { signal } from '@angular/core';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
   let fixture: ComponentFixture<PaymentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
-
-  let currentPath$: Subject<any>;
-  let paymentList$: Subject<any[]>;
-  let response$: Subject<any>;
-  let subErrors$: Subject<any[]>;
+  let paymentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    getPaymentByResourceId: jasmine.Spy;
+    notify: jasmine.Spy;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    currentPath$ = new Subject();
-    paymentList$ = new Subject();
-    response$ = new Subject();
-    subErrors$ = new Subject();
-
-    storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return currentPath$.asObservable();
-        case 2:
-          return paymentList$.asObservable();
-        case 3:
-          return response$.asObservable();
-        case 4:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    paymentStoreSpy = {
+      data: signal(undefined),
+      response: signal(undefined),
+      subErrors: signal(undefined),
+      isLoading: signal(false),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      notify: jasmine.createSpy('notify'),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [PaymentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(PaymentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    currentPath$.complete();
-    paymentList$.complete();
-    response$.complete();
-    subErrors$.complete();
   });
 
   it('should create', () => {
@@ -75,44 +60,45 @@ describe('PaymentComponent', () => {
   });
 
   it('should dispatch getPaymentByResourceId when currentPath is emitted', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
-
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPaymentByResourceId({ id: '123', path: 'reservation' }),
-    );
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('123', 'reservation');
   });
 
   it('should keep accountId from currentPath for back navigation', () => {
-    currentPath$.next({ id: '123', path: 'transaction', accountId: 'account-1' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'transaction');
+    fixture.componentRef.setInput('accountId', 'account-1');
     fixture.detectChanges();
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'accounts', 'account-1', 'transactions', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['accounts', 'account-1', 'transactions', '123']);
   });
 
   it('should navigate back to the resource page when accountId is missing', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
     component.goBack();
 
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB', 'reservation', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', '123']);
   });
 
   it('should hide footer when paymentList has items', () => {
-    paymentList$.next([{ id: '1' }]);
+    paymentStoreSpy.data.set([{ id: '1' }]);
 
     fixture.detectChanges();
 
     expect(component.hiddenSignal()).toBeTrue();
-    expect(component.dataSourceSignal()).toEqual([{ id: '1' }]);
+    expect(component.dataSourceSignal()).toEqual([{ id: '1' } as any]);
   });
 
   it('should show footer when paymentList is empty', () => {
-    paymentList$.next([]);
+    paymentStoreSpy.data.set([]);
 
     fixture.detectChanges();
 
@@ -120,7 +106,7 @@ describe('PaymentComponent', () => {
   });
 
   it('should set errorMessage and showError when subErrors are emitted', () => {
-    subErrors$.next([{ message: 'Payment failed' }]);
+    paymentStoreSpy.subErrors.set([{ message: 'Payment failed' }]);
 
     fixture.detectChanges();
 
@@ -129,32 +115,16 @@ describe('PaymentComponent', () => {
   });
 
   it('should clean and navigate when response has a path', () => {
-    response$.next({ path: 'dashboard' });
+    paymentStoreSpy.response.set({ path: 'dashboard' });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanPayment());
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['en-GB/dashboard']);
-  });
-
-  it('should call store.dispatch(paymentSend) when pay() is called', () => {
-    const payment: IPaymentAll = {
-      timestamp: 0,
-      amount: 0,
-      description: '',
-      paymentId: '',
-      preferenceId: '',
-      status: '',
-      type: 'CASH',
-      link: 'https://pay.com', id: 'p1',
-    };
-
-    component.pay(payment);
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://pay.com' }));
+    expect(paymentStoreSpy.clean).toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
   });
 
   it('should call store.dispatch(notifyPayment) when notify() is called', () => {
-    currentPath$.next({ id: '123', path: 'reservation' });
+    fixture.componentRef.setInput('id', '123');
+    fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
     const payment: any = {
@@ -165,9 +135,7 @@ describe('PaymentComponent', () => {
 
     component.notify(payment);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      notifyPayment({ id: 'p1', path: 'reservation', resourceId: '123', preferenceId: 'pref1', paymentType: 'paypal' }),
-    );
+    expect(paymentStoreSpy.notify).toHaveBeenCalledWith('p1', 'reservation', '123', 'pref1', 'paypal');
   });
 
   it('should return reservation currency icon', () => {
@@ -220,12 +188,38 @@ describe('PaymentComponent', () => {
   it('should not navigate back when path or id is missing', () => {
     component.goBack();
 
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('close() should hide error', () => {
     component.showError = true;
     component.close();
     expect(component.showError).toBeFalse();
+  });
+
+  it('should open payment URL in same tab when pay is called with paymentURL', () => {
+    const openSpy = spyOn(window, 'open');
+
+    const payment = { paymentURL: 'https://pay.example.com/123' } as any;
+
+    component.pay(payment);
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://pay.example.com/123',
+      '_self',
+    );
+  });
+
+  it('should open payment URL in same tab when pay is called with link', () => {
+    const openSpy = spyOn(window, 'open');
+
+    const payment = { link: 'https://pay.example.com/123' } as any;
+
+    component.pay(payment);
+
+    expect(openSpy).toHaveBeenCalledWith(
+      'https://pay.example.com/123',
+      '_self',
+    );
   });
 });

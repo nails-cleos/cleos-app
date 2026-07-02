@@ -2,9 +2,10 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IPay, IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
-import { IReservationPayment } from '../interfaces/reservation';
+import { IReservationPayment } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 @Injectable()
 export class PaymentService {
@@ -18,9 +19,10 @@ export class PaymentService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getPayment = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
+  getPayment = (id: string): Observable<IPaymentAll | undefined> => this.http.get<IPaymentAll>(toUrl(this.urlV1, id));
 
-  getPaymentOptions = (): Observable<IPaymentOption[]> => this.http.get<IPaymentOption[]>(toUrl(this.urlV1, 'options'));
+  getPaymentOptions = (): Observable<IPaymentOption[]> => this.http.get<IPaymentOption[]>(toUrl(this.urlV1, 'options'),
+    { ...skipLoadingOverlay() });
 
   add = (
     id: string,
@@ -52,7 +54,10 @@ export class PaymentService {
   getPaymentByResourceId = (
     id: string,
     path: 'reservation' | 'transaction',
-  ): Observable<IPaymentAll[]> => this.http.get<IPaymentAll[]>(toUrl(this.getKey(path), id, this.url));
+  ): Observable<IPaymentAll[]> => this.http.get<IPaymentAll[]>(
+    toUrl(this.getKey(path), id, this.url),
+    skipLoadingOverlay(),
+  );
 
   public notifyPayment = (
     id: string,

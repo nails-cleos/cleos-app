@@ -1,80 +1,71 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MePaymentComponent } from './me-payment.component';
-import { Store } from '@ngrx/store';
-import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPayment, updatePaymentById } from '../../../store/payment.actions';
-import { PaymentPercentage } from '../../../interfaces/payment';
 import { ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { PaymentPercentage } from '../../../interfaces/payment';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAppIcons } from '../../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
+import { signal } from '@angular/core';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
   let fixture: ComponentFixture<MePaymentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-
-  // streams returned by store.pipe()
-  let paymentId$: Subject<string | null>;
-  let payment$: Subject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
+  let paymentStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    options: ReturnType<typeof signal>;
+    getPayment: jasmine.Spy;
+    getOptions: jasmine.Spy;
+    updateById: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    paymentId$ = new Subject();
-    payment$ = new Subject();
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'MOLLIE',
-        label: 'Mollie',
-        enabled: true,
-        enabledCustomer: true,
-        default: false,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-      },
-      {
-        type: 'PAYPAL',
-        label: 'PayPal',
-        enabled: true,
-        enabledCustomer: true,
-        default: false,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-      },
-    ]);
-
-    storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return paymentId$.asObservable();
-        case 2:
-          return payment$.asObservable();
-        case 3:
-          return paymentOptions$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    paymentStoreSpy = {
+      selected: signal(undefined),
+      options: signal([
+        {
+          type: 'MOLLIE',
+          label: 'Mollie',
+          enabled: true,
+          enabledCustomer: true,
+          default: false,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+        },
+        {
+          type: 'PAYPAL',
+          label: 'PayPal',
+          enabled: true,
+          enabledCustomer: true,
+          default: false,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+        },
+      ]),
+      getPayment: jasmine.createSpy('getPayment'),
+      getOptions: jasmine.createSpy('getOptions'),
+      updateById: jasmine.createSpy('updateById'),
+      clean: jasmine.createSpy('clean'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [MePaymentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 
@@ -82,28 +73,19 @@ describe('MePaymentComponent', () => {
     component = fixture.componentInstance;
   });
 
-  afterEach(() => {
-    paymentId$.complete();
-    payment$.complete();
-    paymentOptions$.complete();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should dispatch getPayment when paymentId is emitted', () => {
-    paymentId$.next('payment-123');
-
+    fixture.componentRef.setInput('id', 'payment-123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPayment({ id: 'payment-123' }),
-    );
+    expect(paymentStoreSpy.getPayment).toHaveBeenCalledWith('payment-123');
   });
 
   it('should keep options empty when no online payment type is available', () => {
-    payment$.next({
+    paymentStoreSpy.selected.set({
       reservation: {
         room: {
           paymentTypes: ['CASH', 'TRANSFER'],
@@ -117,7 +99,7 @@ describe('MePaymentComponent', () => {
   });
 
   it('should derive options from the room payment types', () => {
-    payment$.next({
+    paymentStoreSpy.selected.set({
       reservation: {
         room: {
           paymentTypes: ['CASH', 'MOLLIE'],
@@ -132,8 +114,8 @@ describe('MePaymentComponent', () => {
     ]));
   });
 
-  it('should dispatch updatePaymentById on update()', () => {
-    payment$.next({
+  it('should dispatch updateById on update()', () => {
+    paymentStoreSpy.selected.set({
       id: 'payment-1',
       reservation: {
         room: {
@@ -150,14 +132,9 @@ describe('MePaymentComponent', () => {
 
     component.update();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      updatePaymentById({
-        id: 'payment-1',
-        payment: {
-          type: 'MOLLIE',
-          percentage: PaymentPercentage.total,
-        },
-      }),
+    expect(paymentStoreSpy.updateById).toHaveBeenCalledWith(
+      'payment-1',
+      { type: 'MOLLIE', percentage: PaymentPercentage.total },
     );
   });
 });

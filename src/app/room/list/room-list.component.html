@@ -1,0 +1,158 @@
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <section class="app-surface-section">
+    <div class="app-table-shell">
+      @let resultsLength = resultsLengthSignal();
+      @let pageSize = pageSizeSignal();
+      @if (isLoading()) {
+        <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+      } @else if (dataSourceSignal(); as dataSource) {
+        <table [dataSource]="dataSource" mat-table matSort matSortActive="office" matSortDirection="asc"
+               matSortDisableClear
+               multiTemplateDataRows>
+          <ng-container matColumnDef="position">
+            <th *matHeaderCellDef mat-header-cell>#</th>
+            <td *matCellDef="let room; let i = dataIndex;" mat-cell>
+              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="currency">
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
+                mat-sort-header>{{ 'ROOM.LIST.COLUMN.CURRENCY' | translate }}
+            </th>
+            <td *matCellDef="let room" class="app-surface-hide-mobile" mat-cell>
+              <mat-list>
+                <mat-list-item>
+                  <mat-icon matListItemIcon>{{ room.currency.icon }}</mat-icon>
+                  <div matListItemTitle>{{ room.currency.code }}</div>
+                </mat-list-item>
+              </mat-list>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="office">
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
+                mat-sort-header>{{ 'ROOM.LIST.COLUMN.OFFICE' | translate }}
+            </th>
+            <td *matCellDef="let room" class="app-surface-hide-mobile" mat-cell>
+              <div>{{ room.office.name }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="address">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ROOM.LIST.COLUMN.ADDRESS' | translate }}</th>
+            <td *matCellDef="let room" mat-cell>
+              <div>{{ room.address?.name }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="timeZone">
+            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
+                mat-sort-header>{{ 'ROOM.LIST.COLUMN.TIME_ZONE' | translate }}
+            </th>
+            <td *matCellDef="let room" class="app-surface-hide-mobile" mat-cell>
+              <div>{{ getTimeZone(room.timeZone).label }}</div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="availability">
+            <th *matHeaderCellDef class="app-surface-hide-mobile"
+                mat-header-cell>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.FIELD' | translate }}
+            </th>
+            <td *matCellDef="let room" class="app-surface-hide-mobile" mat-cell>
+              <mat-list>
+                @for (availability of room.availabilities | sortBy: 'asc':'order'; track availability) {
+                  <mat-list-item>
+                    <mat-icon matListItemIcon>date_range</mat-icon>
+                    <div matListItemTitle>{{ 'ROOM.LIST.COLUMN.AVAILABILITY.' + availability.day | translate }}</div>
+                    <div matListItemLine>{{ availability.start }} - {{ availability.end }}</div>
+                  </mat-list-item>
+                }
+              </mat-list>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th *matHeaderCellDef mat-header-cell>
+              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+              <button [routerLink]="['/', language, 'rooms', 'add']" mat-icon-button id="add-button"
+                      matTooltip="{{ 'ROOM.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                <mat-icon color="primary">add</mat-icon>
+              </button>
+            </th>
+            <td *matCellDef="let room" class="app-surface-hide-mobile" mat-cell>
+              @if (!room.deleted) {
+                <button (click)="edit(room)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                        matTooltipPosition="left">
+                  <mat-icon color="primary">edit</mat-icon>
+                </button>
+                <button (click)="delete(room)" mat-icon-button matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                        matTooltipPosition="right">
+                  <mat-icon color="warn">delete</mat-icon>
+                </button>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="expandedDetail">
+            <td *matCellDef="let room" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+              <div [class.detail-expanded]="room === expanded" class="detail app-surface-hide-desktop">
+                <mat-list>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'ROOM.LIST.COLUMN.CURRENCY' | translate }}</div>
+                    <mat-icon matListItemIcon>{{ room.currency.icon }}</mat-icon>
+                    <div matListItemLine>{{ room.currency.code }}</div>
+                  </mat-list-item>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>{{ 'ROOM.LIST.COLUMN.OFFICE' | translate }}</div>
+                    <div matListItemLine>{{ room.office.name }}</div>
+                  </mat-list-item>
+                  @if (getGMT(room.timeZone)) {
+                    <mat-list-item role="list">
+                      <div matListItemTitle>{{ 'ROOM.LIST.COLUMN.TIME_ZONE' | translate }}</div>
+                      <div matListItemLine>{{ getGMT(room.timeZone) }}</div>
+                    </mat-list-item>
+                  }
+
+                  <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <mat-list-item role="list">
+                    @if (!room.deleted) {
+                      <button (click)="edit(room)" color="primary" mat-icon-button>
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button (click)="delete(room)" color="warn" mat-icon-button>
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    }
+                  </mat-list-item>
+                </mat-list>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="noContent">
+            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+              {{ 'ROOM.LIST.ERROR.NO_CONTENT' | translate }}
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr *matRowDef="let room; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
+          <tr (click)="expanded = expanded === room ? null : room"
+              *matRowDef="let room; columns: displayedColumns;"
+              class="app-surface-hide-desktop app-table-master-row"
+              mat-row></tr>
+          <tr *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expanded"
+              class="app-surface-hide-desktop app-table-detail-row"
+              mat-row></tr>
+
+          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+        </table>
+        @if (resultsLength) {
+          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+        }
+      }
+    </div>
+  </section>
+</div>

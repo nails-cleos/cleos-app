@@ -6,6 +6,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 @Component({
   template: `
@@ -43,21 +44,18 @@ describe('BackButtonDirective', () => {
     fixture = TestBed.createComponent(HostComponent);
     hostComp = fixture.componentInstance;
 
-    // ✅ Set all inputs before detectChanges
     hostComp.date = new Date(2026, 2, 20);
     hostComp.step = 1;
     hostComp.form = new FormGroup({ test: new FormControl('') });
 
     fixture.detectChanges();
 
-    // ✅ Query directive after inputs are stable
     const debugEl = fixture.debugElement.query(By.directive(BackButtonDirective));
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
-    // ✅ Spy on dialog AFTER directive is queried
     dialogSpy = spyOn(directive.dialog, 'open');
   });
 
@@ -86,7 +84,7 @@ describe('BackButtonDirective', () => {
   it('should show dialog when form is dirty', () => {
     hostComp.form?.markAsDirty();
 
-    translateService.setTranslation('en-GB', {
+    translateService.setTranslation(DEFAULT_LOCALE, {
       COMMON: { BACK: { TITLE: 'Back Title', CONTENT: 'Back Content' } },
     });
 

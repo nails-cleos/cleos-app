@@ -137,7 +137,7 @@
         [events]="calendarEventsSignal()"
         [eventTitleTemplate]="calendarEventTitle"
         [hourSegments]="hourSegments"
-        [locale]="locale"
+        [locale]="language"
         [tooltipTemplate]="calendarTooltip"
         [viewDate]="viewDate()"
         [weekendDays]="[]"></mwl-calendar-week-view>
@@ -168,9 +168,9 @@
               @if (event?.meta?.isReservation) {
                 <div class="calendar-tooltip-card">
                   <div class="calendar-tooltip-card__time">
-                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:locale }}
+                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:language }}
                     -
-                    {{ event.end | date:'HH:mm':event.meta?.timeZone:locale }}
+                    {{ event.end | date:'HH:mm':event.meta?.timeZone:language }}
                   </div>
                   <div class="calendar-tooltip-card__row">
                     <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</span>

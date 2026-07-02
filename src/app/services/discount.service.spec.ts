@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { DiscountType, IDiscountAll } from '../interfaces/discount';
+import { DiscountType, IDiscountAll } from '../discount/discount';
 
 describe('DiscountService', () => {
   let service: DiscountService;

@@ -5,9 +5,10 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth
 import { NavigationService } from '../../services/navigation.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { IChart } from '../../interfaces/dashboard';
-import { ICurrency } from '../../interfaces/currency';
+import { IChart } from '../../dashboard/dashboard';
+import { ICurrency } from '../../currency/currency';
 import { createChart } from '../../util/chart';
+import { DEFAULT_LOCALE } from '../../util/dates';
 
 describe('ChartComponent', () => {
   let component: ChartComponent;
@@ -43,7 +44,6 @@ describe('ChartComponent', () => {
 
   it('should update chart when chartSummary input changes', () => {
     const currency: ICurrency = { code: 'EUR', icon: 'EUR' };
-    const locale = 'en-GB';
     const timeZone = 'Europe/Amsterdam';
 
     const firstSummary: IChart = {
@@ -59,13 +59,13 @@ describe('ChartComponent', () => {
 
     fixture.componentRef.setInput('error', undefined);
     fixture.componentRef.setInput('currency', currency);
-    fixture.componentRef.setInput('locale', locale);
+    fixture.componentRef.setInput('locale', DEFAULT_LOCALE);
     fixture.componentRef.setInput('timeZone', timeZone);
     fixture.componentRef.setInput('chartSummary', firstSummary);
     fixture.detectChanges();
 
     expect(component.chart()).toEqual(
-      createChart(firstSummary, currency, false, locale, timeZone),
+      createChart(firstSummary, currency, false, DEFAULT_LOCALE, timeZone),
     );
 
     const secondSummary: IChart = {
@@ -81,7 +81,7 @@ describe('ChartComponent', () => {
     fixture.detectChanges();
 
     expect(component.chart()).toEqual(
-      createChart(secondSummary, currency, false, locale, timeZone),
+      createChart(secondSummary, currency, false, DEFAULT_LOCALE, timeZone),
     );
   });
 });

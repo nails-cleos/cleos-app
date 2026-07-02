@@ -1,22 +1,22 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Availability, IAvailability, IAvailabilityDate } from '../../interfaces/room';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Availability, IAvailability, IAvailabilityDate } from '../room';
 import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
-
-type AvailabilityForm = {
-  start: FormControl<string>;
-  end: FormControl<string>;
-  startLunch: FormControl<string | undefined>;
-  endLunch: FormControl<string | undefined>;
-}
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { AvailabilityForm } from '../room-form.types';
 
 @Component({
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, MatError, MatPrefix,
+    ReactiveFormsModule, TimepickerComponent, TimepickerDirective, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvailabilityComponent {
@@ -64,16 +64,6 @@ export class AvailabilityComponent {
   }
 
   create(): void {
-    const availability: IAvailability = new Availability();
-    availability.day = this.day();
-    availability.start = this.getForm.start.value;
-    availability.end = this.getForm.end.value;
-
-    if (this.checked) {
-      availability.startLunch = this.getForm.startLunch.value;
-      availability.endLunch = this.getForm.endLunch.value;
-    }
-
-    return this.availability.emit(availability);
+    return this.availability.emit(Availability.fromForm(this.getForm, this.day(), this.checked));
   }
 }

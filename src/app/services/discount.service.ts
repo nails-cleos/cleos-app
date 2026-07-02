@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../interfaces/discount';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../discount/discount';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { createFilter } from '../util/service-helper';
 import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
@@ -12,7 +12,7 @@ import { IApiResponse } from '../interfaces/common';
 export class DiscountService {
 
   private url = 'discounts';
-  private urlV1 = `v1/${this.url}`;
+  private urlV1 = `v1/${ this.url }`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -40,7 +40,8 @@ export class DiscountService {
     toUrl(this.urlV1, 'me', 'referrals'),
   );
 
-  getDiscount = (id: string): Observable<IDiscount | undefined> => this.http.get<IDiscount>(toUrl(this.urlV1, id));
+  getDiscount = (id: string): Observable<IDiscountAll | undefined> => this.http.get<IDiscountAll>(
+    toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
 
   createDiscount = (discount: IDiscount): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,
     discount);

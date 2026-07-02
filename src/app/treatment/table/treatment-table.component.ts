@@ -1,23 +1,45 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+  MatTableDataSource,
+} from '@angular/material/table';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { ITreatmentAll } from '../../interfaces/treatment';
+import { ITreatmentAll } from '../treatment';
 import { convertDuration } from '../../util/dates';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { PAGE_SIZE } from '../../interfaces/pagination';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { DatePipe, DecimalPipe } from '@angular/common';
+import { TableSkeletonColumn } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-treatment-table',
   templateUrl: './treatment-table.component.html',
   styleUrls: ['./treatment-table.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, TranslatePipe, DecimalPipe, DatePipe, MatTable, MatColumnDef,
+    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentTableComponent {
-  private readonly translate = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   treatment = input<ITreatmentAll[]>([]);
 
@@ -25,7 +47,12 @@ export class TreatmentTableComponent {
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'date', 'asc');
 
-  displayedColumns: string[] = ['date', 'price', 'duration'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'date' },
+    { key: 'price' },
+    { key: 'duration', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   paginatorPageIndex = this.tableState.pageIndex;
 
@@ -40,7 +67,7 @@ export class TreatmentTableComponent {
   resultsLengthSignal = computed(() => this.dataSource().data.length);
   pageSizeSignal = computed(() => PAGE_SIZE);
 
-  dateFormat: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {

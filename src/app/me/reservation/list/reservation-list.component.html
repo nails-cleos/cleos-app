@@ -1,0 +1,155 @@
+@let error = errorSignal();
+@if (!error) {
+    <div class="app-surface-canvas app-surface-shell app-surface-stack">
+        @let upcoming = upcomingSignal();
+        @if (isLoading()) {
+            <section class="app-surface-section">
+                <div class="app-detail-section-header">
+                    <div>
+                        <span class="app-surface-eyebrow">{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</span>
+                    </div>
+                    <div class="app-detail-actions reservations-top-actions">
+                        <button [routerLink]="['/', language, 'me', 'reservation']" mat-stroked-button type="button">
+                            <mat-icon>calendar_add_on</mat-icon>
+                            <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <app-upcoming-skeleton></app-upcoming-skeleton>
+            </section>
+        } @else if (upcoming && !noContent()) {
+            <section class="app-surface-section">
+                <div class="app-detail-section-header">
+                    <div>
+                        <span class="app-surface-eyebrow">{{ 'ME.RESERVATION.UPCOMING.TITLE' | translate }}</span>
+                    </div>
+                    <div class="app-detail-actions reservations-top-actions">
+                        <button [routerLink]="['/', language, 'me', 'reservation']" mat-stroked-button type="button">
+                            <mat-icon>calendar_add_on</mat-icon>
+                            <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                <mat-tab-group class="reservations-tabs">
+                    @for (up of upcoming; track up) {
+                        <mat-tab label="{{up.timestamp | timeDetail | date:'short':up.room.timeZone:language}}">
+                            <div class="reservations-tab-content">
+                                <app-upcoming [upcoming]="up" [small]="small()"></app-upcoming>
+                            </div>
+                        </mat-tab>
+                    }
+                </mat-tab-group>
+            </section>
+        } @else {
+            <section class="app-surface-section reservations-empty-state">
+                <div class="app-detail-section-header">
+                    <div>
+                        <span class="app-surface-eyebrow">{{ 'ME.RESERVATION.UPCOMING.NO_UPCOMING.TITLE' | translate }}</span>
+                    </div>
+                </div>
+                <div class="app-detail-actions reservations-top-actions">
+                    <button [routerLink]="['/', language, 'me', 'reservation']" mat-stroked-button type="button">
+                        <mat-icon>calendar_add_on</mat-icon>
+                        <span>{{ 'COMMON.BUTTON.CREATE' | translate }}</span>
+                    </button>
+                </div>
+            </section>
+        }
+
+        @let resultsLength = resultsLengthSignal();
+        @let pageSize = pageSizeSignal();
+        @if (isLoading()) {
+            <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+        } @else if (dataSourceSignal(); as dataSource) {
+            <div class="mat-elevation-z8 app-table-shell">
+                <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp"
+                       matSortDirection="desc" matSortDisableClear>
+                    <ng-container matColumnDef="position">
+                        <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>#</th>
+                        <td *matCellDef="let reservation; let i = index;" class="app-surface-hide-mobile" mat-cell>
+                            {{ (paginatorPageIndex() * pageSize) + i + 1 }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="professional">
+                        <th *matHeaderCellDef class="app-surface-hide-mobile"
+                            mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
+                        </th>
+                        <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
+                            {{ reservation.professional.displayName }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="timestamp">
+                        <th *matHeaderCellDef mat-header-cell
+                            mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
+                        </th>
+                        <td *matCellDef="let reservation" mat-cell>
+                            {{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}
+                            @if (showTimeZone(reservation)) {
+                                <button (click)="openDialog(reservation)" mat-icon-button type="button">
+                                    <mat-icon>info_outline</mat-icon>
+                                </button>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="treatment">
+                        <th *matHeaderCellDef class="app-surface-hide-mobile"
+                            mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+                        </th>
+                        <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
+                            {{ reservation.treatment.name }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="state">
+                        <th *matHeaderCellDef mat-header-cell
+                            mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
+                        </th>
+                        <td *matCellDef="let reservation" mat-cell>
+                            <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
+                            {{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                        <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+                        <td *matCellDef="let reservation" mat-cell>
+                            <button [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
+                                    matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                            @if (reservation.state === 'COMPLETED') {
+                                <button (click)="onRatingChanged(reservation)" mat-icon-button
+                                        matTooltipPosition="right"
+                                        matTooltip="{{ 'COMMON.BUTTON.REVIEW' | translate }}">
+                                    <mat-icon color="primary">reviews</mat-icon>
+                                </button>
+                            }
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="noContent">
+                        <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold"
+                            mat-footer-cell>
+                            {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
+                        </td>
+                    </ng-container>
+
+                    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+                    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                    <tr *matRowDef="let row; columns: displayedColumns;"
+                        [class.row-is-canceled]="row.state === 'CANCELLED'" mat-row></tr>
+                </table>
+                @if (resultsLength) {
+                    <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+                }
+            </div>
+        }
+    </div>
+} @else {
+    <app-error [error]="error" [isCard]="true"></app-error>
+}

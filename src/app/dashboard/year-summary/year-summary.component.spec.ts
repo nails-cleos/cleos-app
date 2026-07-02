@@ -1,46 +1,80 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
-import { Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { BehaviorSubject } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule } from '@ngx-translate/core';
 import { ActivatedRoute } from '@angular/router';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../../interfaces/dashboard';
+import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard';
 import fs from 'file-saver';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
 import { signal } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { By } from '@angular/platform-browser';
+import { YearComponent } from './year/year.component';
+import { DashboardStore } from '../../store/dashboard.store';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<DashboardState>>;
+  let dashboardStoreSpy: {
+    yearSummaryMap: ReturnType<typeof signal>;
+    yearExport: ReturnType<typeof signal>;
+    getYearSummary: jasmine.Spy;
+    exportYearSummary: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let saveAsSpy: jasmine.Spy;
+  let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    dashboardStoreSpy = {
+      yearSummaryMap: signal<any>(undefined),
+      yearExport: signal<any>(undefined),
+      getYearSummary: jasmine.createSpy('getYearSummary'),
+      exportYearSummary: jasmine.createSpy('exportYearSummary'),
+      clean: jasmine.createSpy('clean'),
+    };
+    breakpoint$ = new BehaviorSubject({
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+        [Breakpoints.Medium]: false,
+      },
+    });
+
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
+    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
 
-    storeSpy.pipe.and.returnValue(new Subject().asObservable());
+    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [YearSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
 
@@ -52,8 +86,7 @@ describe('YearSummaryComponent', () => {
     });
   });
 
-  afterEach(() => {
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -320,6 +353,47 @@ describe('YearSummaryComponent', () => {
       authUserSignal.set({ ...initialAuthUser, displayName: 'Lucas' });
 
       expect(component['userName']()).toBe('Lucas');
+    });
+
+    it('should pass short measure to year view on handset breakpoints', () => {
+      const room = {
+        roomId: 'room-1',
+        roomName: 'Main room',
+        primary: true,
+        currency: { code: 'EUR', icon: 'EUR' },
+        timeZone: 'Europe/Amsterdam',
+      };
+      const quarterSummaries = [{
+        quarter: 1,
+        monthSummaries: [{ month: 1, total: [] }],
+      }];
+
+      dashboardStoreSpy.yearSummaryMap.set(new Map([
+        [room, { quarterSummaries }],
+      ]));
+      fixture.detectChanges();
+      TestBed.flushEffects();
+      fixture.detectChanges();
+
+      let yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
+      expect(component.isHandset()).toBeFalse();
+      expect(yearComponent.measure()).toBe('long');
+
+      breakpoint$.next({
+        matches: true,
+        breakpoints: {
+          [Breakpoints.XSmall]: true,
+          [Breakpoints.Small]: false,
+          [Breakpoints.Medium]: false,
+        },
+      });
+      fixture.detectChanges();
+      TestBed.flushEffects();
+      fixture.detectChanges();
+
+      yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
+      expect(component.isHandset()).toBeTrue();
+      expect(yearComponent.measure()).toBe('short');
     });
   });
 });

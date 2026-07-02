@@ -22,7 +22,14 @@ export class EmptyPagination<T> implements Pagination<T> {
 }
 
 export const EXPECT_PAGINATION = new HttpContextToken<boolean>(() => false);
+export const SKIP_LOADING_OVERLAY = new HttpContextToken<boolean>(() => false);
 
 export const paginated = () => ({
-  context: new HttpContext().set(EXPECT_PAGINATION, true),
+  context: new HttpContext()
+    .set(EXPECT_PAGINATION, true)
+    .set(SKIP_LOADING_OVERLAY, true),
+});
+
+export const skipLoadingOverlay = () => ({
+  context: new HttpContext().set(SKIP_LOADING_OVERLAY, true),
 });

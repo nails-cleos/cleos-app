@@ -39,13 +39,19 @@
             }
           </mat-autocomplete>
         </mat-form-field>
+      } @else {
+        <div class="ssc-line"></div>
       }
     </div>
   </section>
 
   @let resultsLength = resultsLengthSignal();
   @let pageSize = pageSizeSignal();
-  @if (dataSourceSignal(); as dataSource) {
+  @if (isLoading()) {
+    <section class="app-surface-section">
+      <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+    </section>
+  } @else if (dataSourceSignal(); as dataSource) {
     <section class="app-surface-section">
       <div class="app-table-shell">
       <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
@@ -54,22 +60,14 @@
         <ng-container matColumnDef="position">
           <th *matHeaderCellDef mat-header-cell>#</th>
           <td *matCellDef="let reservation; let i = dataIndex;" mat-cell>
-            @if (reservation.id) {
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
+            <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="customer">
           <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
           <td *matCellDef="let reservation" mat-cell>
-            @if (reservation.id) {
-              <div>{{ reservation.customer?.displayName }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
+            <div>{{ reservation.customer?.displayName }}</div>
           </td>
         </ng-container>
 
@@ -78,15 +76,11 @@
               mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
           </th>
           <td *matCellDef="let reservation" mat-cell>
-            @if (reservation.id) {
-              <div>{{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:dateFormat }}</div>
-              @if (showTimeZone(reservation)) {
-                <button (click)="openDialog(reservation)" mat-icon-button type="button">
-                  <mat-icon>info_outline</mat-icon>
-                </button>
-              }
-            } @else {
-              <div class="ssc-line"></div>
+            <div>{{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}</div>
+            @if (showTimeZone(reservation)) {
+              <button (click)="openDialog(reservation)" mat-icon-button type="button">
+                <mat-icon>info_outline</mat-icon>
+              </button>
             }
           </td>
         </ng-container>
@@ -96,12 +90,8 @@
               mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
           </th>
           <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            @if (reservation.id) {
-              <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
-              <div>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
+            <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
+            <div>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</div>
           </td>
         </ng-container>
 
@@ -110,35 +100,27 @@
               mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
           </th>
           <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            @if (reservation.id) {
-              <div>{{ reservation.treatment.name }}</div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
+            <div>{{ reservation.treatment.name }}</div>
           </td>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
           <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            @if (reservation.id) {
-              <div>
-                @if (!reservation.deleted) {
-                  <button [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
-                    <mat-icon color="primary">visibility</mat-icon>
-                  </button>
-                }
-                @if (reservation.deadLine) {
-                  <button (click)="cancel(reservation)" class="app-surface-hide-mobile" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
-                    <mat-icon color="warn">close</mat-icon>
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="ssc-line"></div>
-            }
+            <div>
+              @if (!reservation.deleted) {
+                <button [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                  <mat-icon color="primary">visibility</mat-icon>
+                </button>
+              }
+              @if (reservation.deadLine) {
+                <button (click)="cancel(reservation)" class="app-surface-hide-mobile" mat-icon-button
+                        matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
+                  <mat-icon color="warn">close</mat-icon>
+                </button>
+              }
+            </div>
           </td>
         </ng-container>
 
@@ -197,10 +179,6 @@
         <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
       }
       </div>
-    </section>
-  } @else {
-    <section class="app-surface-section app-surface-loading-state">
-      <mat-spinner></mat-spinner>
     </section>
   }
 </div>

@@ -11,8 +11,8 @@ import {
   ITotal,
   IYearRoomExport,
   IYearRoomSummary,
-} from '../interfaces/dashboard';
-import { IReservation } from '../interfaces/reservation';
+} from '../dashboard/dashboard';
+import { IReservation } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 
 @Injectable()
@@ -32,7 +32,7 @@ export class DashboardService {
   updateEvent = (
     reservationId: string,
     reservation: IReservation,
-  ): Observable<IRoomEvents> => this.http.patch<IRoomEvents>(
+  ): Observable<void> => this.http.patch<void>(
     toUrl(this.urlV1, 'me', 'events', reservationId),
     reservation,
   );
@@ -41,7 +41,7 @@ export class DashboardService {
     toUrl(this.urlV1, 'summaries', date));
 
   updateMonthlySummary = (
-    date: string, type: string, totals: ITotal[], summaries: IMonthlySummaryRequest[], roomId: string,
+    date: string, type: string, totals: ITotal[], summaries: IMonthlySummaryRequest[], roomId?: string,
   ): Observable<void> => this.http.post<void>(
     toUrl(this.urlV1, 'summaries', date), { totals, summaries, type, roomId },
   );

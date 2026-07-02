@@ -1,14 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { IPaymentOption } from '../../interfaces/payment';
+import { MatError, MatFormField, MatLabel } from '@angular/material/input';
+import { MatSelect, MatSelectTrigger } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatListItem } from '@angular/material/list';
 
 @Component({
   selector: 'app-payment-option-select',
   templateUrl: './payment-option-select.component.html',
   styleUrls: ['./payment-option-select.component.scss'],
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslateModule],
+  imports: [MatFormField, MatLabel, MatSelect, MatOption, MatIcon, MatListItem, TranslatePipe, MatError,
+    ReactiveFormsModule, MatSelectTrigger],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentOptionSelectComponent {

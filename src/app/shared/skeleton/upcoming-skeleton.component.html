@@ -1,0 +1,20 @@
+<mat-tab-group class="reservations-tabs">
+  @for (tab of tabs(); track tab) {
+    <mat-tab label="...">
+      <div class="reservations-tab-content">
+        <section class="app-surface-section upcoming-section">
+          <div class="ssc-head-line"></div>
+
+          <div class="upcoming-grid">
+            @for (field of fieldCards(); track field) {
+              <div class="ssc-square app-detail-skeleton-card"></div>
+            }
+          </div>
+
+          <div class="ssc-line"></div>
+          <div class="ssc-head-line"></div>
+        </section>
+      </div>
+    </mat-tab>
+  }
+</mat-tab-group>
