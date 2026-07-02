@@ -7,7 +7,6 @@ import {
   setDetailReservationParams,
   setReservationParams,
 } from '../store/actions/reservation.actions';
-import { getOptions } from '../store/actions/payment.actions';
 import { navigation } from '../util/router-navigation.operator';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ReservationCompleteComponent } from './detail/complete/reservation-complete.component';
@@ -38,7 +37,6 @@ export class ReservationNavigationEffects {
 
           return [
             cleanReservation(),
-            getOptions(),
             setReservationParams({
               isDashboard: navigationState?.['isDashboard'],
             }),
@@ -69,7 +67,7 @@ export class ReservationNavigationEffects {
       navigation(ReservationCreatePageComponent, {
         run: () => {
           const navigationState = history.state;
-          const actions: Action[] = [cleanReservation(), getOptions()];
+          const actions: Action[] = [cleanReservation()];
           if (navigationState) {
             actions.push(this.toReservationParamsAction(navigationState));
           }
@@ -85,7 +83,7 @@ export class ReservationNavigationEffects {
         run: () => {
           const navigationState = history.state;
 
-          const actions: Action[] = [cleanReservation(), getOptions()];
+          const actions: Action[] = [cleanReservation()];
           if (navigationState) {
             actions.push(this.toReservationParamsAction(navigationState));
           }
@@ -104,7 +102,6 @@ export class ReservationNavigationEffects {
 
           return [
             cleanReservation(),
-            getOptions(),
             setDetailReservationParams({ step: navigationState?.['step'] }),
           ];
         },

@@ -7,12 +7,16 @@ import { paymentNotComplete } from '../../../store/actions/payment.actions';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('PaymentCompleteComponent', () => {
   let fixture: ComponentFixture<PaymentCompleteComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
+  let paymentStoreSpy: {
+    clean: jasmine.Spy;
+  };
 
   let paymentResultParams$: Subject<any>;
   let subErrors$: Subject<any>;
@@ -22,6 +26,9 @@ describe('PaymentCompleteComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    paymentStoreSpy = {
+      clean: jasmine.createSpy('clean'),
+    };
     paymentResultParams$ = new Subject();
     subErrors$ = new Subject();
     response$ = new Subject();
@@ -47,6 +54,7 @@ describe('PaymentCompleteComponent', () => {
       imports: [PaymentCompleteComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();

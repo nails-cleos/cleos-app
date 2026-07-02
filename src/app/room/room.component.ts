@@ -13,7 +13,6 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { AbstractControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { AvailabilityDate, IAvailability, IAvailabilityDate, IRoom, IRoomAll, Room } from './room';
 import { IUser, IUserAll } from '../user/user';
 import { map, startWith } from 'rxjs/operators';
@@ -34,8 +33,6 @@ import { GoogleMapComponent, GoogleMapForm } from '../shared/google-map/google-m
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError } from '../interfaces/common';
-import { PaymentState } from '../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { RoomNamePipe } from '../pipes/room-name.pipe';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
@@ -53,8 +50,8 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { MatCheckbox } from '@angular/material/checkbox';
 import { RoomStore } from '../store/room.store';
 import { RoomForm } from './room-form.types';
-import { getOptions } from '../store/actions/payment.actions';
 import { NavigationService } from '../services/navigation.service';
+import { PaymentStore } from '../store/payment.store';
 import PlaceResult = google.maps.places.PlaceResult;
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 
@@ -88,14 +85,13 @@ export class RoomComponent {
   submitData = output<IRoom>();
 
   private readonly roomStore = inject(RoomStore);
-  private readonly paymentStore: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
   private professionalsSignal = this.roomStore.professionals;
   private subErrorsSignal = this.roomStore.subErrors;
-  private paymentOptions$ = this.paymentStore.pipe(getPaymentOptionsPipe);
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private paymentOptionsSignal = this.paymentStore.options;
 
   errors = signal<Record<string, unknown>>({});
 
@@ -214,7 +210,7 @@ export class RoomComponent {
 
   constructor() {
     this.roomStore.loadInfo();
-    this.paymentStore.dispatch(getOptions());
+    this.paymentStore.getOptions();
     effect(() => {
       const paymentOptions = this.paymentOptions();
       if (!paymentOptions.length || this.room() || this.paymentTypes.length) {

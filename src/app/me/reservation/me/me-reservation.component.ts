@@ -111,7 +111,6 @@ import {
   OfficeForm,
 } from '../../../reservation/reservation-form.types';
 import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
-import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
@@ -126,6 +125,7 @@ import { MatCheckbox } from '@angular/material/checkbox';
 import { NavigationService } from '../../../services/navigation.service';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { AdditionalStore } from '../../../store/additional.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -166,6 +166,7 @@ export class MeReservationComponent {
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly navigationService: NavigationService = inject(NavigationService);
@@ -179,7 +180,6 @@ export class MeReservationComponent {
   private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
   private availableList$ = this.store.pipe(getAvailableListPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
@@ -190,7 +190,7 @@ export class MeReservationComponent {
   private readonly availableListSignal = toSignal(this.availableList$);
   private readonly subErrorsSignal = toSignal(this.subErrors$);
   private readonly authUserSignal = this.authUserService.authUser;
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -455,6 +455,7 @@ export class MeReservationComponent {
   penalty = PENALTY;
 
   constructor() {
+    this.paymentStore.getOptions();
     const preview = new Step(5, 'preview', () => this.create());
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);

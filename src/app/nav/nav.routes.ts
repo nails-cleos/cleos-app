@@ -52,6 +52,7 @@ import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { MessagingService } from '../services/messaging.service';
 import { AuthStore } from '../store/auth.store';
+import { PaymentStore } from '../store/payment.store';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
@@ -98,6 +99,7 @@ const providers = [
   TreatmentStore,
   RoomStore,
   DashboardStore,
+  PaymentStore,
   provideGlobalFeedbackSource(UserStore),
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
@@ -115,6 +117,7 @@ const providers = [
   provideGlobalFeedbackSource(TreatmentStore),
   provideGlobalFeedbackSource(RoomStore),
   provideGlobalFeedbackSource(AuthStore),
+  provideGlobalFeedbackSource(PaymentStore),
   provideState(RESERVATION_FEATURE_KEY, reservationReducer),
   provideState(PAYMENT_FEATURE_KEY, paymentReducer),
   provideEffects(

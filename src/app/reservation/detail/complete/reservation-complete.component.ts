@@ -60,7 +60,6 @@ import {
 } from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe } from '../../../store/selectors/payment.selectors';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
@@ -75,6 +74,7 @@ import { ReservationDetailSkeletonComponent } from '../reservation-detail-skelet
 import { NavigationService } from '../../../services/navigation.service';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { AdditionalStore } from '../../../store/additional.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -107,6 +107,7 @@ export class ReservationCompleteComponent {
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -114,12 +115,11 @@ export class ReservationCompleteComponent {
   private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
   private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private readonly reservationParamsSignal = toSignal(this.reservationParams$);
   private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly paymentsSignal = toSignal(this.payments$);
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   readonly selectedReservationSignal = toSignal(this.selectedReservation$);
   readonly additionalListSignal = computed(() => {
@@ -228,6 +228,7 @@ export class ReservationCompleteComponent {
   private currentSplitData?: IExtras[];
 
   constructor() {
+    this.paymentStore.getOptions();
     effect(() => {
       const reservation = this.selectedReservationSignal();
       if (reservation) {

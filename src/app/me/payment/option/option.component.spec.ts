@@ -1,36 +1,41 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
-import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../../interfaces/payment';
-import { getPaymentByResourceId } from '../../../store/actions/payment.actions';
 import { IReservationAll } from '../../../reservation/reservation';
 import { provideHttpClient } from '@angular/common/http';
 import { NavigationService } from '../../../services/navigation.service';
 import { provideAppIcons } from '../../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../../util/dates';
+import { signal } from '@angular/core';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
   let fixture: ComponentFixture<OptionComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    data: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+    getPaymentByResourceId: jasmine.Spy;
+    createPaymentLinkByReservationId: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
   let payments$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
-    payments$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject([
+    const paymentOptions = [
       {
         type: 'PAYPAL',
         label: 'PayPal',
@@ -73,33 +78,27 @@ describe('OptionComponent', () => {
         show: true,
         icon: 'transfer',
       },
-    ]);
+    ];
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      data: signal(undefined),
+      getOptions: jasmine.createSpy('getOptions'),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      createPaymentLinkByReservationId: jasmine.createSpy('createPaymentLinkByReservationId'),
+      clean: jasmine.createSpy('clean'),
+    };
+    payments$ = new BehaviorSubject(undefined);
     breakpoint$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
-
-    // Simulate the signal order
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return payments$.asObservable();
-        case 2:
-          return paymentOptions$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     await TestBed.configureTestingModule({
       imports: [OptionComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         provideHttpClient(),
         provideAppIcons(),
@@ -122,9 +121,7 @@ describe('OptionComponent', () => {
   it('should dispatch getPaymentByResourceId when reservationId is emitted', () => {
     fixture.componentRef.setInput('id', 'res-123');
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPaymentByResourceId({ id: 'res-123', path: 'reservation' }),
-    );
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('res-123', 'reservation');
   });
 
   it('should derive options from the reservation room payment types', () => {
@@ -192,10 +189,7 @@ describe('OptionComponent', () => {
 
     component.pay();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      reservationId: 'res-123',
-      payment: jasmine.any(Object),
-    }));
+    expect(paymentStoreSpy.createPaymentLinkByReservationId).toHaveBeenCalledWith('res-123', jasmine.any(Object));
   });
 
   it('should not dispatch createPaymentLinkByReservationId if form type is undefined', () => {
@@ -204,9 +198,7 @@ describe('OptionComponent', () => {
     component.form.controls.option.setValue(undefined);
     component.pay();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
-      reservationId: 'res-123',
-    }));
+    expect(paymentStoreSpy.createPaymentLinkByReservationId).not.toHaveBeenCalledWith('res-123', jasmine.any(Object));
   });
 
   it('should move one step back without going below zero', () => {

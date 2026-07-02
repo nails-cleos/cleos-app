@@ -4,7 +4,6 @@ import { ROUTER_NAVIGATED, RouterNavigatedAction } from '@ngrx/router-store';
 import { Action } from '@ngrx/store';
 import { firstValueFrom, ReplaySubject } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
-import { getOptions } from '../store/actions/payment.actions';
 import {
   cleanReservation,
   setDetailReservationParams,
@@ -69,12 +68,11 @@ describe('ReservationNavigationEffects', () => {
     }));
 
     const result = await firstValueFrom(
-      effects.loadCompletePage$.pipe(take(3), toArray()),
+      effects.loadCompletePage$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       setReservationParams({
         isDashboard: true,
       }),
@@ -99,12 +97,11 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigated(ReservationCreatePageComponent));
 
     const result = await firstValueFrom(
-      effects.loadReservationCreatePage$.pipe(take(3), toArray()),
+      effects.loadReservationCreatePage$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       setReservationParams({
         isDashboard: true,
         skip: true,
@@ -126,12 +123,11 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigated(ReservationDetailComponent, { id: 'res-2' }));
 
     const result = await firstValueFrom(
-      effects.loadReservationDetailsPage$.pipe(take(3), toArray()),
+      effects.loadReservationDetailsPage$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       setDetailReservationParams({ step: 3 }),
     ]);
   });
@@ -153,12 +149,11 @@ describe('ReservationNavigationEffects', () => {
     actions$.next(routerNavigated(ReservationEditPageComponent, { id: 'res-2' }));
 
     const result = await firstValueFrom(
-      effects.loadReservationEditPage$.pipe(take(3), toArray()),
+      effects.loadReservationEditPage$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       setReservationParams({
         customerId: 'customer-1',
         isDashboard: true,

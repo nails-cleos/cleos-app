@@ -1,28 +1,21 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 import {
   adjustPayments,
-  createPaymentLinkByReservationId,
-  getOptions,
-  getOptionsSuccess,
-  getPayment,
-  getPaymentByResourceId,
   notifyPayment,
   paymentFailure,
   paymentNotComplete,
   paymentSave,
   paymentSaveSuccess,
   paymentSelected,
-  paymentSend,
   recreate,
-  updatePaymentById,
 } from '../actions/payment.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { PaymentService } from '../../services/payment.service';
-import { IPay, IPayment, IPaymentOption } from '../../interfaces/payment';
-import { IApiResponse, successResponse } from '../../interfaces/common';
+import { IPay } from '../../interfaces/payment';
+import { successResponse } from '../../interfaces/common';
 import { effectRequest } from '../../util/rxjs';
 import { NavigationService } from '../../services/navigation.service';
 
@@ -32,44 +25,6 @@ export class PaymentEffects {
   private readonly actions: Actions = inject(Actions);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly paymentService: PaymentService = inject(PaymentService);
-
-  getAll$ = createEffect(() => this.actions.pipe(
-    ofType(getPayment),
-    switchMap(({ id }) => effectRequest(
-      this.paymentService.getPayment(id).pipe(map((selected?: IPayment) => paymentSelected({ selected }))),
-      action => action,
-      paymentFailure,
-    )),
-  ));
-
-  getOptions$ = createEffect(() => this.actions.pipe(
-    ofType(getOptions),
-    switchMap(() => effectRequest(
-      this.paymentService.getPaymentOptions().pipe(map((options: IPaymentOption[]) => getOptionsSuccess({ options }))),
-      action => action,
-      paymentFailure,
-    )),
-  ));
-
-  findByReservation$ = createEffect(() => this.actions.pipe(
-    ofType(getPaymentByResourceId),
-    switchMap(({ id, path }) => effectRequest(
-      this.paymentService.getPaymentByResourceId(id, path)
-        .pipe(map((selected: IPayment[]) => paymentSelected({ selected }))),
-      action => action,
-      paymentFailure,
-    )),
-  ));
-
-  createOne$ = createEffect(() => this.actions.pipe(
-    ofType(createPaymentLinkByReservationId),
-    switchMap(({ reservationId, payment }) => effectRequest(
-      this.paymentService.createPaymentLinkByReservationId(reservationId, payment)
-        .pipe(map((response: IPayment) => paymentSend({ link: response.link || response.paymentURL }))),
-      action => action,
-      paymentFailure,
-    )),
-  ));
 
   save$ = createEffect(() => this.actions.pipe(
     ofType(paymentSave),
@@ -97,16 +52,6 @@ export class PaymentEffects {
     switchMap(({ payments }) => effectRequest(
       this.paymentService.adjustPayments(payments)
         .pipe(switchMap(() => this.requestSuccess('COMMON.PAYMENT.SUCCESS', undefined, true))),
-      action => action,
-      paymentFailure,
-    )),
-  ));
-
-  updateLink$ = createEffect(() => this.actions.pipe(
-    ofType(updatePaymentById),
-    switchMap(({ id, payment }) => effectRequest(
-      this.paymentService.updatePayment(id, payment)
-        .pipe(map((response: IApiResponse) => paymentSend({ link: response.paymentLink }))),
       action => action,
       paymentFailure,
     )),
@@ -154,11 +99,6 @@ export class PaymentEffects {
         }
       }
     }),
-  ), { dispatch: false });
-
-  send$ = createEffect(() => this.actions.pipe(
-    ofType(paymentSend),
-    tap(({ link }) => window.open(link, '_self')),
   ), { dispatch: false });
 
   private requestSuccess(key: string, path?: string, reload?: boolean) {

@@ -14,9 +14,10 @@ import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../room/room';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
-import { signal } from "@angular/core";
-import { TreatmentStore } from "../../../store/treatment.store";
-import { AdditionalStore } from "../../../store/additional.store";
+import { signal } from '@angular/core';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { AdditionalStore } from '../../../store/additional.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
@@ -34,11 +35,14 @@ describe('ReservationCompleteComponent', () => {
     data: ReturnType<typeof signal>;
     loadAllByGroupId: jasmine.Spy;
   };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
 
   let navigationParams$: BehaviorSubject<any>;
   let selectedReservation$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
 
   const mockReservation = {
     id: 'reservation-1',
@@ -147,10 +151,13 @@ describe('ReservationCompleteComponent', () => {
       data: signal<any>({ kind: 'list', value: mockAdditionalList }),
       loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
     };
+    paymentStoreSpy = {
+      options: signal(mockPaymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(mockPayments);
-    paymentOptions$ = new BehaviorSubject(mockPaymentOptions);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
 
@@ -164,8 +171,6 @@ describe('ReservationCompleteComponent', () => {
           return selectedReservation$.asObservable();
         case 3:
           return payments$.asObservable();
-        case 4:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -178,6 +183,7 @@ describe('ReservationCompleteComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
@@ -195,7 +201,6 @@ describe('ReservationCompleteComponent', () => {
     navigationParams$.complete();
     selectedReservation$.complete();
     payments$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -512,7 +517,7 @@ describe('ReservationCompleteComponent', () => {
       fixture.componentRef.setInput('customerId', 'customer-1');
       fixture.detectChanges();
 
-      expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('new-room-id', 'customer-1')
+      expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('new-room-id', 'customer-1');
     });
 
     it('should dispatch getAllAdditionalByGroupId when group is selected', () => {

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input } f
 import { Store } from '@ngrx/store';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
+import { notifyPayment } from '../../../store/actions/payment.actions';
 import { newDateTimestamp } from '../../../util/dates';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -13,6 +13,7 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-transaction-detail',
@@ -27,6 +28,7 @@ export class TransactionDetailComponent {
   transactionId = input<string>();
 
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly accountStore = inject(AccountStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
@@ -71,7 +73,7 @@ export class TransactionDetailComponent {
   }
 
   pay(): void {
-    this.store.dispatch(paymentSend({ link: this.transactionSignal()?.payment?.paymentURL }));
+    window.open(this.transactionSignal()?.payment?.paymentURL, '_self');
   }
 
   notify(): void {

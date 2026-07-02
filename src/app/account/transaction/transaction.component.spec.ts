@@ -1,19 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
 
 import { TransactionComponent } from './transaction.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { IAccountAll, ITransaction } from '../account';
 import { IPaymentOption } from '../../interfaces/payment';
-import { getOptions } from '../../store/actions/payment.actions';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
 import { provideAppIcons } from '../../util/app-icons.provider';
 import { AccountStore } from '../../store/account.store';
 import { DEFAULT_LOCALE } from '../../util/dates';
+import { PaymentStore } from '../../store/payment.store';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -23,10 +21,12 @@ describe('TransactionComponent', () => {
   let selectedAccountSignal: ReturnType<typeof signal<IAccountAll | undefined>>;
   let subErrorsSignal: ReturnType<typeof signal<any>>;
   let responseSignal: ReturnType<typeof signal<any>>;
-  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
   let accountStoreSpy: jasmine.SpyObj<any>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
@@ -53,43 +53,42 @@ describe('TransactionComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
+    const paymentOptions = [{
+      type: 'CASH',
+      label: 'Cash',
+      enabled: true,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'cash',
+    }, {
+      type: 'TRANSFER',
+      label: 'Transfer',
+      enabled: true,
+      default: true,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+      icon: 'transfer',
+    }, {
+      type: 'MOLLIE',
+      label: 'Mollie',
+      enabled: true,
+      default: false,
+      filter: true,
+      defaultFilter: false,
+      show: true,
+    }];
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     authUserSignal.set(initialAuthUser);
     selectedAccountSignal = signal<any>(undefined);
     subErrorsSignal = signal<any>(undefined);
     responseSignal = signal<any>(undefined);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-      {
-        type: 'TRANSFER',
-        label: 'Transfer',
-        enabled: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'transfer',
-      },
-      {
-        type: 'MOLLIE',
-        label: 'Mollie',
-        enabled: true,
-        default: false,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-      },
-    ]);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadAccount', 'createTransaction'], {
       selected: selectedAccountSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
@@ -99,14 +98,12 @@ describe('TransactionComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
-    storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
-
     await TestBed.configureTestingModule({
       imports: [TransactionComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideAppIcons(),
@@ -117,10 +114,6 @@ describe('TransactionComponent', () => {
     component = fixture.componentInstance;
 
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -156,14 +149,14 @@ describe('TransactionComponent', () => {
   });
 
   it('should load the account and payment options when accountId signal emits an id', () => {
-    storeSpy.dispatch.calls.reset();
+    paymentStoreSpy.getOptions.calls.reset();
     fixture.componentRef.setInput('id', 'account-123');
 
     fixture.detectChanges();
 
     expect(accountStoreSpy.clean).toHaveBeenCalled();
     expect(accountStoreSpy.loadAccount).toHaveBeenCalledWith('account-123');
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getOptions());
+    expect(paymentStoreSpy.getOptions).toHaveBeenCalled();
   });
 
   it('should react to selectedAccount updates (accountSignal)', () => {

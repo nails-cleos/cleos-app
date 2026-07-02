@@ -19,7 +19,7 @@ export class PaymentService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getPayment = (id: string): Observable<IPayment | undefined> => this.http.get<IPayment>(toUrl(this.urlV1, id));
+  getPayment = (id: string): Observable<IPaymentAll | undefined> => this.http.get<IPaymentAll>(toUrl(this.urlV1, id));
 
   getPaymentOptions = (): Observable<IPaymentOption[]> => this.http.get<IPaymentOption[]>(toUrl(this.urlV1, 'options'),
     { ...skipLoadingOverlay() });

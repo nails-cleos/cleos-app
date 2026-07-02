@@ -1,16 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { getPayment, updatePaymentById } from '../../../store/actions/payment.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { IReservationPayment } from '../../../reservation/reservation';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe, getSelectedPaymentPipe } from '../../../store/selectors/payment.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseService } from '../../../services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
@@ -25,6 +20,7 @@ import {
   MatCardTitle,
 } from '@angular/material/card';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-me-payment',
@@ -39,16 +35,13 @@ import { NavigationService } from '../../../services/navigation.service';
 export class MePaymentComponent {
   id = input<string>();
 
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly firebaseService = inject(FirebaseService);
 
-  private payment$ = this.store.pipe(getSelectedPaymentPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
-
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
-  paymentSignal = toSignal(this.payment$);
+  private paymentOptionsSignal = this.paymentStore.options;
+  readonly paymentSignal = this.paymentStore.selected;
 
   form = this.formBuilder.group<BankForm>({
     option: this.formBuilder.control(undefined),
@@ -63,6 +56,8 @@ export class MePaymentComponent {
   readonly language = this.navigationService.language;
 
   constructor() {
+    this.paymentStore.clean();
+    this.paymentStore.getOptions();
     effect(() => {
       const id = this.id();
       if (id) {
@@ -72,7 +67,7 @@ export class MePaymentComponent {
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MePaymentComponent',
         });
-        this.store.dispatch(getPayment({ id }));
+        this.paymentStore.getPayment(id);
       }
     });
 
@@ -105,6 +100,6 @@ export class MePaymentComponent {
     const payment: IReservationPayment = { type, percentage };
 
     const id = this.paymentSignal()?.id;
-    this.store.dispatch(updatePaymentById({ id: id!, payment }));
+    this.paymentStore.updatePaymentById(id!, payment);
   }
 }

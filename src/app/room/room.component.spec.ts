@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -21,6 +20,7 @@ import { ICommon } from '../interfaces/common';
 import { RoomStore } from '../store/room.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { NavigationService } from '../services/navigation.service';
+import { PaymentStore } from '../store/payment.store';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -29,13 +29,14 @@ describe('RoomComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let paymentOptions$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store>;
   let roomStoreSpy: {
     professionals: ReturnType<typeof signal<any>>;
     subErrors: ReturnType<typeof signal<any>>;
     loadInfo: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal<any>>;
+    getOptions: jasmine.Spy;
   };
   let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
   let authUserService: jasmine.SpyObj<AuthUserService>;
@@ -136,20 +137,22 @@ describe('RoomComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
-    paymentOptions$ = new BehaviorSubject(paymentOptions);
+
+    roomStoreSpy = {
+      professionals: signal(undefined),
+      subErrors: signal(undefined),
+      loadInfo: jasmine.createSpy('loadInfo'),
+    };
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
       isAdmin: false,
       professionalId: 'prof-123',
     }));
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    roomStoreSpy = {
-      professionals: signal(undefined),
-      subErrors: signal(undefined),
-      loadInfo: jasmine.createSpy('loadInfo'),
-    };
     geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
     paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
@@ -157,14 +160,12 @@ describe('RoomComponent', () => {
       authUser: authUserSignal.asReadonly(),
     });
 
-    storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
-
     await TestBed.configureTestingModule({
       imports: [RoomComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
         { provide: AuthUserService, useValue: authUserService },
@@ -280,7 +281,8 @@ describe('RoomComponent', () => {
     const emitSpy = jasmine.createSpy('emit');
     component.submitData.subscribe(emitSpy);
 
-    roomStoreSpy.professionals.set([mockProfessional, { ...mockProfessional, id: 'user-456', displayName: 'Jane Doe' }]);
+    roomStoreSpy.professionals.set(
+      [mockProfessional, { ...mockProfessional, id: 'user-456', displayName: 'Jane Doe' }]);
     fixture.componentRef.setInput('room', {
       ...mockRoom,
       id: 'abc-123',

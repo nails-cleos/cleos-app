@@ -7,7 +7,6 @@ import { Action } from '@ngrx/store';
 import { firstValueFrom, ReplaySubject } from 'rxjs';
 import { take, toArray } from 'rxjs/operators';
 import { OverviewComponent } from '../user/overview/overview.component';
-import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
 import {
   cleanReservation,
   getUpcomingReservation,
@@ -16,10 +15,7 @@ import {
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
-import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import { MePaymentComponent } from './payment/me/me-payment.component';
 import { OptionComponent } from './payment/option/option.component';
-import { PaymentComponent } from './payment/payment.component';
 import { ReferralsComponent } from './referrals/referrals.component';
 import { ReservationListComponent } from './reservation/list/reservation-list.component';
 import { MeNavigationEffects } from './me-navigation.effects';
@@ -67,46 +63,6 @@ describe('MeNavigationEffects', () => {
     expect(result).toEqual([]);
   });
 
-  it('should clean payments on the me resource payment page', async () => {
-    actions$.next(routerNavigated(PaymentComponent, { path: 'reservation', id: 'res-1' }));
-
-    const result = await firstValueFrom(
-      effects.loadPaymentPage$.pipe(take(1), toArray()),
-    );
-
-    expect(result).toEqual([cleanPayment()]);
-  });
-
-  it('should prepare payment result params on the payment completion page', async () => {
-    actions$.next(routerNavigated(
-      PaymentCompleteComponent,
-      { path: 'reservation', id: 'res-1', status: 'success' },
-      { payment_id: 'pay-1', preference_id: 'pref-1', reason: 'declined', account_id: 'acc-1' },
-    ));
-
-    const result = await firstValueFrom(
-      effects.loadPaymentCompletePage$.pipe(take(2), toArray()),
-    );
-
-    expect(result).toEqual([
-      cleanPayment(),
-      setPaymentResultParams({
-        path: 'reservation',
-        id: 'res-1',
-        status: 'success',
-        paymentId: 'pay-1',
-        preferenceId: 'pref-1',
-        payerId: undefined,
-        token: undefined,
-        reason: 'declined',
-        orderId: undefined,
-        orderStatusId: undefined,
-        paymentType: undefined,
-        accountId: 'acc-1',
-      }),
-    ]);
-  });
-
   it('should restore reservation params on the me reservation create page', async () => {
     const date = new Date('2026-06-01T10:00:00Z');
     history.replaceState({
@@ -120,12 +76,11 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(MeReservationCreatePageComponent));
 
     const result = await firstValueFrom(
-      effects.loadReservationCreatePage$.pipe(take(4), toArray()),
+      effects.loadReservationCreatePage$.pipe(take(3), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       setMeReservationParams({
         treatmentId: 'treat-1',
         roomId: 'room-1',
@@ -141,12 +96,11 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(MeReservationDetailsPageComponent, { id: 'res-1' }));
 
     const result = await firstValueFrom(
-      effects.loadReservationDetailsPage$.pipe(take(3), toArray()),
+      effects.loadReservationDetailsPage$.pipe(take(2), toArray()),
     );
 
     expect(result).toEqual([
       cleanReservation(),
-      getOptions(),
       getUpcomingReservation(),
     ]);
   });
@@ -155,13 +109,11 @@ describe('MeNavigationEffects', () => {
     actions$.next(routerNavigated(OptionComponent, { id: 'res-1' }));
 
     const result = await firstValueFrom(
-      effects.loadPaymentOptionPage$.pipe(take(3), toArray()),
+      effects.loadPaymentOptionPage$.pipe(take(1), toArray()),
     );
 
     expect(result).toEqual([
-      cleanPayment(),
       cleanReservation(),
-      getOptions(),
     ]);
   });
 
@@ -193,15 +145,5 @@ describe('MeNavigationEffects', () => {
     );
 
     expect(result).toEqual([]);
-  });
-
-  it('should load options for the direct me payment page', async () => {
-    actions$.next(routerNavigated(MePaymentComponent, { id: 'payment-1' }));
-
-    const result = await firstValueFrom(
-      effects.loadDirectPaymentPage$.pipe(take(2), toArray()),
-    );
-
-    expect(result).toEqual([cleanPayment(), getOptions()]);
   });
 });

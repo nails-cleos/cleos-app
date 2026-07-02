@@ -22,7 +22,7 @@ import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
-import { RoomStore } from "../../store/room.store";
+import { RoomStore } from '../../store/room.store';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;

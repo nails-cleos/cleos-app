@@ -121,7 +121,6 @@ import {
 } from './reservation-form.types';
 import { ReservationFormErrorService } from './reservation-form-error.service';
 import { ReservationCalendarService } from './reservation-calendar.service';
-import { getPaymentOptionsPipe } from '../store/selectors/payment.selectors';
 import { PaymentState } from '../store/reducers/payment.reducers';
 import { IPaymentOption } from '../interfaces/payment';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -145,6 +144,7 @@ import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { AdditionalStore } from '../store/additional.store';
 import PlaceResult = google.maps.places.PlaceResult;
+import { PaymentStore } from '../store/payment.store';
 
 const RESERVATION_ERROR_FIELDS = [
   'customer',
@@ -192,6 +192,7 @@ export class ReservationComponent {
   private readonly roomStore = inject(RoomStore);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
@@ -201,7 +202,6 @@ export class ReservationComponent {
   private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
   private calendar$ = this.store.pipe(getCalendarPipe);
   private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
   private readonly navigationParams = toSignal(this.navigationParams$);
@@ -210,7 +210,7 @@ export class ReservationComponent {
   private readonly calendarSignal = toSignal(this.calendar$);
   private readonly subErrorsSignal = toSignal(this.subErrors$);
   private readonly authUserSignal = this.authUserService.authUser;
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
   private readonly roomsSignal = computed(() => {
     const data = this.roomStore.data();
     return data?.kind === 'list' ? data.value : undefined;
@@ -476,6 +476,7 @@ export class ReservationComponent {
   private hydratingEdit = false;
 
   constructor() {
+    this.paymentStore.getOptions();
     const preview = new Step(6, 'preview', () => this.create());
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
     const settings = new Step(4, 'settings', (goNext: boolean) => this.callStepSix(goNext), book);

@@ -20,7 +20,7 @@ import {
   updateReservationColor,
   updateReservationCustomer,
 } from '../../store/actions/reservation.actions';
-import { notifyPayment, paymentSend } from '../../store/actions/payment.actions';
+import { notifyPayment } from '../../store/actions/payment.actions';
 import { ServiceType } from '../../room/room';
 import { IUserAll } from '../../user/user';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
@@ -29,6 +29,7 @@ import { IAdditionalAll } from '../../additional/additional';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
@@ -39,10 +40,13 @@ describe('ReservationDetailComponent', () => {
   let reservationSelected$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let histories$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
 
@@ -140,36 +144,39 @@ describe('ReservationDetailComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    paymentStoreSpy = {
+      options: signal([
+        {
+          type: 'CASH',
+          label: 'Cash',
+          enabled: true,
+          enabledCustomer: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'cash',
+        },
+        {
+          type: 'TRANSFER',
+          label: 'Transfer',
+          enabled: true,
+          enabledCustomer: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'transfer',
+        },
+      ]),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
     reservationSelected$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     histories$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        enabledCustomer: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-      {
-        type: 'TRANSFER',
-        label: 'Transfer',
-        enabled: true,
-        enabledCustomer: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'transfer',
-      },
-    ]);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
@@ -188,8 +195,6 @@ describe('ReservationDetailComponent', () => {
           return payments$.asObservable();
         case 4:
           return histories$.asObservable();
-        case 5:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -198,8 +203,9 @@ describe('ReservationDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReservationDetailComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: Store, useValue: storeSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
       ],
@@ -220,7 +226,6 @@ describe('ReservationDetailComponent', () => {
     reservationSelected$.complete();
     payments$.complete();
     histories$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -975,16 +980,6 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.payments.length).toBe(2);
-    });
-
-    it('should dispatch paymentSend when pay is called', () => {
-      const payment = {
-        paymentURL: 'https://payment.url',
-      } as any;
-
-      component.pay(payment);
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
     });
   });
 });

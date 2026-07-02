@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 import { AuthUserService } from '../../services/auth-user.service';
 import { ITransaction } from '../account';
 import { currencySymbol } from '../../util/helper';
@@ -9,16 +8,13 @@ import { BalanceComponent } from '../balance/balance.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { BankComponent, BankForm } from '../../shared/bank/bank.component';
 import { IError } from '../../interfaces/common';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { AccountStore } from '../../store/account.store';
-import { PaymentState } from '../../store/reducers/payment.reducers';
-import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
-import { getOptions } from '../../store/actions/payment.actions';
 import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -38,17 +34,15 @@ export type TransactionForm = {
 export class TransactionComponent {
   id = input<string>();
 
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
   private readonly accountStore = inject(AccountStore);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
-
-  private authUserSignal = this.authUserService.authUser;
-  private accountId = computed(() => this.id());
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly accountId = computed(() => this.id());
+  private readonly paymentOptionsSignal = this.paymentStore.options;
 
   errors = signal<Record<string, unknown>>({});
   accountSignal = computed(() => this.accountStore.selected());
@@ -120,7 +114,7 @@ export class TransactionComponent {
       if (id) {
         this.accountStore.clean();
         this.accountStore.loadAccount(id);
-        this.store.dispatch(getOptions());
+        this.paymentStore.getOptions();
       }
     });
   }

@@ -1,15 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
+import { notifyPayment } from '../../store/actions/payment.actions';
 import { TranslatePipe } from '@ngx-translate/core';
-import {
-  getPaymentResponsePipe,
-  getPaymentsPipe,
-  getSubErrorsPipe,
-  selectPaymentIsLoading,
-} from '../../store/selectors/payment.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
@@ -34,6 +27,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 @Component({
   selector: 'app-payment',
@@ -50,16 +44,13 @@ export class PaymentComponent {
   accountId = input<string>();
 
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private paymentList$ = this.store.pipe(getPaymentsPipe);
-  private response$ = this.store.pipe(getPaymentResponsePipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private loadingSignal = toSignal(this.store.select(selectPaymentIsLoading), { initialValue: false });
-  private paymentListSignal = toSignal(this.paymentList$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
+  private loadingSignal = this.paymentStore.isLoading;
+  private paymentListSignal = this.paymentStore.data;
+  private subErrorsSignal = this.paymentStore.subErrors;
+  private responseSignal = this.paymentStore.response;
 
   dataSourceSignal = computed(() => this.paymentListSignal());
   isLoading = computed(() => this.loadingSignal());
@@ -82,18 +73,19 @@ export class PaymentComponent {
   showError = false;
 
   constructor() {
+    this.paymentStore.clean();
     effect(() => {
       const path = this.path();
       const id = this.id();
       if (path && id) {
-        this.store.dispatch(getPaymentByResourceId({ id, path }));
+        this.paymentStore.getPaymentByResourceId(id, path);
       }
     });
 
     effect(() => {
       const response = this.responseSignal();
       if (response?.path) {
-        this.store.dispatch(cleanPayment());
+        this.paymentStore.clearResponse();
         this.navigationService.navigate([response.path]);
       }
     });
@@ -115,10 +107,7 @@ export class PaymentComponent {
   }
 
   pay = (payment: IPaymentAll): void => {
-    const link = payment.link || payment.paymentURL;
-    if (link) {
-      this.store.dispatch(paymentSend({ link }));
-    }
+    window.open(payment.link || payment.paymentURL, '_self');
   };
 
   notify = (payment: IPayment): void => {

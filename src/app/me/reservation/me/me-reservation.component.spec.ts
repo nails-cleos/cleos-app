@@ -17,8 +17,9 @@ import { DiscountType, IUserDiscount } from '../../../discount/discount';
 import { ToastService } from '../../../services/toast.service';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
-import { AdditionalStore } from "../../../store/additional.store";
-import { TreatmentStore } from "../../../store/treatment.store";
+import { AdditionalStore } from '../../../store/additional.store';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
@@ -30,10 +31,13 @@ describe('MeReservationComponent', () => {
     treatmentDiscount: ReturnType<typeof signal>;
     getAllTreatments: jasmine.Spy;
   };
-
   let additionalStoreSpy: {
     data: ReturnType<typeof signal>;
     loadAllByGroupId: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
   };
 
   let navigationParams$: BehaviorSubject<any>;
@@ -41,7 +45,6 @@ describe('MeReservationComponent', () => {
   let customerReservation$: BehaviorSubject<any>;
   let availableList$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const mockCurrency = { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' };
@@ -187,12 +190,15 @@ describe('MeReservationComponent', () => {
       data: signal<any>(undefined),
       loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
     };
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     customerReservation$ = new BehaviorSubject(undefined);
     availableList$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject(paymentOptions);
 
     storeSpy = jasmine.createSpyObj<Store<ReservationState>>('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -211,7 +217,6 @@ describe('MeReservationComponent', () => {
       customerReservation$,
       availableList$,
       subErrors$,
-      paymentOptions$,
     ];
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(
@@ -223,6 +228,7 @@ describe('MeReservationComponent', () => {
         { provide: Store, useValue: storeSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
@@ -245,7 +251,6 @@ describe('MeReservationComponent', () => {
     customerReservation$.complete();
     availableList$.complete();
     subErrors$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {

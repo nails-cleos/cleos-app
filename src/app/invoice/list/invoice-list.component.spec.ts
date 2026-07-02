@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule } from '@ngx-translate/core';
 import { InvoiceListComponent } from './invoice-list.component';
@@ -22,13 +21,13 @@ import { NavigationService } from '../../services/navigation.service';
 import { signal } from '@angular/core';
 import { OfficeStore } from '../../store/office.store';
 import { InvoiceStore } from '../../store/invoice.store';
+import { PaymentStore } from '../../store/payment.store';
 
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
   let fixture: ComponentFixture<InvoiceListComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
@@ -45,6 +44,10 @@ describe('InvoiceListComponent', () => {
     clean: jasmine.Spy;
     loadOfficeToInvoice: jasmine.Spy;
     uploadInvoices: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
   };
 
   const mockOffice: IOfficeAll = {
@@ -164,14 +167,16 @@ describe('InvoiceListComponent', () => {
       show: false,
     },
   ];
-  let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
-    paymentOptions$ = new BehaviorSubject(paymentOptions);
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -180,7 +185,6 @@ describe('InvoiceListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
     paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
@@ -204,7 +208,6 @@ describe('InvoiceListComponent', () => {
       },
     });
 
-    storeSpy.pipe.and.returnValue(paymentOptions$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -212,7 +215,7 @@ describe('InvoiceListComponent', () => {
       imports: [InvoiceListComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: InvoiceStore, useValue: invoiceStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -236,7 +239,7 @@ describe('InvoiceListComponent', () => {
     } as any);
 
     fixture.detectChanges();
-    storeSpy.dispatch.calls.reset();
+    paymentStoreSpy.getOptions.calls.reset();
   });
 
   it('should filter payment types by label or type', () => {
@@ -247,10 +250,7 @@ describe('InvoiceListComponent', () => {
     expect(byType?.map(option => option.type)).toEqual(['MOLLIE']);
   });
 
-  afterEach(() => {
-    paymentOptions$.complete();
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();

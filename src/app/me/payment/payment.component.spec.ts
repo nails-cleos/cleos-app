@@ -3,12 +3,12 @@ import { PaymentComponent } from './payment.component';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
-import { IPaymentAll } from '../../interfaces/payment';
+import { notifyPayment } from '../../store/actions/payment.actions';
 import { PaymentState } from '../../store/reducers/payment.reducers';
 import { DEFAULT_LOCALE } from '../../util/dates';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
+import { signal } from '@angular/core';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
@@ -16,43 +16,37 @@ describe('PaymentComponent', () => {
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let storeSpy: jasmine.SpyObj<Store<PaymentState>>;
-
-  let paymentList$: Subject<any[]>;
-  let response$: Subject<any>;
-  let subErrors$: Subject<any[]>;
-  let isLoading$: BehaviorSubject<boolean>;
+  let paymentStoreSpy: {
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    getPaymentByResourceId: jasmine.Spy;
+    clean: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+  };
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
-    paymentList$ = new Subject();
-    response$ = new Subject();
-    subErrors$ = new Subject();
-    isLoading$ = new BehaviorSubject<boolean>(false);
+    paymentStoreSpy = {
+      data: signal(undefined),
+      response: signal(undefined),
+      subErrors: signal(undefined),
+      isLoading: signal(false),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      clean: jasmine.createSpy('clean'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+    };
 
     storeSpy = jasmine.createSpyObj<Store<PaymentState>>('Store', ['dispatch', 'pipe', 'select']);
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return paymentList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     await TestBed.configureTestingModule({
       imports: [PaymentComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: Store, useValue: storeSpy },
       ],
@@ -66,13 +60,6 @@ describe('PaymentComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    paymentList$.complete();
-    response$.complete();
-    subErrors$.complete();
-    isLoading$.complete();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -82,9 +69,7 @@ describe('PaymentComponent', () => {
     fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPaymentByResourceId({ id: '123', path: 'reservation' }),
-    );
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('123', 'reservation');
   });
 
   it('should keep accountId from currentPath for back navigation', () => {
@@ -109,16 +94,16 @@ describe('PaymentComponent', () => {
   });
 
   it('should hide footer when paymentList has items', () => {
-    paymentList$.next([{ id: '1' }]);
+    paymentStoreSpy.data.set([{ id: '1' }]);
 
     fixture.detectChanges();
 
     expect(component.hiddenSignal()).toBeTrue();
-    expect(component.dataSourceSignal()).toEqual([{ id: '1' }]);
+    expect(component.dataSourceSignal()).toEqual([{ id: '1' } as any]);
   });
 
   it('should show footer when paymentList is empty', () => {
-    paymentList$.next([]);
+    paymentStoreSpy.data.set([]);
 
     fixture.detectChanges();
 
@@ -126,7 +111,7 @@ describe('PaymentComponent', () => {
   });
 
   it('should set errorMessage and showError when subErrors are emitted', () => {
-    subErrors$.next([{ message: 'Payment failed' }]);
+    paymentStoreSpy.subErrors.set([{ message: 'Payment failed' }]);
 
     fixture.detectChanges();
 
@@ -135,28 +120,11 @@ describe('PaymentComponent', () => {
   });
 
   it('should clean and navigate when response has a path', () => {
-    response$.next({ path: 'dashboard' });
+    paymentStoreSpy.response.set({ path: 'dashboard' });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanPayment());
+    expect(paymentStoreSpy.clean).toHaveBeenCalled();
     expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard']);
-  });
-
-  it('should call store.dispatch(paymentSend) when pay() is called', () => {
-    const payment: IPaymentAll = {
-      timestamp: 0,
-      amount: 0,
-      description: '',
-      paymentId: '',
-      preferenceId: '',
-      status: '',
-      type: 'CASH',
-      link: 'https://pay.com', id: 'p1',
-    };
-
-    component.pay(payment);
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://pay.com' }));
   });
 
   it('should call store.dispatch(notifyPayment) when notify() is called', () => {

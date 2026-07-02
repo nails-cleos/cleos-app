@@ -6,7 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../account';
-import { notifyPayment, paymentSend } from '../../../store/actions/payment.actions';
+import { notifyPayment } from '../../../store/actions/payment.actions';
 import { NavigationService } from '../../../services/navigation.service';
 import { AccountStore } from '../../../store/account.store';
 import { signal } from '@angular/core';
@@ -97,14 +97,6 @@ describe('TransactionDetailComponent', () => {
     expect(transaction).toBeDefined();
     expect(transaction?.id).toBe('transaction-123');
     expect(transaction?.payment?.paymentURL).toBe('https://payment.url');
-  });
-
-  it('should dispatch paymentSend when pay() is called', () => {
-    selectedTransactionSignal.set(mockTransaction);
-    fixture.detectChanges();
-
-    component.pay();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
   });
 
   it('should dispatch notifyPayment when notify() is called', () => {

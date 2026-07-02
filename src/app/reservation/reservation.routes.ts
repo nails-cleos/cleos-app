@@ -43,46 +43,46 @@ const children: Routes = [
     path: 'search',
     component: SearchComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.professional] }
+    data: { roles: [Role.admin, Role.manager, Role.professional] },
   },
   {
     path: 'calendar',
     component: CalendarComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.professional] }
+    data: { roles: [Role.admin, Role.manager, Role.professional] },
   },
   {
     path: '',
     component: ReservationCreatePageComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] }
+    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] },
   },
   {
     path: ':id/edit',
     component: ReservationEditPageComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] }
+    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] },
   },
   {
     path: ':id',
     component: ReservationDetailComponent,
     canActivate: [authGuard],
     data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer] },
-    runGuardsAndResolvers: 'always'
+    runGuardsAndResolvers: 'always',
   },
   {
     path: ':id/rooms/:roomId/customer/:customerId/complete',
     component: ReservationCompleteComponent,
     canActivate: [authGuard],
     data: { roles: [Role.professional, Role.roomAdmin] },
-    runGuardsAndResolvers: 'always'
+    runGuardsAndResolvers: 'always',
   },
   {
     path: ':id/more-info',
     component: MoreInfoComponent,
     canActivate: [authGuard],
     data: { roles: [Role.professional, Role.manager, Role.roomAdmin] },
-    runGuardsAndResolvers: 'always'
+    runGuardsAndResolvers: 'always',
   },
 ];
 

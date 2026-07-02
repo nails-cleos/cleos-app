@@ -16,7 +16,7 @@ import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { NavigationService } from '../../services/navigation.service';
-import { UserStore } from "../../store/user.store";
+import { UserStore } from '../../store/user.store';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;

@@ -54,7 +54,7 @@ import { isToday, isTomorrow } from 'date-fns';
 import { ReservationIconName } from '../../util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
-import { adjustPayments, notifyPayment, paymentSend } from '../../store/actions/payment.actions';
+import { adjustPayments, notifyPayment } from '../../store/actions/payment.actions';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
@@ -96,7 +96,6 @@ import {
   MatTable,
   MatTableDataSource,
 } from '@angular/material/table';
-import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
 import { findStateColor } from '../../util/theme';
 import { DurationTimePipe } from '../../pipes/durationTime.pipe';
 import { MatFormField, MatInput, MatPrefix } from '@angular/material/input';
@@ -116,6 +115,7 @@ import { MatCard, MatCardContent } from '@angular/material/card';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { ReservationDetailSkeletonComponent } from './reservation-detail-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 type PaymentForm = {
   amount: FormControl<string>;
@@ -148,6 +148,7 @@ export class ReservationDetailComponent {
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly store: Store<ReservationState | PaymentState> = inject(Store<ReservationState | PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -160,11 +161,10 @@ export class ReservationDetailComponent {
   private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
   private payments$ = this.store.pipe(getPaymentsPipe);
   private histories$ = this.store.pipe(getHistoriesPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
 
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly navigationParams = toSignal(this.navigationParams$);
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
+  private readonly paymentOptionsSignal = this.paymentStore.options;
   private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -300,6 +300,7 @@ export class ReservationDetailComponent {
 
   constructor() {
     this.payments.clear();
+    this.paymentStore.getOptions();
     effect(() => {
       const id = this.id();
       if (id && !this.hasFetched()) {
@@ -677,7 +678,9 @@ export class ReservationDetailComponent {
     paymentType: payment.type,
   }));
 
-  pay = (payment: IPaymentAll): void => this.store.dispatch(paymentSend({ link: payment.paymentURL || payment.link }));
+  pay = (payment: IPaymentAll): void => {
+    window.open(payment.link || payment.paymentURL, '_self')
+  };
 
   twoDigit = (i: number): void => {
     const payment = this.payments.at(i).getRawValue();

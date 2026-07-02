@@ -8,16 +8,14 @@ import {
   getUpcomingReservation,
   setMeReservationParams,
 } from '../store/actions/reservation.actions';
-import { cleanPayment, getOptions, setPaymentResultParams } from '../store/actions/payment.actions';
+import { setPaymentResultParams } from '../store/actions/payment.actions';
 import { getRouteParams } from '../util/router-state.utils';
 import { navigation } from '../util/router-navigation.operator';
 import { MeDiscountComponent } from './discount/me/me-discount.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
 import { PaymentCompleteComponent } from './payment/complete/payment-complete.component';
-import { MePaymentComponent } from './payment/me/me-payment.component';
 import { OptionComponent } from './payment/option/option.component';
-import { PaymentComponent } from './payment/payment.component';
 import { ReferralsComponent } from './referrals/referrals.component';
 import { ReservationListComponent } from './reservation/list/reservation-list.component';
 
@@ -41,27 +39,11 @@ export class MeNavigationEffects {
       }),
     ));
 
-  loadPaymentPage$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ROUTER_NAVIGATED),
-      navigation(PaymentComponent, {
-        run: () => cleanPayment(),
-      }),
-    ));
-
-  loadDirectPaymentPage$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ROUTER_NAVIGATED),
-      navigation(MePaymentComponent, {
-        run: () => [cleanPayment(), getOptions()],
-      }),
-    ));
-
   loadPaymentOptionPage$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(OptionComponent, {
-        run: () => [cleanPayment(), cleanReservation(), getOptions()],
+        run: () => [cleanReservation()],
       }),
     ));
 
@@ -79,7 +61,6 @@ export class MeNavigationEffects {
           }
 
           return [
-            cleanPayment(),
             setPaymentResultParams({
               path,
               id: params['id'],
@@ -105,7 +86,7 @@ export class MeNavigationEffects {
       navigation(MeReservationCreatePageComponent, {
         run: () => {
           const navigationState = history.state;
-          const actions: Action[] = [cleanReservation(), getOptions()];
+          const actions: Action[] = [cleanReservation()];
 
           if (this.hasReservationParams(navigationState)) {
             actions.push(
@@ -119,7 +100,7 @@ export class MeNavigationEffects {
             );
           }
 
-          actions.push( getUpcomingReservation());
+          actions.push(getUpcomingReservation());
           return actions;
         },
       }),
@@ -129,7 +110,7 @@ export class MeNavigationEffects {
     this.actions$.pipe(
       ofType(ROUTER_NAVIGATED),
       navigation(MeReservationDetailsPageComponent, {
-        run: () => [cleanReservation(), getOptions(), getUpcomingReservation()],
+        run: () => [cleanReservation(), getUpcomingReservation()],
       }),
     ));
 

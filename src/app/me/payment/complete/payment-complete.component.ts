@@ -11,6 +11,7 @@ import {
   getSubErrorsPipe,
 } from '../../../store/selectors/payment.selectors';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-payment-complete',
@@ -23,6 +24,7 @@ import { NavigationService } from '../../../services/navigation.service';
 export class PaymentCompleteComponent {
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly translateService: TranslateService = inject(TranslateService);
 
   private paymentResultParams$ = this.store.pipe(getResultParamsPipe);
@@ -37,6 +39,7 @@ export class PaymentCompleteComponent {
   private path: 'reservation' | 'transaction' = 'reservation';
 
   constructor() {
+    this.paymentStore.clean();
     effect(() => {
       const params = this.paymentResultParamsSignal();
       if (params) {

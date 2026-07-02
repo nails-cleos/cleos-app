@@ -9,8 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { combineLatestWith, Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { combineLatestWith } from 'rxjs';
 import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../../util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../interfaces/payment';
@@ -38,9 +37,6 @@ import { provideMonthPeriodAdapter } from '../../util/adapter/app-date.provider'
 import { DriveAccessService } from '../../services/drive-access.service';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { EnvService } from '../../services/env.service';
-import { getOptions } from '../../store/actions/payment.actions';
-import { getPaymentOptionsPipe } from '../../store/selectors/payment.selectors';
-import { PaymentState } from '../../store/reducers/payment.reducers';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -72,6 +68,7 @@ import { InvoiceStore } from '../../store/invoice.store';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;
@@ -106,20 +103,19 @@ export class InvoiceListComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly officeStore = inject(OfficeStore);
   private readonly invoiceStore = inject(InvoiceStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private readonly paymentOptions$ = this.store.pipe(getPaymentOptionsPipe) as Observable<IPaymentOption[]>;
 
   private allOfficesSignal = computed(() => {
     const data = this.officeStore.data();
     return data?.kind === 'list' ? data.value : undefined;
   });
-  private paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] as IPaymentOption[] });
+  private paymentOptionsSignal = this.paymentStore.options;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -220,7 +216,7 @@ export class InvoiceListComponent {
 
   constructor() {
     this.invoiceStore.clean();
-    this.store.dispatch(getOptions());
+    this.paymentStore.getOptions();
     this.officeStore.loadMyOffices();
 
     effect(() => {

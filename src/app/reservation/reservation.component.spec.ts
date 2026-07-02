@@ -25,10 +25,11 @@ import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { NavigationService } from '../services/navigation.service';
 import { ToastService } from '../services/toast.service';
-import { UserStore } from "../store/user.store";
-import { RoomStore } from "../store/room.store";
-import { TreatmentStore } from "../store/treatment.store";
-import { AdditionalStore } from "../store/additional.store";
+import { UserStore } from '../store/user.store';
+import { RoomStore } from '../store/room.store';
+import { TreatmentStore } from '../store/treatment.store';
+import { AdditionalStore } from '../store/additional.store';
+import { PaymentStore } from '../store/payment.store';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -41,27 +42,27 @@ describe('ReservationComponent', () => {
     customerInfo: ReturnType<typeof signal>;
     getCustomerInformation: jasmine.Spy;
   };
-
   let roomStoreSpy: {
     data: ReturnType<typeof signal>;
     loadAll: jasmine.Spy;
   };
-
   let treatmentStoreSpy: {
     treatmentDiscount: ReturnType<typeof signal>;
     getAllTreatments: jasmine.Spy;
   };
-
   let additionalStoreSpy: {
     data: ReturnType<typeof signal>;
     loadAllByGroupId: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
   };
 
   let matches$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   let isLoading$: BehaviorSubject<boolean>;
 
   let storeSpy: jasmine.SpyObj<Store>;
@@ -175,24 +176,27 @@ describe('ReservationComponent', () => {
       data: signal<any>(undefined),
       loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
     };
+    paymentStoreSpy = {
+      options: signal([
+        {
+          type: 'CASH',
+          label: 'Cash',
+          enabled: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'cash',
+        },
+      ]),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
     navigationParams$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
     isLoading$ = new BehaviorSubject<boolean>(false);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-    ]);
     matches$ = new BehaviorSubject(undefined);
 
     storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
@@ -220,8 +224,6 @@ describe('ReservationComponent', () => {
           return calendar$.asObservable();
         case 3:
           return subErrors$.asObservable();
-        case 4:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -237,6 +239,7 @@ describe('ReservationComponent', () => {
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },

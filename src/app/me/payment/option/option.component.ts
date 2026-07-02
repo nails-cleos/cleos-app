@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/actions/payment.actions';
-import { Store } from '@ngrx/store';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { getPrice, newPercentage } from '../../../util/helper';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
@@ -10,16 +8,13 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-option',
@@ -33,15 +28,12 @@ import { NavigationService } from '../../../services/navigation.service';
 export class OptionComponent {
   id = input<string>();
 
-  private readonly store: Store<PaymentState | ReservationState> = inject(Store<PaymentState | ReservationState>);
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private payments$ = this.store.pipe(getPaymentsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
-
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
-  private paymentsSignal = toSignal(this.payments$);
+  private readonly paymentOptionsSignal = this.paymentStore.options;
+  private paymentsSignal = this.paymentStore.data;
 
   form: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     option: this.formBuilder.control(undefined),
@@ -60,10 +52,12 @@ export class OptionComponent {
   currentStepIndex = signal(0);
 
   constructor() {
+    this.paymentStore.clean();
+    this.paymentStore.getOptions();
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getPaymentByResourceId({ id, path: 'reservation' }));
+        this.paymentStore.getPaymentByResourceId(id, 'reservation');
       }
     });
 
@@ -114,7 +108,7 @@ export class OptionComponent {
     if (!reservationId) {
       return;
     }
-    this.store.dispatch(createPaymentLinkByReservationId({ reservationId, payment }));
+    this.paymentStore.createPaymentLinkByReservationId(reservationId, payment);
   }
 
   callStepTwo = (goNext: boolean): void => {

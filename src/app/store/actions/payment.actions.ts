@@ -1,13 +1,11 @@
 import { createAction, props } from '@ngrx/store';
 import { IError, IResponseSuccess } from '../../interfaces/common';
-import { IPayment, IPaymentOption, IPaymentRequest, PaymentStatus } from '../../interfaces/payment';
+import { IPayment, IPaymentRequest, PaymentStatus } from '../../interfaces/payment';
 import { IReservationPayment } from '../../reservation/reservation';
 
 enum PaymentActionTypes {
   paymentSave = '[Payment] Save',
   adjustPayments = '[Payment] Adjust Payments',
-  updatePaymentById = '[Payment] Update payment by id',
-  paymentSend = '[Payment] Send',
   notifyPayment = '[Payment] Notify',
   recreate = '[Payment] Recreate',
   paymentSaveSuccess = '[Payment] Save Success',
@@ -15,11 +13,8 @@ enum PaymentActionTypes {
   paymentFailure = '[Payment] Failure',
   paymentSelected = '[Payment] Selected',
   getPaymentByResourceId = '[Payment] Find by resource',
-  getPayment = '[Payment] Find payment by ID',
   createPaymentLinkByReservationId = '[Payment] Create payment link',
   setPaymentResultParams = '[Payment] Set payment result params',
-  options = '[Payment] Get options',
-  optionsSuccess = '[Payment] Options success',
   clean = '[Payment] Clean',
 }
 
@@ -36,16 +31,6 @@ export const paymentSave = createAction(
 export const adjustPayments = createAction(
   PaymentActionTypes.adjustPayments,
   props<{ payments: IPaymentRequest[] }>(),
-);
-
-export const updatePaymentById = createAction(
-  PaymentActionTypes.updatePaymentById,
-  props<{ id: string; payment: IReservationPayment }>(),
-);
-
-export const paymentSend = createAction(
-  PaymentActionTypes.paymentSend,
-  props<{ link?: string }>(),
 );
 
 export const recreate = createAction(
@@ -84,11 +69,6 @@ export const getPaymentByResourceId = createAction(
   props<{ id: string; path: 'reservation' | 'transaction' }>(),
 );
 
-export const getPayment = createAction(
-  PaymentActionTypes.getPayment,
-  props<{ id: string }>(),
-);
-
 export const createPaymentLinkByReservationId = createAction(
   PaymentActionTypes.createPaymentLinkByReservationId,
   props<{ reservationId: string; payment: IReservationPayment }>(),
@@ -111,12 +91,3 @@ export const setPaymentResultParams = createAction(
     accountId?: string;
   }>(),
 );
-
-export const getOptions = createAction(PaymentActionTypes.options);
-
-export const getOptionsSuccess = createAction(
-  PaymentActionTypes.optionsSuccess,
-  props<{ options: IPaymentOption[] }>(),
-);
-
-export const cleanPayment = createAction(PaymentActionTypes.clean);

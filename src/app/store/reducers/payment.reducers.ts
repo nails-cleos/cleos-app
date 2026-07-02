@@ -1,24 +1,16 @@
 import { Pagination } from '../../interfaces/pagination';
 import {
   adjustPayments,
-  cleanPayment,
-  createPaymentLinkByReservationId,
-  getOptions,
-  getOptionsSuccess,
-  getPayment,
-  getPaymentByResourceId,
   notifyPayment,
   paymentFailure,
   paymentNotComplete,
   paymentSave,
   paymentSaveSuccess,
   paymentSelected,
-  paymentSend,
   recreate,
   setPaymentResultParams,
-  updatePaymentById,
 } from '../actions/payment.actions';
-import { IPayment, IPaymentOption } from '../../interfaces/payment';
+import { IPayment } from '../../interfaces/payment';
 import { IError, IResponseSuccess } from '../../interfaces/common';
 import { createReducer, on } from '@ngrx/store';
 import { clearGlobalError, clearGlobalResponse } from '../actions/global.actions';
@@ -28,7 +20,6 @@ export const PAYMENT_FEATURE_KEY = 'payment';
 export interface PaymentState {
   response?: IResponseSuccess;
   data?: IPayment | Pagination<IPayment>;
-  options?: IPaymentOption[];
   error?: IError;
   subErrors?: IError[];
   selected?: IPayment | IPayment[];
@@ -53,7 +44,6 @@ export interface PaymentState {
 export const initialState: PaymentState = {
   response: undefined,
   data: undefined,
-  options: undefined,
   error: undefined,
   subErrors: undefined,
   selected: undefined,
@@ -64,30 +54,6 @@ export const initialState: PaymentState = {
 
 export const paymentReducer = createReducer(
   initialState,
-  on(getPaymentByResourceId, (state) => ({
-    ...state,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-    isLoading: true,
-  })),
-  on(getOptions, (state) => ({
-    ...state,
-    isLoading: true,
-    options: undefined,
-  })),
-  on(getOptionsSuccess, (state, { options }) => ({
-    ...state,
-    options: options,
-    isLoading: false,
-  })),
-  on(createPaymentLinkByReservationId, getPayment, (state) => ({
-    ...state,
-    isLoading: true,
-    subErrors: undefined,
-    selected: undefined,
-    response: undefined,
-  })),
   on(paymentSaveSuccess, (state, action) => ({
     ...state,
     response: action,
@@ -115,7 +81,7 @@ export const paymentReducer = createReducer(
     response: undefined,
     isLoading: false,
   })),
-  on(adjustPayments, updatePaymentById, recreate, paymentSave, paymentSend, notifyPayment, (state) => ({
+  on(adjustPayments, recreate, paymentSave, notifyPayment, (state) => ({
     ...state,
     subErrors: undefined,
     response: undefined,
@@ -152,7 +118,6 @@ export const paymentReducer = createReducer(
         accountId,
       },
     })),
-  on(cleanPayment, () => initialState),
 
   on(clearGlobalResponse, (state) => ({
     ...state,
