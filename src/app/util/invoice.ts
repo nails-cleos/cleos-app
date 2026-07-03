@@ -1,8 +1,8 @@
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 import { currencySymbol } from './helper';
-import { IInvoice, IItem, IRoomInvoice, ITotals } from '../interfaces/invoice';
-import { API_LOCALE, dayViewTitle, newDateTimestamp } from './dates';
-import { IOfficeAll } from '../interfaces/office';
+import { IInvoice, IItem, IRoomInvoice, ITotals } from '../invoice/invoice';
+import { DEFAULT_LOCALE, dayViewTitle, newDateTimestamp } from './dates';
+import { IOfficeAll } from '../office/office';
 import { EnvService } from '../services/env.service';
 
 const createHeader = (
@@ -264,7 +264,7 @@ export const pdf = (
   invoices.map((invoice, index) => {
     const next = start + invoice.position;
     const receiptNro = `${next}`.padStart(5, '0');
-    const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), API_LOCALE);
+    const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), DEFAULT_LOCALE);
     const titleDate = 'Date';
     const titleSubject = 'Subject';
     const titleKVK = 'KvK nr';

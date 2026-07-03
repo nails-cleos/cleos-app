@@ -1,12 +1,6 @@
-@if (itemsSignal(); as items) {
+@if (isLoading()) {
+  <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [showMedia]="false"></app-card-list-skeleton>
+} @else if (itemsSignal(); as items) {
   <app-drag-drop-sorting [title]="'ADDITIONAL.DETAIL' | translate" [items]="items"
                          (sorted)="sorted($event)"></app-drag-drop-sorting>
-} @else {
-  <div class="app-surface-canvas app-surface-shell app-surface-stack">
-    <section class="app-surface-section app-crud-loading">
-      <div class="ssc-hr"></div>
-      <div class="ssc-square app-crud-loading__block"></div>
-      <div class="ssc-hr"></div>
-    </section>
-  </div>
 }

@@ -20,7 +20,6 @@
       <mat-divider class="price-divider"></mat-divider>
 
       <div class="app-surface-item app-crud-loading price-card--bank">
-        <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
         <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
                   [showPaymentMessage]="!currentPrice?.isPaid"
                   [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
@@ -29,7 +28,6 @@
   </div>
 } @else if (currentShowBank) {
   <div class="app-surface-item app-crud-loading price-card--bank">
-    <span class="app-surface-item__label">{{ 'COMMON.PAYMENT.FIELD' | translate }}</span>
     <app-bank [firstTime]="currentFirstTime" [form]="form" [options]="currentOptions"
               [professionalName]="currentProfessionalName" (percentageEmitter)="emitter($event)"></app-bank>
   </div>

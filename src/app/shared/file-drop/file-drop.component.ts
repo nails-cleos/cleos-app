@@ -11,14 +11,24 @@ import {
   viewChild,
 } from '@angular/core';
 import { finalize, interval, takeWhile } from 'rxjs';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { PercentPipe } from '@angular/common';
 import { formatBytes, resizeImage } from '../../util/file';
 import { DragDropDirective } from '../../directives/drag-drop.directive';
 import { ToastService } from '../../services/toast.service';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+  MatCardTitleGroup,
+} from '@angular/material/card';
+import { MatProgressBar } from '@angular/material/progress-bar';
+import { PercentPipe } from '@angular/common';
 
 export interface UploadFile {
   raw?: File;
@@ -32,13 +42,15 @@ export interface UploadFile {
   selector: 'app-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, PercentPipe, DragDropDirective, ReactiveFormsModule],
+  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle,
+    MatCardContent, DragDropDirective, ReactiveFormsModule, MatCardTitleGroup, MatProgressBar, PercentPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
+  private hadCurrentFile = false;
 
   accept = input<string>('*');
   fileName = input<string>();
@@ -53,6 +65,7 @@ export class FileDropComponent {
   file = signal<UploadFile | undefined>(undefined);
   isImage = signal(false);
 
+  private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
   private canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private canvasXs = viewChild<ElementRef<HTMLCanvasElement>>('canvasXs');
   private resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
@@ -60,10 +73,17 @@ export class FileDropComponent {
   constructor() {
     effect(() => {
       const currentFile = this.currentFile();
+      const file = this.file();
       if (!currentFile) {
-        const file = this.file();
+        if (this.hadCurrentFile) {
+          this.hadCurrentFile = false;
+          this.file.set(undefined);
+          this.isImage.set(false);
+          this.resetNativeInput();
+          return;
+        }
         if (file === undefined || file?.progress === 100) {
-          this.fileSelected.emit(this.file());
+          this.fileSelected.emit(file);
         }
       }
     });
@@ -71,7 +91,9 @@ export class FileDropComponent {
     effect(() => {
       const currentFile = this.currentFile();
       if (currentFile) {
+        this.hadCurrentFile = true;
         this.file.set(currentFile);
+        this.isImage.set(!!currentFile.image);
       }
     });
   }
@@ -84,19 +106,29 @@ export class FileDropComponent {
   };
 
   fileBrowseHandler = (target: EventTarget | null): void => {
-    const rawFile = (target as HTMLInputElement)?.files?.[0];
+    const input = target as HTMLInputElement | null;
+    const rawFile = input?.files?.[0];
     if (rawFile) {
       this.handleFile(rawFile);
     }
+    if (input) {
+      input.value = '';
+    }
   };
+
+  openFileBrowser(): void {
+    this.resetNativeInput();
+    this.fileInput()?.nativeElement.click();
+  }
 
   delete() {
     const file = this.file();
     this.file.set(undefined);
+    this.resetNativeInput();
     if (!this.undo()) {
       this.fileSelected.emit(undefined);
     } else {
-      const content = this.translate.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
+      const content = this.translateService.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
       const toastRef = this.toastService.show(content, 'warning', 5000, { actionType: 'button', action: 'undo' });
       toastRef.onAction().subscribe(() => {
         this.file.set(file);
@@ -155,6 +187,13 @@ export class FileDropComponent {
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  private resetNativeInput(): void {
+    const input = this.fileInput()?.nativeElement;
+    if (input) {
+      input.value = '';
+    }
   }
 
   protected readonly formatBytes = formatBytes;

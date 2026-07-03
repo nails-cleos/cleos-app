@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { DocumentService } from './document.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IDocument } from '../interfaces/document';
+import { IDocument } from '../document/document';
 import { Pagination } from '../interfaces/pagination';
 
 describe('DocumentService', () => {

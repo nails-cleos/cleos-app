@@ -1,24 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { OfficeListComponent } from './office-list.component';
-import { IOffice } from '../../interfaces/office';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { deleteOffice, getOfficesPage, officeSelected } from '../../store/office.actions';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { OfficeState } from '../../store/reducers/office.reducers';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { BehaviorSubject, of } from 'rxjs';
+
+import { IOffice } from '../office';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { OfficeStore } from '../../store/office.store';
+import { OfficeListComponent } from './office-list.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('OfficeListComponent', () => {
   let component: OfficeListComponent;
   let fixture: ComponentFixture<OfficeListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<OfficeState>>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let officeStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const mockOffice: IOffice[] = [
     { id: '1', name: 'Office 1' },
@@ -30,13 +41,12 @@ describe('OfficeListComponent', () => {
     totalElements: 2,
   };
 
-  let officeList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    officeList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -45,8 +55,17 @@ describe('OfficeListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    officeStoreSpy = {
+      isLoading: signal(false),
+      data: signal<any>({ kind: 'pagination', value: mockPagination }),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -54,45 +73,29 @@ describe('OfficeListComponent', () => {
       },
     });
 
-    // Define order of .pipe() calls
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return officeList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [OfficeListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
+
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(OfficeListComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
-
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
-    officeList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -101,7 +104,7 @@ describe('OfficeListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    officeList$.next(mockPagination);
+    officeStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -109,7 +112,7 @@ describe('OfficeListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    officeList$.next(mockPagination);
+    officeStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -141,54 +144,58 @@ describe('OfficeListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getOfficePage when paginatorPageIndex changes', () => {
-    component.paginatorPageIndex.set(1);
+  it('should call loadPage when paginatorPageIndex changes', () => {
+    officeStoreSpy.loadPage.calls.reset();
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getOfficesPage({
-        page: 1,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(officeStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
-
-    component['paginator'] = signal(paginatorMock);
-
-    response$.next({ success: true });
-
+  it('should clear response and reset paginator when responseSignal emits', () => {
+    const paginator = component['paginator']();
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getOfficesPage({
-        page: 0,
-        sort: 'name',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    officeStoreSpy.clearResponse.calls.reset();
+    officeStoreSpy.loadPage.calls.reset();
+
+    officeStoreSpy.response.set({ success: true } as any);
+    fixture.detectChanges();
+
+    expect(officeStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(officeStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'name',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch officeSelected when edit is called', () => {
+  it('should navigate when edit is called', () => {
     const item = mockOffice[0];
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(officeSelected({ selected: item }));
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['offices', item.id]);
   });
 
-  it('should dispatch deleteOffice when dialog returns a result', () => {
+  it('should call delete when dialog returns a result', () => {
     const item = mockOffice[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteOffice({ id: item.id!, name: item.name! }));
+    expect(officeStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
   });
 });

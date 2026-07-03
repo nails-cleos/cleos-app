@@ -17,17 +17,6 @@
   margin-bottom: 18px;
 }
 
-.calendar-toolbar__compact {
-  min-width: 52px;
-  width: 52px;
-  height: 52px;
-  padding: 0;
-}
-
-.calendar-week__surface {
-  overflow: hidden;
-}
-
 .calendar-event-detail {
   display: block;
   width: 100%;
@@ -55,6 +44,68 @@
 
 .calendar-event-detail__time {
   font-weight: 800;
+}
+
+span.cal-event-actions {
+  position: absolute;
+  top: 100%;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  width: 100%;
+  padding: 0 5px;
+  text-align: center;
+  opacity: 0;
+  transition: all 0.5s ease;
+  cursor: pointer;
+}
+
+.timing {
+  opacity: 1;
+  transition: all 0.5s ease;
+}
+
+.cal-custom-event {
+  position: relative;
+}
+
+.cal-custom-event::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: scaleY(0);
+  transform-origin: bottom center;
+  transition: transform 0.5s;
+}
+
+.cal-custom-event:hover::after {
+  transform: scaleY(1);
+}
+
+.cal-custom-event:hover span.cal-event-actions {
+  top: 30%;
+  z-index: 99;
+  opacity: 1;
+}
+
+.cal-custom-event:hover .timing {
+  opacity: 0;
+}
+
+.diagonal::before {
+  content: '';
+  position: absolute;
+  top: 2%;
+  right: 2%;
+  bottom: 2%;
+  left: 2%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 .calendar-tooltip-card,
@@ -104,19 +155,19 @@
   font-weight: 700;
 }
 
-:host ::ng-deep .calendar-week__surface :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header),
-:host ::ng-deep .calendar-week__surface :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header) * {
+:host ::ng-deep .cal-week-view :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header),
+:host ::ng-deep .cal-week-view :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header) * {
   color: var(--app-surface-text);
 }
 
-:host ::ng-deep .calendar-week__surface .cal-event-title {
+:host ::ng-deep .cal-week-view .cal-event-title {
   display: block;
   width: 100%;
   color: var(--app-surface-text, #111111) !important;
   white-space: normal;
 }
 
-:host ::ng-deep .calendar-week__surface :is(.cal-time-events, .cal-all-day-events) .cal-event {
+:host ::ng-deep .cal-week-view :is(.cal-time-events, .cal-all-day-events) .cal-event {
   padding: 4px 6px !important;
   overflow: hidden;
   color: var(--app-surface-text, #111111) !important;
@@ -124,7 +175,7 @@
   white-space: normal !important;
 }
 
-:host ::ng-deep .calendar-week__surface .cal-all-day-events .cal-event {
+:host ::ng-deep .cal-week-view .cal-all-day-events .cal-event {
   display: flex !important;
   align-items: center;
   min-height: 28px;
@@ -134,15 +185,24 @@
   white-space: normal !important;
 }
 
-:host ::ng-deep .calendar-week__surface .cal-all-day-events :is(.cal-event-title, .calendar-event-detail, .calendar-event-detail *) {
+:host ::ng-deep .cal-week-view .cal-all-day-events .cal-event-title {
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 2px 4px !important;
+  overflow: visible !important;
+  line-height: 1.2 !important;
+}
+
+:host ::ng-deep .cal-week-view .cal-all-day-events :is(.cal-event-title, .calendar-event-detail, .calendar-event-detail *) {
   display: block !important;
   color: var(--app-surface-text, #111111) !important;
   line-height: 1.25 !important;
   opacity: 1 !important;
   visibility: visible !important;
+  white-space: normal !important;
 }
 
-:host ::ng-deep .calendar-week__surface .cal-event * {
+:host ::ng-deep .cal-week-view .cal-event * {
   color: inherit !important;
 }
 
@@ -163,11 +223,6 @@
   .calendar-search__grid {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .calendar-search__button {
-    justify-self: stretch;
-    margin-top: 0;
-  }
 }
 
 @media (max-width: 720px) {
@@ -185,16 +240,8 @@
     margin: 0;
   }
 
-  .calendar-toolbar.app-detail-actions .spacer {
+  .calendar-toolbar.app-detail-actions .app-surface-spacer {
     flex: 1 1 auto;
     min-width: 0;
-  }
-}
-
-@media (max-width: 599px) {
-  .calendar-toolbar__compact {
-    min-width: 44px;
-    width: 44px;
-    height: 44px;
   }
 }

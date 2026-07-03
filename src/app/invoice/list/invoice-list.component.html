@@ -1,0 +1,214 @@
+@if (isOfficeLoading()) {
+  <app-skeleton [showTitle]="false" [buttons]="0" [lines]="2"></app-skeleton>
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
+    <section class="app-surface-section">
+      <div class="mat-elevation-z8 app-table-shell">
+        <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+      </div>
+    </section>
+  </div>
+} @else {
+  <div class="app-surface-canvas app-surface-shell app-surface-stack">
+    <section class="app-surface-section">
+      <div class="app-detail-section-header">
+        <div>
+          <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+        </div>
+      </div>
+
+      @let selection = selectionSignal();
+      <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="print()">
+        <div class="app-surface-filter-grid invoice-filter-grid">
+          <mat-form-field appearance="outline" class="invoice-filter-grid__office">
+            <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
+            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
+                   autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
+                   type="text" required>
+            <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+              @for (office of filteredOfficeSignal(); track office.id) {
+                <mat-option [value]="office">
+                  {{ office.name }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+            @if (getForm.office.hasError('required')) {
+              <mat-error [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.office.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="invoice-filter-grid__payment">
+            <mat-label>{{ 'INVOICE.PAYMENT.SEARCH' | translate }}</mat-label>
+            <mat-chip-grid #chipList aria-label="Payment type selection">
+              @for (option of selectedPaymentOptionsSignal(); track option) {
+                <mat-chip-row (removed)="remove(option)" [removable]="true" color="primary">
+                  {{ option.label }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip-row>
+              }
+              <input #typeInput matInput [formControl]="getForm.type" [matAutocomplete]="auto"
+                     [matChipInputFor]="chipList" placeholder="{{ 'INVOICE.PAYMENT.FIELD' | translate }}">
+            </mat-chip-grid>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+              @for (type of filteredTypesSignal(); track type) {
+                <mat-option [value]="type.type">
+                  {{ type.label }}
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="invoice-filter-grid__range">
+            <mat-label>{{ 'INVOICE.SEARCH.RANGE.FIELD' | translate }}</mat-label>
+            <mat-date-range-input [rangePicker]="drp" [formGroup]="getForm.dateRange">
+              <input matStartDate [formControl]="getDateRangeForm.startDate" matInput
+                     placeholder="{{'INVOICE.SEARCH.RANGE.START' | translate }}">
+              <input matEndDate [formControl]="getDateRangeForm.endDate" matInput
+                     placeholder="{{'INVOICE.SEARCH.RANGE.END' | translate }}">
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="drp"></mat-datepicker-toggle>
+            <mat-date-range-picker #drp touchUi></mat-date-range-picker>
+            <mat-error [innerHTML]="'INVOICE.SEARCH.RANGE.REQUIRED' | translate">
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="invoice-filter-grid__start">
+            <mat-label>{{ 'INVOICE.SEARCH.START.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.startNumber" matInput matNativeControl required [type]="'number'" [step]="1"
+                   [min]="1">
+            @if (getForm.startNumber.hasError('required')) {
+              <mat-error [innerHTML]="'INVOICE.SEARCH.START.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.startNumber.hasError('min')) {
+              <mat-error [innerHTML]="'INVOICE.SEARCH.START.MIN' | translate"></mat-error>
+            }
+          </mat-form-field>
+          <button class="app-detail-action-button invoice-filter-grid__print"
+                  id="print"
+                  mat-stroked-button
+                  type="submit"
+                  [disabled]="!selection.selected.length">
+            <mat-icon>print</mat-icon>
+            <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    @if (showResultsSignal()) {
+      <section class="app-surface-section">
+        <div class="mat-elevation-z8 app-table-shell">
+          @if (isLoading()) {
+            <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
+          } @else if (dataSourceSignal(); as dataSource) {
+            <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-checkbox (change)="toggleAllRows()"
+                                [checked]="isAllSelected()"
+                                [indeterminate]="isIndeterminate()"
+                                [aria-label]="checkboxLabel()" [disabled]="!resultsLengthSignal()">
+                  </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                  <mat-checkbox (click)="$event.stopPropagation()"
+                                (change)="toggleRow(row)"
+                                [checked]="selectionSignal().isSelected(row)"
+                                [aria-label]="checkboxLabel(row)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="position">
+                <th *matHeaderCellDef mat-header-cell class="app-surface-hide-mobile">#</th>
+                <td *matCellDef="let invoice; let i = dataIndex;" mat-cell class="app-surface-hide-mobile">
+                  {{ i + 1 }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="customer">
+                <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
+                <td *matCellDef="let invoice" mat-cell>
+                  {{ invoice.customer.displayName }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="timestamp">
+                <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
+                <td *matCellDef="let invoice" mat-cell>
+                  {{ invoice.timestamp | timeDetail | date:'short':invoice.room.timeZone:language }}
+                  <!--              @if (showTimeZone(invoice)) {-->
+                  <!--                <button (click)="openDialog(invoice)" mat-icon-button type="button">-->
+                  <!--                  <mat-icon>info_outline</mat-icon>-->
+                  <!--                </button>-->
+                  <!--              }-->
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="description">
+                <th *matHeaderCellDef class="app-surface-hide-mobile"
+                    mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+                </th>
+                <td *matCellDef="let invoice" class="app-surface-hide-mobile" mat-cell>
+                  {{ invoice.items?.[0].name }}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th *matHeaderCellDef class="app-surface-hide-mobile"
+                    mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                </th>
+                <td *matCellDef="let invoice" class="app-surface-hide-mobile" mat-cell>
+                  <button (click)="goToPath(invoice)" type="button" mat-icon-button
+                          matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                    <mat-icon color="primary">visibility</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="expandedDetail">
+                <td *matCellDef="let invoice" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+                  <div [class.detail-expanded]="invoice === expandedInvoice" class="detail app-surface-hide-desktop">
+                    <mat-list>
+                      <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                      <mat-list-item role="list">
+                        <button (click)="goToPath(invoice)" color="primary" mat-icon-button>
+                          <mat-icon matListItemIcon>visibility</mat-icon>
+                        </button>
+                      </mat-list-item>
+                    </mat-list>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="noContent">
+                <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+                  {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
+                </td>
+              </ng-container>
+
+              <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+              <tr *matRowDef="let invoice; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row
+                  [ngClass]="invoice.order"></tr>
+              <tr (click)="expandedInvoice = expandedInvoice === invoice ? null : invoice"
+                  *matRowDef="let invoice; columns: displayedColumns;"
+                  class="app-surface-hide-desktop app-table-master-row"
+                  mat-row
+                  [ngClass]="invoice.order"></tr>
+              <tr *matRowDef="let row; columns: ['expandedDetail']"
+                  [class.app-table-detail-row--expanded]="row === expandedInvoice"
+                  class="app-surface-hide-desktop app-table-detail-row"
+                  mat-row></tr>
+
+              <tr *matFooterRowDef="['noContent']" [hidden]="resultsLengthSignal() > 0" mat-footer-row></tr>
+            </table>
+          }
+        </div>
+      </section>
+    }
+
+    <div class="app-detail-actions">
+      <button [form]="form" appBackButton mat-stroked-button type="button">
+        <mat-icon>keyboard_return</mat-icon>
+        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+      </button>
+    </div>
+  </div>
+}

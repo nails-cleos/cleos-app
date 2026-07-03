@@ -9,9 +9,9 @@
     <div class="year-summary-toolbar">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
-        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)">
+        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)" touchUi>
         </mat-datepicker>
       </mat-form-field>
 
@@ -45,7 +45,8 @@
             @if (export) {
               <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
             } @else {
-              <span [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
+              <span
+                [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
             }
           </button>
         }
@@ -55,11 +56,9 @@
 
   @if (getForm.date.value) {
     @if (yearSummaryMap?.size) {
-      <section class="app-surface-section">
-        <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
-                  [measure]="(isHandset$ | async) ? 'short' : 'long'" [currency]="currencySignal()"
-                  [showCash]="showCash()"></app-year>
-      </section>
+      <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
+                [measure]="isHandset() ? 'short' : 'long'" [currency]="currencySignal()"
+                [showCash]="showCash()"></app-year>
 
       <section class="app-surface-section">
         <div class="app-detail-section-header">

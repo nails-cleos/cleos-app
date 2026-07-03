@@ -3,9 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { InvoiceService } from './invoice.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IOfficeAll } from '../interfaces/office';
-import { IInvoice, IInvoiceData } from '../interfaces/invoice';
-import { Pagination } from '../interfaces/pagination';
+import { IOfficeAll } from '../office/office';
+import { IInvoice, IInvoiceData } from '../invoice/invoice';
+import { Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
@@ -91,8 +91,8 @@ describe('InvoiceService', () => {
         params = params.append('types', type);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${officeId}`, {
-        params: params,
+      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${ officeId }`, {
+        params: params, ...skipLoadingOverlay(),
       });
     });
 
@@ -106,8 +106,8 @@ describe('InvoiceService', () => {
         expect(result).toEqual([invoice]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${officeId}`, {
-        params: new HttpParams().set('start', start).set('end', end),
+      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${ officeId }`, {
+        params: new HttpParams().set('start', start).set('end', end), ...skipLoadingOverlay(),
       });
     });
   });
@@ -126,7 +126,7 @@ describe('InvoiceService', () => {
 
       const [url, body, options] = httpSpy.post.calls.mostRecent().args;
 
-      expect(url).toBe(`v1/invoices/offices/${officeId}`);
+      expect(url).toBe(`v1/invoices/offices/${ officeId }`);
       expect(body instanceof FormData).toBeTrue();
 
       const file = (body as FormData).get('file') as File;
@@ -152,7 +152,7 @@ describe('InvoiceService', () => {
 
       const [url, body, options] = httpSpy.post.calls.mostRecent().args;
 
-      expect(url).toBe(`v1/invoices/offices/${officeId}`);
+      expect(url).toBe(`v1/invoices/offices/${ officeId }`);
       expect(body instanceof FormData).toBeTrue();
 
       const file = (body as FormData).get('file') as File;

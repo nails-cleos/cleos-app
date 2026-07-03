@@ -1,34 +1,39 @@
 @if (imageSrc) {
-  <div class="app-surface-canvas app-surface-shell app-surface-stack">
-    <div class="card-container">
-      @if (isCard()) {
-        <div>
+  <div class="app-surface-canvas app-surface-shell app-surface-stack" [class.error-page-shell]="!isCard()">
+    @if (isCard()) {
+      <div class="card-container card-container--card">
+        <div class="error-media error-media--card">
           <img alt="error" class="error" src="{{imageSrc}}">
         </div>
-      } @else {
-        <mat-card appearance="outlined">
-          <mat-card-header>
-          </mat-card-header>
-          <img alt="error" class="error" mat-card-image src="{{imageSrc}}">
-        </mat-card>
-      }
-    </div>
-
-    <div class="app-detail-actions">
-      <button appBackButton mat-stroked-button type="button">
-        <mat-icon>keyboard_return</mat-icon>
-        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-      </button>
-      @if (retry) {
-        <button (click)="reload()" mat-stroked-button type="button">
-          {{ 'COMMON.BUTTON.RELOAD' | translate }}
-        </button>
-      }
-    </div>
+      </div>
+    } @else {
+      <section class="error-state app-surface-section">
+        <div class="error-state__content">
+          <div class="error-state__eyebrow">{{ errorCode() }}</div>
+          <h1 class="error-state__title">{{ titleKey() | translate }}</h1>
+          <div class="error-state__media">
+            <img alt="error" class="error" src="{{imageSrc}}">
+          </div>
+          <p class="error-state__description">{{ descriptionKey() | translate }}</p>
+          <div class="error-state__actions app-detail-actions">
+            <button appBackButton mat-stroked-button type="button">
+              <mat-icon>keyboard_return</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+            @if (retry) {
+              <button (click)="reload()" mat-stroked-button type="button">
+                <mat-icon>refresh</mat-icon>
+                {{ 'COMMON.BUTTON.RELOAD' | translate }}
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+    }
   </div>
 } @else {
   <div class="app-surface-canvas app-surface-shell app-surface-stack">
-    <div class="card-container">
+    <div class="card-container" [class.card-container--card]="isCard()">
       @if (isCard()) {
         <div class="card-content">
           <div class="no-content bold">

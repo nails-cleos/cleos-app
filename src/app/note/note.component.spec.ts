@@ -1,29 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject, of } from 'rxjs';
 import { NoteComponent } from './note.component';
-import { IUser, IUserAll } from '../interfaces/user';
-import { INote, INoteAll } from '../interfaces/note';
+import { IUser, IUserAll } from '../user/user';
+import { INoteAll } from './note';
 import { FrequencyEnum } from '../util/helper';
-import { IError } from '../interfaces/common';
-import { backendFormatDate, getNowTimeZone } from '../util/dates';
+import { ICommon, IError } from '../interfaces/common';
+import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { addDays } from 'date-fns';
+import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
+import { NavigationService } from '../services/navigation.service';
+import { NoteStore } from '../store/note.store';
+import { signal } from '@angular/core';
+import { UserStore } from '../store/user.store';
 
 describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
-  let storeSpy: jasmine.SpyObj<Store<any>>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let noteStoreSpy: {
+    navigationParams: ReturnType<typeof navigationParamsSignal.asReadonly>;
+    subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
+    clearError: jasmine.Spy;
+    setNavigationParams: jasmine.Spy;
+  };
+  let userStoreSpy: {
+    professionals: ReturnType<typeof allProfessionalsSignal.asReadonly>;
+    loadProfessionals: jasmine.Spy;
+  };
 
-  let noteId$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
-  let selectedNote$: BehaviorSubject<any>;
-  let allProfessionals$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
+  const navigationParamsSignal = signal<any>(undefined);
+  const allProfessionalsSignal = signal<any>(undefined);
+  const subErrorsSignal = signal<any>(undefined);
 
   const mockProfessional: IUserAll = {
     id: 'p1',
@@ -44,50 +50,46 @@ describe('NoteComponent', () => {
     deleted: false,
   };
 
+  const config: ICommon = {
+    title: 'NOTE.TITLE',
+    button: { icon: 'add_note', label: 'COMMON.BUTTON.CREATE' },
+  };
+
   beforeEach(async () => {
-    noteId$ = new BehaviorSubject(undefined);
-    navigationParams$ = new BehaviorSubject(undefined);
-    selectedNote$ = new BehaviorSubject(undefined);
-    allProfessionals$ = new BehaviorSubject(undefined);
-    subErrors$ = new BehaviorSubject(undefined);
+    navigationParamsSignal.set(undefined);
+    allProfessionalsSignal.set(undefined);
+    subErrorsSignal.set(undefined);
 
-    let pipeCallIndex = 0;
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return noteId$.asObservable();
-        case 2:
-          return navigationParams$.asObservable();
-        case 3:
-          return selectedNote$.asObservable();
-        case 4:
-          return allProfessionals$.asObservable();
-        case 5:
-          return subErrors$.asObservable();
-        default:
-          return of(undefined);
-      }
-    });
+    noteStoreSpy = {
+      navigationParams: navigationParamsSignal.asReadonly(),
+      subErrors: subErrorsSignal.asReadonly(),
+      clearError: jasmine.createSpy('clearError'),
+      setNavigationParams: jasmine.createSpy('setNavigationParams'),
+    };
+    userStoreSpy = {
+      professionals: allProfessionalsSignal.asReadonly(),
+      loadProfessionals: jasmine.createSpy('loadProfessionals'),
+    };
 
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
       imports: [NoteComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: MatDialog, useValue: dialogSpy },
+        { provide: NoteStore, useValue: noteStoreSpy },
+        { provide: UserStore, useValue: userStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        provideAppDateAdapter(),
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NoteComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -95,13 +97,8 @@ describe('NoteComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize in add mode when no noteId', () => {
-    noteId$.next(null);
-    expect(component.isAddModeSignal()).toBeTrue();
-  });
-
   it('should patch form when selectedNote emits', () => {
-    selectedNote$.next(mockNote);
+    fixture.componentRef.setInput('note', mockNote);
     fixture.detectChanges();
 
     expect(component.getForm.description.value).toBe(mockNote.description);
@@ -111,7 +108,7 @@ describe('NoteComponent', () => {
 
   it('should handle subErrors and set form errors', () => {
     const error: IError = { field: 'description', message: 'Required' };
-    subErrors$.next([error]);
+    subErrorsSignal.set([error]);
     fixture.detectChanges();
 
     expect(component.errors()['description']).toBe('Required');
@@ -119,6 +116,9 @@ describe('NoteComponent', () => {
   });
 
   it('should submit a new note in add mode', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     const descriptionControl = component.getForm.description;
     descriptionControl.setValue('New Test');
     descriptionControl.markAsDirty();
@@ -138,18 +138,18 @@ describe('NoteComponent', () => {
 
     component.submit();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      note: jasmine.objectContaining({
-        description: 'New Test',
-        professionalId: 'p1',
-        repeat: FrequencyEnum.none,
-        date: backendFormatDate(date),
-      }),
-      type: '[Note] Create note',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      description: 'New Test',
+      professionalId: 'p1',
+      repeat: FrequencyEnum.none,
+      date: backendFormatDate(date),
     }));
   });
 
   it('should submit updated note in edit mode', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     const mockProfessional: IUserAll = {
       id: 'p2',
       displayName: 'Dr. Jones',
@@ -158,8 +158,8 @@ describe('NoteComponent', () => {
       timeZone: '',
       authorities: [],
     };
-    noteId$.next('note1');
-    selectedNote$.next(mockNote);
+    fixture.componentRef.setInput('id', 'note1');
+    fixture.componentRef.setInput('note', mockNote);
     fixture.detectChanges();
 
     const date = addDays(getNowTimeZone(), 5);
@@ -182,50 +182,20 @@ describe('NoteComponent', () => {
 
     component.submit();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      note: jasmine.objectContaining(
-        {
-          description: 'Updated Test',
-          professionalId: 'p2',
-          date: backendFormatDate(date),
-          repeat: FrequencyEnum.everyDay,
-        }),
-      type: '[Note] Update note by id',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      description: 'Updated Test',
+      professionalId: 'p2',
+      date: backendFormatDate(date),
+      repeat: FrequencyEnum.everyDay,
     }));
   });
 
   it('should not submit when form invalid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     component.getForm.description.setValue('');
     component.submit();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
-  });
-
-  it('should call deleteNote on delete', () => {
-    const mockProfessional: IUserAll = {
-      id: 'p1',
-      displayName: 'Dr. Smith',
-      email: '',
-      locale: 'en',
-      timeZone: '',
-      authorities: [],
-    };
-    const mockNote: INote = {
-      id: 'note1',
-      description: 'desc',
-      professional: mockProfessional,
-      date: '2024-01-01',
-      repeat: FrequencyEnum.none,
-    };
-    spyOn(component, 'noteSignal').and.returnValue(mockNote as any);
-
-    spyOn(component['dialog'], 'open').and.returnValue({ afterClosed: () => of(mockNote) } as any);
-
-    component.delete();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      id: 'note1',
-      description: 'desc',
-    }));
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should display user displayName correctly', () => {

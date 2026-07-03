@@ -1,54 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
-import { MainContentService } from '../../services/main-content.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { TranslateModule } from '@ngx-translate/core';
+import { signal } from '@angular/core';
+import { CatalogueStore } from '../../store/catalogue.store';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
   let fixture: ComponentFixture<CatalogComponent>;
-  let translateService: TranslateService;
 
-  let catalogues$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<CatalogueState>>;
-  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
+  let catalogueStoreSpy: {
+    data: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadCatalogs: jasmine.Spy;
+  };
 
   beforeEach(async () => {
-    catalogues$ = new BehaviorSubject<any>(undefined);
-
-    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return catalogues$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    catalogueStoreSpy = {
+      data: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadCatalogs: jasmine.createSpy('loadCatalogs'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [CatalogComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: MainContentService, useValue: mainContentServiceSpy },
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogComponent);
     component = fixture.componentInstance;
-    translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-  });
-
-  afterEach(() => {
-    catalogues$.complete();
+    fixture.detectChanges();
   });
 
   it('should create', () => {
@@ -56,16 +38,15 @@ describe('CatalogComponent', () => {
     expect(component.catalogues()).toEqual([]);
   });
 
-  it('should add catalogues with image and configure mainContent', () => {
+  it('should add catalogues with image', () => {
     spyOn(window.URL, 'createObjectURL').and.returnValue('blob:fake-url');
 
     const fakeBase64 = 'ZmFrZUJhc2U2NA==';
     const fakeItem = { blob: fakeBase64, contentType: 'text/plain' };
-    catalogues$.next([fakeItem]);
+    catalogueStoreSpy.data.set([fakeItem]);
     fixture.detectChanges();
 
     expect(component.catalogues().length).toBe(1);
     expect(component.catalogues()[0].image).toBe('blob:fake-url');
-    expect(mainContentServiceSpy.configure).toHaveBeenCalledWith(false, 'open');
   });
 });

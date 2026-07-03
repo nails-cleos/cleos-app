@@ -8,32 +8,31 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../../interfaces/main';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { TranslateService } from '@ngx-translate/core';
-import { sendMessage } from '../../store/main.actions';
+import { ITreatmentGroupAll } from '../../treatment/treatment';
+import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../main';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthUserService } from '../../services/auth-user.service';
-import {
-  goTo,
-  observeElementSignal,
-} from '../../util/animation';
+import { goTo, observeElementSignal } from '../../util/animation';
 import { isMobile } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MainContentService } from '../../services/main-content.service';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router } from '@angular/router';
-import { SharedModule } from '../../shared/shared.module';
 import { ToastService } from '../../services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
-import { getCataloguePipe, getMainErrorPipe, getResponsePipe } from '../../store/selectors/main.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
-import { MainState } from '../../store/reducers/main.reducers';
 import { EnvService } from '../../services/env.service';
-import { ICatalogueAll } from '../../interfaces/catalogue';
+import { ICatalogueAll } from '../../catalogue/catalogue';
 import { getImage } from '../../util/file';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
+import { NgClass, NgStyle } from '@angular/common';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+import { CatalogueStore } from '../../store/catalogue.store';
+import { MainStore } from '../../store/main.store';
+import { MainContentService } from '../../services/main-content.service';
+import { NavigationService } from '../../services/navigation.service';
 
 type MainForm = {
   name: FormControl<string>;
@@ -46,20 +45,22 @@ type MainForm = {
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  imports: [SharedModule],
+  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    NgClass, MatError, NgStyle, MatPrefix, MatHint, MatFabButton, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
   private static readonly BIAB_TREATMENT_ID = 'biab-treatment';
 
-  private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly catalogueStore = inject(CatalogueStore);
+  private readonly mainStore = inject(MainStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly mainContent = inject(MainContentService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly mainContent: MainContentService = inject(MainContentService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly env: EnvService = inject(EnvService);
 
@@ -77,16 +78,14 @@ export class MainContentComponent {
   private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
   private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
 
-  private response$ = this.store.pipe(getResponsePipe);
-  private error$ = this.store.pipe(getMainErrorPipe);
-  private catalogue$ = this.store.pipe(getCataloguePipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private authUserSignal = this.authUserService.authUser;
-  private responseSignal = toSignal(this.response$);
-  private errorSignal = toSignal(this.error$);
-  private catalogueSignal = toSignal(this.catalogue$);
-  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+  private readonly authUserSignal = this.authUserService.authUser;
+  private readonly responseSignal = this.mainStore.response;
+  private readonly errorSignal = this.mainStore.error;
+  private readonly catalogueSignal = this.catalogueStore.data;
+  private readonly isLoadingSignal = this.mainStore.isLoading;
+  private readonly breakpointsSignal = toSignal(this.breakpointObserver$, {
     initialValue: {
       matches: false,
       breakpoints: {
@@ -98,6 +97,7 @@ export class MainContentComponent {
 
   isSmall = computed(() => this.breakpointsSignal()?.matches ?? isMobile());
   isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  isCatalogueLoading = computed(() => this.isLoadingSignal());
 
   treatmentItemState = signal<'open' | 'close'>('open');
   treatmentTitleState = signal<'open' | 'close'>('open');
@@ -210,11 +210,14 @@ export class MainContentComponent {
   ];
 
   currentIndex = signal(0);
-  sliderTransform = computed(() => `translateX(-${this.currentIndex() * 100}%)`);
+  sliderTransform = computed(() => `translateX(-${ this.currentIndex() * 100 }%)`);
 
   private readonly sliderIntervalMs = 5000;
 
   constructor() {
+    this.mainContent.configure(false, 'close', true);
+    this.mainStore.clean();
+    this.catalogueStore.getAllHome();
     effect(() => {
       const error = this.errorSignal();
       if (error?.message) {
@@ -238,7 +241,7 @@ export class MainContentComponent {
     });
 
     effect(() => {
-      const treatments = this.translate.instant('TREATMENTS');
+      const treatments = this.translateService.instant('TREATMENTS');
       const groups = Array.isArray(treatments) ? treatments : [];
       this.groups.set(groups);
     });
@@ -337,8 +340,6 @@ export class MainContentComponent {
           onCleanup(() => obs?.disconnect());
         }
       });
-
-      this.mainContent.configure(false, 'close', true);
     });
 
     effect((onCleanup) => {
@@ -356,7 +357,9 @@ export class MainContentComponent {
   }
 
   openBottomSheet(): void {
-    this.bottomSheet.open(BottomSheetBookAppointmentComponent);
+    this.bottomSheet.open(BottomSheetBookAppointmentComponent, {
+      panelClass: 'app-surface-bottom-sheet-panel',
+    });
   }
 
   sendEmail(): void {
@@ -367,7 +370,7 @@ export class MainContentComponent {
         subject: this.getForm.subject.value,
         body: this.getForm.body.value,
       };
-      this.store.dispatch(sendMessage({ sendMessage: sendMessageData }));
+      this.mainStore.create(sendMessageData);
     }
   }
 
@@ -377,13 +380,13 @@ export class MainContentComponent {
     const treatmentId = name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
     if (treatmentId === MainContentComponent.BIAB_TREATMENT_ID) {
       goTo('home');
-      this.router.navigate([this.translate.getCurrentLang(), 'home', treatmentId, 'treatment']);
+      this.navigationService.navigate(['home', treatmentId, 'treatment']);
     }
   };
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${social.name}${suffix}`;
+    social.svgIcon = `${ social.name }${ suffix }`;
   };
 
   filterBy = (group?: ITreatmentGroupAll): void => {

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { IRoom, IRoomAll } from '../interfaces/room';
+import { IRoom, IRoomAll } from '../room/room';
 import { roomCurrency, roomGMT } from '../util/helper';
 
 @Pipe({

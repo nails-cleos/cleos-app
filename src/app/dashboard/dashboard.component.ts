@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Store } from '@ngrx/store';
-import { getCards, getEvents } from '../store/dashboard.actions';
-import { IReservationSummary, States } from '../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
+import { IReservationSummary, States } from '../reservation/reservation';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   getDurationOrUndefined,
   getEnd,
@@ -25,31 +23,31 @@ import {
 } from 'angular-calendar';
 import { findStateColor, getStateOrder } from '../util/theme';
 import { allDayEvent, DataEvent, IDataEvent, IMeta, Meta, monthEvent } from '../util/event';
-import { Router } from '@angular/router';
 import { isSameDay, isSameMonth, startOfMonth } from 'date-fns';
-import { ICalendarNote, ICalendarSummary, IChart } from '../interfaces/dashboard';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { IRoom } from '../interfaces/room';
+import { ICalendarNote, ICalendarSummary, IChart } from './dashboard';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { IRoom } from '../room/room';
 import { CalendarDialogComponent } from '../shared/dialog/calendar/calendar-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { executeDialogNoWidth, FrequencyEnum } from '../util/helper';
 import { numberFormat } from '../util/numbers';
-import { ICurrency } from '../interfaces/currency';
+import { ICurrency } from '../currency/currency';
 import { AuthUserService } from '../services/auth-user.service';
-import { SharedModule } from '../shared/shared.module';
 import { MiniCardComponent } from './mini-card/mini-card.component';
 import { ReservationTableComponent } from './reservation/table/reservation-table.component';
 import { CardComponent } from '../shared/card/card.component';
 import { ChartComponent } from '../shared/chart/chart.component';
 import { IError } from '../interfaces/common';
-import {
-  getDashboardMapPipe,
-  getDashboardNavigationParamsPipe,
-  getErrorPipe,
-  isDashboardLoadingPipe,
-} from '../store/selectors/dashboard.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DashboardState } from '../store/reducers/dashboard.reducers';
+import { MatFormField } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { MatOption } from '@angular/material/core';
+import { MatGridList, MatGridTile } from '@angular/material/grid-list';
+import { DashboardStore } from '../store/dashboard.store';
+import { NavigationService } from '../services/navigation.service';
 
 type DashboardForm = {
   selectedDash: FormControl<string | undefined>;
@@ -59,17 +57,18 @@ type DashboardForm = {
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
-  imports: [SharedModule, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
+  imports: [MatFormField, MatSelect, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    KeyValuePipe, MiniCardComponent, ReservationTableComponent, CardComponent, ChartComponent, CalendarDatePipe,
     CalendarNextViewDirective, CalendarTodayDirective, CalendarPreviousViewDirective, CalendarMonthViewComponent,
-    ClickDirective],
+    ClickDirective, MatGridList, MatGridTile],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly router: Router = inject(Router);
+  private readonly dashboardStore = inject(DashboardStore);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
@@ -77,14 +76,9 @@ export class DashboardComponent {
     selectedDash: this.formBuilder.control(undefined),
   });
 
-  private navigationParams$ = this.store.pipe(getDashboardNavigationParamsPipe);
-  private dashboardMap$ = this.store.pipe(getDashboardMapPipe);
-  private error$ = this.store.pipe(getErrorPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
   private breakpointObserver$ = this.breakpointObserver.observe(
     [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
 
-  private navigationParams = toSignal(this.navigationParams$);
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -100,7 +94,6 @@ export class DashboardComponent {
   );
 
   private isDarkMode = computed(() => this.authUserSignal().isDarkMode);
-  private isLoadingSignal = toSignal(this.isLoading$);
   private selectDashboardSignal = toSignal(this.getForm.selectedDash.valueChanges);
   private dashboardSelection = computed(() => {
     const selected = this.selectDashboardSignal();
@@ -109,8 +102,8 @@ export class DashboardComponent {
     return { selected, dashboardData, isDarkMode };
   });
 
-  dashboardMapSignal = toSignal(this.dashboardMap$);
-  errorSignal = toSignal(this.error$);
+  dashboardMapSignal = this.dashboardStore.data;
+  errorSignal = this.dashboardStore.error;
   cardLayoutSignal = computed(() => {
     const breakpointState = this.breakpointsSignal();
     const authUser = this.authUserSignal();
@@ -158,33 +151,32 @@ export class DashboardComponent {
   viewDate = signal(getNowTimeZone(this.timeZone));
   readonly viewMonth = computed(() => {
     const date = this.viewDate();
-    return `${date.getFullYear()}-${date.getMonth()}`;
+    return `${ date.getFullYear() }-${ date.getMonth() }`;
   });
-  readonly isLoading = computed(() => this.isLoadingSignal() ?? true);
+  readonly isLoading = computed(() => this.dashboardStore.isLoading() ?? true);
+
+  readonly language = this.navigationService.language;
 
   activeDayIsOpen = false;
-  dateFormat: string = this.translate.getCurrentLang();
   calendar: IDataEvent = new DataEvent([], 0, this.viewDate()!, 0, false);
 
   currency?: ICurrency;
   all = false;
-  thisMonthTotal: string = numberFormat(0, this.currency, this.dateFormat);
+  thisMonthTotal: string = numberFormat(0, this.currency, this.language);
 
-  miniCardData: IReservationSummary[] = [{} as IReservationSummary, {} as IReservationSummary,
-    {} as IReservationSummary, {} as IReservationSummary];
-
-  charts: IChart[] = [{} as IChart, {} as IChart, {} as IChart,
-    {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
-
-  private readonly language: string = this.translate.getCurrentLang();
+  miniCardData: IReservationSummary[] = [];
+  charts: IChart[] = [];
+  readonly miniCardSkeletons = Array.from({ length: 4 }, (_, index) => index);
+  readonly chartSkeletons = Array.from({ length: 8 }, (_, index) => index);
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params?.date) {
-        this.viewDate.set(params.date);
+      const newDate = history.state?.date;
+      if (newDate) {
+        this.viewDate.set(newDate);
+        this.activeDayIsOpen = true;
       }
-      this.activeDayIsOpen = params?.activeDayIsOpen ?? false;
     });
 
     effect(() => {
@@ -214,32 +206,34 @@ export class DashboardComponent {
         this.calendarSummary = dashboard.calendarSummary;
         this.all = dashboard.all ?? false;
         this.timeZone = dashboard.timeZone;
-        this.thisMonthTotal = numberFormat(dashboard.thisMonthTotal || 0, this.currency, this.dateFormat);
+        this.thisMonthTotal = numberFormat(dashboard.thisMonthTotal || 0, this.currency, this.language);
         this.createEvents(isDarkMode);
         if (!dashboard.chartSummaries && !dashboard.miniCardSummaries) {
-          this.charts = [{} as IChart, {} as IChart, {} as IChart,
-            {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+          this.charts = [];
           this.miniCardError('NO_CONTENT');
         } else {
           if (dashboard.chartSummaries && dashboard.chartSummaries.length) {
             this.charts = dashboard.chartSummaries;
           } else {
-            this.charts = [{} as IChart, {} as IChart, {} as IChart,
-              {} as IChart, {} as IChart, {} as IChart, {} as IChart, {} as IChart];
+            this.charts = [];
           }
           if (dashboard.miniCardSummaries && dashboard.miniCardSummaries.length) {
             this.miniCardData = dashboard.miniCardSummaries.map(miniCard => {
               if (!miniCard.isCurrency) {
                 return miniCard;
               }
+
+              const currentValue = miniCard.value;
+              const currentPreviousPeriodValue = miniCard.previousPeriodValue;
+
               return {
                 ...miniCard,
-                value: miniCard.value
-                  ? numberFormat(miniCard.value, this.currency, this.dateFormat)
-                  : miniCard.value,
-                previousPeriodValue: miniCard.previousPeriodValue
-                  ? numberFormat(miniCard.previousPeriodValue, this.currency, this.dateFormat)
-                  : miniCard.previousPeriodValue,
+                value: currentValue !== null && currentValue !== undefined
+                  ? numberFormat(currentValue, this.currency, this.language)
+                  : currentValue,
+                previousPeriodValue: currentPreviousPeriodValue !== null && currentPreviousPeriodValue !== undefined
+                  ? numberFormat(currentPreviousPeriodValue, this.currency, this.language)
+                  : currentPreviousPeriodValue,
               };
             });
           } else {
@@ -258,11 +252,12 @@ export class DashboardComponent {
 
     effect(() => {
       this.viewMonth();
-      const date = untracked(() => this.viewDate());
-
-      this.calendar.resetEvents();
-      this.store.dispatch(getEvents({ date }));
-      this.store.dispatch(getCards({ date }));
+      untracked(() => {
+        const date = this.viewDate();
+        this.calendar.resetEvents();
+        this.dashboardStore.getEvents(date);
+        this.dashboardStore.getCards(date);
+      });
     });
   }
 
@@ -280,7 +275,7 @@ export class DashboardComponent {
       (event: CalendarEvent) => DashboardComponent.completedByMonth(event, this.viewDate()))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
-    return numberFormat(total, this.currency, this.dateFormat);
+    return numberFormat(total, this.currency, this.language);
   }
 
   get upcoming(): number {
@@ -293,7 +288,7 @@ export class DashboardComponent {
       (event: CalendarEvent) => DashboardComponent.upcomingByMonth(event, this.viewDate()))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
-    return numberFormat(total, this.currency, this.dateFormat);
+    return numberFormat(total, this.currency, this.language);
   }
 
   get transaction(): number {
@@ -306,11 +301,11 @@ export class DashboardComponent {
       (event: CalendarEvent) => DashboardComponent.transactionByMonth(event, this.viewDate()))
       .reduce((a, b) => a + b.meta.total || 0, 0);
 
-    return numberFormat(total, this.currency, this.dateFormat);
+    return numberFormat(total, this.currency, this.language);
   }
 
   private static createErrorMiniCard = (title: string, message: string): IReservationSummary => ({
-    title: `DASHBOARD.MINI_CARD.${title}`,
+    title: `DASHBOARD.MINI_CARD.${ title }`,
     error: {
       status: message,
     },
@@ -343,7 +338,7 @@ export class DashboardComponent {
   }
 
   handleEvent = (event: CalendarEvent): void => {
-    this.router.navigate(event.meta.route);
+    this.navigationService.navigate(event.meta.route);
   };
 
   dayClicked = ({ date, events }: { date: Date; events: CalendarEvent[] }): void => {
@@ -389,7 +384,7 @@ export class DashboardComponent {
       const data = { date, roomId: room.id };
       executeDialogNoWidth(this.dialog, CalendarDialogComponent, null, result => {
         if (result) {
-          this.router.navigate([this.language].concat(result.split(',')), { state: data });
+          this.navigationService.navigate(result.split(','), { state: data });
         }
       });
     }
@@ -416,7 +411,7 @@ export class DashboardComponent {
         this.activeDayIsOpen = this.activeDayIsOpen
           ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
 
-        const meta = new Meta(true, this.timeZone, it.state, [this.language, 'reservation', it.reservationId],
+        const meta = new Meta(true, this.timeZone, it.state, ['reservation', it.reservationId],
           undefined, it.total);
         meta.isReservation = true;
         return monthEvent(it.title, start, end, it.reservationId, findStateColor(it.state, darkMode), meta, darkMode);
@@ -428,17 +423,18 @@ export class DashboardComponent {
         const start = newDateTimestamp(it.start);
         this.activeDayIsOpen = this.activeDayIsOpen
           ? this.activeDayIsOpen : isSameDay(start, getNowTimeZone(this.timeZone));
-        const title = it.duration ? it.title : `${this.translate.instant('COMMON.ALL_DAY.CHECK')} - ${it.title}`;
+        const title = it.duration ? it.title :
+          `${ this.translateService.instant('COMMON.ALL_DAY.CHECK') } - ${ it.title }`;
 
         if (it.repeat === FrequencyEnum.none) {
           const end = getEnd(start, it.duration);
           return monthEvent(title, start, end, it.unavailableId, findStateColor('DEFAULT', darkMode),
-            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', [this.language, 'unavailable', it.unavailableId]),
+            new Meta(!!it.duration, this.timeZone, 'UNAVAILABLE', ['unavailable', it.unavailableId]),
             darkMode,
           );
         } else {
           this.calendar.recurringEvent?.addFrequency(it.repeat, start, it.unavailableId, title, 'UNAVAILABLE',
-            `${this.language}/unavailable/`, (date, recurring) => this.createEvent(date, recurring, darkMode),
+            'unavailable/', (date, recurring) => this.createEvent(date, recurring, darkMode),
             getDurationOrUndefined(it.duration), undefined, it.allDay,
           );
           return undefined;
@@ -449,8 +445,8 @@ export class DashboardComponent {
         const startDate = newDateTimestamp(it.date);
         startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('BIRTHDAY', darkMode);
-        return allDayEvent(it.title, color, startDate, darkMode, `${this.language}/users/${it.userId}`,
-          new Meta(false, this.timeZone, 'BIRTHDAY', [this.language, 'users', it.userId]),
+        return allDayEvent(it.title, color, startDate, darkMode, `users/${ it.userId }`,
+          new Meta(false, this.timeZone, 'BIRTHDAY', ['users', it.userId]),
         );
       });
 
@@ -459,9 +455,9 @@ export class DashboardComponent {
         startDate.setFullYear(getNowTimeZone(this.timeZone).getFullYear());
         const color = findStateColor('TRANSACTION', darkMode);
         return allDayEvent(it.title, color, startDate, darkMode,
-          `${this.language}/accounts/${it.accountId}/transactions/ ${it.transactionId}`,
+          `accounts/${ it.accountId }/transactions/ ${ it.transactionId }`,
           new Meta(false, this.timeZone, 'TRANSACTION',
-            [this.language, 'accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total,
+            ['accounts', it.accountId, 'transactions', it.transactionId], undefined, it.total,
           ),
         );
       });
@@ -478,8 +474,7 @@ export class DashboardComponent {
         } else {
           repeatDate = startDate;
         }
-        this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE',
-          `${this.language}/notes/`,
+        this.calendar.recurringEvent?.addFrequency(it.repeat, repeatDate, it.noteId, it.title, 'NOTE', 'notes/',
           (date, recurring) => this.createEvent(date, recurring, darkMode), undefined, undefined, true,
         );
         return undefined;
@@ -504,8 +499,8 @@ export class DashboardComponent {
 
   private createNoteEvent = (note: ICalendarNote, date: Date, darkMode: boolean): CalendarEvent => {
     const color = findStateColor('NOTE', darkMode);
-    return allDayEvent(note.title, color, date, darkMode, `${this.language}/notes/${note.noteId}`,
-      new Meta(false, this.timeZone, 'NOTE', [this.language, 'notes', note.noteId]),
+    return allDayEvent(note.title, color, date, darkMode, `notes/${ note.noteId }`,
+      new Meta(false, this.timeZone, 'NOTE', ['notes', note.noteId]),
     );
   };
 }

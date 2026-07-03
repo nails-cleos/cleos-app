@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ShareButtonsComponent } from './share-buttons.component';
 import { provideHttpClient } from '@angular/common/http';
+import { provideAppIcons } from '../../../util/app-icons.provider';
 
 describe('ShareButtonsComponent', () => {
   let component: ShareButtonsComponent;
@@ -10,7 +11,7 @@ describe('ShareButtonsComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ShareButtonsComponent],
-      providers: [provideHttpClient()],
+      providers: [provideHttpClient(), provideAppIcons()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShareButtonsComponent);

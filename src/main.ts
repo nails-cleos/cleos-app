@@ -1,5 +1,4 @@
 import {
-  enableProdMode,
   importProvidersFrom,
   inject,
   LOCALE_ID,
@@ -9,9 +8,8 @@ import {
 import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
-import { AppRoutingModule } from './app/app-routing.module';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
-import { ActionReducer, MetaReducer, provideStore } from '@ngrx/store';
+import { provideStore } from '@ngrx/store';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -20,8 +18,6 @@ import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { AuthUserService } from './app/services/auth-user.service';
 import { CookieService } from 'ngx-cookie-service';
 import { AsyncPipe, registerLocaleData } from '@angular/common';
-import { MessagingService } from './app/services/messaging.service';
-import { TranslationLoaderResolver } from './app/util/translation.resolver';
 import { NavigationService } from './app/services/navigation.service';
 import { TokenService } from './app/services/token.service';
 import { PermissionsService } from './app/services/auth-guard.service';
@@ -34,30 +30,16 @@ import localeEs from '@angular/common/locales/es';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouterStore } from '@ngrx/router-store';
-import { localStorageSync } from 'ngrx-store-localstorage';
-import { AUTH_FEATURE_KEY, authReducer } from './app/store/reducers/auth.reducers';
-import { userReducer } from './app/store/reducers/user.reducers';
-import { treatmentReducer } from './app/store/reducers/treatment.reducers';
-import { catalogueReducer } from './app/store/reducers/catalogue.reducers';
-import { roomReducer } from './app/store/reducers/room.reducers';
 import { reservationReducer } from './app/store/reducers/reservation.reducers';
-import { notificationReducer } from './app/store/reducers/notification.reducers';
-import { unavailableReducer } from './app/store/reducers/unavailable.reducers';
-import { discountReducer } from './app/store/reducers/discount.reducers';
-import { mainReducer } from './app/store/reducers/main.reducers';
-import { paymentReducer } from './app/store/reducers/payment.reducers';
-import { dashboardReducer } from './app/store/reducers/dashboard.reducers';
-import { additionalReducer } from './app/store/reducers/additional.reducers';
-import { currencyReducer } from './app/store/reducers/currency.reducers';
-import { officeReducer } from './app/store/reducers/office.reducers';
-import { invoiceReducer } from './app/store/reducers/invoice.reducers';
-import { colorReducer } from './app/store/reducers/color.reducers';
-import { expenseReducer } from './app/store/reducers/expense.reducers';
-import { noteReducer } from './app/store/reducers/note.reducers';
-import { accountReducer } from './app/store/reducers/account.reducers';
-import { i18nReducer } from './app/store/reducers/i18n.reducers';
-import { I18NEffects } from './app/store/effects/i18n.effects';
-import { provideEffects } from '@ngrx/effects';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
+import { routes } from './app/app.routes';
+import { provideAppIcons } from './app/util/app-icons.provider';
+import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
+import { AppRouterStateSerializer } from './app/util/router-state.serializer';
+import { DEFAULT_LOCALE } from './app/util/dates';
+import { AuthStore } from './app/store/auth.store';
+import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
+import { I18NStore } from './app/store/i18n.store';
 
 export interface ISendMessage {
   name: string;
@@ -86,18 +68,13 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
   type: 'info',
   content: {
-    href: `${environment.appServer}/privacy`,
+    href: `${ environment.appServer }/privacy`,
   },
 };
 
-const localStorageSyncReducer = (reducer: ActionReducer<any>): ActionReducer<any> => localStorageSync(
-  { keys: [AUTH_FEATURE_KEY], rehydrate: true })(reducer);
-
-registerLocaleData(localeEnGB, 'en-GB');
+registerLocaleData(localeEnGB, DEFAULT_LOCALE);
 registerLocaleData(localeNl, 'nl');
 registerLocaleData(localeEs, 'es');
-
-const metaReducers: Array<MetaReducer<any, any>> = [localStorageSyncReducer];
 
 export function initializePwaService(pwaService: PwaService) {
   pwaService.initPwaPrompt();
@@ -105,30 +82,14 @@ export function initializePwaService(pwaService: PwaService) {
 
 const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
-  provideStore({
-    auth: authReducer,
-    user: userReducer,
-    treatment: treatmentReducer,
-    catalogue: catalogueReducer,
-    room: roomReducer,
-    reservation: reservationReducer,
-    notification: notificationReducer,
-    unavailable: unavailableReducer,
-    discount: discountReducer,
-    main: mainReducer,
-    payment: paymentReducer,
-    dashboard: dashboardReducer,
-    additional: additionalReducer,
-    currency: currencyReducer,
-    office: officeReducer,
-    invoice: invoiceReducer,
-    color: colorReducer,
-    expense: expenseReducer,
-    note: noteReducer,
-    accounts: accountReducer,
-    i18n: i18nReducer,
-  }, { metaReducers }),
-  provideRouterStore(),
+  provideStore({ reservation: reservationReducer }),
+  provideRouter(
+    routes,
+    withRouterConfig({ onSameUrlNavigation: 'reload' }),
+    withComponentInputBinding(),
+    withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+  ),
+  provideRouterStore({ serializer: AppRouterStateSerializer }),
   importProvidersFrom(
     BrowserModule,
     TranslateModule.forRoot({
@@ -141,7 +102,6 @@ const providers = [
       extend: true,
     }),
     NgcCookieConsentModule.forRoot(cookieConfig),
-    AppRoutingModule,
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000',
@@ -154,33 +114,32 @@ const providers = [
   PermissionsService,
   TokenService,
   NavigationService,
-  TranslationLoaderResolver,
-  MessagingService,
   AsyncPipe,
   CookieService,
   TranslateService,
   AuthUserService,
   {
     provide: LOCALE_ID,
-    useValue: 'en-GB',
+    useValue: DEFAULT_LOCALE,
   },
   {
     provide: MAT_ICON_DEFAULT_OPTIONS,
     useValue: { fontSet: 'material-symbols-outlined' },
   },
+  ...provideAppDateAdapter(),
+  ...provideAppCalendar(),
+  provideAppIcons(),
+  provideAppInitializer(() => {
+    inject(AuthRedirectEffect);
+    const authStore = inject(AuthStore);
+    authStore.hydrate();
+    const i18nStore = inject(I18NStore);
+    i18nStore.hydrate();
+  }),
   provideAppInitializer(() => initializePwaService(inject(PwaService))),
   provideCharts(withDefaultRegisterables()),
-  provideEffects(I18NEffects),
 ];
-
-if (environment.production) {
-  enableProdMode();
-}
 
 bootstrapApplication(AppComponent, {
   providers: [provideZoneChangeDetection(), ...providers],
-}).then(() => {
-  if ('serviceWorker' in navigator && environment.production) {
-    navigator.serviceWorker.register('ngsw-worker.js');
-  }
 }).catch(err => console.error(err));

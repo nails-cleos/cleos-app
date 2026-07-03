@@ -3,26 +3,33 @@ import { BehaviorSubject } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IReservationAll, States } from '../reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { getAllFilterReservations } from '../../store/reservation.actions';
+import { getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
-import { IUserAll } from '../../interfaces/user';
-import { getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../interfaces/currency';
-import { ServiceType } from '../../interfaces/room';
+import { IUserAll } from '../../user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
+import { ICurrencyAll } from '../../currency/currency';
+import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
+import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from '../../store/user.store';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
+
+  let userStoreSpy: {
+    customers: ReturnType<typeof signal>;
+    loadCustomers: jasmine.Spy;
+  };
 
   const professional: IUserAll = {
     id: 'prof-123',
@@ -93,14 +100,21 @@ describe('SearchComponent', () => {
   };
 
   let reservationList$: BehaviorSubject<any>;
-  let customerList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   let response$: BehaviorSubject<any>;
+  let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    userStoreSpy = {
+      customers: signal<any>(undefined),
+      loadCustomers: jasmine.createSpy('loadCustomers'),
+    };
     reservationList$ = new BehaviorSubject(mockPagination);
-    customerList$ = new BehaviorSubject(undefined);
     response$ = new BehaviorSubject<any>(undefined);
+    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -109,7 +123,7 @@ describe('SearchComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -125,19 +139,20 @@ describe('SearchComponent', () => {
         case 1:
           return reservationList$.asObservable();
         case 2:
-          return customerList$.asObservable();
-        case 3:
           return response$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
     });
+    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [SearchComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: UserStore, useValue: userStoreSpy },
         { provide: Store, useValue: storeSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -147,16 +162,16 @@ describe('SearchComponent', () => {
     fixture = TestBed.createComponent(SearchComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
     reservationList$.complete();
-    customerList$.complete();
     response$.complete();
+    isLoading$.complete();
     breakpoint$.complete();
   });
 
@@ -206,7 +221,10 @@ describe('SearchComponent', () => {
   });
 
   it('should dispatch getColorPage when paginatorPageIndex changes', () => {
-    component.paginatorPageIndex.set(1);
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(
@@ -262,7 +280,7 @@ describe('SearchComponent', () => {
   });
 
   it('should update allCustomersWritableSignal when store emits', async () => {
-    customerList$.next(mockCustomers);
+    userStoreSpy.customers.set(mockCustomers);
     fixture.detectChanges();
     await fixture.whenStable();
 

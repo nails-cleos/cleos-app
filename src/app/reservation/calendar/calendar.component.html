@@ -10,7 +10,7 @@
           <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
         </button>
       } @else {
-        <div class="calendar-search__grid">
+        <div class="calendar-search__grid app-inline-field-action">
           @if (currentOffices) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
@@ -69,13 +69,8 @@
           }
 
           <button type="submit" [disabled]="form.invalid"
-                  class="hide-gt-xs app-surface-filter-action calendar-search__button calendar-toolbar__compact"
-                  color="accent" mat-stroked-button>
-            <mat-icon matPrefix>search</mat-icon>
-          </button>
-          <button type="submit" [disabled]="form.invalid"
-                  class="hide-xs app-surface-filter-action calendar-search__button"
-                  color="accent" mat-stroked-button>
+                  class="app-surface-filter-action app-detail-action-button"
+                  mat-stroked-button>
             <mat-icon matPrefix>search</mat-icon>
             <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
           </button>
@@ -86,56 +81,48 @@
 
   @let calendarDay = calendarDaySignal();
   <section class="app-surface-section">
-    <div class="divider card-actions calendar-toolbar app-detail-actions">
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="decrement()" color="accent" mat-stroked-button>
+    <div class="divider app-surface-actions calendar-toolbar app-detail-actions">
+      <button (click)="decrement()" mat-icon-button class="app-surface-hide-desktop">
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <button class="hide-xs" (click)="decrement()" color="accent" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="decrement()" mat-stroked-button>
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
       <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
              hidden matInput [max]="maxDate" [min]="minDate">
       <mat-datepicker #picker touchUi></mat-datepicker>
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="picker.open()" color="primary" mat-stroked-button>
-        <mat-icon>today</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="picker.open()" color="primary" mat-stroked-button>
+        <button (click)="picker.open()" mat-icon-button class="app-surface-hide-desktop">
+          <mat-icon>today</mat-icon>
+        </button>
+      <button class="app-surface-hide-mobile" (click)="picker.open()" mat-stroked-button>
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-      <button class="hide-gt-xs calendar-toolbar__compact" (click)="increment()" color="accent" mat-stroked-button>
-        <mat-icon>navigate_next</mat-icon>
-      </button>
-      <button class="hide-xs" (click)="increment()" color="accent" mat-stroked-button>
+        <button (click)="increment()" mat-icon-button class="app-surface-hide-desktop">
+          <mat-icon>navigate_next</mat-icon>
+        </button>
+      <button class="app-surface-hide-mobile" (click)="increment()" mat-stroked-button>
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       @if (daysInWeekSignal() >= 5) {
-        <button class="hide-gt-xs calendar-toolbar__compact"
-                (click)="downloadPDF()"
-                color="accent"
-                mat-stroked-button
-                [disabled]="isDarkMode()">
-          <mat-icon>print</mat-icon>
-        </button>
-        <button class="hide-xs" (click)="downloadPDF()" color="accent" mat-stroked-button [disabled]="isDarkMode()">
+        <button class="app-surface-hide-mobile" (click)="downloadPDF()" mat-stroked-button>
           <mat-icon>print</mat-icon>
           <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
       }
-      <button class="hide-gt-xs calendar-toolbar__compact" color="primary" mat-stroked-button
-              [routerLink]="['/', language, 'reservation']">
-        <mat-icon>book_online</mat-icon>
-      </button>
-      <button class="hide-xs" color="primary" mat-stroked-button [routerLink]="['/', language, 'reservation']">
+        <button mat-icon-button [routerLink]="['/', language, 'reservation']" class="app-surface-hide-desktop">
+          <mat-icon>book_online</mat-icon>
+        </button>
+      <button class="app-surface-hide-mobile" mat-stroked-button [routerLink]="['/', language, 'reservation']">
         <mat-icon>book_online</mat-icon>
         <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
       </button>
     </div>
 
-    <div class="divider calendar-week__surface app-surface-item app-surface-item--section" id="weekViewPDF">
+    <div class="divider" id="weekViewPDF">
       <mwl-calendar-week-view
         (beforeViewRender)="beforeMonthViewRender($event)"
         (eventClicked)="view($event.event)"
@@ -150,7 +137,7 @@
         [events]="calendarEventsSignal()"
         [eventTitleTemplate]="calendarEventTitle"
         [hourSegments]="hourSegments"
-        [locale]="locale"
+        [locale]="language"
         [tooltipTemplate]="calendarTooltip"
         [viewDate]="viewDate()"
         [weekendDays]="[]"></mwl-calendar-week-view>
@@ -181,9 +168,9 @@
               @if (event?.meta?.isReservation) {
                 <div class="calendar-tooltip-card">
                   <div class="calendar-tooltip-card__time">
-                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:locale }}
+                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:language }}
                     -
-                    {{ event.end | date:'HH:mm':event.meta?.timeZone:locale }}
+                    {{ event.end | date:'HH:mm':event.meta?.timeZone:language }}
                   </div>
                   <div class="calendar-tooltip-card__row">
                     <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</span>

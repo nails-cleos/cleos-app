@@ -9,12 +9,12 @@ import {
   IReservationAll,
   IRoomReservation,
   IUpcomingAll,
-} from '../interfaces/reservation';
-import { Pagination } from '../interfaces/pagination';
-import { IReview } from '../interfaces/review';
+} from '../reservation/reservation';
+import { Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import { IReview } from '../me/reservation/list/review';
 import { IApiResponse } from '../interfaces/common';
-import { ICurrencyAll } from '../interfaces/currency';
-import { ServiceType } from '../interfaces/room';
+import { ICurrencyAll } from '../currency/currency';
+import { ServiceType } from '../room/room';
 import { dateToTimestamp, getNowTimeZone } from '../util/dates';
 
 describe('ReservationService', () => {
@@ -205,7 +205,7 @@ describe('ReservationService', () => {
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/customer', jasmine.objectContaining({
-        params: jasmine.any(Object),
+        params: jasmine.any(Object), ...skipLoadingOverlay(),
       }));
     });
 
@@ -217,7 +217,7 @@ describe('ReservationService', () => {
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/customer', jasmine.objectContaining({
-        params: jasmine.any(Object),
+        params: jasmine.any(Object), ...skipLoadingOverlay(),
       }));
     });
   });
@@ -355,7 +355,7 @@ describe('ReservationService', () => {
         expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', { ...skipLoadingOverlay() });
     });
 
     it('should get reservation with edit path', () => {
@@ -365,7 +365,7 @@ describe('ReservationService', () => {
         expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/edit');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/edit', { ...skipLoadingOverlay() });
     });
   });
 
@@ -378,7 +378,7 @@ describe('ReservationService', () => {
         expect(result).toEqual(history);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/history');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/history', { ...skipLoadingOverlay() });
     });
   });
 
@@ -527,7 +527,7 @@ describe('ReservationService', () => {
         expect(result).toEqual(mockReview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/reviews');
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/reviews', { ...skipLoadingOverlay() });
     });
   });
 

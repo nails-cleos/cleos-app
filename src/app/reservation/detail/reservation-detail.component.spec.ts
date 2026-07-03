@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationDetailComponent } from './reservation-detail.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { CancelOption, IReservationAll, States } from '../../interfaces/reservation';
+import { CancelOption, IReservationAll, States } from '../reservation';
 import { IPaymentAll } from '../../interfaces/payment';
 import {
   approveReservation,
@@ -19,31 +19,35 @@ import {
   startReservation,
   updateReservationColor,
   updateReservationCustomer,
-} from '../../store/reservation.actions';
-import { notifyPayment, paymentSend } from '../../store/payment.actions';
-import { ServiceType } from '../../interfaces/room';
-import { IUserAll } from '../../interfaces/user';
-import { getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../interfaces/currency';
-import { IAdditionalAll } from '../../interfaces/additional';
+} from '../../store/actions/reservation.actions';
+import { ServiceType } from '../../room/room';
+import { IUserAll } from '../../user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
+import { ICurrencyAll } from '../../currency/currency';
+import { IAdditionalAll } from '../../additional/additional';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
+import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
   let fixture: ComponentFixture<ReservationDetailComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let reservationId$: BehaviorSubject<any>;
   let navigationParams$: BehaviorSubject<any>;
   let reservationSelected$: BehaviorSubject<any>;
   let payments$: BehaviorSubject<any>;
   let histories$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
-  let navigateSpy: jasmine.Spy;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+    notify: jasmine.Spy;
+    adjust: jasmine.Spy;
+  };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
 
@@ -138,44 +142,46 @@ describe('ReservationDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    reservationId$ = new BehaviorSubject(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    paymentStoreSpy = {
+      options: signal([
+        {
+          type: 'CASH',
+          label: 'Cash',
+          enabled: true,
+          enabledCustomer: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'cash',
+        },
+        {
+          type: 'TRANSFER',
+          label: 'Transfer',
+          enabled: true,
+          enabledCustomer: true,
+          enabledProfessional: true,
+          default: true,
+          filter: true,
+          defaultFilter: false,
+          show: true,
+          icon: 'transfer',
+        },
+      ]),
+      getOptions: jasmine.createSpy('getOptions'),
+      notify: jasmine.createSpy('notify'),
+      adjust: jasmine.createSpy('adjust'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
     reservationSelected$ = new BehaviorSubject(undefined);
     payments$ = new BehaviorSubject(undefined);
     histories$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject([
-      {
-        type: 'CASH',
-        label: 'Cash',
-        enabled: true,
-        enabledCustomer: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'cash',
-      },
-      {
-        type: 'TRANSFER',
-        label: 'Transfer',
-        enabled: true,
-        enabledCustomer: true,
-        enabledProfessional: true,
-        default: true,
-        filter: true,
-        defaultFilter: false,
-        show: true,
-        icon: 'transfer',
-      },
-    ]);
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -185,17 +191,13 @@ describe('ReservationDetailComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return reservationId$.asObservable();
-        case 2:
           return navigationParams$.asObservable();
-        case 3:
+        case 2:
           return reservationSelected$.asObservable();
-        case 4:
+        case 3:
           return payments$.asObservable();
-        case 5:
+        case 4:
           return histories$.asObservable();
-        case 6:
-          return paymentOptions$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
       }
@@ -204,31 +206,29 @@ describe('ReservationDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ReservationDetailComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-
-    const router = TestBed.inject(Router);
-    navigateSpy = spyOn(router, 'navigate');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(ReservationDetailComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'reservation-id');
 
     dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
-    reservationId$.complete();
     navigationParams$.complete();
     reservationSelected$.complete();
     payments$.complete();
     histories$.complete();
-    paymentOptions$.complete();
   });
 
   it('should create', () => {
@@ -260,7 +260,7 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should dispatch getReservation actions on init', () => {
-    reservationId$.next('reservation-123');
+    fixture.componentRef.setInput('id', 'reservation-123');
     fixture.detectChanges();
 
     expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'reservation-123' }));
@@ -339,7 +339,15 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
-      expect(component.changeState.length).toBe(5);
+      expect(component.changeState.map(action => action.id)).toEqual([
+        'overview',
+        'note',
+        'approve',
+        'edit',
+        'cancel',
+        'more',
+        'clone',
+      ]);
     });
 
     it('should transition from created to approved state', () => {
@@ -390,7 +398,8 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('send');
 
       expect(window.open).toHaveBeenCalledWith(
-        `https://api.whatsapp.com/send?phone=+${mockReservation.customer.phone}&text=WHATSAPP.SEND.TOMORROW`, '_blank');
+        `https://api.whatsapp.com/send?phone=+${ mockReservation.customer.phone }&text=WHATSAPP.SEND.TOMORROW`,
+        '_blank');
     });
 
     it('should send coffee message', () => {
@@ -412,7 +421,7 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('coffee');
 
       expect(window.open).toHaveBeenCalledWith(
-        `https://api.whatsapp.com/send?phone=+${mockReservation.customer.phone}&text=WHATSAPP.SEND.COFFEE`, '_blank');
+        `https://api.whatsapp.com/send?phone=+${ mockReservation.customer.phone }&text=WHATSAPP.SEND.COFFEE`, '_blank');
     });
 
     it('should send today message', () => {
@@ -434,7 +443,7 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('send');
 
       expect(window.open).toHaveBeenCalledWith(
-        `https://api.whatsapp.com/send?phone=+${mockReservation.customer.phone}&text=WHATSAPP.SEND.TODAY`, '_blank');
+        `https://api.whatsapp.com/send?phone=+${ mockReservation.customer.phone }&text=WHATSAPP.SEND.TODAY`, '_blank');
     });
 
     it('should send future message', () => {
@@ -465,7 +474,8 @@ describe('ReservationDetailComponent', () => {
       component.onChangeState('send');
 
       expect(window.open).toHaveBeenCalledWith(
-        `https://api.whatsapp.com/send?phone=+${mockReservation.customer.phone}&text=WHATSAPP.SEND.APPROVE`, '_blank');
+        `https://api.whatsapp.com/send?phone=+${ mockReservation.customer.phone }&text=WHATSAPP.SEND.APPROVE`,
+        '_blank');
     });
 
     it('should allow editing from created state', () => {
@@ -479,8 +489,8 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('edit');
 
-      expect(navigateSpy).toHaveBeenCalledWith(
-        ['en-GB', 'reservation', 'reservation-123', 'edit'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['reservation', 'reservation-123', 'edit'],
         { state: { roomId: 'room-123' } },
       );
     });
@@ -497,8 +507,8 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('complete');
 
-      expect(navigateSpy).toHaveBeenCalledWith(
-        ['en-GB', 'reservation', 'reservation-123', 'rooms', 'room-123', 'customer', 'customer-123', 'complete'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['reservation', 'reservation-123', 'rooms', 'room-123', 'customer', 'customer-123', 'complete'],
       );
     });
 
@@ -510,7 +520,7 @@ describe('ReservationDetailComponent', () => {
 
       component.overview();
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'overview']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
     });
 
     it('should navigate to customer overview for non-customer users', () => {
@@ -520,7 +530,7 @@ describe('ReservationDetailComponent', () => {
 
       component.overview();
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'users', mockReservation.customer.id, 'overview']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', mockReservation.customer.id, 'overview']);
     });
 
     it('should allow clone from completed state', () => {
@@ -544,7 +554,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('clone');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation'], jasmine.objectContaining({
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation'], jasmine.objectContaining({
         state: jasmine.objectContaining({
           date: nextMonday,
           customerId: mockReservation.customer.id,
@@ -625,7 +635,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('more');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation', 'reservation-123', 'more-info']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', 'reservation-123', 'more-info']);
     });
 
     it('should transition from partiallyCompleted to completed', () => {
@@ -657,7 +667,7 @@ describe('ReservationDetailComponent', () => {
       const professionalId = mockReservation.professional.id;
       const data = { customerId, roomId, treatmentId, professionalId };
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'reservation'], { state: data });
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation'], { state: data });
     });
   });
 
@@ -680,7 +690,12 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
-      expect(component.changeState.length).toBe(2);
+      expect(component.changeState.map(action => action.id)).toEqual([
+        'overview',
+        'note',
+        'edit',
+        'cancel',
+      ]);
     });
 
     it('should allow booking from completed state', () => {
@@ -696,7 +711,7 @@ describe('ReservationDetailComponent', () => {
       const professionalId = mockReservation.professional.id;
       const data = { roomId, treatmentId, professionalId };
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation'], { state: data });
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation'], { state: data });
     });
 
     it('should allow edit a reservation', () => {
@@ -710,7 +725,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('edit');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation', mockReservation.id]);
     });
 
     it('should allow notify when it has pending payments', () => {
@@ -730,13 +745,13 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('notify');
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(notifyPayment({
-        id: pendingPayment.id,
-        path: 'reservation',
-        resourceId: mockReservation.id,
-        preferenceId: pendingPayment.preferenceId,
-        paymentType: pendingPayment.type,
-      }));
+      expect(paymentStoreSpy.notify).toHaveBeenCalledWith(
+        pendingPayment.id,
+        'reservation',
+        mockReservation.id,
+        pendingPayment.preferenceId,
+        pendingPayment.type,
+      );
     });
 
     it('should allow paid when payment is required and it has no pending payments', () => {
@@ -756,7 +771,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('pay');
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/', 'en-GB', 'me', 'payment', createdPayment.id]);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'payment', createdPayment.id]);
     });
 
 
@@ -767,8 +782,8 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('pay');
 
-      expect(navigateSpy)
-        .toHaveBeenCalledWith(['/', 'en-GB', 'me', 'reservation', mockReservation.id, 'payment', 'option']);
+      expect(navigationServiceSpy.navigate)
+        .toHaveBeenCalledWith(['me', 'reservation', mockReservation.id, 'payment', 'option']);
     });
 
     it('should allow cancel and edit a reservation', () => {
@@ -794,7 +809,7 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(navigateSpy).toHaveBeenCalledWith(['en-GB', 'me', 'reservation', mockReservation.id]);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation', mockReservation.id]);
     });
 
     it('should allow canceling when is edit mode and no payments', () => {
@@ -968,16 +983,6 @@ describe('ReservationDetailComponent', () => {
       fixture.detectChanges();
 
       expect(component.payments.length).toBe(2);
-    });
-
-    it('should dispatch paymentSend when pay is called', () => {
-      const payment = {
-        paymentURL: 'https://payment.url',
-      } as any;
-
-      component.pay(payment);
-
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentSend({ link: 'https://payment.url' }));
     });
   });
 });

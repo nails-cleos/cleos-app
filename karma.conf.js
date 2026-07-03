@@ -44,6 +44,7 @@ module.exports = (config) => {
         '**/src/app/**/*.reducers.ts',
         '**/src/app/**/*.effects.ts',
         '**/src/app/**/*.selectors.ts',
+        "src/app/**/*-stub.component.ts",
       ],
     },
     reporters: ['spec', 'kjhtml', 'junit'],

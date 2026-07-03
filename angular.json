@@ -23,6 +23,7 @@
           "options": {
             "allowedCommonJsDependencies": [
               "chart.js",
+              "bowser",
               "deepmerge",
               "exceljs",
               "google-libphonenumber",
@@ -47,7 +48,6 @@
               "src/assets",
               "src/manifest.json",
               "src/firebase-messaging-sw.js",
-              "src/styles.scss",
               "src/sitemap.xml",
               "src/browserconfig.xml",
               "src/robots.txt",
@@ -59,7 +59,7 @@
             ],
             "styles": [
               "node_modules/cookieconsent/build/cookieconsent.min.css",
-              "src/styles.scss"
+              "src/global.scss"
             ],
             "scripts": [
               "node_modules/cookieconsent/build/cookieconsent.min.js"
@@ -225,7 +225,6 @@
               "src/assets",
               "src/manifest.json",
               "src/firebase-messaging-sw.js",
-              "src/styles.scss",
               "src/sitemap.xml",
               "src/browserconfig.xml",
               "src/robots.txt",
@@ -237,7 +236,7 @@
             ],
             "styles": [
               "node_modules/cookieconsent/build/cookieconsent.min.css",
-              "src/styles.scss"
+              "src/global.scss"
             ],
             "scripts": [
               "node_modules/cookieconsent/build/cookieconsent.min.js"

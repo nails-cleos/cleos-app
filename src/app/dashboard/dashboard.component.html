@@ -1,6 +1,6 @@
 @let mapDashboard = dashboardMapSignal();
 @let selectedDashboard = getForm.selectedDash.value;
-@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):dateFormat;
+@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):language;
 @let cardLayout = cardLayoutSignal();
 
 <div class="dashboard-shell app-surface-canvas app-surface-stack">
@@ -34,16 +34,18 @@
         <h3>{{ currentPeriod }}</h3>
       </div>
       <div class="dashboard-calendar__actions">
-        <button class="dashboard-calendar__icon hide-gt-xs"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                [viewDate]="viewDate()"
-                [view]="view"
-                mat-icon-button
-                mwlCalendarPreviousView
-                type="button">
-          <mat-icon>navigate_before</mat-icon>
-        </button>
-        <button class="dashboard-calendar__button hide-xs"
+        <div class="app-surface-hide-desktop">
+          <button class="app-detail-action-button app-surface-hide-desktop"
+                  (viewDateChange)="closeOpenMonthViewDay($event)"
+                  [viewDate]="viewDate()"
+                  [view]="view"
+                  mat-icon-button
+                  mwlCalendarPreviousView
+                  type="button">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
+        </div>
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 [viewDate]="viewDate()"
                 [view]="view"
@@ -53,15 +55,17 @@
           <mat-icon>navigate_before</mat-icon>
           <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
         </button>
-        <button class="dashboard-calendar__icon hide-gt-xs"
-                [viewDate]="viewDate()"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                mat-icon-button
-                mwlCalendarToday
-                type="button">
-          <mat-icon>today</mat-icon>
-        </button>
-        <button class="dashboard-calendar__button hide-xs"
+        <div class="app-surface-hide-desktop">
+          <button class="app-detail-action-button"
+                  [viewDate]="viewDate()"
+                  (viewDateChange)="closeOpenMonthViewDay($event)"
+                  mat-icon-button
+                  mwlCalendarToday
+                  type="button">
+            <mat-icon>today</mat-icon>
+          </button>
+        </div>
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 [viewDate]="viewDate()"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 mat-stroked-button
@@ -70,16 +74,18 @@
           <mat-icon>today</mat-icon>
           <span>{{ 'COMMON.BUTTON.TODAY' | translate }}</span>
         </button>
-        <button class="dashboard-calendar__icon hide-gt-xs"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                [viewDate]="viewDate()"
-                [view]="view"
-                mat-icon-button
-                mwlCalendarNextView
-                type="button">
-          <mat-icon>navigate_next</mat-icon>
-        </button>
-        <button class="dashboard-calendar__button hide-xs"
+        <div class="app-surface-hide-desktop">
+          <button class="app-detail-action-button"
+                  (viewDateChange)="closeOpenMonthViewDay($event)"
+                  [viewDate]="viewDate()"
+                  [view]="view"
+                  mat-icon-button
+                  mwlCalendarNextView
+                  type="button">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
+        </div>
+        <button class="app-detail-action-button app-surface-hide-mobile"
                 (viewDateChange)="closeOpenMonthViewDay($event)"
                 [viewDate]="viewDate()"
                 [view]="view"
@@ -113,7 +119,7 @@
                                (beforeViewRender)="beforeMonthViewRender($event)"
                                [activeDayIsOpen]="activeDayIsOpen"
                                [events]="calendar.calendarEvents"
-                               [locale]="dateFormat"
+                               [locale]="language"
                                [viewDate]="viewDate()"></mwl-calendar-month-view>
     </div>
 
@@ -131,10 +137,15 @@
            [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}">
       </div>
     </div>
-  </section>
 
-  <section class="dashboard-grid-shell">
     <mat-grid-list class="dashboard-grid" [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
+      @if (isLoading()) {
+        @for (skeleton of miniCardSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+            <app-mini-card [title]="''" [isLoading]="true"></app-mini-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (mc of miniCardData; track mc.title) {
         <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
           <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
@@ -147,14 +158,23 @@
           </app-mini-card>
         </mat-grid-tile>
       }
+      }
 
+      @if (isLoading()) {
+        @for (skeleton of chartSkeletons; track skeleton) {
+          <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+            <app-card></app-card>
+          </mat-grid-tile>
+        }
+      } @else {
       @for (chart of charts; track chart.title) {
         <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
           <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
             <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading()"
-                       [locale]="dateFormat" [timeZone]="timeZone"></app-chart>
+                       [locale]="language" [timeZone]="timeZone"></app-chart>
           </app-card>
         </mat-grid-tile>
+      }
       }
 
       @if (roomId || professionalId) {

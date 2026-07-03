@@ -1,24 +1,19 @@
 @let account = accountSignal();
-@if (account) {
-  <div class="app-surface-canvas app-surface-shell app-surface-stack">
-    <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
+<div class="app-surface-canvas app-surface-shell app-surface-stack">
+  <app-balance [account]="account" [showAdd]="showAdd()" [showView]="true" [language]="language"></app-balance>
 
+  @if (isLoading()) {
+    <app-skeleton />
+  } @else if (account) {
     <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
       <section class="app-surface-section">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'ACCOUNT.TITLE' | translate }}</span>
             @if (account.customer) {
               <h2 class="account-title">
-                @if (userId() === account.customer.id) {
-                  <a [routerLink]="['/', language, 'me', 'overview']" class="app-detail-link">
-                    {{ account.customer.displayName }}
-                  </a>
-                } @else {
-                  <a [routerLink]="['/', language, 'users', account.customer.id, 'overview']" class="app-detail-link">
-                    {{ account.customer.displayName }}
-                  </a>
-                }
+                <a [routerLink]="navigation" class="app-detail-link">
+                  {{ account.customer.displayName }}
+                </a>
               </h2>
             } @else {
               <div class="ssc-line app-skeleton-title"></div>
@@ -52,7 +47,7 @@
               <button type="button"
                       [routerLink]="['/', language, 'currency', 'add']"
                       mat-stroked-button
-                      class="app-detail-action-button">
+                      class="app-surface-filter-action app-detail-action-button">
                 <mat-icon>add_card</mat-icon>
                 <span>{{ 'COMMON.CURRENCY.ADD_BUTTON' | translate }}</span>
               </button>
@@ -90,5 +85,5 @@
         </div>
       </section>
     </form>
-  </div>
-}
+  }
+</div>

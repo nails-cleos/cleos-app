@@ -1,7 +1,16 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { SharedModule } from '../../shared/shared.module';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDragHandle,
+  CdkDragPlaceholder,
+  CdkDropList,
+  moveItemInArray,
+} from '@angular/cdk/drag-drop';
 import { BackButtonDirective } from '../../directives/back-button.directive';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 
 export interface ISorted {
   order: number;
@@ -40,7 +49,8 @@ export class ItemSorting implements ISorting {
   selector: 'app-drag-drop-sorting',
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatIcon, MatButton, TranslatePipe, BackButtonDirective, BackButtonDirective,
+    CdkDropList, CdkDrag, CdkDragPlaceholder, CdkDragHandle],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DragDropSortingComponent {

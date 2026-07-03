@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { Token } from '../interfaces/token';
-import { IUserAll } from '../interfaces/user';
+import { IUserAll } from '../user/user';
 
 describe('AuthService', () => {
   let service: AuthService;

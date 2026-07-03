@@ -138,6 +138,7 @@
     "TITLE": "Agregar gasto",
     "CREATED": "Gasto {{invoice}} creado",
     "DETAIL": "Actualizar gasto",
+    "CREATE_ANOTHER": "Crear otro gasto",
     "LIST": {
       "COLUMN": {
         "INVOICE": "Factura",

@@ -1,23 +1,23 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { IMenu } from '../../interfaces/user';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { IMenu } from '../../user/user';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateService } from '@ngx-translate/core';
 import { MatDrawer } from '@angular/material/sidenav';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-menu-item',
   templateUrl: './menu-item.component.html',
   styleUrls: ['./menu-item.component.scss'],
-  imports: [AppMaterialModule, RouterLinkActive, RouterLink],
+  imports: [MatIcon, MatListItem, RouterLink, MatListItemIcon, RouterLinkActive, MatNavList],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MenuItemComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   items = input.required<IMenu[]>();
   drawer = input<MatDrawer>();
@@ -43,14 +43,11 @@ export class MenuItemComponent {
   openSubMenus: { [key: number]: boolean } = {};
   openSubSubMenus: { [key: number]: { [key: number]: boolean } } = {};
 
-  language: string = this.translate.getCurrentLang();
-
-  constructor() {
-  }
+  language = this.navigationService.language;
 
   navigate = (menu: IMenu, drawer?: MatDrawer): void => {
     drawer?.toggle();
-    this.router.navigate([this.language].concat(menu.path.split('/')));
+    this.navigationService.navigate(menu.path.split('/'));
   };
 
   toggleSubMenu = (index: number) => {

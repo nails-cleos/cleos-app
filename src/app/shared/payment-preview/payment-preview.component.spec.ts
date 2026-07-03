@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentPreviewComponent } from './payment-preview.component';
-import { SharedModule } from '../shared.module';
 import { By } from '@angular/platform-browser';
 import { IPaymentOption } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
@@ -25,7 +24,7 @@ describe('PaymentPreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaymentPreviewComponent, SharedModule, TranslateModule.forRoot()],
+      imports: [PaymentPreviewComponent, TranslateModule.forRoot()],
       providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
     }).compileComponents();
 

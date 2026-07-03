@@ -1,21 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { cleanUser, getAllDisableUsers } from '../../store/user.actions';
-import { IUserAll } from '../../interfaces/user';
+import { IUserAll } from '../user';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { DiscountState } from '../../store/reducers/discount.reducers';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
 import { Role } from '../../interfaces/token';
+import { signal, WritableSignal } from '@angular/core';
+import { UserStore } from '../../store/user.store';
 
 describe('SelectUserDialogComponent', () => {
   let component: SelectUserDialogComponent;
   let fixture: ComponentFixture<SelectUserDialogComponent>;
 
-  let allUsers$: BehaviorSubject<IUserAll[] | undefined>;
+  let usersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectUserDialogComponent>>;
 
   const mockUser: IUserAll = {
@@ -27,7 +25,7 @@ describe('SelectUserDialogComponent', () => {
     phone: '+1234567890',
     enabled: true,
     verified: true,
-    imageUrl: 'http://example.com/image.jpg',
+    image: 'AAA',
     timeZone: 'Europa/Amsterdam',
   };
 
@@ -37,11 +35,13 @@ describe('SelectUserDialogComponent', () => {
   ];
 
   beforeEach(async () => {
-    allUsers$ = new BehaviorSubject<IUserAll[] | undefined>(undefined);
+    usersSignal = signal<IUserAll[] | undefined>(undefined);
 
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(allUsers$.asObservable());
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadDisabledUsers']);
+    Object.assign(userStoreSpy, {
+      users: usersSignal.asReadonly(),
+    });
 
     await TestBed.configureTestingModule({
       imports: [SelectUserDialogComponent, TranslateModule.forRoot()],
@@ -51,7 +51,7 @@ describe('SelectUserDialogComponent', () => {
           useFactory: () => ({ newUser: mockUser }),
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
       ],
     }).compileComponents();
 
@@ -59,21 +59,19 @@ describe('SelectUserDialogComponent', () => {
     component = fixture.componentInstance;
   });
 
-  afterEach(() => allUsers$.complete());
-
   it('should create component', () => {
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
-  it('should dispatch clean and getAllDisableUsers on init', () => {
+  it('should clean and load disabled users on init', () => {
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanUser());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllDisableUsers());
+    expect(userStoreSpy.clean).toHaveBeenCalled();
+    expect(userStoreSpy.loadDisabledUsers).toHaveBeenCalled();
   });
 
   it('should update users when store emits', () => {
-    allUsers$.next([...mockUsers, mockUser]);
+    usersSignal.set([...mockUsers, mockUser]);
     fixture.detectChanges();
 
     expect(component.users()).toEqual(mockUsers);

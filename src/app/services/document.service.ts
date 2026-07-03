@@ -5,7 +5,7 @@ import { toUrl } from '../util/helper';
 import { paginated, Pagination } from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';
 import { createFilter } from '../util/service-helper';
-import { IDocument } from '../interfaces/document';
+import { IDocument } from '../document/document';
 
 @Injectable({
   providedIn: 'root',

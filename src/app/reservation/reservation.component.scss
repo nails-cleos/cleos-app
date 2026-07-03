@@ -48,3 +48,15 @@
 .time-field {
   width: 100%;
 }
+
+.add-button-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.add-button {
+  display: flex;
+  justify-content: center;
+}

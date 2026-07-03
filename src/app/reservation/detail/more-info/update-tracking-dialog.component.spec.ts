@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
+import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
 
 describe('UpdateTrackingDialogComponent', () => {
   let component: UpdateTrackingDialogComponent;
@@ -23,6 +24,7 @@ describe('UpdateTrackingDialogComponent', () => {
       providers: [
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: mockTimestamps },
+        provideAppDateAdapter(),
       ],
     });
 

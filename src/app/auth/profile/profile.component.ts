@@ -8,65 +8,57 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { Store } from '@ngrx/store';
-import { IUser, User } from '../../interfaces/user';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { cleanUser, getMyUser, updateMyPhoto, updateMyUser } from '../../store/user.actions';
-import { fieldChange, validColorValidator, valueChange } from '../../util/validators';
+import { User } from '../../user/user';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { validColorValidator, valueChange } from '../../util/validators';
 import { flags, IFlag } from '../../util/flags';
-import { createAddress, getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
-import { backendFormatDate, createDateFromString, newDate } from '../../util/dates';
+import { getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
+import { createDateFromString } from '../../util/dates';
 import { Role } from '../../interfaces/token';
-import { LangChangeEvent, TranslateService } from '@ngx-translate/core';
+import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { resizeImage } from '../../util/file';
-import { SharedModule } from '../../shared/shared.module';
 import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getSelectedUserPipe, getSubErrorsPipe, getUserResponsePipe } from '../../store/selectors/user.selectors';
 import { IError } from '../../interfaces/common';
-import { UserState } from '../../store/reducers/user.reducers';
 import { ColorPickerComponent } from '../../shared/color-picker/color-picker.component';
-import PlaceResult = google.maps.places.PlaceResult;
+import { MatIcon } from '@angular/material/icon';
+import { NgClass, UpperCasePipe } from '@angular/common';
+import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
-
-type ProfileForm = {
-  lang: FormControl<string | undefined>;
-  displayName: FormControl<string>;
-  phone: FormControl<string>;
-  dob: FormControl<Date | undefined>;
-  darkColor: FormControl<string>;
-  lightColor: FormControl<string>;
-  addressForm: FormGroup<GoogleMapForm>;
-};
+import PlaceResult = google.maps.places.PlaceResult;
+import { MatCheckbox } from '@angular/material/checkbox';
+import { ProfileForm } from '../../user/user-form.types';
+import { UserStore } from '../../store/user.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
-  imports: [SharedModule, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
-    ColorPickerComponent],
+  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
+    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass, MatError, MatPrefix, BackButtonDirective,
+    NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective, NgIcon,
+    ColorPickerComponent, UpperCasePipe, MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent {
-  private readonly store: Store<UserState> = inject(Store<UserState>);
+  private readonly userStore = inject(UserStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
-
-  private selectedUser$ = this.store.pipe(getSelectedUserPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getUserResponsePipe);
-
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
-  private langChangeSignal = toSignal<LangChangeEvent>(this.translate.onLangChange);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private langChangeSignal = toSignal<LangChangeEvent>(this.translateService.onLangChange);
 
   canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
 
-  selectedUserSignal = toSignal(this.selectedUser$);
+  selectedUserSignal = this.userStore.selected;
 
   showCashSignal = signal(false);
   errors = signal<Record<string, unknown>>({});
@@ -90,7 +82,7 @@ export class ProfileComponent {
   });
   labels = computed(() => {
     this.langChangeSignal();
-    const phoneTranslations = this.translate.instant('COMMON.USER.PHONE');
+    const phoneTranslations = this.translateService.instant('COMMON.USER.PHONE');
 
     return {
       mainLabel: '',
@@ -132,15 +124,19 @@ export class ProfileComponent {
   private geometry?: PlaceGeometry;
   private formattedAddress?: string;
   private lastImageUrl?: string;
+  private readonly language = this.navigationService.language;
 
   constructor() {
+    this.userStore.clean();
+    this.userStore.loadMyUser();
+
     effect(() => {
       const lang = this.selectedLang();
       this.selectedFlag.set(this.flagList.find(l => l.value === lang)?.flag);
     });
 
     effect(() => {
-      const subErrors = this.subErrorsSignal();
+      const subErrors = this.userStore.subErrors();
       if (subErrors) {
         const errorMap: Record<string, unknown> = {};
         subErrors.forEach((error: IError) => {
@@ -156,9 +152,9 @@ export class ProfileComponent {
     });
 
     effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanUser());
-        this.store.dispatch(getMyUser());
+      if (this.userStore.response()) {
+        this.userStore.clean();
+        this.userStore.loadMyUser();
       }
     });
 
@@ -221,27 +217,17 @@ export class ProfileComponent {
       return;
     }
     const selectedUser = this.selectedUserSignal();
+    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.language;
+    const user = User.fromProfileForm(
+      this.getForm,
+      this.showCashSignal(),
+      selectedUser,
+      this.language,
+      this.formattedAddress,
+      this.geometry?.location,
+    );
 
-    const lang = valueChange(this.getForm.lang.value, selectedUser?.locale) || this.translate.getCurrentLang();
-    const user: IUser = new User();
-    user.locale = lang;
-    user.displayName = fieldChange(this.getForm.displayName, selectedUser?.displayName);
-    user.phone = fieldChange(this.getForm.phone, selectedUser?.phone);
-    user.dob = fieldChange(this.getForm.dob, selectedUser?.dob);
-    user.dob = user.dob ? backendFormatDate(newDate(user.dob)) : user.dob;
-    user.showCash = this.showCashSignal();
-
-    if (this.getForm.lightColor.value) {
-      user.lightColor = this.getForm.lightColor.value;
-    }
-
-    if (this.getForm.darkColor.value) {
-      user.darkColor = this.getForm.darkColor.value;
-    }
-
-    user.address = createAddress(this.formattedAddress, this.geometry?.location, selectedUser?.address);
-
-    this.store.dispatch(updateMyUser({ user, redirectUrl: `/${getLocale(lang).language}/auth/profile` }));
+    this.userStore.updateMyUser(user, `/${getLocale(lang).language}/auth/profile`);
     return;
   }
 
@@ -259,7 +245,7 @@ export class ProfileComponent {
             if (resizedImage) {
               resizedImage.nativeElement.src = dataUrl;
             }
-            this.store.dispatch(updateMyPhoto({ file: dataUrl }));
+            this.userStore.updateMyPhoto(dataUrl);
           }
         };
         img.src = e.target.result;

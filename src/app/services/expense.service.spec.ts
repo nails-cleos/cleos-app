@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { ExpenseService } from './expense.service';
 import { SortDirection } from '@angular/material/sort';
-import { IExpense } from '../interfaces/expense';
+import { IExpense } from '../room/me/expense/expense';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('ExpenseService', () => {
   let service: ExpenseService;
@@ -88,7 +89,7 @@ describe('ExpenseService', () => {
 
     service.getAllExpensesInfo(roomId).subscribe();
 
-    expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/info`);
+    expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/info`, { ...skipLoadingOverlay() });
   });
 
   it('should get a single expense by id', () => {
@@ -96,7 +97,7 @@ describe('ExpenseService', () => {
 
     service.getExpense(roomId, 'exp-1').subscribe();
 
-    expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`);
+    expect(httpSpy.get).toHaveBeenCalledWith(`v1/rooms/${roomId}/expenses/exp-1`, { ...skipLoadingOverlay() });
   });
 
   it('should create expense', () => {
@@ -172,6 +173,6 @@ describe('ExpenseService', () => {
 
     service.getExpense('room-x', 'id-y').subscribe();
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/rooms/room-x/expenses/id-y');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/rooms/room-x/expenses/id-y', { ...skipLoadingOverlay() });
   });
 });

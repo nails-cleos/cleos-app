@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MonthComponent } from './month.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IMonthSummary, ISummaryTotal } from '../../../interfaces/dashboard';
-import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { IMonthSummary, ISummaryTotal } from '../../dashboard';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
 
 describe('MonthComponent', () => {
   let component: MonthComponent;
   let fixture: ComponentFixture<MonthComponent>;
-
-  let routerSpy: jasmine.SpyObj<Router>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   const monthSummary: IMonthSummary = {
     month: 1,
@@ -26,17 +26,16 @@ describe('MonthComponent', () => {
   };
 
   beforeEach(async () => {
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
 
     await TestBed.configureTestingModule({
       imports: [MonthComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
-
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
 
     fixture = TestBed.createComponent(MonthComponent);
     component = fixture.componentInstance;
@@ -79,8 +78,8 @@ describe('MonthComponent', () => {
     it('should navigate with step 0 for INCOME', () => {
       component.goToMonth(5, 'INCOME');
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 0 } },
       );
     });
@@ -88,8 +87,8 @@ describe('MonthComponent', () => {
     it('should navigate with step 1 for EXPENSE', () => {
       component.goToMonth(5, 'EXPENSE');
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 1 } },
       );
     });
@@ -97,8 +96,8 @@ describe('MonthComponent', () => {
     it('should navigate with step 2 for CASH', () => {
       component.goToMonth(5, 'CASH');
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'monthly', 'summary'],
         { state: { date: '5-2025', step: 2 } },
       );
     });
@@ -106,8 +105,8 @@ describe('MonthComponent', () => {
     it('should navigate with step 0 when type is undefined', () => {
       component.goToMonth(7);
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        ['en-GB', 'dashboard', 'monthly', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'monthly', 'summary'],
         { state: { date: '7-2025', step: 0 } },
       );
     });

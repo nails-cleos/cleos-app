@@ -1,17 +1,12 @@
-<div class="expanded-chart-frame app-surface-dialog-shell">
-  <div class="app-surface-dialog-header expanded-chart-header">
-    <div class="app-surface-dialog-title-wrap">
-      <div class="app-surface-dialog-badge" aria-hidden="true">
-        <mat-icon>insert_chart</mat-icon>
-      </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ data.title }}</h1>
-    </div>
-    <button [mat-dialog-close]="true" class="app-surface-dialog-close close-button" type="button">
-      <mat-icon>close</mat-icon>
-    </button>
-  </div>
-  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
-  <div mat-dialog-content class="app-surface-dialog-content expanded-chart-content">
+<div class="app-surface-dialog-shell">
+  <div mat-dialog-title class="app-surface-dialog-title">{{ data.title }}</div>
+  <div mat-dialog-content class="app-surface-dialog-content">
     <app-chart [chartData]="data.chart"></app-chart>
+  </div>
+  <div mat-dialog-actions class="app-surface-dialog-actions">
+    <div class="app-surface-dialog-spacer"></div>
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CLOSE' | translate }}
+    </button>
   </div>
 </div>

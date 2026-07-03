@@ -8,6 +8,7 @@
 .auth-choice-list {
   display: flex;
   flex-direction: column;
+  margin-top: 10px;
 }
 
 .auth-form,
@@ -31,10 +32,8 @@
 }
 
 .auth-legal {
-  margin: 0;
   color: var(--app-surface-text-muted);
   text-align: center;
-  line-height: 1.6;
 }
 
 .auth-actions {
@@ -79,7 +78,7 @@ img {
     align-items: stretch;
   }
 
-  .auth-actions .spacer {
+  .auth-actions .app-surface-spacer {
     display: none;
   }
 }

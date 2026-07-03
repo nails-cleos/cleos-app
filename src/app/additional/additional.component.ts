@@ -5,66 +5,60 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
+  output,
   signal,
   Signal,
   viewChild,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Additional, IAdditional } from '../interfaces/additional';
-import { createAdditional, getAdditional, updateAdditional } from '../store/additional.actions';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
-import { fieldChange, valueChange } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from './additional';
+import { ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
-import { formatDuration } from '../util/dates';
-import { areEquals } from '../util/helper';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { TranslatePipe } from '@ngx-translate/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ICommon, IError, isString } from '../interfaces/common';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
+import { MatOption } from '@angular/material/core';
+import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getCurrentAdditionalIdPipe,
-  getGroupPipe,
-  getSelectedAdditionalPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/additional.selectors';
-import { IError, isString } from '../interfaces/common';
-import { AdditionalState } from '../store/reducers/additional.reducers';
-
-type AdditionalForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  duration: FormControl<string>;
-  group: FormControl<ITreatmentGroupAll | undefined>;
-};
+import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
+import { TreatmentStore } from '../store/treatment.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-additional',
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
+    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
+    ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
+    MatChipRemove, BackButtonDirective, SkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {
-  private readonly store: Store<AdditionalState> = inject(Store<AdditionalState>);
+  config = input.required<ICommon>();
+  additional = input<IAdditionalAll | undefined>();
+  submitData = output<IAdditional>();
+
+  private readonly additionalStore = inject(AdditionalStore);
+  private readonly treatmentStore = inject(TreatmentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private additionalId$ = this.store.pipe(getCurrentAdditionalIdPipe);
-  private selectedAdditional$ = this.store.pipe(getSelectedAdditionalPipe);
-  private allGroups$ = this.store.pipe(getGroupPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private additionalIdSignal = toSignal(this.additionalId$);
-  private selectedAdditionalSignal = toSignal(this.selectedAdditional$);
-  private allGroupsSignal = toSignal(this.allGroups$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-
-  private additionalId = computed(() => this.additionalIdSignal());
-
-  additionalSignal = computed(() => this.selectedAdditionalSignal());
+  private readonly allGroupsSignal = computed(() => {
+    const data = this.treatmentStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
+  private subErrorsSignal = this.additionalStore.subErrors;
 
   form: FormGroup<AdditionalForm> = this.formBuilder.group<AdditionalForm>({
     name: this.formBuilder.control('', {
@@ -81,37 +75,34 @@ export class AdditionalComponent {
     this.getForm.group.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.name),
-      combineLatestWith(this.allGroups$),
+      combineLatestWith(toObservable(this.allGroupsSignal)),
       map(([name, groups]) => {
         if (name) {
-          return this.filterGroup(name, groups);
+          return this.filterGroup(name, groups ?? []);
         } else {
           return groups ? groups.slice() : groups;
         }
       }),
     ),
   );
-  isAddModeSignal = computed(() => !this.additionalId());
   groupsSignal = signal<ITreatmentGroupAll[]>([]);
-  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(undefined);
+  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(this.allGroupsSignal());
   errors = signal<Record<string, unknown>>({});
 
   groupInput = viewChild.required<ElementRef<HTMLInputElement>>('groupInput');
 
-  language: string = this.translate.getCurrentLang();
+  language: string = this.navigationService.language;
 
   private currentGroupIds: string[] = [];
 
   constructor() {
+    this.treatmentStore.loadAllGroups();
+
     effect(() => {
-      const selected = this.selectedAdditionalSignal();
-      if (selected?.id) {
-        const duration = formatDuration(selected.duration);
-        const additional = Object.assign({}, selected, { duration });
-        this.form.patchValue(additional);
-        return additional;
+      const selected = this.additional();
+      if (selected) {
+        this.form.patchValue(selected);
       }
-      return selected;
     });
 
     effect(() => {
@@ -131,14 +122,7 @@ export class AdditionalComponent {
     });
 
     effect(() => {
-      const id = this.additionalId();
-      if (id) {
-        this.store.dispatch(getAdditional({ id }));
-      }
-    });
-
-    effect(() => {
-      const additional = this.selectedAdditionalSignal();
+      const additional = this.additional();
       const allGroups = this.allGroupsSignal();
 
       // Update allGroups from store
@@ -169,29 +153,17 @@ export class AdditionalComponent {
     return this.form.controls;
   }
 
+  get getConfig(): ICommon {
+    return this.config();
+  }
+
   submit(): void {
     if (this.form.invalid) {
       return;
     }
 
-    const additionalSignal = this.additionalSignal();
-    const additional: IAdditional = new Additional();
-    additional.name = fieldChange(this.getForm.name, additionalSignal?.name);
-    additional.description = valueChange(this.getForm.description.value, additionalSignal?.description);
-    additional.duration = fieldChange(this.getForm.duration, additionalSignal?.duration);
-
     const newGroupIds: string[] = this.groupsSignal().map(({ id }) => id).filter(isString);
-    if (!areEquals(newGroupIds, this.currentGroupIds)) {
-      additional.groupIds = newGroupIds;
-    }
-
-    const id = this.additionalId();
-    if (!id) {
-      this.store.dispatch(createAdditional({ additional }));
-    } else {
-      this.store.dispatch(updateAdditional({ id, additional }));
-    }
-    return;
+    this.submitData.emit(Additional.fromForm(this.getForm, this.additional(), newGroupIds, this.currentGroupIds));
   }
 
   remove = (group: ITreatmentGroupAll): void => {

@@ -5,8 +5,8 @@ import { UnavailableService } from './unavailable.service';
 import { of } from 'rxjs';
 import { createFilter } from '../util/service-helper';
 import { paginated, Pagination } from '../interfaces/pagination';
-import { IUnavailableAll } from '../interfaces/unavailable';
-import { IUserAll } from '../interfaces/user';
+import { IUnavailableAll } from '../unavailable/unavailable';
+import { IUserAll } from '../user/user';
 import { getNowTimeZone } from '../util/dates';
 import { FrequencyEnum } from '../util/helper';
 

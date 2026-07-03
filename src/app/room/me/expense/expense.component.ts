@@ -1,40 +1,53 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Expense, IExpense, ISupplyStore, ITotalExpense } from '../../../interfaces/expense';
-import { TranslateService } from '@ngx-translate/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  viewChild,
+} from '@angular/core';
+import {
+  FormArray,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { Expense, ExpenseForm, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from './expense';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { createExpense, getAllExpensesInfo, getExpense, updateExpense } from '../../../store/expense.actions';
-import { API_LOCALE, createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
-import { fieldChange, noDuplicateDatesValidator } from '../../../util/validators';
+import { createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
+import { noDuplicateDatesValidator } from '../../../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { SharedModule } from '../../../shared/shared.module';
 import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { ExpenseState } from '../../../store/reducers/expense.reducers';
-import { RoomState } from '../../../store/reducers/room.reducers';
-import {
-  getCurrentExpenseIdPipe,
-  getExpenseResponsePipe,
-  getInfoPipe,
-  getSelectedExpensePipe,
-  getSubErrorsPipe,
-} from '../../../store/selectors/expense.selectors';
-import { getCurrentRoomIdPipe } from '../../../store/selectors/room.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../../../interfaces/common';
+import { ICommon, IError } from '../../../interfaces/common';
 import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
-import { AwsState } from '../../../store/reducers/aws.reducers';
-import { AuthState } from '../../../store/reducers/auth.reducers';
-import { getAwsPipe } from '../../../store/selectors/aws.selectors';
 import { awsExtractToNumberFormat } from '../../../interfaces/aws';
 import { calculateBTW, calculateNet } from '../../../util/numbers';
-import { callAwsLambda } from '../../../store/aws.actions';
 import { AuthUserService } from '../../../services/auth-user.service';
 import { DriveAccessService } from '../../../services/drive-access.service';
 import { EnvService } from '../../../services/env.service';
 import { TokenService } from '../../../services/token.service';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import { MatOptgroup, MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { DecimalPipe, KeyValuePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { AwsStore } from '../../../store/aws.store';
+import { ExpenseStore } from '../../../store/expense.store';
+import { NavigationService } from '../../../services/navigation.service';
 
 type TotalsForm = {
   type: FormControl<string>;
@@ -43,51 +56,47 @@ type TotalsForm = {
   description: FormControl<string>;
 }
 
-type ExpenseForm = {
-  invoice: FormControl<string>;
-  supplyStore: FormControl<string | ISupplyStore>;
-  date: FormControl<Date | undefined>;
-  totals: FormArray;
-}
-
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
-  imports: [SharedModule, TwoDigitsDirective, BackButtonDirective, FileDropComponent],
+  imports: [TwoDigitsDirective, MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle,
+    MatDatepicker, MatSelect, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
+    KeyValuePipe, DecimalPipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatSuffix,
+    BackButtonDirective, TwoDigitsDirective, BackButtonDirective, FileDropComponent, MatOptgroup, MatHint,
+    MatCheckbox],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
+  roomId = input.required<string>();
+  config = input.required<ICommon>();
+  expense = input<IExpenseAll | undefined>();
+  submitData = output<{ expense: IExpense, file?: File }>();
+
   private readonly env: EnvService = inject(EnvService);
-  private readonly store: Store<ExpenseState | RoomState | AwsState | AuthState> = inject(
-    Store<ExpenseState | RoomState | AwsState | AuthState>);
+  private readonly expenseStore = inject(ExpenseStore);
+  private readonly awsStore = inject(AwsStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
   private readonly tokenService: TokenService = inject(TokenService);
+  private readonly formDirective = viewChild(FormGroupDirective);
 
-  private roomId$ = this.store.pipe(getCurrentRoomIdPipe);
-  private expenseId$ = this.store.pipe(getCurrentExpenseIdPipe);
-  private selectedExpense$ = this.store.pipe(getSelectedExpensePipe);
-  private info$ = this.store.pipe(getInfoPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-  private response$ = this.store.pipe(getExpenseResponsePipe);
-  private aws$ = this.store.pipe(getAwsPipe);
-
-  private awsSignal = toSignal(this.aws$);
+  private awsSignal = this.awsStore.data;
   private userId = computed(() => this.authUserService.authUser().userId);
 
-  private expenseIdSignal = toSignal(this.expenseId$);
-  private roomIdSignal = toSignal(this.roomId$);
-  private infoSignal = toSignal(this.info$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
+  private infoSignal = this.expenseStore.info;
+  private subErrorsSignal = this.expenseStore.subErrors;
+  private responseSignal = this.expenseStore.response;
+  private errorSignal = this.expenseStore.error;
+  private isLoadingSignal = this.expenseStore.isLoading;
 
-  expenseSignal = toSignal(this.selectedExpense$);
-  isAddModeSignal = computed(() => !this.expenseIdSignal());
   errors = signal<Record<string, unknown>>({});
+  private readonly createAnotherState = signal(false);
+  private readonly pendingCreateAnotherReset = signal(false);
+  private readonly createAnotherRequestStarted = signal(false);
 
   form: FormGroup<ExpenseForm> = this.formBuilder.group<ExpenseForm>({
     invoice: this.formBuilder.control('', {
@@ -102,13 +111,12 @@ export class ExpenseComponent {
     totals: this.formBuilder.array<FormGroup<TotalsForm>>([], { validators: [noDuplicateDatesValidator('btw')] }),
   });
 
-  createAnother: boolean = false;
   types = computed(() => this.infoSignal()?.types || []);
   currencyIcon = computed(() => this.infoSignal()?.currency?.icon || '');
   roomName = computed(() => this.infoSignal()?.roomName || '');
   supplyStores = computed(() => this.infoSignal()?.supplyStores || []);
   today = computed(() => getNowTimeZone(this.timeZone()));
-  readonly fileName = computed(() => this.expenseSignal()?.document?.name);
+  readonly fileName = computed(() => this.expense()?.document?.name);
 
   filteredSupplyStore = toSignal(
     this.getForm.supplyStore.valueChanges.pipe(
@@ -125,23 +133,21 @@ export class ExpenseComponent {
     ),
   );
 
-  readonly submitLabel = computed(() => `COMMON.BUTTON.${this.isAddModeSignal() ? 'CREATE' : 'UPDATE'}`);
-
   totalMap: Map<number, { btwValue: string, net: string }> = new Map();
 
   file = signal<UploadFile | undefined>(undefined);
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
   private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
 
-  private readonly language: string = this.translate.getCurrentLang();
+  private readonly language: string = this.navigationService.language;
 
   constructor() {
     effect(() => {
-      const selected = this.expenseSignal();
+      const selected = this.expense();
       if (selected?.document) {
         this.file.set({ name: selected.document.name, progress: 100, size: 0 });
       }
-      if (selected?.id) {
+      if (selected) {
         queueMicrotask(() => {
           this.form.patchValue(selected);
           this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
@@ -170,85 +176,94 @@ export class ExpenseComponent {
     });
 
     effect(() => {
-      const roomId = this.roomIdSignal();
       if (this.responseSignal()) {
-        if (this.isAddModeSignal() && this.createAnother) {
-          this.file.set(undefined);
-        } else {
-          this.router.navigate([this.language, 'rooms', roomId, 'expenses']);
+        if (!this.expense() && this.createAnother) {
+          return;
         }
+
+        this.navigationService.navigate(['rooms', this.roomId(), 'expenses']);
       }
     });
 
     effect(() => {
-      const id = this.expenseIdSignal();
-      const roomId = this.roomIdSignal();
-      if (roomId && id) {
-        this.store.dispatch(getExpense({ roomId, id }));
+      if (!this.pendingCreateAnotherReset()) {
+        return;
       }
+
+      if (this.isLoadingSignal()) {
+        this.createAnotherRequestStarted.set(true);
+        return;
+      }
+
+      if (!this.createAnotherRequestStarted()) {
+        return;
+      }
+
+      this.pendingCreateAnotherReset.set(false);
+      this.createAnotherRequestStarted.set(false);
+
+      if (this.errorSignal() || this.subErrorsSignal()) {
+        return;
+      }
+
+      this.awsStore.clean?.();
+      this.file.set(undefined);
+      this.resetCreateAnotherForm();
     });
 
     effect(() => {
-      const roomId = this.roomIdSignal();
-      if (roomId) {
-        this.store.dispatch(getAllExpensesInfo({ roomId }));
-      }
+      this.expenseStore.loadInfo(this.roomId());
     });
 
     effect(() => {
       const file = this.file()?.raw;
       if (!file) {
-        if (!this.isAddModeSignal()) {
+        if (this.expense()) {
           return;
         }
-        this.form.reset();
-        this.form.markAsPristine({ emitEvent: false });
-        this.form.markAsUntouched({ emitEvent: false });
-        this.totals.clear();
-        this.totals.controls.forEach(control => {
-          control.markAsPristine({ emitEvent: false });
-          control.markAsUntouched({ emitEvent: false });
-        });
-        this.totalMap = new Map();
+        this.resetCreateAnotherForm();
         return;
       }
       const token = this.tokenService.token();
       if (token && this.env.awsExtractEnable) {
-        this.store.dispatch(callAwsLambda({ token, file, userId: this.userId() }));
+        this.awsStore.processPdf(token, file, this.userId());
       }
     });
 
     effect(() => {
       const aws = this.awsSignal();
-      if (aws) {
-        this.setSupplierOrName(aws.VENDOR_NAME);
-        if (aws.INVOICE_RECEIPT_DATE) {
-          const date = new Date(aws.INVOICE_RECEIPT_DATE);
-          if (!isNaN(date.getTime())) {
-            this.getForm.date.setValue(date);
-          }
-        }
-        if (aws.INVOICE_RECEIPT_ID) {
-          this.getForm.invoice.setValue(aws.INVOICE_RECEIPT_ID);
-        }
-        let total = awsExtractToNumberFormat(aws.TOTAL);
-        const btwValue = awsExtractToNumberFormat(aws.TAX);
-        const subtotal = awsExtractToNumberFormat(aws.SUBTOTAL);
+      const file = this.file()?.raw;
+      if (!aws || !file) {
+        return;
+      }
 
-        let btwPercentage = 0;
-        if (!total && subtotal && btwValue) {
-          total = subtotal + btwValue;
+      this.setSupplierOrName(aws.VENDOR_NAME);
+      if (aws.INVOICE_RECEIPT_DATE) {
+        const date = new Date(aws.INVOICE_RECEIPT_DATE);
+        if (!isNaN(date.getTime())) {
+          this.getForm.date.setValue(date);
         }
-        if (total) {
-          btwPercentage = subtotal ? calculateBTW(total, subtotal) : 0;
-          this.addTotal(true, 0, total, btwPercentage);
-        }
+      }
+      if (aws.INVOICE_RECEIPT_ID) {
+        this.getForm.invoice.setValue(aws.INVOICE_RECEIPT_ID);
+      }
+      let total = awsExtractToNumberFormat(aws.TOTAL);
+      const btwValue = awsExtractToNumberFormat(aws.TAX);
+      const subtotal = awsExtractToNumberFormat(aws.SUBTOTAL);
+
+      let btwPercentage = 0;
+      if (!total && subtotal && btwValue) {
+        total = subtotal + btwValue;
+      }
+      if (total) {
+        btwPercentage = subtotal ? calculateBTW(total, subtotal) : 0;
+        this.addTotal(true, 0, total, btwPercentage);
       }
     });
 
     effect(() => {
       const supplyStore = this.selectedSupplyStore();
-      if (supplyStore && typeof supplyStore === 'string') {
+      if (supplyStore && typeof supplyStore === 'string' && this.getForm.supplyStore.value === supplyStore) {
         this.getForm.supplyStore.setValue({ id: '', name: supplyStore });
       }
     });
@@ -256,6 +271,10 @@ export class ExpenseComponent {
     effect(() => {
       this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
     });
+  }
+
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): ExpenseForm {
@@ -276,31 +295,39 @@ export class ExpenseComponent {
     });
   }
 
+  private resetCreateAnotherForm(): void {
+    const formDirective = this.formDirective();
+    this.totals.clear();
+    this.totalMap = new Map();
+    if (formDirective?.form) {
+      formDirective.resetForm();
+      (formDirective as FormGroupDirective & { submitted: boolean }).submitted = false;
+    }
+
+    this.getForm.invoice.reset('', { emitEvent: false });
+    this.getForm.supplyStore.reset('', { emitEvent: false });
+    this.getForm.date.reset(undefined, { emitEvent: false });
+    this.errors.set({});
+    this.form.markAsPristine({ emitEvent: false });
+    this.form.markAsUntouched({ emitEvent: false });
+    this.form.updateValueAndValidity({ emitEvent: false });
+  }
+
   submit() {
     const date = this.getForm.date.value;
-    const roomId = this.roomIdSignal();
     const uploadFile = this.file();
-    if (this.form.invalid || !roomId || !date || !uploadFile) {
+    if (this.form.invalid || !date || !uploadFile) {
       return;
     }
 
-    const expenseSignal = this.expenseSignal();
-    const expense: IExpense = new Expense();
-    const supplyStore = fieldChange(this.getForm.supplyStore, expenseSignal?.supplyStore);
-    expense.invoice = fieldChange(this.getForm.invoice, expenseSignal?.invoice);
-    expense.supplyStoreString = supplyStore?.id ? supplyStore.id : supplyStore.name;
-    expense.expenseTotals = this.totals.getRawValue() as unknown as ITotalExpense[];
-    expense.date = createNewDateZonedTime(date, expenseSignal?.room?.timeZone).toLocaleString(API_LOCALE);
-
-    const id = this.expenseIdSignal();
+    const expense: IExpense = Expense.fromForm(this.getForm, date, this.expense(),
+      this.totals.getRawValue() as unknown as ITotalExpense[]);
     const file = uploadFile.raw;
-    if (!id) {
-      if (file) {
-        this.store.dispatch(createExpense({ roomId, expense, file }));
-      }
-    } else {
-      this.store.dispatch(updateExpense({ id, roomId, expense, file }));
+    if (!this.expense() && this.createAnother) {
+      this.pendingCreateAnotherReset.set(true);
+      this.createAnotherRequestStarted.set(false);
     }
+    this.submitData.emit({ expense, file });
   }
 
   removeSupplyStore() {
@@ -325,10 +352,10 @@ export class ExpenseComponent {
       .reduce((acc, btw) => acc + btw, 0);
   }
 
-  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${supplyStore.name}` : '';
+  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : '';
 
   validateInputValue = (input: HTMLInputElement, index: number, min?: number, max?: number): void => {
-    const id = input.id.replace(`${index}`, '');
+    const id = input.id.replace(`${ index }`, '');
     const expense = this.totals.at(index)?.get(id);
     if (input.value) {
       this.errors.update(prev => {
@@ -340,7 +367,7 @@ export class ExpenseComponent {
         expense?.setValue(null);
         return;
       }
-      const EXPENSE = this.translate.instant('EXPENSE');
+      const EXPENSE = this.translateService.instant('EXPENSE');
       if (min !== undefined && value < min) {
         this.errors.update(prev => {
           prev[input.id] = EXPENSE[id.toUpperCase()].MIN;
@@ -398,6 +425,14 @@ export class ExpenseComponent {
 
   onSelectedFile(currentFile?: UploadFile) {
     this.file.set(currentFile);
+  }
+
+  get createAnother(): boolean {
+    return this.createAnotherState();
+  }
+
+  set createAnother(value: boolean) {
+    this.createAnotherState.set(value);
   }
 
   private setSupplierOrName(supplyStore: string = '') {

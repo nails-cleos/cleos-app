@@ -6,7 +6,8 @@ import { TranslateService } from '@ngx-translate/core';
 export class YearMonthDateAdapter extends CustomDateAdapter {
 
   constructor(readonly translate: TranslateService) {
-    super(translate.getCurrentLang());
+    super();
+    this.setLocale(translate.getCurrentLang());
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

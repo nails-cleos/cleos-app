@@ -1,17 +1,27 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IColorAll } from '../../interfaces/color';
+import { IColorAll } from '../../color/color';
 import { combineLatestWith } from 'rxjs';
 import { requireMatch } from '../../util/validators';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { getColorsByTreatmentId } from '../../store/reservation.actions';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { getColorsByTreatmentId } from '../../store/actions/reservation.actions';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { getColorsPipe } from '../../store/selectors/reservation.selectors';
+import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 
 type ChangeColorForm = {
   color: FormControl<IColorAll | undefined>,
@@ -26,7 +36,8 @@ type ChangeColorDialogData = {
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  imports: [AppMaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete, MatError,
+    MatAutocompleteTrigger, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeColorDialogComponent {

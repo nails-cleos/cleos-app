@@ -1,19 +1,20 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
 
 type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
 
 @Component({
   selector: 'app-bottom-sheet-book-appointment',
   templateUrl: 'bottom-sheet-book-appointment.html',
-  imports: [AppMaterialModule, TranslatePipe],
+  styleUrls: ['./bottom-sheet-book-appointment.scss'],
+  imports: [MatIcon, TranslatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetBookAppointmentComponent {
   private readonly bottomSheetRef = inject(MatBottomSheetRef<BottomSheetBookAppointmentComponent>);
-  private readonly translate = inject(TranslateService);
+  private readonly translateService = inject(TranslateService);
 
   private readonly actionSignal = signal<ContactKey | undefined>(undefined);
 
@@ -24,7 +25,7 @@ export class BottomSheetBookAppointmentComponent {
         return;
       }
 
-      const contact = this.translate.instant('MAIN.CONTACT');
+      const contact = this.translateService.instant('MAIN.CONTACT');
       let url = '';
 
       switch (action) {
@@ -64,5 +65,9 @@ export class BottomSheetBookAppointmentComponent {
     this.bottomSheetRef.dismiss();
 
     this.actionSignal.set(key);
+  }
+
+  close(): void {
+    this.bottomSheetRef.dismiss();
   }
 }

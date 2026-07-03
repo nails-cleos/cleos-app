@@ -1,4 +1,4 @@
-import { IMenu, IUserAll } from './user';
+import { IMenu, IUserAll } from '../user/user';
 
 export interface Token {
   tokenAccess: string;

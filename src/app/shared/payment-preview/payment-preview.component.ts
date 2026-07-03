@@ -1,16 +1,18 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { IPaymentOption } from '../../interfaces/payment';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
-import { IPrice } from '../../interfaces/treatment';
+import { IPrice } from '../../treatment/treatment';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
 
 @Component({
   selector: 'app-payment-preview',
   templateUrl: './payment-preview.component.html',
   styleUrls: ['./payment-preview.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe, CurrencySymbolPipe, PricePreviewComponent],
+  imports: [MatIcon, MatListItem, MatListSubheaderCssMatStyler, TranslatePipe, MatListItemIcon, CurrencySymbolPipe,
+    PricePreviewComponent, MatDivider],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentPreviewComponent {

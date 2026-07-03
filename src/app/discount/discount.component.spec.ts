@@ -1,27 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountComponent } from './discount.component';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
-import { DiscountType, IDiscountAll } from '../interfaces/discount';
-import { ICurrency } from '../interfaces/currency';
-import { DiscountState } from '../store/reducers/discount.reducers';
+import { DiscountType, IDiscountAll } from './discount';
+import { ICurrency } from '../currency/currency';
+import { NavigationService } from '../services/navigation.service';
+import { signal } from '@angular/core';
+import { DiscountStore } from '../store/discount.store';
+import { ICommon } from '../interfaces/common';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let discountId$: BehaviorSubject<string | null>;
-  let selectedDiscount$: BehaviorSubject<IDiscountAll | undefined>;
-  let subErrors$: BehaviorSubject<any>;
-  let allCurrencies$: BehaviorSubject<ICurrency[]>;
-  let action$: BehaviorSubject<void>;
-
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let discountStoreSpy: {
+    subErrors: ReturnType<typeof signal>;
+  };
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const mockCurrency: ICurrency = {
@@ -40,59 +36,33 @@ describe('DiscountComponent', () => {
     description: 'Test Description',
   };
 
+  const config: ICommon = {
+    title: 'DISCOUNT.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
+  };
+
   beforeEach(async () => {
-    discountId$ = new BehaviorSubject<string | null>(null);
-    selectedDiscount$ = new BehaviorSubject<IDiscountAll | undefined>(undefined);
-    subErrors$ = new BehaviorSubject<any>([]);
-    allCurrencies$ = new BehaviorSubject<ICurrency[]>([]);
-    action$ = new BehaviorSubject<void>(void 0);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    discountStoreSpy = {
+      subErrors: signal<any>(undefined),
+    };
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return discountId$.asObservable();
-        case 2:
-          return selectedDiscount$.asObservable();
-        case 3:
-          return allCurrencies$.asObservable();
-        case 4:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
-    toastServiceSpy.show.and.returnValue({
-      onAction: () => action$.asObservable(),
-      onDismiss: () => of(void 0),
-    });
 
     await TestBed.configureTestingModule({
       imports: [DiscountComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-
     fixture = TestBed.createComponent(DiscountComponent);
     component = fixture.componentInstance;
+
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -100,26 +70,12 @@ describe('DiscountComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should be in add mode when discountId is null', () => {
-    discountId$.next(null);
+  it('should patch form when selectedDiscount emits', () => {
+    fixture.componentRef.setInput('discount', mockDiscount);
     fixture.detectChanges();
 
-    expect(component.isAddModeSignal()).toBeTrue();
-  });
-
-  it('should be in edit mode when discountId is set', () => {
-    discountId$.next('123');
-    fixture.detectChanges();
-
-    expect(component.isAddModeSignal()).toBeFalse();
-  });
-
-  it('should patch form when selectedDiscount emits a value', () => {
-    selectedDiscount$.next(mockDiscount);
-    fixture.detectChanges();
-
-    expect(component.getForm.name.value).toBe(mockDiscount.name!);
-    expect(component.getForm.description.value).toBe(mockDiscount.description);
+    expect(component.discount()?.id).toBe('1');
+    expect(component.getForm.name.value).toBe('Test Discount');
   });
 
   it('should set form errors when subErrors emits values', () => {
@@ -128,7 +84,7 @@ describe('DiscountComponent', () => {
       { field: 'currency', message: 'Currency invalid' },
       { field: 'type', message: 'Type required' },
     ];
-    subErrors$.next(errors);
+    discountStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
@@ -140,7 +96,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should filter groups correctly using filteredCurrencySignal', () => {
-    allCurrencies$.next([mockCurrency, { id: '2', name: 'USD', code: 'USD', icon: 'dollar' }]);
+    fixture.componentRef.setInput('currencies', [mockCurrency, { id: '2', name: 'USD', code: 'USD', icon: 'dollar' }]);
     (component.getForm.currency as any).setValue('U');
     fixture.detectChanges();
 
@@ -149,7 +105,23 @@ describe('DiscountComponent', () => {
     expect(filtered?.[0].name).toBe('USD');
   });
 
+  it('should not dispatch when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
+    // ensure form invalid
+    (component.getForm.name as any).setValue(undefined);
+    fixture.detectChanges();
+
+    component.submit();
+
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
   it('should update form values correctly on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
     nameControl.markAsDirty();
@@ -170,16 +142,12 @@ describe('DiscountComponent', () => {
 
     component.submit();
 
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      discount: jasmine.objectContaining({
-        name: 'New Name',
-        description: 'New Description',
-        type: DiscountType.percentage,
-        currencyId: mockCurrency.id,
-        amount: 15,
-      }),
-      type: '[Discount] Create discount',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      name: 'New Name',
+      description: 'New Description',
+      type: DiscountType.percentage,
+      currencyId: mockCurrency.id,
+      amount: 15,
     }));
   });
 

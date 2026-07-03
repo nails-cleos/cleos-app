@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DialogComponent } from './dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
 
 describe('DialogComponent', () => {
   let component: DialogComponent;
@@ -21,7 +20,7 @@ describe('DialogComponent', () => {
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [DialogComponent, TranslateModule.forRoot(), AppMaterialModule],
+      imports: [DialogComponent, TranslateModule.forRoot()],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } }, // Create fresh copy each time
@@ -119,10 +118,10 @@ describe('DialogComponent', () => {
     expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.YES');
   });
 
-  it('should render a close button in the header', () => {
+  it('should render the header icon', () => {
     const compiled = fixture.nativeElement;
-    const closeButton = compiled.querySelector('.app-surface-dialog-header .app-surface-dialog-close');
-    expect(closeButton).toBeTruthy();
+    const icon = compiled.querySelector('.app-surface-dialog-header mat-icon');
+    expect(icon?.textContent?.trim()).toBe('info_outline');
   });
 
   it('should render warning variant styles and confirm color', () => {

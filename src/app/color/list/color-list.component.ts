@@ -1,42 +1,68 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { IColor } from '../../interfaces/color';
-import { TranslateService } from '@ngx-translate/core';
+import { IColor } from '../color';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { cleanColor, colorSelected, deleteColor, getColorsPage } from '../../store/color.actions';
 import { executeDialogNoWidth } from '../../util/helper';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { SharedModule } from '../../shared/shared.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { getColorPaginationPipe, getColorResponsePipe } from '../../store/selectors/color.selectors';
-import { ColorState } from '../../store/reducers/color.reducers';
+import { ColorStore } from '../../store/color.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-color-list',
   templateUrl: './color-list.component.html',
   styleUrls: ['./color-list.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
+    TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<ColorState> = inject(Store<ColorState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly colorStore = inject(ColorStore);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private colorList$ = this.store.pipe(getColorPaginationPipe);
-  private response$ = this.store.pipe(getColorResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'name', 'asc');
 
-  private colorListSignal = toSignal(this.colorList$);
-  private responseSignal = toSignal(this.response$);
+  private readonly colorListSignal = computed(() => {
+    const data = this.colorStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private responseSignal = this.colorStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -49,60 +75,67 @@ export class ColorListComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'name');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'asc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = this.colorStore.isLoading;
   dataSourceSignal = computed(() => this.colorListSignal()?.content);
   resultsLengthSignal = computed(() => this.colorListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'name', 'description', 'actions', 'add'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'name' },
+    { key: 'description', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   expandedColor?: IColor;
 
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
+    effect(() => {
+      const request = this.tableState.baseRequest();
+      this.colorStore.loadPage({
+        ...request,
+        size: this.pageSizeSignal(),
+      });
     });
 
     effect(() => {
-      const page = this.paginatorPageIndex();
-      this.store.dispatch(
-        getColorsPage({
-          page: page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+      const response = this.responseSignal();
+      if (!response) {
+        return;
+      }
+
+      const currentPage = this.paginatorPageIndex();
+      this.colorStore.clearResponse();
+
+      if (currentPage === 0) {
+        const request = this.tableState.baseRequest();
+        this.colorStore.loadPage({
+          ...request,
+          page: 0,
           size: this.pageSizeSignal(),
-        }),
-      );
-    });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanColor());
-        this.paginator()?.firstPage();
+        });
+        return;
       }
+
+      this.tableState.resetPage();
     });
   }
 
-  edit = (selected: IColor): void => this.store.dispatch(colorSelected({ selected }));
+  edit = (selected: IColor): void => {
+    this.navigationService.navigate(['colors', selected.id]);
+  };
 
   delete = (color: IColor): void => {
-    const title = this.translate.instant('COLOR.DELETED.TITLE');
-    const content = this.translate.instant('COLOR.DELETED.CONTENT', { name: color.name });
+    const title = this.translateService.instant('COLOR.DELETED.TITLE');
+    const content = this.translateService.instant('COLOR.DELETED.CONTENT', { name: color.name });
 
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: color, variant: 'warning' }, result => {
       if (result) {
-        this.store.dispatch(deleteColor({ id: result.id, name: result.name }));
+        this.colorStore.delete({ id: result.id, name: result.name });
       }
     });
   };

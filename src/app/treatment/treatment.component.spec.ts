@@ -1,32 +1,36 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-
+import { signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentComponent } from './treatment.component';
-import { IColorAll } from '../interfaces/color';
-import { ITreatmentGroupAll } from '../interfaces/treatment';
-import { TreatmentState } from '../store/reducers/treatment.reducers';
-import { getTreatmentGroup } from '../store/treatment.actions';
+import { IColorAll } from '../color/color';
+import { ITreatmentGroupAll } from './treatment';
+import { TreatmentStore } from '../store/treatment.store';
+import { DEFAULT_LOCALE } from '../util/dates';
+import { ColorStore } from '../store/color.store';
+import { NavigationService } from '../services/navigation.service';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
   let fixture: ComponentFixture<TreatmentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let treatmentStoreSpy: {
+    subErrors: ReturnType<typeof signal<any>>;
+  };
 
-  let treatmentId$: BehaviorSubject<any>;
-  let selectedTreatment$: BehaviorSubject<any>;
-  let allColors$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
-  let histories$: BehaviorSubject<any>;
-  let routeUrl$: BehaviorSubject<any>;
+  let colorStoreSpy: {
+    data: ReturnType<typeof signal<any>>;
+    loadAll: jasmine.Spy;
+  };
 
   const mockColor = {
     id: 'g1',
     name: 'Color 1',
+  };
+
+  const config = {
+    title: 'TREATMENT.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
   const mockTreatment: Partial<ITreatmentGroupAll> = {
@@ -37,46 +41,23 @@ describe('TreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<any>(null);
-    selectedTreatment$ = new BehaviorSubject<any>(undefined);
-    allColors$ = new BehaviorSubject<any>(undefined);
-    subErrors$ = new BehaviorSubject<any>(undefined);
-    histories$ = new BehaviorSubject<any>(undefined);
-    routeUrl$ = new BehaviorSubject<any>([{ path: 'add' }]);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-        url: [{ path: 'add' }],
-      },
-      url: routeUrl$.asObservable(),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return treatmentId$.asObservable();
-        case 2:
-          return selectedTreatment$.asObservable();
-        case 3:
-          return allColors$.asObservable();
-        case 4:
-          return subErrors$.asObservable();
-        case 5:
-          return histories$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    treatmentStoreSpy = {
+      subErrors: signal<any>(undefined),
+    };
+    colorStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadAll'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [TreatmentComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: ColorStore, useValue: colorStoreSpy },
       ],
     }).compileComponents();
 
@@ -85,9 +66,7 @@ describe('TreatmentComponent', () => {
         .createComponent(TreatmentComponent);
     component = fixture.componentInstance;
 
-    const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -95,152 +74,86 @@ describe('TreatmentComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should derive mode from route and treatment id', () => {
-    expect(component.mode()).toBe('add');
-
-    treatmentId$.next('123');
+  it('should patch form when treatment input emits', () => {
+    colorStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        mockColor,
+        { id: 'g2', name: 'Color 2' },
+      ] as IColorAll[],
+    });
+    fixture.componentRef.setInput('treatment', mockTreatment as ITreatmentGroupAll);
     fixture.detectChanges();
-    expect(component.mode()).toBe('edit');
-
-    routeUrl$.next([{ path: 'view' }]);
-    fixture.detectChanges();
-    expect(component.mode()).toBe('view');
+    expect(component.colorsSignal().length).toBe(1);
+    expect(component.allColorsWritableSignal()?.some((g: IColorAll) => g.id === 'g2')).toBeTrue();
   });
 
-  it('should dispatch getTreatment when treatmentId emits a value', () => {
-    // reset calls
-    storeSpy.dispatch.calls.reset();
-
-    // emit an id (simulate edit mode)
-    treatmentId$.next('123');
-    fixture.detectChanges();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentGroup({ id: '123', path: 'edit' }));
-  });
-
-  it('should patch form when selectedTreatment emits', () => {
-    selectedTreatment$.next(mockTreatment);
-    allColors$.next([
-      mockColor,
-      { id: 'g2', name: 'Color 2', colors: [] },
+  it('should handle form errors from subErrors signal', () => {
+    treatmentStoreSpy.subErrors.set([
+      { field: 'name', message: 'Name required' },
     ]);
     fixture.detectChanges();
 
-    const treatmentSignalValue: any = component.treatmentSignal();
-    expect(treatmentSignalValue.id).toBe('1');
-    expect(component.colorsSignal().length).toBe(1);
-    expect(component.allColorsWritableSignal()?.some?.((g: IColorAll) => g.id === 'g2')).toBeTrue();
-  });
-
-  it('should include history on the selected treatment in view mode', () => {
-    selectedTreatment$.next({
-      id: 'group-1',
-      treatments: [{ id: 't1', name: 'Treatment 1' }, { id: 't2', name: 'Treatment 2' }],
-    });
-    histories$.next([{ id: 'history-1' }]);
-    component['selectedHistoryTreatmentId'].set('t2');
-    fixture.detectChanges();
-
-    const treatments = component.viewTreatmentSignal()?.treatments as any[];
-    expect(treatments[0].showHistory).toBeUndefined();
-    expect(treatments[1].showHistory).toBeTrue();
-    expect(treatments[1].history).toEqual([{ id: 'history-1' }]);
-  });
-
-  it('should return undefined view treatment when no selected treatment exists', () => {
-    selectedTreatment$.next(undefined);
-    fixture.detectChanges();
-
-    expect(component.viewTreatmentSignal()).toBeUndefined();
-  });
-
-  it('should handle form errors from subErrorsSignal', () => {
-    const errors = [
-      { field: 'name', message: 'Name required' },
-    ];
-
-    subErrors$.next(errors);
-    fixture.detectChanges();
-
-    const errs = component.errors();
-    expect(errs['name']).toBe('Name required');
+    expect(component.errors()['name']).toBe('Name required');
     expect(component.getForm.name.hasError('incorrect')).toBeTrue();
   });
 
-  it('should not dispatch when form invalid on submit', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should not emit when form invalid on submit', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    // ensure form invalid
-    (component.getForm.name as any).setValue(undefined);
+    component.getForm.name.setValue('');
     fixture.detectChanges();
 
     component.submit();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
   });
 
-  it('should dispatch createTreatment when in add mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit submitData when in add mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('New Treatment');
-    nameControl.markAsDirty();
-    const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('New Description');
-    descriptionControl.markAsDirty();
+    component.getForm.name.setValue('New Treatment');
+    component.getForm.name.markAsDirty();
+    component.getForm.description.setValue('New Description');
+    component.getForm.description.markAsDirty();
 
-    const input = component.nameInput();
-    if (input) {
-      input.nativeElement.value = 'treatment1';
-    }
-
+    component.nameInput()!.nativeElement.value = 'treatment1';
     component.addTab();
     fixture.detectChanges();
     component.treatmentsSignal()[0].time = '10:00';
-    fixture.detectChanges();
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      treatmentGroup: jasmine.objectContaining({
-        name: 'New Treatment',
-        description: 'New Description',
-      }),
-      type: '[Treatment] Create treatment',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      name: 'New Treatment',
+      description: 'New Description',
     }));
   });
 
-  it('should dispatch updateTreatment when in edit mode and form valid', () => {
-    storeSpy.dispatch.calls.reset();
+  it('should emit submitData when in edit mode and form valid', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
 
-    // simulate edit mode
-    treatmentId$.next('abc-123');
-    selectedTreatment$.next(
-      { id: 'abc-123', name: 'Old', description: 'old', treatments: [{ name: 't1', duration: 'PT10M' }] },
-    );
+    fixture.componentRef.setInput('treatment', {
+      id: 'abc-123',
+      name: 'Old',
+      description: 'old',
+      treatments: [{ name: 't1', duration: 'PT10M', primary: true }],
+    } as ITreatmentGroupAll);
     fixture.detectChanges();
 
-    const nameControl = component.getForm.name;
-    nameControl.setValue('Updated Treatment');
-    nameControl.markAsDirty();
-    const descriptionControl = component.getForm.description;
-    descriptionControl.setValue('Updated Description');
-    descriptionControl.markAsDirty();
+    component.getForm.name.setValue('Updated Treatment');
+    component.getForm.name.markAsDirty();
+    component.getForm.description.setValue('Updated Description');
+    component.getForm.description.markAsDirty();
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-
-    expect(dispatched).toEqual(jasmine.objectContaining({
-      id: 'abc-123',
-      treatmentGroup: jasmine.objectContaining({
-        description: 'Updated Description',
-        name: 'Updated Treatment',
-      }),
-      type: '[Treatment] Update treatment group by id',
+    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
+      description: 'Updated Description',
+      name: 'Updated Treatment',
     }));
   });
 
@@ -249,17 +162,15 @@ describe('TreatmentComponent', () => {
       { id: '1', name: 'Test Color 1' },
       { id: '2', name: 'Another Color' },
       { id: '3', name: 'Test Color 2' },
-    ];
-    allColors$.next(colors);
+    ] as IColorAll[];
+    colorStoreSpy.data.set({ kind: 'list', value: colors });
     fixture.detectChanges();
 
-    // when color control empty -> return all
     component.getForm.color.setValue(undefined);
     fixture.detectChanges();
     expect(component.filteredColorSignal()).toEqual(colors);
 
-    // when color control has 'Test' -> filtered
-    (component.getForm.color as any).setValue('Test');
+    component.getForm.color.setValue('Test' as any);
     fixture.detectChanges();
     expect(component.filteredColorSignal()).toEqual([
       { id: '1', name: 'Test Color 1' },
@@ -268,7 +179,14 @@ describe('TreatmentComponent', () => {
   });
 
   it('remove should remove color and put it back to allColorsWritableSignal', () => {
-    // set initial colors
+    colorStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        { id: 'g1', name: 'G1' },
+        { id: 'g2', name: 'G2' },
+        { id: 'g3', name: 'G3' },
+      ] as any,
+    });
     component.colorsSignal.set([
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
@@ -282,26 +200,55 @@ describe('TreatmentComponent', () => {
     fixture.detectChanges();
 
     expect(component.colorsSignal().length).toBe(1);
-    expect(component.allColorsWritableSignal()?.some?.((g: any) => g.id === 'g2')).toBeTrue();
-    // color input control should be reset (undefined)
+    expect(component.allColorsWritableSignal()?.some((g: any) => g.id === 'g2')).toBeTrue();
     expect(component.getForm.color.value).toBeUndefined();
   });
 
   it('selectedColor should add selected color, remove it from allColorsWritableSignal and clear input', () => {
     const g1 = { id: 'g1', name: 'G1' } as any;
+    colorStoreSpy.data.set({ kind: 'list', value: [g1, { id: 'g2', name: 'G2' } as any] });
     component.colorsSignal.set([]);
     component.allColorsWritableSignal.set([g1, { id: 'g2', name: 'G2' } as any]);
 
     const event: any = { option: { value: g1 } };
-
     component.colorInput()!.nativeElement.value = 'something';
 
     component.selectedColor(event);
     fixture.detectChanges();
 
     expect(component.colorsSignal().some((g: any) => g.id === 'g1')).toBeTrue();
-    expect(component.allColorsWritableSignal()?.some?.((g: any) => g.id === 'g1')).toBeFalse();
+    expect(component.allColorsWritableSignal()?.some((g: any) => g.id === 'g1')).toBeFalse();
     expect(component.getForm.color.value).toBeUndefined();
+  });
+
+  it('should not show selected colors in filteredColorSignal', () => {
+    const colors = [
+      { id: 'g1', name: 'Blue' },
+      { id: 'g2', name: 'Black' },
+      { id: 'g3', name: 'White' },
+    ] as IColorAll[];
+    colorStoreSpy.data.set({ kind: 'list', value: colors });
+    component.colorsSignal.set([colors[0]]);
+    fixture.detectChanges();
+
+    expect(component.filteredColorSignal()).toEqual([colors[1], colors[2]]);
+
+    component.getForm.color.setValue('Bl' as any);
+    fixture.detectChanges();
+
+    expect(component.filteredColorSignal()).toEqual([colors[1]]);
+  });
+
+  it('selectedColor should ignore duplicate selected events', () => {
+    const color = { id: 'g1', name: 'Blue' } as any;
+    colorStoreSpy.data.set({ kind: 'list', value: [color] });
+    component.colorsSignal.set([color]);
+    component.allColorsWritableSignal.set([]);
+
+    component.selectedColor({ option: { value: color } } as any);
+    fixture.detectChanges();
+
+    expect(component.colorsSignal().filter(({ id }) => id === color.id).length).toBe(1);
   });
 
   it('sortColors should sort alphabetically ignoring case', () => {
@@ -316,43 +263,5 @@ describe('TreatmentComponent', () => {
     expect(response?.[1].name).toBe('Alpha Color');
     expect(response?.[2].name).toBe('Beta Color');
     expect(response?.[3].name).toBe('Gamma Color');
-  });
-
-  it('should dispatch treatmentSelected on edit', () => {
-    selectedTreatment$.next(mockTreatment);
-    fixture.detectChanges();
-
-    component.edit();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      path: 'edit',
-      selected: mockTreatment,
-      type: '[Treatment] Selected',
-    }));
-  });
-
-  it('should dispatch getAllTreatmentsHistory when treatment ids are available', () => {
-    selectedTreatment$.next({ id: 'group-1' });
-    fixture.detectChanges();
-
-    component.getHistory('treatment-1');
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      id: 'group-1',
-      treatmentId: 'treatment-1',
-      type: '[Treatment] Get all treatments history',
-    }));
-  });
-
-  it('should not dispatch getHistory when ids are missing', () => {
-    storeSpy.dispatch.calls.reset();
-
-    component.getHistory(undefined);
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
-
-    selectedTreatment$.next(undefined);
-    fixture.detectChanges();
-    component.getHistory('treatment-1');
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
   });
 });

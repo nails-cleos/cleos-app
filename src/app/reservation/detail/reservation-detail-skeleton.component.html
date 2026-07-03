@@ -1,0 +1,161 @@
+<div class="app-surface-canvas app-surface-shell">
+  <div class="app-detail-shell app-surface-stack reservation-detail-skeleton">
+    <section class="app-surface-section app-surface-hero reservation-detail-skeleton__hero">
+      @if (showTopline()) {
+        <div class="reservation-detail-skeleton__topline">
+          <div class="ssc-head-line reservation-detail-skeleton__eyebrow"></div>
+          @if (showGhostChip()) {
+            <div class="ssc-head-line reservation-detail-skeleton__chip reservation-detail-skeleton__chip--ghost"></div>
+          }
+        </div>
+      }
+
+      <div class="reservation-detail-skeleton__header">
+        <div class="reservation-detail-skeleton__identity">
+          <div class="reservation-detail-skeleton__title-row">
+            <div class="reservation-detail-skeleton__title-stack">
+              <div class="ssc-line reservation-detail-skeleton__title"></div>
+              <div class="ssc-line reservation-detail-skeleton__subtitle"></div>
+            </div>
+
+            @if (showFab()) {
+              <div class="ssc-square reservation-detail-skeleton__fab"></div>
+            }
+          </div>
+
+          <div class="reservation-detail-skeleton__meta">
+            @for (chip of metaChips; track chip) {
+              <div class="ssc-head-line reservation-detail-skeleton__chip"></div>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (showHeroSummary()) {
+        <div class="app-surface-grid app-surface-grid--quad reservation-detail-skeleton__summary-grid">
+          @for (card of summaryCards; track card) {
+            <div class="app-surface-item reservation-detail-skeleton__summary-card">
+              <div class="ssc-line reservation-detail-skeleton__label"></div>
+              <div class="ssc-line reservation-detail-skeleton__value"></div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    @if (showNoteSection()) {
+      <section class="app-surface-section reservation-detail-skeleton__section">
+        <div class="reservation-detail-skeleton__section-header">
+          <div class="ssc-head-line reservation-detail-skeleton__section-eyebrow"></div>
+        </div>
+
+        <div class="app-surface-grid app-surface-grid--auto reservation-detail-skeleton__note-grid">
+          @for (card of noteCards; track card) {
+            <div class="app-surface-item reservation-detail-skeleton__note-card">
+              <div class="ssc-line reservation-detail-skeleton__label"></div>
+              <div class="ssc-line reservation-detail-skeleton__body-line"></div>
+              <div class="ssc-line reservation-detail-skeleton__body-line"></div>
+              <div class="ssc-line reservation-detail-skeleton__body-line reservation-detail-skeleton__body-line--short"></div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (showAppointmentSection()) {
+      <section class="app-surface-section reservation-detail-skeleton__section">
+        <div class="reservation-detail-skeleton__section-header">
+          <div class="ssc-head-line reservation-detail-skeleton__section-eyebrow"></div>
+        </div>
+
+        <div class="app-surface-grid app-surface-grid--auto reservation-detail-skeleton__info-grid">
+          @for (card of appointmentCards; track card) {
+            <div class="app-surface-item reservation-detail-skeleton__info-card">
+              <div class="ssc-line reservation-detail-skeleton__label"></div>
+              <div class="ssc-line reservation-detail-skeleton__value"></div>
+              <div class="ssc-line reservation-detail-skeleton__muted"></div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (showTreatmentSection()) {
+      <section class="app-surface-section reservation-detail-skeleton__section">
+        <div class="reservation-detail-skeleton__section-header">
+          <div class="ssc-head-line reservation-detail-skeleton__section-eyebrow"></div>
+        </div>
+
+        <div class="app-surface-grid app-surface-grid--auto reservation-detail-skeleton__info-grid">
+          @for (card of treatmentCards; track card) {
+            <div class="app-surface-item reservation-detail-skeleton__info-card">
+              <div class="ssc-line reservation-detail-skeleton__label"></div>
+              <div class="ssc-line reservation-detail-skeleton__value"></div>
+            </div>
+          }
+        </div>
+
+        @if (showExtras()) {
+          <div class="reservation-detail-skeleton__extras">
+            <div class="app-surface-item reservation-detail-skeleton__extras-card">
+              <div class="ssc-line reservation-detail-skeleton__label reservation-detail-skeleton__label--wide"></div>
+              <div class="reservation-detail-skeleton__extras-list">
+                @for (row of extraRows; track row) {
+                  <div class="reservation-detail-skeleton__extra-row">
+                    <div class="ssc-line reservation-detail-skeleton__extra-title"></div>
+                    <div class="ssc-line reservation-detail-skeleton__extra-value"></div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="app-surface-grid app-surface-grid--auto reservation-detail-skeleton__totals-grid">
+              @for (card of noteCards; track card) {
+                <div class="app-surface-item reservation-detail-skeleton__info-card">
+                  <div class="ssc-line reservation-detail-skeleton__label"></div>
+                  <div class="ssc-line reservation-detail-skeleton__value"></div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    @if (showPaymentSection()) {
+      <section class="app-surface-section reservation-detail-skeleton__section">
+        <div class="reservation-detail-skeleton__section-header">
+          <div class="ssc-head-line reservation-detail-skeleton__section-eyebrow"></div>
+        </div>
+
+        <div class="reservation-detail-skeleton__table-shell">
+          <app-table-skeleton [columns]="paymentTableColumns" [rowCount]="paymentTableRows()"></app-table-skeleton>
+        </div>
+
+        @if (showPaymentAction()) {
+          <div class="app-detail-actions reservation-detail-skeleton__actions">
+            <div class="ssc-head-line reservation-detail-skeleton__button"></div>
+          </div>
+        }
+      </section>
+    }
+
+    @if (showHistorySection()) {
+      <section class="app-surface-section reservation-detail-skeleton__section">
+        <div class="reservation-detail-skeleton__section-header">
+          <div class="ssc-head-line reservation-detail-skeleton__section-eyebrow"></div>
+        </div>
+
+        <div class="reservation-detail-skeleton__table-shell">
+          <app-table-skeleton [columns]="historyTableColumns" [rowCount]="historyTableRows()" [showPaginator]="true"></app-table-skeleton>
+        </div>
+      </section>
+    }
+
+    <div class="app-detail-actions reservation-detail-skeleton__footer-actions">
+      @for (button of footerButtons(); track button) {
+        <div class="ssc-head-line reservation-detail-skeleton__button"></div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,48 +1,8 @@
 .fade-in-background {
   animation: fadeIn 4000ms;
-  -webkit-animation: fadeIn 4000ms;
-  -moz-animation: fadeIn 4000ms;
-  -o-animation: fadeIn 4000ms;
-  -ms-animation: fadeIn 4000ms;
 }
 
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-@-ms-keyframes fadeIn {
   0% {
     opacity: 0;
   }

@@ -2,12 +2,13 @@ import { TestBed } from '@angular/core/testing';
 
 import { AccountService } from './account.service';
 import { HttpClient } from '@angular/common/http';
-import { IAccountAll, ITransaction } from '../interfaces/account';
+import { IAccountAll, IAccountTransaction, ITransaction } from '../account/account';
 import { of } from 'rxjs';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
-import { IUserAll } from '../interfaces/user';
-import { ICurrencyAll } from '../interfaces/currency';
+import { IUserAll } from '../user/user';
+import { ICurrencyAll } from '../currency/currency';
+import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('AccountService', () => {
   let service: AccountService;
@@ -62,14 +63,22 @@ describe('AccountService', () => {
 
   describe('getTransactionsByAccountId', () => {
     it('should fetch transactions with correct parameters', () => {
-      httpSpy.get.and.returnValue(of([mockTransaction]));
+      const mockResult: IAccountTransaction = {
+        transactions: {
+          content: [mockTransaction],
+          totalElements: 1,
+          totalPages: 1,
+          number: 0,
+        },
+      };
+      httpSpy.get.and.returnValue(of(mockResult));
 
       service.getTransactionsByAccountId('1', 0, 'name', 'asc', 5).subscribe((result) => {
-        expect(result).toEqual([mockTransaction]);
+        expect(result).toEqual(mockResult);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/1/transactions', {
-        params: createFilter(0, 5, 'name', 'asc'),
+        params: createFilter(0, 5, 'name', 'asc'), ...skipLoadingOverlay(),
       });
     });
   });
@@ -91,7 +100,7 @@ describe('AccountService', () => {
       expect(result).toEqual(mockTransaction);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/ac-1/transactions/tr-1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/ac-1/transactions/tr-1', { ...skipLoadingOverlay() });
   });
 
   it('should fetch account by customer id', () => {
@@ -101,7 +110,7 @@ describe('AccountService', () => {
       expect(result).toEqual(mockAccount);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/customers/c-1');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/customers/c-1', { ...skipLoadingOverlay() });
   });
 
   it('should create new transaction', () => {

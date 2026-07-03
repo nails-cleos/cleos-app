@@ -6,17 +6,12 @@
       </div>
       <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.CANCEL.TITLE' | translate }}</h1>
     </div>
-    <button (click)="onNoClick()" aria-label="Close dialog" class="app-surface-dialog-close" type="button">
-      <mat-icon>close</mat-icon>
-    </button>
   </div>
-
-  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
   <div mat-dialog-content class="app-surface-dialog-content">
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
       <app-price [price]="price" [typeForm]="typeForm" [options]="paymentOptions" [currency]="currency"
-                 [firstTime]="true" [showPenalty]="showPenalty" [showBank]="true"
+                 [firstTime]="showBank" [showPenalty]="showPenalty" [showBank]="showBank"
                  [includeBalance]="false"></app-price>
       <div class="top-space">
         <mat-label>{{ 'RESERVATION.CANCEL.FIELD' | translate }}</mat-label>
@@ -33,8 +28,6 @@
       </div>
     </form>
   </div>
-
-  <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>

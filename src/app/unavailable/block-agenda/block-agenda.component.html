@@ -1,128 +1,106 @@
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
-    @let isAddMode = isAddModeSignal();
-    @let unavailable = unavailableSignal();
+  <section class="app-surface-hero app-detail-panel block-agenda-hero">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{ getConfig.title | translate }}</span>
+      </div>
+    </div>
 
-    <section class="app-surface-hero app-detail-panel block-agenda-hero">
-      <div class="app-detail-section-header">
-        <div>
-          <span
-            class="app-surface-eyebrow">{{ (isAddMode ? 'UNAVAILABLE.BLOCK_AGENDA.TITLE' : 'UNAVAILABLE.BLOCK_AGENDA.DETAIL') | translate }}</span>
-        </div>
+    @if (unavailable(); as unavailable) {
+      <div class="app-detail-meta">
+          <span class="app-detail-chip app-detail-chip--ghost">
+            <mat-icon>sell</mat-icon>
+            <span>{{ unavailable.id }}</span>
+          </span>
+      </div>
+    }
+    <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <div class="app-crud-form-grid">
+        @if (allProfessionalsSignal()) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
+            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional" [matAutocomplete]="auto"
+                   matInput required type="text">
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+              @for (professional of filteredProfessionalSignal(); track professional) {
+                <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+              }
+            </mat-autocomplete>
+            @if (getForm.professional.hasError('required')) {
+              <mat-error [innerHTML]="'UNAVAILABLE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
+            } @else if (getForm.professional.hasError('requireMatch')) {
+              <mat-error [innerHTML]="'UNAVAILABLE.PROFESSIONAL.INVALID' | translate"></mat-error>
+            } @else if (errors()['professional']) {
+              <mat-error>{{ errors()['professional'] }}</mat-error>
+            }
+          </mat-form-field>
+        } @else {
+          <div class="ssc-line"></div>
+        }
+
+        @if (getForm.professional.valid) {
+          <div class="app-crud-form-grid__full app-crud-form-grid">
+            <mat-form-field appearance="outline" color="primary">
+              <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
+              <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+                <mat-icon>today</mat-icon>
+              </button>
+              <input (focus)="picker.open()" [formControl]="getForm.startDate" [matDatepickerFilter]="myFilter"
+                     [matDatepicker]="picker" matInput required>
+              <mat-datepicker #picker touchUi></mat-datepicker>
+              @if (getForm.startDate.hasError('required')) {
+                <mat-error [innerHTML]="'UNAVAILABLE.DATE.REQUIRED' | translate"></mat-error>
+              } @else if (errors()['startDate']) {
+                <mat-error>{{ errors()['startDate'] }}</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
+              <input (focusin)="focusin()" [formControl]="getForm.startTime" [format]="24" [max]="maxTime"
+                     [min]="minTime" [timepicker]="time" matInput name="start_time" readonly/>
+              <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
+              <app-timepicker #time [minutesGap]="15"></app-timepicker>
+              @if (getForm.startTime.hasError('required')) {
+                <mat-error [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate"></mat-error>
+              }
+            </mat-form-field>
+          </div>
+        }
+
+        @if (showDuration()) {
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.duration" [format]="24" [max]="durationMax" [timepicker]="t"
+                   matInput name="duration" readonly/>
+            <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+            <app-timepicker #t [minutesGap]="15"></app-timepicker>
+            @if (getForm.duration.hasError('required')) {
+              <mat-error [innerHTML]="'UNAVAILABLE.DURATION.REQUIRED' | translate"></mat-error>
+            } @else if (errors()['duration']) {
+              <mat-error>{{ errors()['duration'] }}</mat-error>
+            }
+          </mat-form-field>
+        }
       </div>
 
-      @if (!isAddMode) {
-        <div class="app-detail-meta">
-          @if (unavailable) {
-            <span class="app-detail-chip app-detail-chip--ghost">
-              <mat-icon>sell</mat-icon>
-              <span>{{ unavailable.id }}</span>
-            </span>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-        </div>
-      }
-
-      @if (isAddMode || unavailable) {
-        <div class="app-crud-form-grid">
-          @if (allProfessionalsSignal()) {
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'UNAVAILABLE.PROFESSIONAL.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional"
-                     [matAutocomplete]="auto" matInput required type="text">
-              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                @for (professional of filteredProfessionalSignal(); track professional) {
-                  <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
-                }
-              </mat-autocomplete>
-              @if (getForm.professional.hasError('required')) {
-                <mat-error [innerHTML]="'UNAVAILABLE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
-              } @else if (getForm.professional.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'UNAVAILABLE.PROFESSIONAL.INVALID' | translate"></mat-error>
-              } @else if (errors()['professional']) {
-                <mat-error>{{ errors()['professional'] }}</mat-error>
-              }
-            </mat-form-field>
-          } @else {
-            <div class="ssc-line"></div>
-          }
-
-          @if (getForm.professional.valid) {
-            <div class="app-crud-form-grid__full app-crud-form-grid">
-              <mat-form-field appearance="outline" color="primary">
-                <mat-label>{{ 'UNAVAILABLE.DATE.FIELD' | translate }}</mat-label>
-                <button (click)="picker.open()" mat-icon-button matPrefix type="button">
-                  <mat-icon>today</mat-icon>
-                </button>
-                <input (focus)="picker.open()" [formControl]="getForm.startDate" [matDatepickerFilter]="myFilter"
-                       [matDatepicker]="picker" matInput required>
-                <mat-datepicker #picker touchUi></mat-datepicker>
-                @if (getForm.startDate.hasError('required')) {
-                  <mat-error [innerHTML]="'UNAVAILABLE.DATE.REQUIRED' | translate"></mat-error>
-                } @else if (errors()['startDate']) {
-                  <mat-error>{{ errors()['startDate'] }}</mat-error>
-                }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'UNAVAILABLE.TIME.FIELD' | translate }}</mat-label>
-                <input (focusin)="focusin()" [formControl]="getForm.startTime" [format]="24" [max]="maxTime"
-                       [min]="minTime" [timepicker]="time" matInput name="start_time" readonly/>
-                <span matPrefix><mat-icon (click)="time.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                <app-timepicker #time [minutesGap]="15"></app-timepicker>
-                @if (getForm.startTime.hasError('required')) {
-                  <mat-error [innerHTML]="'UNAVAILABLE.TIME.REQUIRED' | translate"></mat-error>
-                }
-              </mat-form-field>
-            </div>
-          }
-
-          @if (showDuration()) {
-            <mat-form-field appearance="outline">
-              <mat-label>{{ 'UNAVAILABLE.DURATION.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.duration" [format]="24" [max]="durationMax" [timepicker]="t"
-                     matInput name="duration" readonly/>
-              <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
-              <app-timepicker #t [minutesGap]="15"></app-timepicker>
-              @if (getForm.duration.hasError('required')) {
-                <mat-error [innerHTML]="'UNAVAILABLE.DURATION.REQUIRED' | translate"></mat-error>
-              } @else if (errors()['duration']) {
-                <mat-error>{{ errors()['duration'] }}</mat-error>
-              }
-            </mat-form-field>
-          }
-        </div>
-
-        <div class="app-detail-actions">
-          <div class="spacer"></div>
-          <button [form]="form" appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
+      <div class="app-detail-actions">
+        <div class="app-surface-spacer"></div>
+        <button [form]="form" appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        <button [disabled]="form.invalid || form.pristine" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          {{ getConfig.button.label | translate }}
+        </button>
+        @if (getConfig.button.showDelete) {
+          <button (click)="delete()" mat-stroked-button type="button">
+            <mat-icon>delete</mat-icon>
+            {{ 'COMMON.BUTTON.DELETE' | translate }}
           </button>
-          @if (isAddMode) {
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">
-              <mat-icon>calendar_lock</mat-icon>
-              {{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
-          } @else {
-            <button [disabled]="form.invalid || form.pristine" mat-stroked-button type="submit">
-              <mat-icon>published_with_changes</mat-icon>
-              {{ 'COMMON.BUTTON.UPDATE' | translate }}
-            </button>
-            <button (click)="delete()" mat-stroked-button type="button">
-              <mat-icon>delete</mat-icon>
-              {{ 'COMMON.BUTTON.DELETE' | translate }}
-            </button>
-          }
-        </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
-          <div class="ssc-square mb"></div>
-          <div class="ssc-hr"></div>
-        </div>
-      }
-    </section>
-  </form>
+        }
+      </div>
+    </form>
+  </section>
 </div>

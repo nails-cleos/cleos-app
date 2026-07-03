@@ -2,11 +2,11 @@
 <div class="dashboard-events app-surface-canvas app-surface-shell app-surface-stack">
   <section class="app-surface-section">
     <div class="dashboard-events-toolbar app-detail-actions">
-      <button class="hide-gt-xs dashboard-events-toolbar__compact" (click)="decrement()" [disabled]="prevBtnDisabled"
+      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="decrement()" [disabled]="prevBtnDisabled"
               mat-stroked-button>
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <button class="hide-xs" (click)="decrement()" [disabled]="prevBtnDisabled" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="decrement()" [disabled]="prevBtnDisabled" mat-stroked-button>
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
@@ -14,25 +14,25 @@
              [value]="currentViewDate"
              hidden matInput>
       <mat-datepicker #picker touchUi></mat-datepicker>
-      <button class="hide-gt-xs dashboard-events-toolbar__compact" (click)="picker.open()" mat-stroked-button>
+      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="picker.open()" mat-stroked-button>
         <mat-icon>today</mat-icon>
       </button>
-      <button class="hide-xs" (click)="picker.open()" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="picker.open()" mat-stroked-button>
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-      <button class="hide-gt-xs dashboard-events-toolbar__compact" (click)="increment()" [disabled]="nextBtnDisabled"
+      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="increment()" [disabled]="nextBtnDisabled"
               mat-stroked-button>
         <mat-icon>navigate_next</mat-icon>
       </button>
-      <button class="hide-xs" (click)="increment()" [disabled]="nextBtnDisabled" mat-stroked-button>
+      <button class="app-surface-hide-mobile" (click)="increment()" [disabled]="nextBtnDisabled" mat-stroked-button>
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       <div class="dashboard-events-title">
         <span class="app-surface-eyebrow">{{ 'DASHBOARD.FIELD' | translate }}</span>
-        <h2>{{ displayDate | calendarDate:'dayViewTitle':locale }}</h2>
+        <h2>{{ displayDate | calendarDate:'dayViewTitle':language }}</h2>
         <app-counter (refreshViewDate)="refreshViewDate($event)"></app-counter>
       </div>
     </div>
@@ -45,7 +45,7 @@
           (segmentClicked)="segmentClick($event.date, $event.professionalId)"
           (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
           (beforeViewRender)="beforeMonthViewRender($event)"
-          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="locale"
+          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="language"
           [viewDate]="currentViewDate">
         </app-mwl-day-view-scheduler>
       </div>
@@ -55,7 +55,7 @@
       <div class="dashboard-events-empty app-surface-item">
         <mat-icon>event_busy</mat-icon>
         <h2>
-          {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':locale } }}
+          {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':language } }}
         </h2>
       </div>
     </section>

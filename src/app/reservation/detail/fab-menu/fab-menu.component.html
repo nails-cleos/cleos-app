@@ -8,10 +8,9 @@
     <div class="menu-items">
       @for (item of menus; track item.icon; let i = $index) {
         <button mat-stroked-button class="menu-item-enter menu-item" [style.--fab-item-delay]="(i * 100) + 'ms'"
-                (click)="handleMenuItemClick(item)" matTooltip="{{ item.tooltip }}" [color]="item.color"
-                matTooltipPosition="left" type="button">
+                (click)="handleMenuItemClick(item)" [color]="item.color" type="button">
           <mat-icon>{{ item.icon }}</mat-icon>
-          <span>{{ item.tooltip }}</span>
+          <span>{{ item.name }}</span>
         </button>
       }
     </div>

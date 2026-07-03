@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TotalSummaryComponent } from './total-summary.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { By } from '@angular/platform-browser';
-import { ISummaryTotals, Total } from '../../interfaces/dashboard';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { ISummaryTotals, Total } from '../dashboard';
+import { ICurrencyAll } from '../../currency/currency';
 
 describe('TotalSummaryComponent', () => {
   let component: TotalSummaryComponent;

@@ -1,28 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { ICatalogueAll } from '../../interfaces/catalogue';
-import { Store } from '@ngrx/store';
-import { MainContentService } from '../../services/main-content.service';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ICatalogueAll } from '../../catalogue/catalogue';
 import { getImage } from '../../util/file';
-import { getCatalogueListPipe } from '../../store/selectors/catalogue.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
-import { CatalogueState } from '../../store/reducers/catalogue.reducers';
+import { MatIcon } from '@angular/material/icon';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader, MatCardMdImage,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
+import { CatalogueStore } from '../../store/catalogue.store';
+import { MainContentService } from '../../services/main-content.service';
 
 @Component({
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
+    MatCardActions, MatCardMdImage],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogComponent {
-  private readonly store: Store<CatalogueState> = inject(Store<CatalogueState>);
-  private readonly mainContent: MainContentService = inject(MainContentService);
-
-  private catalogues$ = this.store.pipe(getCatalogueListPipe);
-
-  private cataloguesSignal = toSignal(this.catalogues$);
+  private readonly catalogueStore = inject(CatalogueStore);
+  private readonly mainContent = inject(MainContentService);
+  private readonly cataloguesSignal = this.catalogueStore.data;
 
   catalogues = computed(() => {
     const catalogues: ICatalogueAll[] = [];
@@ -37,11 +40,8 @@ export class CatalogComponent {
   });
 
   constructor() {
-    effect(() => {
-      if (this.catalogues().length) {
-        this.mainContent.configure(false, 'open');
-      }
-    });
+    this.mainContent.configure(false, 'open');
+    this.catalogueStore.clean();
+    this.catalogueStore.loadCatalogs();
   }
 }
-

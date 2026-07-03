@@ -1,24 +1,35 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AdditionalListComponent } from './additional-list.component';
-import { IAdditional } from '../../interfaces/additional';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { additionalSelected, deleteAdditional, getAdditionalPage } from '../../store/additional.actions';
-import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { AdditionalState } from '../../store/reducers/additional.reducers';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+import { BehaviorSubject, of } from 'rxjs';
+
+import { IAdditional, IAdditionalAll } from '../additional';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { AdditionalStore } from '../../store/additional.store';
+import { AdditionalListComponent } from './additional-list.component';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
   let fixture: ComponentFixture<AdditionalListComponent>;
-  let storeSpy: jasmine.SpyObj<Store<AdditionalState>>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let translate: TranslateService;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let additionalStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    clean: jasmine.Spy;
+    loadPage: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
 
   const mockAdditional: IAdditional[] = [
     { id: '1', name: 'Additional 1', description: 'Desc 1', duration: 'PT15M' },
@@ -30,13 +41,12 @@ describe('AdditionalListComponent', () => {
     totalElements: 2,
   };
 
-  let additionalList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    additionalList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -45,8 +55,17 @@ describe('AdditionalListComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    additionalStoreSpy = {
+      isLoading: signal(false),
+      data: signal<any>({ kind: 'pagination', value: mockPagination }),
+      response: signal<any>(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadPage: jasmine.createSpy('loadPage'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      delete: jasmine.createSpy('delete'),
+    };
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
@@ -54,45 +73,25 @@ describe('AdditionalListComponent', () => {
       },
     });
 
-    // Define order of .pipe() calls
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return additionalList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [AdditionalListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: MatDialog, useValue: dialogSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalListComponent);
     component = fixture.componentInstance;
-
-    translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
-
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
-    additionalList$.complete();
-    response$.complete();
     breakpoint$.complete();
   });
 
@@ -101,7 +100,7 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    additionalList$.next(mockPagination);
+    additionalStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -111,7 +110,7 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    additionalList$.next(mockPagination);
+    additionalStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -143,54 +142,59 @@ describe('AdditionalListComponent', () => {
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
   });
 
-  it('should dispatch getAdditionalPage when paginatorPageIndex changes', () => {
-    component.paginatorPageIndex.set(1);
+  it('should call loadPage when paginatorPageIndex changes', () => {
+    additionalStoreSpy.loadPage.calls.reset();
+    const paginator = component['paginator']();
+
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getAdditionalPage({
-        page: 1,
-        sort: 'order',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    expect(additionalStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'order',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+  it('should clear response and reset paginator when responseSignal emits', () => {
+    const paginator = component['paginator']();
 
-    component['paginator'] = signal(paginatorMock);
-
-    response$.next({ success: true });
-
+    paginator!.pageIndex = 1;
+    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getAdditionalPage({
-        page: 0,
-        sort: 'order',
-        direction: 'asc',
-        size: PAGE_SIZE,
-      }),
-    );
+    additionalStoreSpy.clearResponse.calls.reset();
+    additionalStoreSpy.loadPage.calls.reset();
+
+    additionalStoreSpy.response.set({ success: true } as any);
+    fixture.detectChanges();
+
+    expect(additionalStoreSpy.clearResponse).toHaveBeenCalled();
+    expect(additionalStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'order',
+      direction: 'asc',
+      size: PAGE_SIZE,
+    });
   });
 
-  it('should dispatch additionalSelected when edit is called', () => {
-    const item = mockAdditional[0];
+  it('should navigate when edit is called', () => {
+    const item = mockAdditional[0] as IAdditionalAll;
     component.edit(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(additionalSelected({ selected: item }));
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['additional', item.id]);
   });
 
-  it('should dispatch deleteAdditional when dialog returns a result', () => {
+  it('should call delete when dialog returns a result', () => {
     const item = mockAdditional[0];
-    dialogSpy.and.returnValue({
+    dialogSpy.open.and.returnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(deleteAdditional({ id: item.id!, name: item.name! }));
+    expect(additionalStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
   });
 });

@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
-import { AppMaterialModule } from '../../util/app-material.module';
 
 describe('AddNoteDialogComponent', () => {
   let component: AddNoteDialogComponent;
@@ -20,7 +19,7 @@ describe('AddNoteDialogComponent', () => {
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [AddNoteDialogComponent, TranslateModule.forRoot(), AppMaterialModule],
+      imports: [AddNoteDialogComponent, TranslateModule.forRoot()],
       providers: [
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },

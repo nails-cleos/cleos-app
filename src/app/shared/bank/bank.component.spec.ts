@@ -3,6 +3,7 @@ import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
 import { TranslateModule } from '@ngx-translate/core';
+import { provideAppIcons } from '../../util/app-icons.provider';
 
 describe('BankComponent', () => {
   let component: BankComponent;
@@ -38,6 +39,7 @@ describe('BankComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BankComponent, TranslateModule.forRoot()],
+      providers: [provideAppIcons()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BankComponent);

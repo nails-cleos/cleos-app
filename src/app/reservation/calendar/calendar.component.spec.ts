@@ -5,34 +5,41 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/reservation.actions';
+import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
 import { CalendarEvent } from 'angular-calendar';
 import { addDays, addMonths } from 'date-fns';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { Role } from '../../interfaces/token';
-import { IOfficeAll } from '../../interfaces/office';
-import { IRoomAll } from '../../interfaces/room';
-import { ICurrencyAll } from '../../interfaces/currency';
-import { IUserAll } from '../../interfaces/user';
-import { States } from '../../interfaces/reservation';
-import { createNewDate } from '../../util/dates';
+import { IOfficeAll } from '../../office/office';
+import { IRoomAll } from '../../room/room';
+import { ICurrencyAll } from '../../currency/currency';
+import { IUserAll } from '../../user/user';
+import { States } from '../reservation';
+import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
+import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { NavigationService } from '../../services/navigation.service';
+import { RoomStore } from '../../store/room.store';
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
+  let roomStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAll: jasmine.Spy;
+  };
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let dialogSpy: jasmine.SpyObj<any>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  let rooms$: BehaviorSubject<any>;
   let calendar$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -123,13 +130,19 @@ describe('CalendarComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    roomStoreSpy = {
+      data: signal<any>(undefined),
+      loadAll: jasmine.createSpy('loadCustomers'),
+    };
     authUserSignal.update(prev => ({
       ...prev,
       isDarkMode: false,
       professionalId: 'professional-id',
       isRoomAdmin: false,
     }));
-    rooms$ = new BehaviorSubject(undefined);
     calendar$ = new BehaviorSubject([mockCalendarData]);
     breakpoint$ = new BehaviorSubject({
       matches: false,
@@ -137,7 +150,7 @@ describe('CalendarComponent', () => {
     });
 
     storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
@@ -153,8 +166,6 @@ describe('CalendarComponent', () => {
       pipeCallIndex++;
       switch (pipeCallIndex) {
         case 1:
-          return rooms$.asObservable();
-        case 2:
           return calendar$.asObservable();
         default:
           return new BehaviorSubject(undefined).asObservable();
@@ -166,27 +177,27 @@ describe('CalendarComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CalendarComponent, TranslateModule.forRoot()],
       providers: [
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        provideAppDateAdapter(),
+        provideAppCalendar(),
       ],
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(CalendarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
-    dialogSpy = spyOn(component['dialog'], 'open');
   });
 
   afterEach(() => {
-    rooms$.complete();
     calendar$.complete();
     breakpoint$.complete();
   });
@@ -219,8 +230,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should set locale from translate service', () => {
-      expect(component.locale).toBe('en-GB');
-      expect(component.language).toBe('en-GB');
+      expect(component.language).toBe(DEFAULT_LOCALE);
     });
   });
 
@@ -246,7 +256,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should compute offices from rooms', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       fixture.detectChanges();
 
       const offices = component.offices();
@@ -282,13 +292,13 @@ describe('CalendarComponent', () => {
 
   describe('Form Auto-selection', () => {
     it('should auto-select office when only one office exists', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       expect(component.getForm.office.value?.id).toEqual(mockRoom1.office?.id);
     });
 
     it('should auto-select room when office has only one room', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       fixture.detectChanges();
 
       component.getForm.office.setValue(component.offices()[0]);
@@ -297,7 +307,7 @@ describe('CalendarComponent', () => {
     });
 
     it('should auto-select professional when room has only one professional', () => {
-      rooms$.next([mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom2] });
       fixture.detectChanges();
       expect(component.getForm.professional.value).toEqual(mockProfessional1);
     });
@@ -423,7 +433,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['reservation-123']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation-123']);
     });
 
     it('should not navigate when event id is OUT_OF_WORK_ALL_DAY', () => {
@@ -435,7 +445,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should not navigate when event id is OUT_OF_WORK', () => {
@@ -447,7 +457,7 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should not navigate when event id is LUNCH', () => {
@@ -459,23 +469,23 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(routerSpy.navigate).not.toHaveBeenCalled();
+      expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
     });
 
     it('should open dialog on segmentClick when date is valid', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
 
       component.getForm.room.setValue(mockRoom1);
       const futureDate = addDays(new Date(), 5);
 
-      dialogSpy.and.returnValue({
+      dialogSpy.open.and.returnValue({
         afterClosed: () => of('en,reservation,new'),
       } as any);
 
       component.segmentClick(futureDate, mockRoom1);
 
-      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
     });
   });
 
@@ -519,7 +529,7 @@ describe('CalendarComponent', () => {
 
   describe('Store Dispatching', () => {
     it('should dispatch getAllGroupingByRoom on room selection', () => {
-      rooms$.next([mockRoom1, mockRoom2]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       component.getForm.office.setValue(component.offices()[0]);
       component.getForm.room.setValue(mockRoom1);
       fixture.detectChanges();
@@ -532,9 +542,9 @@ describe('CalendarComponent', () => {
     });
 
     it('should dispatch updateReservationTimestamp when event times changed is confirmed', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const newStart = new Date(2024, 5, 15, 11, 0);
@@ -554,7 +564,7 @@ describe('CalendarComponent', () => {
 
       component.eventTimesChanged({ event, newStart, newEnd, type: '' } as any);
 
-      expect(dialogSpy).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
       expect(storeSpy.dispatch).toHaveBeenCalledWith(
         jasmine.objectContaining({
           type: updateReservationTimestamp.type,
@@ -563,9 +573,9 @@ describe('CalendarComponent', () => {
     });
 
     it('should revert event times when eventTimesChanged is cancelled', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      dialogSpy.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const oldEnd = new Date(2024, 5, 15, 11, 0);
@@ -592,7 +602,7 @@ describe('CalendarComponent', () => {
 
     it('should not trigger eventTimesChanged when start date is the same', () => {
       const start = new Date(2024, 5, 15, 10, 0);
-      dialogSpy.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
       const event: CalendarEvent = {
         id: 'reservation-123',
         start: start,
@@ -603,7 +613,7 @@ describe('CalendarComponent', () => {
 
       component.eventTimesChanged({ event, newStart: start, newEnd: new Date(2024, 5, 15, 11, 0), type: '' } as any);
 
-      expect(dialogSpy).not.toHaveBeenCalled();
+      expect(dialogSpy.open).not.toHaveBeenCalled();
     });
   });
 
@@ -679,12 +689,12 @@ describe('CalendarComponent', () => {
 
   describe('Role-based behavior', () => {
     it('should dispatch with roomAdmin role when user is room admin', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: true }));
       fixture.detectChanges();
 
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',
@@ -713,12 +723,12 @@ describe('CalendarComponent', () => {
     });
 
     it('should dispatch with professional role when user is not room admin', () => {
-      rooms$.next([mockRoom1]);
+      roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
       authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
       fixture.detectChanges();
 
-      dialogSpy.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',

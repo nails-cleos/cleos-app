@@ -1,12 +1,11 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-total-summary-item',
   templateUrl: './total-summary-item.component.html',
   styleUrl: './total-summary-item.component.scss',
-  imports: [AppMaterialModule, CurrencyPipe],
+  imports: [CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TotalSummaryItemComponent {

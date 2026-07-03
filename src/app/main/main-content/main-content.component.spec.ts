@@ -1,82 +1,83 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainContentComponent } from './main-content.component';
-import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { Router } from '@angular/router';
-import { MainContentService } from '../../services/main-content.service';
 import { ToastService } from '../../services/toast.service';
-import { sendMessage } from '../../store/main.actions';
 import { ISendMessage } from '../../../main';
-import { ISocialLink } from '../../interfaces/main';
-import { BehaviorSubject } from 'rxjs';
+import { ISocialLink } from '../main';
 import { provideHttpClient } from '@angular/common/http';
-import { MainState } from '../../store/reducers/main.reducers';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
+import { provideAppIcons } from '../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { CatalogueStore } from '../../store/catalogue.store';
+import { MainStore } from '../../store/main.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
   let fixture: ComponentFixture<MainContentComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
+  let catalogueStoreSpy: {
+    data: ReturnType<typeof signal>;
+    getAllHome: jasmine.Spy;
+  };
+  let mainStoreSpy: {
+    response: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    create: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
-  let response$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<MainState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
   let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
-  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
-
-  let translateService: TranslateService;
 
   beforeEach(async () => {
-    response$ = new BehaviorSubject(undefined);
-    error$ = new BehaviorSubject(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    catalogueStoreSpy = {
+      data: signal<any>(undefined),
+      getAllHome: jasmine.createSpy('getAllHome'),
+    };
+    mainStoreSpy = {
+      response: signal<any>(undefined),
+      error: signal<any>(undefined),
+      isLoading: signal<any>(false),
+      create: jasmine.createSpy('create'),
+      clean: jasmine.createSpy('clean'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', ['configure']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return response$.asObservable();
-        case 2:
-          return error$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     await TestBed.configureTestingModule({
       imports: [MainContentComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: MainStore, useValue: mainStoreSpy },
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         provideHttpClient(),
         provideHttpClientTesting(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 
-    translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
-    translateService.setTranslation('en-GB', {
+    const translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
+    translateService.setTranslation(DEFAULT_LOCALE, {
       TREATMENTS: [{
         TITLE: 'Treatment Title',
         CONTENT: 'Treatment Content',
@@ -111,9 +112,7 @@ describe('MainContentComponent', () => {
 
     component.sendEmail();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      sendMessage({ sendMessage: component.form.value as ISendMessage }),
-    );
+    expect(mainStoreSpy.create).toHaveBeenCalledWith(component.form.value as ISendMessage);
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
@@ -126,7 +125,7 @@ describe('MainContentComponent', () => {
 
     component.sendEmail();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({ type: '[Main] Send Message' }));
+    expect(mainStoreSpy.create).not.toHaveBeenCalled();
   });
 
   it('should update currentIndex signal when moveForwardSlide is called', () => {
@@ -152,12 +151,13 @@ describe('MainContentComponent', () => {
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-    expect(routerSpy.navigate).toHaveBeenCalledWith([translateService.getCurrentLang(), 'home', 'biab-treatment', 'treatment']);
+    expect(navigationServiceSpy.navigate)
+      .toHaveBeenCalledWith(['home', 'biab-treatment', 'treatment']);
   });
 
   it('should not navigate for other treatments', () => {
     component.goToTreatment('other');
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
   });
 
   it('should update social icon on hover', () => {

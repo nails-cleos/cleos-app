@@ -6,27 +6,30 @@
       @let status = statusSignal();
       <form class="auth-form" [formGroup]="form" (ngSubmit)="onSubmit()">
         @if (!showForm) {
-          <section class="app-surface-section auth-section">
-            <div class="auth-section__header">
-              <div class="app-surface-eyebrow">{{ 'COMMON.USER.WITH.IN' | translate }}</div>
-            </div>
+          <div class="auth-section__header">
+            <div class="auth-title">{{ 'COMMON.USER.WITH.IN' | translate }}</div>
+          </div>
 
-            <div class="auth-choice-list">
-              <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
+          <div class="auth-choice-list">
+            <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
 
-              <button class="auth-choice-button auth-choice-button--email"
-                      mat-stroked-button
-                      (click)="showForm = true"
-                      type="button">
-                <mat-icon>email</mat-icon>
-                <span>{{ 'COMMON.USER.WITH.EMAIL' | translate }}</span>
-              </button>
-            </div>
+            <button class="auth-choice-button auth-choice-button--email"
+                    mat-stroked-button
+                    (click)="showForm = true"
+                    type="button">
+              <mat-icon>email</mat-icon>
+              <span>{{ 'COMMON.USER.WITH.EMAIL' | translate }}</span>
+            </button>
+          </div>
 
-            <p class="auth-legal"
-               [innerHTML]="'COMMON.USER.LOGIN.ACCEPT' | translate:{tos: tos, privacyPolicy:privacyPolicy}">
-            </p>
-          </section>
+          <mat-form-field appearance="outline" class="app-crud-form-grid--single">
+            <mat-label>{{ 'AUTH.SIGN_IN.CODE.FIELD' | translate }}</mat-label>
+            <input [formControl]="getForm.code" matInput autocomplete="one-time-code">
+          </mat-form-field>
+
+          <p class="auth-legal"
+             [innerHTML]="'COMMON.USER.LOGIN.ACCEPT' | translate:{tos: tos, privacyPolicy:privacyPolicy}">
+          </p>
         }
 
         @if (showForm) {
@@ -86,14 +89,9 @@
               <div class="app-surface-item app-surface-item--section app-crud-fields app-crud-form-grid__full">
                 <div class="app-surface-item__label">{{ 'COMMON.USER.LOGIN.ACCOUNT.TITLE' | translate }}</div>
                 <div class="app-surface-item__value"
-                     [innerHTML]="'COMMON.USER.LOGIN.ACCOUNT.MESSAGE' | translate:{email: getForm.email.value}"></div>
+                     [innerHTML]="'COMMON.USER.LOGIN.ACCOUNT.MESSAGE' | translate:{ email: getForm.email.value }"></div>
               </div>
             }
-
-            <mat-form-field appearance="outline" class="app-crud-form-grid__full">
-              <mat-label>{{ 'AUTH.SIGN_IN.CODE.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.code" matInput autocomplete="one-time-code">
-            </mat-form-field>
           </div>
 
           <div class="app-detail-actions auth-actions">
@@ -102,16 +100,16 @@
                  [routerLink]="['/', language, 'auth', 'forgot-password']">
                 {{ 'AUTH.SIGN_IN.FORGOT_PASSWORD' | translate }}
               </a>
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <button mat-stroked-button type="submit" [disabled]="form.invalid">
                 <mat-icon>login</mat-icon>
                 {{ 'COMMON.BUTTON.LOGIN' | translate }}
               </button>
             } @else if (status === 'google.com') {
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <ng-container [ngTemplateOutlet]="googleButton"></ng-container>
             } @else {
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <button mat-stroked-button type="button" (click)="showForm = false">
                 {{ 'COMMON.BUTTON.CANCEL' | translate }}
               </button>

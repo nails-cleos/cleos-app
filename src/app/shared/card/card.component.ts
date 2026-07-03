@@ -1,17 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { createChart } from '../../util/chart';
-import { IChart } from '../../interfaces/dashboard';
-import { ICurrency } from '../../interfaces/currency';
+import { IChart } from '../../dashboard/dashboard';
+import { ICurrency } from '../../currency/currency';
 import { AuthUserService } from '../../services/auth-user.service';
 import { CardChartComponent } from './card-chart.component';
-import { AppMaterialModule } from '../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatIconButton } from '@angular/material/button';
+import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  imports: [AppMaterialModule],
+  imports: [MatIcon, MatIconButton, MatCard, MatCardHeader, MatCardTitle, MatCardContent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {

@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { currencySymbol } from '../util/helper';
-import { ICurrency, ICurrencyAll } from '../interfaces/currency';
+import { ICurrency, ICurrencyAll } from '../currency/currency';
 
 @Pipe({
   name: 'currencySymbol',

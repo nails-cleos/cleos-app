@@ -1,6 +1,6 @@
 import { Cell, CellFormulaValue, CellHyperlinkValue, Row, Workbook, Worksheet, WorksheetView } from 'exceljs';
 import {
-  API_LOCALE,
+  DEFAULT_LOCALE,
   createNewDateZonedTime,
   exportFormatDate,
   getCurrentTimeZone,
@@ -15,7 +15,7 @@ import {
   ISummaryTotal,
   ISummaryTotals,
   SummaryType,
-} from '../interfaces/dashboard';
+} from '../dashboard/dashboard';
 import { TranslateService } from '@ngx-translate/core';
 import { titleCase } from './helper';
 import { EnvService } from '../services/env.service';
@@ -106,7 +106,7 @@ export const createQuarterSummary = (
   translate: TranslateService,
 ): Workbook => {
   const workbook = new Workbook();
-  const name = `Q${quarter}`;
+  const name = `Q${ quarter }`;
   const worksheet = workbook.addWorksheet(name);
 
   setQTitles(worksheet, name, translate);
@@ -184,17 +184,17 @@ export const createYearlyWorkbook = (
       const totalNet = saleNet - expenseNet;
       const totalBtw = saleBtw - expenseBtw;
 
-      worksheet.mergeCells(`A${cellNumber}`, `E${cellNumber}`);
-      setTotal(worksheet, cellNumber, 'F', `F${saleCellNumber} - F${expenseCellNumber}`, totalGross);
-      setTotal(worksheet, cellNumber, 'G', `G${saleCellNumber} - G${expenseCellNumber}`, totalNet);
-      setTotal(worksheet, cellNumber, 'H', `H${saleCellNumber} - H${expenseCellNumber}`, totalBtw);
+      worksheet.mergeCells(`A${ cellNumber }`, `E${ cellNumber }`);
+      setTotal(worksheet, cellNumber, 'F', `F${ saleCellNumber } - F${ expenseCellNumber }`, totalGross);
+      setTotal(worksheet, cellNumber, 'G', `G${ saleCellNumber } - G${ expenseCellNumber }`, totalNet);
+      setTotal(worksheet, cellNumber, 'H', `H${ saleCellNumber } - H${ expenseCellNumber }`, totalBtw);
       setResultTitle(worksheet, cellNumber);
 
       const priceFormat = currencyFormat(currency);
       setColumnFormat(worksheet, ['F', 'G', 'H'], priceFormat);
 
       const positivePriceFormat = currencyFormat(currency, true);
-      setCellFormat(worksheet, [`F${cellNumber}`, `G${cellNumber}`, `H${cellNumber}`], positivePriceFormat);
+      setCellFormat(worksheet, [`F${ cellNumber }`, `G${ cellNumber }`, `H${ cellNumber }`], positivePriceFormat);
 
       monthResults = [...monthResults, {
         month: it.month,
@@ -234,7 +234,7 @@ const monthlyIncomeWorksheet = (
   timeZone: string,
   env: EnvService,
 ): Worksheet => {
-  const worksheet = workbook.addWorksheet(`${name} - ${header}`);
+  const worksheet = workbook.addWorksheet(`${ name } - ${ header }`);
   let cellNumber = 1;
   setTitle(worksheet, cellNumber, 'K', title);
   cellNumber++;
@@ -258,7 +258,7 @@ const monthlyIncomeWorksheet = (
       rowData.forEach((income) => {
         const link = {
           text: income.id,
-          hyperlink: `${env.appServer}/${income.paths}`,
+          hyperlink: `${ env.appServer }/${ income.paths }`,
         } as CellHyperlinkValue;
 
         if (income.total.payments.length) {
@@ -271,7 +271,8 @@ const monthlyIncomeWorksheet = (
             totalNet += payment.net;
             totalBtw += payment.btw;
             const row = worksheet.addRow(
-              [++totalRow, link, exportFormatDate(newDateTimestamp(income.timestamp, timeZone), API_LOCALE, timeZone),
+              [++totalRow, link,
+                exportFormatDate(newDateTimestamp(income.timestamp, timeZone), DEFAULT_LOCALE, timeZone),
                 income.customerName, income.description, income.total.discountDescription, income.color, typeValue,
                 payment.gross, payment.net, payment.btw,
               ],
@@ -280,12 +281,12 @@ const monthlyIncomeWorksheet = (
           });
           if (paymentSize > 1) {
             const start = paymentInit + cellNumber;
-            worksheet.mergeCells(`A${start + 1}`, `A${start + paymentSize}`);
-            worksheet.mergeCells(`B${start + 1}`, `B${start + paymentSize}`);
-            worksheet.mergeCells(`D${start + 1}`, `D${start + paymentSize}`);
-            worksheet.mergeCells(`E${start + 1}`, `E${start + paymentSize}`);
-            worksheet.mergeCells(`F${start + 1}`, `F${start + paymentSize}`);
-            worksheet.mergeCells(`G${start + 1}`, `G${start + paymentSize}`);
+            worksheet.mergeCells(`A${ start + 1 }`, `A${ start + paymentSize }`);
+            worksheet.mergeCells(`B${ start + 1 }`, `B${ start + paymentSize }`);
+            worksheet.mergeCells(`D${ start + 1 }`, `D${ start + paymentSize }`);
+            worksheet.mergeCells(`E${ start + 1 }`, `E${ start + paymentSize }`);
+            worksheet.mergeCells(`F${ start + 1 }`, `F${ start + paymentSize }`);
+            worksheet.mergeCells(`G${ start + 1 }`, `G${ start + paymentSize }`);
           }
         } else {
           totalGross += income.total.gross;
@@ -294,7 +295,7 @@ const monthlyIncomeWorksheet = (
           rowIndex++;
           const typeValue = translate.instant(getTranslateTypeKey(type));
           const row = worksheet.addRow(
-            [++totalRow, link, exportFormatDate(newDateTimestamp(income.timestamp, timeZone), API_LOCALE, timeZone),
+            [++totalRow, link, exportFormatDate(newDateTimestamp(income.timestamp, timeZone), DEFAULT_LOCALE, timeZone),
               income.customerName, income.description, income.total.discountDescription, income.color, typeValue,
               income.total.gross, income.total.net, income.total.btw,
             ],
@@ -310,12 +311,12 @@ const monthlyIncomeWorksheet = (
     }
   });
 
-  worksheet.mergeCells(`A${cellNumber}`, `H${cellNumber}`);
+  worksheet.mergeCells(`A${ cellNumber }`, `H${ cellNumber }`);
   setResultTitle(worksheet, cellNumber);
 
-  setTotal(worksheet, cellNumber, 'I', `SUM(I${3}:I${cellNumber - 1})`, totalGross, 'K');
-  setTotal(worksheet, cellNumber, 'J', `SUM(J${3}:J${cellNumber - 1})`, totalNet, 'K');
-  setTotal(worksheet, cellNumber, 'K', `SUM(K${3}:K${cellNumber - 1})`, totalBtw, 'K');
+  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalGross, 'K');
+  setTotal(worksheet, cellNumber, 'J', `SUM(J${ 3 }:J${ cellNumber - 1 })`, totalNet, 'K');
+  setTotal(worksheet, cellNumber, 'K', `SUM(K${ 3 }:K${ cellNumber - 1 })`, totalBtw, 'K');
 
   const priceFormat = currencyFormat(currency);
   setColumnFormat(worksheet, ['I', 'J', 'K'], priceFormat);
@@ -340,7 +341,7 @@ const monthlyExpenseWorksheet = (
   timeZone: string,
   env: EnvService,
 ): Worksheet => {
-  const worksheet = workbook.addWorksheet(`${name} - ${header}`);
+  const worksheet = workbook.addWorksheet(`${ name } - ${ header }`);
   let cellNumber = 1;
   setTitle(worksheet, cellNumber, 'K', title);
   cellNumber++;
@@ -364,7 +365,7 @@ const monthlyExpenseWorksheet = (
       rowData.forEach((expense) => {
         const link = {
           text: expense.id,
-          hyperlink: `${env.appServer}/${expense.paths}`,
+          hyperlink: `${ env.appServer }/${ expense.paths }`,
         } as CellHyperlinkValue;
 
         const paymentInit = rowIndex;
@@ -377,7 +378,8 @@ const monthlyExpenseWorksheet = (
           totalNet += payment.net;
           totalBtw += payment.btw;
           const row = worksheet.addRow(
-            [++totalRow, link, exportFormatDate(newDateTimestamp(expense.timestamp, timeZone), API_LOCALE, timeZone),
+            [++totalRow, link,
+              exportFormatDate(newDateTimestamp(expense.timestamp, timeZone), DEFAULT_LOCALE, timeZone),
               expense.invoice, expense.supplyStore, payment.description, typeValue, subTypeValue, payment.gross,
               payment.net, payment.btw,
             ],
@@ -386,12 +388,12 @@ const monthlyExpenseWorksheet = (
         });
         if (paymentSize > 1) {
           const start = paymentInit + cellNumber;
-          worksheet.mergeCells(`A${start + 1}`, `A${start + paymentSize}`);
-          worksheet.mergeCells(`B${start + 1}`, `B${start + paymentSize}`);
-          worksheet.mergeCells(`C${start + 1}`, `C${start + paymentSize}`);
-          worksheet.mergeCells(`D${start + 1}`, `D${start + paymentSize}`);
-          worksheet.mergeCells(`E${start + 1}`, `E${start + paymentSize}`);
-          worksheet.mergeCells(`F${start + 1}`, `F${start + paymentSize}`);
+          worksheet.mergeCells(`A${ start + 1 }`, `A${ start + paymentSize }`);
+          worksheet.mergeCells(`B${ start + 1 }`, `B${ start + paymentSize }`);
+          worksheet.mergeCells(`C${ start + 1 }`, `C${ start + paymentSize }`);
+          worksheet.mergeCells(`D${ start + 1 }`, `D${ start + paymentSize }`);
+          worksheet.mergeCells(`E${ start + 1 }`, `E${ start + paymentSize }`);
+          worksheet.mergeCells(`F${ start + 1 }`, `F${ start + paymentSize }`);
         }
       });
       const init = ++cellNumber;
@@ -402,12 +404,12 @@ const monthlyExpenseWorksheet = (
     }
   });
 
-  worksheet.mergeCells(`A${cellNumber}`, `H${cellNumber}`);
+  worksheet.mergeCells(`A${ cellNumber }`, `H${ cellNumber }`);
   setResultTitle(worksheet, cellNumber);
 
-  setTotal(worksheet, cellNumber, 'I', `SUM(I${3}:I${cellNumber - 1})`, totalNet, 'K');
-  setTotal(worksheet, cellNumber, 'J', `SUM(J${3}:J${cellNumber - 1})`, totalBtw, 'K');
-  setTotal(worksheet, cellNumber, 'K', `SUM(K${3}:K${cellNumber - 1})`, totalGross, 'K');
+  setTotal(worksheet, cellNumber, 'I', `SUM(I${ 3 }:I${ cellNumber - 1 })`, totalNet, 'K');
+  setTotal(worksheet, cellNumber, 'J', `SUM(J${ 3 }:J${ cellNumber - 1 })`, totalBtw, 'K');
+  setTotal(worksheet, cellNumber, 'K', `SUM(K${ 3 }:K${ cellNumber - 1 })`, totalGross, 'K');
 
   const priceFormat = currencyFormat(currency);
   setColumnFormat(worksheet, ['I', 'J', 'K'], priceFormat);
@@ -423,7 +425,7 @@ const monthlyExpenseWorksheet = (
 const createHeader = (worksheet: Worksheet, headers: string[], translate: TranslateService): void => {
   worksheet.addRow([
     'N°', 'Link',
-    ...headers.map(key => translate.instant(`SUMMARY.MONTHLY.TABLE.${key}`)),
+    ...headers.map(key => translate.instant(`SUMMARY.MONTHLY.TABLE.${ key }`)),
   ]);
 };
 
@@ -438,7 +440,7 @@ const setCellFormat = (worksheet: Worksheet, columns: string[], format: string):
 const completeData = (workbook: Workbook, date: Date, data: IMonthlyExport[]): IMonthlyExport[] => {
   for (let i = 12; i >= 1; i--) {
     if (i % 3 === 0) {
-      workbook.addWorksheet(`Q${(i / 3)}`);
+      workbook.addWorksheet(`Q${ (i / 3) }`);
     }
     const name = monthViewTitle(new Date(date.getFullYear(), i - 1));
     workbook.addWorksheet(name);
@@ -483,10 +485,10 @@ const addData = (
     cellNumber += rowData.length;
     setBorder(worksheet, init, cellNumber - 1, monthCells);
 
-    worksheet.mergeCells(`A${cellNumber}`, `E${cellNumber}`);
-    setTotal(worksheet, cellNumber, 'F', `SUM(F${init}:F${cellNumber - 1})`, gross);
-    setTotal(worksheet, cellNumber, 'G', `SUM(G${init}:G${cellNumber - 1})`, net);
-    setTotal(worksheet, cellNumber, 'H', `SUM(H${init}:H${cellNumber - 1})`, btw);
+    worksheet.mergeCells(`A${ cellNumber }`, `E${ cellNumber }`);
+    setTotal(worksheet, cellNumber, 'F', `SUM(F${ init }:F${ cellNumber - 1 })`, gross);
+    setTotal(worksheet, cellNumber, 'G', `SUM(G${ init }:G${ cellNumber - 1 })`, net);
+    setTotal(worksheet, cellNumber, 'H', `SUM(H${ init }:H${ cellNumber - 1 })`, btw);
     setResultTitle(worksheet, cellNumber, 'Total');
   } else {
     // no data
@@ -504,8 +506,8 @@ const setTitle = (
   startLetter: string = 'A',
   color: string = 'b5ac9e',
 ) => {
-  worksheet.mergeCells(`${startLetter}${cellNumber}`, `${endLetter}${cellNumber}`);
-  const titleCell = worksheet.getCell(`${startLetter}${cellNumber}`);
+  worksheet.mergeCells(`${ startLetter }${ cellNumber }`, `${ endLetter }${ cellNumber }`);
+  const titleCell = worksheet.getCell(`${ startLetter }${ cellNumber }`);
   titleCell.value = key;
   setTitleFormat(titleCell, color);
   titleCell.border = {
@@ -517,7 +519,7 @@ const setTitle = (
 
 const setSubtitle = (worksheet: Worksheet, cellList: string[], cellNumber: number) => {
   cellList.forEach((cell, index) => {
-    const currentCell = worksheet.getCell(`${cell}${cellNumber}`);
+    const currentCell = worksheet.getCell(`${ cell }${ cellNumber }`);
     setTitleFormat(currentCell, 'dcc8c2');
     currentCell.border = {
       left: { style: index === 0 ? 'medium' : 'thin' },
@@ -528,7 +530,7 @@ const setSubtitle = (worksheet: Worksheet, cellList: string[], cellNumber: numbe
   });
 };
 
-const getTranslateTypeKey = (key: string, type: string = 'PENDING') => `COMMON.${key.toUpperCase()}.TYPE.${type}`;
+const getTranslateTypeKey = (key: string, type: string = 'PENDING') => `COMMON.${ key.toUpperCase() }.TYPE.${ type }`;
 
 const getSaleRowData = (saleSummary: IMonthlySummarySale[], timeZone: string, env: EnvService): {
   saleRowData: (string | number | CellHyperlinkValue)[][];
@@ -542,7 +544,7 @@ const getSaleRowData = (saleSummary: IMonthlySummarySale[], timeZone: string, en
   const rowData = saleSummary.map((sale, index) => {
     const id = {
       text: sale.id,
-      hyperlink: `${env.appServer}/${sale.paths.join('/')}`,
+      hyperlink: `${ env.appServer }/${ sale.paths.join('/') }`,
     } as CellHyperlinkValue;
 
     const paid = sale.total.payments.reduce((payments: any, payment: ISummaryTotal) => {
@@ -556,7 +558,7 @@ const getSaleRowData = (saleSummary: IMonthlySummarySale[], timeZone: string, en
     net += paid.net;
     btw += paid.btw;
 
-    return [index + 1, id, exportFormatDate(newDateTimestamp(sale.timestamp, timeZone), API_LOCALE, timeZone),
+    return [index + 1, id, exportFormatDate(newDateTimestamp(sale.timestamp, timeZone), DEFAULT_LOCALE, timeZone),
       sale.customerName, sale.description, paid.gross, paid.net, paid.btw];
   });
 
@@ -575,14 +577,15 @@ const getExpenseRowData = (expenseSummary: IMonthlySummaryExpense[], timeZone: s
   const rowData = expenseSummary.map((expense, index) => {
     const id = {
       text: expense.id,
-      hyperlink: `${env.appServer}/${expense.paths.join('/')}`,
+      hyperlink: `${ env.appServer }/${ expense.paths.join('/') }`,
     } as CellHyperlinkValue;
 
     gross += expense.total.gross;
     net += expense.total.net;
     btw += expense.total.btw;
 
-    return [index + 1, id, exportFormatDate(createNewDateZonedTime(expense.timestamp, timeZone), API_LOCALE, timeZone),
+    return [index + 1, id,
+      exportFormatDate(createNewDateZonedTime(expense.timestamp, timeZone), DEFAULT_LOCALE, timeZone),
       expense.invoice, expense.supplyStore, expense.total.gross, expense.total.net, expense.total.btw];
   });
 
@@ -596,7 +599,7 @@ const createQData = (
   translate: TranslateService,
 ) => {
   [...Array(4)].map((_, i) => {
-    const name = `Q${++i}`;
+    const name = `Q${ ++i }`;
     const worksheet = workbook.getWorksheet(name);
     if (worksheet) {
       setQTitles(worksheet, name, translate);
@@ -620,14 +623,14 @@ const createQData = (
         expenseBtw += total.expenseBtw;
         worksheet.getRow(incomeRow).values = [it.name, total.saleGross, total.saleNet, total.saleBtw];
         worksheet.getRow(expenseRow).values = [it.name, total.expenseGross, total.expenseNet, total.expenseBtw];
-        worksheet.getCell(`A${totalRow}`).value = it.name;
-        setTotal(worksheet, totalRow, 'B', `B${incomeRow} - B${expenseRow}`, total.saleGross - total.expenseGross,
+        worksheet.getCell(`A${ totalRow }`).value = it.name;
+        setTotal(worksheet, totalRow, 'B', `B${ incomeRow } - B${ expenseRow }`, total.saleGross - total.expenseGross,
           'D', false,
         );
-        setTotal(worksheet, totalRow, 'C', `C${incomeRow} - C${expenseRow}`, total.saleNet - total.expenseNet, 'D',
+        setTotal(worksheet, totalRow, 'C', `C${ incomeRow } - C${ expenseRow }`, total.saleNet - total.expenseNet, 'D',
           false,
         );
-        setTotal(worksheet, totalRow, 'D', `D${incomeRow} - D${expenseRow}`, total.saleBtw - total.expenseBtw, 'D',
+        setTotal(worksheet, totalRow, 'D', `D${ incomeRow } - D${ expenseRow }`, total.saleBtw - total.expenseBtw, 'D',
           false,
         );
       });
@@ -664,15 +667,15 @@ const createYearSummarySheet = (
 
   worksheet.addRow([
     monthTitle,
-    `${incomeTitle} ${grossTitle}`,
-    `${incomeTitle} ${netTitle}`,
-    `${incomeTitle} ${btwTitle}`,
-    `${expenseTitle} ${grossTitle}`,
-    `${expenseTitle} ${netTitle}`,
-    `${expenseTitle} ${btwTitle}`,
-    `Result ${grossTitle}`,
-    `Result ${netTitle}`,
-    `Result ${btwTitle}`,
+    `${ incomeTitle } ${ grossTitle }`,
+    `${ incomeTitle } ${ netTitle }`,
+    `${ incomeTitle } ${ btwTitle }`,
+    `${ expenseTitle } ${ grossTitle }`,
+    `${ expenseTitle } ${ netTitle }`,
+    `${ expenseTitle } ${ btwTitle }`,
+    `Result ${ grossTitle }`,
+    `Result ${ netTitle }`,
+    `Result ${ btwTitle }`,
   ]);
   setSubtitle(worksheet, yearCells, 2);
 
@@ -711,23 +714,23 @@ const createYearSummarySheet = (
   const resultNet = incomeNet - expenseNet;
   const resultBtw = incomeBtw - expenseBtw;
 
-  setTotal(worksheet, totalRow, 'B', `SUM(B${startRow}:B${endRow})`, incomeGross, 'J');
-  setTotal(worksheet, totalRow, 'C', `SUM(C${startRow}:C${endRow})`, incomeNet, 'J');
-  setTotal(worksheet, totalRow, 'D', `SUM(D${startRow}:D${endRow})`, incomeBtw, 'J');
-  setTotal(worksheet, totalRow, 'E', `SUM(E${startRow}:E${endRow})`, expenseGross, 'J');
-  setTotal(worksheet, totalRow, 'F', `SUM(F${startRow}:F${endRow})`, expenseNet, 'J');
-  setTotal(worksheet, totalRow, 'G', `SUM(G${startRow}:G${endRow})`, expenseBtw, 'J');
-  setTotal(worksheet, totalRow, 'H', `SUM(H${startRow}:H${endRow})`, resultGross, 'J');
-  setTotal(worksheet, totalRow, 'I', `SUM(I${startRow}:I${endRow})`, resultNet, 'J');
-  setTotal(worksheet, totalRow, 'J', `SUM(J${startRow}:J${endRow})`, resultBtw, 'J');
+  setTotal(worksheet, totalRow, 'B', `SUM(B${ startRow }:B${ endRow })`, incomeGross, 'J');
+  setTotal(worksheet, totalRow, 'C', `SUM(C${ startRow }:C${ endRow })`, incomeNet, 'J');
+  setTotal(worksheet, totalRow, 'D', `SUM(D${ startRow }:D${ endRow })`, incomeBtw, 'J');
+  setTotal(worksheet, totalRow, 'E', `SUM(E${ startRow }:E${ endRow })`, expenseGross, 'J');
+  setTotal(worksheet, totalRow, 'F', `SUM(F${ startRow }:F${ endRow })`, expenseNet, 'J');
+  setTotal(worksheet, totalRow, 'G', `SUM(G${ startRow }:G${ endRow })`, expenseBtw, 'J');
+  setTotal(worksheet, totalRow, 'H', `SUM(H${ startRow }:H${ endRow })`, resultGross, 'J');
+  setTotal(worksheet, totalRow, 'I', `SUM(I${ startRow }:I${ endRow })`, resultNet, 'J');
+  setTotal(worksheet, totalRow, 'J', `SUM(J${ startRow }:J${ endRow })`, resultBtw, 'J');
 
   const priceFormat = currencyFormat(currency);
   setColumnFormat(worksheet, ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], priceFormat);
 
   const positivePriceFormat = currencyFormat(currency, true);
   setCellFormat(worksheet, [
-    `B${totalRow}`, `C${totalRow}`, `D${totalRow}`, `E${totalRow}`, `F${totalRow}`, `G${totalRow}`,
-    `H${totalRow}`, `I${totalRow}`, `J${totalRow}`,
+    `B${ totalRow }`, `C${ totalRow }`, `D${ totalRow }`, `E${ totalRow }`, `F${ totalRow }`, `G${ totalRow }`,
+    `H${ totalRow }`, `I${ totalRow }`, `J${ totalRow }`,
   ], positivePriceFormat);
 
   resizeColumn(worksheet);
@@ -788,16 +791,16 @@ const setQTotals = (
   const endSumCell = startSumCell + 2;
   const totalCell = startSumCell + 3;
   setBorder(worksheet, startSumCell, totalCell, qCells);
-  setTotal(worksheet, totalCell, 'B', `${isNegative ? '-' : ''}SUM(B${startSumCell}:B${endSumCell})`, gross, 'D');
-  setTotal(worksheet, totalCell, 'C', `${isNegative ? '-' : ''}SUM(C${startSumCell}:C${endSumCell})`, net, 'D');
-  setTotal(worksheet, totalCell, 'D', `${isNegative ? '-' : ''}SUM(D${startSumCell}:D${endSumCell})`, btw, 'D');
+  setTotal(worksheet, totalCell, 'B', `${ isNegative ? '-' : '' }SUM(B${ startSumCell }:B${ endSumCell })`, gross, 'D');
+  setTotal(worksheet, totalCell, 'C', `${ isNegative ? '-' : '' }SUM(C${ startSumCell }:C${ endSumCell })`, net, 'D');
+  setTotal(worksheet, totalCell, 'D', `${ isNegative ? '-' : '' }SUM(D${ startSumCell }:D${ endSumCell })`, btw, 'D');
 
   setResultTitle(worksheet, totalCell);
-  setCellFormat(worksheet, [`B${totalCell}`, `C${totalCell}`, `D${totalCell}`], positivePriceFormat);
+  setCellFormat(worksheet, [`B${ totalCell }`, `C${ totalCell }`, `D${ totalCell }`], positivePriceFormat);
 };
 
 const setResultTitle = (worksheet: Worksheet, cellNumber: number, value: string = 'Result') => {
-  const resultCellTitle = worksheet.getCell(`A${cellNumber}`);
+  const resultCellTitle = worksheet.getCell(`A${ cellNumber }`);
   resultCellTitle.value = value;
   resultCellTitle.alignment = { vertical: 'middle', horizontal: 'right' };
   setAllBorders(resultCellTitle);
@@ -835,8 +838,8 @@ const setWeek = (
   endLetter: string,
   translate: TranslateService,
 ) => {
-  worksheet.mergeCells(`A${cellNumber}`, `${endLetter}${cellNumber}`);
-  const weekCell = worksheet.getCell(`A${cellNumber}`);
+  worksheet.mergeCells(`A${ cellNumber }`, `${ endLetter }${ cellNumber }`);
+  const weekCell = worksheet.getCell(`A${ cellNumber }`);
   weekCell.value = translate.instant('SUMMARY.MONTHLY.TABLE.WEEK', { weekNumber: index + 1 });
   setTitleFormat(weekCell, 'ffd38c');
   setAllBorders(weekCell);
@@ -851,7 +854,7 @@ const setTotal = (
   endBorder: string = 'H',
   format: boolean = true,
 ): void => {
-  const totalCell = worksheet.getCell(`${letter}${cellNumber}`);
+  const totalCell = worksheet.getCell(`${ letter }${ cellNumber }`);
   totalCell.value = {
     formula,
     result,
@@ -903,7 +906,7 @@ const setBorder = (worksheet: Worksheet, start: number, end: number, cellList: s
   cellList.forEach((cell, index) => {
     const length = Math.abs(end - start) + 1;
     Array.from({ length }, (_, i) => start + i).forEach(cellNumber => {
-      const currentCell = worksheet.getCell(`${cell}${cellNumber}`);
+      const currentCell = worksheet.getCell(`${ cell }${ cellNumber }`);
       currentCell.border = {
         left: { style: index === 0 ? 'medium' : 'thin' },
         right: { style: index === cellList.length - 1 ? 'medium' : 'thin' },
@@ -931,6 +934,6 @@ const resizeColumn = (worksheet: Worksheet) => {
 };
 
 const currencyFormat = (currency: string, positiveColor: boolean = false) =>
-  `${positiveColor ? '[Blue]' : ''}"${currency} "#,##0.00;[Red]\("${currency} "#,##0.00\)`;
+  `${ positiveColor ? '[Blue]' : '' }"${ currency } "#,##0.00;[Red]\("${ currency } "#,##0.00\)`;
 
 const diff = (major: number, minor: number): number => major - minor;

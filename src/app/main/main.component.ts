@@ -1,32 +1,37 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NavigationEnd, Router, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { redirect } from '../store/auth.actions';
-import { IUser, User } from '../interfaces/user';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { IUser, User } from '../user/user';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
 import { ThemeService } from 'ng2-charts';
 import { goTo, observeElementSignal } from '../util/animation';
 import { AuthUserService } from '../services/auth-user.service';
 import { MainContentService } from '../services/main-content.service';
-import { updateMyUser } from '../store/main.actions';
 import { NavigationService } from '../services/navigation.service';
-import { SharedModule } from '../shared/shared.module';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { getCurrentLangPipe } from '../store/selectors/main.selectors';
-import { MainState } from '../store/reducers/main.reducers';
 import { EnvService } from '../services/env.service';
 import { filter } from 'rxjs';
 import { FirebaseService } from '../services/firebase.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatSidenavContainer, MatSidenavContent } from '@angular/material/sidenav';
+import { MatToolbar, MatToolbarRow } from '@angular/material/toolbar';
+import { UpperCasePipe } from '@angular/common';
+import { MatMenu, MatMenuTrigger } from '@angular/material/menu';
+import { AuthStore } from '../store/auth.store';
+import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   styleUrls: ['./main.component.scss'],
-  imports: [SharedModule, RouterOutlet, RouterLinkActive],
+  imports: [MatIcon, MatListItem, MatIconButton, MatButton, TranslatePipe, RouterLink,
+    MatListItemIcon, RouterOutlet, RouterLinkActive, MatSidenavContainer, MatSidenavContent, MatToolbar, UpperCasePipe,
+    MatMenuTrigger, MatMenu, MatNavList, MatDivider, MatToolbarRow],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainComponent {
@@ -34,9 +39,10 @@ export class MainComponent {
 
   private readonly env: EnvService = inject(EnvService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<MainState> = inject(Store<MainState>);
+  private readonly authStore = inject(AuthStore);
+  private readonly userStore = inject(UserStore);
   private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
   private readonly cookieService: CookieService = inject(CookieService);
   private readonly themeService: ThemeService = inject(ThemeService);
@@ -46,10 +52,8 @@ export class MainComponent {
   private readonly firebaseService = inject(FirebaseService);
 
   private authUserSignal = this.authUserService.authUser;
-  private lang$ = this.store.pipe(getCurrentLangPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.Handset]);
 
-  private langSignal = toSignal(this.lang$);
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -74,7 +78,7 @@ export class MainComponent {
 
   cssClass?: string;
   backgroundColor = computed(() => this.isDarkMode() ? '126, 119, 105' : '169, 163, 151');
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
   showArrow: boolean = false;
 
   private navigationObserve?: IntersectionObserver;
@@ -104,9 +108,8 @@ export class MainComponent {
     });
 
     effect(() => {
-      const lang = this.langSignal();
-      this.authUserService.cookieConsent(this.translate);
-      this.language = this.navigationService.attachLang(lang);
+      this.navigationService.language$();
+      this.authUserService.cookieConsent(this.translateService);
     });
 
     this.router.events
@@ -124,17 +127,17 @@ export class MainComponent {
   }
 
   redirect(): void {
-    return this.store.dispatch(redirect());
+    this.authStore.authRedirect();
   }
 
   treatment(): void {
     goTo('home');
-    this.router.navigate([this.translate.getCurrentLang(), 'home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
+    this.navigationService.navigate(['home', MainComponent.BIAB_TREATMENT_ID, 'treatment']);
     return;
   }
 
   scrollToElement = (element: HTMLElement | string): void => {
-    this.router.navigate(['/', this.language]).then(() => setTimeout(() => {
+    this.navigationService.navigate(['home'], undefined, () => setTimeout(() => {
       this.navigationAnimation();
       goTo(element);
     }, 100));
@@ -154,8 +157,9 @@ export class MainComponent {
     const authenticatedUser: IUser = new User();
     authenticatedUser.theme = theme;
     const redirectUrl = this.router.url;
-    const message = this.translate.instant(`COMMON.PROFILE.UPDATED.DARK_MODE_${isDark.toString().toUpperCase()}`);
-    this.store.dispatch(updateMyUser({ user: authenticatedUser, redirectUrl, message }));
+    const message = this.translateService.instant(
+      `COMMON.PROFILE.UPDATED.DARK_MODE_${ isDark.toString().toUpperCase() }`);
+    this.userStore.updateMyUser(authenticatedUser, redirectUrl, message);
   }
 
   private navigationAnimation = (): void => {

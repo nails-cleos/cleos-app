@@ -1,30 +1,27 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MainContentService } from '../../services/main-content.service';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '../../util/MainTreatment';
 import { NgClass, NgOptimizedImage } from '@angular/common';
-import { getCurrentLangPipe, getCurrentTreatmentIdPipe } from '../../store/selectors/main.selectors';
-import { Store } from '@ngrx/store';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { AppMaterialModule } from '../../util/app-material.module';
-import { MainState } from '../../store/reducers/main.reducers';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
+import { MatDivider, MatList } from '@angular/material/list';
+import { MainContentService } from '../../services/main-content.service';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-main-treatment',
   templateUrl: './main-treatment.component.html',
   styleUrl: './main-treatment.component.scss',
-  imports: [AppMaterialModule, NgOptimizedImage, NgClass],
+  imports: [MatList, NgOptimizedImage, NgClass, MatDivider],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainTreatmentComponent {
-  private readonly store: Store<MainState> = inject(Store<MainState>);
-  private readonly mainContent: MainContentService = inject(MainContentService);
+  id = input<string>();
 
-  private treatmentId$ = this.store.pipe(getCurrentTreatmentIdPipe);
-  private lang$ = this.store.pipe(getCurrentLangPipe);
+  private readonly mainContent = inject(MainContentService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private sections$ = combineLatest([this.treatmentId$, this.lang$]).pipe(
+  private sections$ = combineLatest([toObservable(this.id), toObservable(this.navigationService.language$)]).pipe(
     switchMap(([treatmentId, lang]) => {
       if (!treatmentId) {
         return of(undefined);

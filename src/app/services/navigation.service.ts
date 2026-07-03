@@ -1,13 +1,17 @@
-import { inject, Injectable } from '@angular/core';
-import { NavigationEnd, Router } from '@angular/router';
-import { getLocale } from '../util/helper';
-import { IUser, User } from '../interfaces/user';
-import { updateMyUser } from '../store/user.actions';
-import { Store } from '@ngrx/store';
-import { setLanguage } from '../store/i18n.actions';
-import { getI18NLanguagePipe } from '../store/selectors/i18n.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { I18NState } from '../store/reducers/i18n.reducers';
+import { DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
+import { currentLanguageFromUrl, getLocale } from '../util/helper';
+import { I18NStore } from '../store/i18n.store';
+import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
+import { resetTheme, Theme } from '../util/theme';
+import { TranslateService } from '@ngx-translate/core';
+import { SeoService } from './seo.service';
+import { DateAdapter } from '@angular/material/core';
+import { OverlayContainer } from '@angular/cdk/overlay';
+import { CookieService } from 'ngx-cookie-service';
+import { ThemeService } from 'ng2-charts';
+import { goTo } from '../util/animation';
 
 @Injectable({
   providedIn: 'root',
@@ -16,20 +20,48 @@ export class NavigationService {
   private static readonly HISTORY_STORAGE_KEY = 'cleos-navigation-history';
   private static readonly HISTORY_LIMIT = 40;
 
-  private store: Store<I18NState> = inject(Store<I18NState>);
-  private router: Router = inject(Router);
-
-  private readonly languageSignal = toSignal(this.store.pipe(getI18NLanguagePipe));
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly seoService = inject(SeoService);
+  private readonly cookieService = inject(CookieService);
+  private readonly themeService = inject(ThemeService);
+  private readonly i18nStore = inject(I18NStore);
+  private readonly router: Router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly dateAdapter = inject(DateAdapter<Date>);
+  private readonly overlayContainer = inject(OverlayContainer);
 
   private history: string[] = this.readHistory();
+  private isTrackingHistory = false;
+
+  private readonly cssClass = signal<string | undefined>(undefined);
+
+  readonly language$ = this.i18nStore.language;
+
+  readonly urlLanguage$ = this.router.events.pipe(
+    filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+    startWith(undefined),
+    map(() => currentLanguageFromUrl(this.router.url)),
+    distinctUntilChanged(),
+  );
+
+  constructor() {
+    this.subscribe();
+  }
 
   subscribe(): void {
+    if (this.isTrackingHistory) {
+      return;
+    }
+
+    this.isTrackingHistory = true;
     this.syncCurrentUrl();
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        this.pushHistory(event.urlAfterRedirects);
-      }
-    });
+    this.router.events
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          this.pushHistory(event.urlAfterRedirects);
+        }
+      });
   }
 
   back(date?: Date, step: number = 0): void {
@@ -45,7 +77,66 @@ export class NavigationService {
 
     const previous = this.history[this.history.length - 1];
     const target = previous || this.resolveFallbackUrl(current);
-    this.router.navigateByUrl(target, { state: { date, step } });
+    void this.router.navigateByUrl(target, { state: { date, step } });
+  }
+
+  navigate(path?: (string | number | undefined)[], extras?: NavigationExtras, callback?: () => void) {
+    let navigation: Promise<boolean>;
+    if (path) {
+      navigation = this.router.navigate([`/${ this.language$() }/${ path.join('/') }`], extras);
+    } else {
+      navigation = this.router.navigate([this.router.url]);
+    }
+    if (callback) {
+      navigation.then(() => callback());
+    }
+  }
+
+  get language(): string {
+    return this.language$();
+  }
+
+  resetConfig = (locale: string, theme?: Theme): void => {
+    const currentLocale = getLocale(locale);
+
+    if (this.language !== currentLocale.language) {
+      this.i18nStore.setLanguage(currentLocale.language);
+
+      const meta = this.translateService.instant('META');
+
+      this.seoService.setMetaDescription(meta.CONTENT);
+      this.seoService.setMetaTitle(meta.TITLE);
+
+      this.dateAdapter.setLocale(currentLocale.language);
+    }
+
+    this.cssClass.set(resetTheme(
+      this.overlayContainer,
+      this.cookieService,
+      this.themeService,
+      theme,
+      this.cssClass(),
+    ));
+  };
+
+  scrollToAnchor(hostElement: HTMLElement, id?: string) {
+    let anchorId;
+    if (id) {
+      anchorId = id.trim();
+    } else {
+      const fragment = this.router.parseUrl(this.router.url).fragment;
+      if (fragment) {
+        anchorId = fragment;
+      }
+    }
+    if (!anchorId) {
+      return;
+    }
+
+    const target = hostElement.querySelector<HTMLElement>(`#${ anchorId }`);
+    if (target) {
+      goTo(target);
+    }
   }
 
   private syncCurrentUrl(reloadHistory: boolean = true): void {
@@ -57,7 +148,7 @@ export class NavigationService {
   }
 
   private resolveFallbackUrl(currentUrl: string): string {
-    const currentLang = getLocale(this.languageSignal()).language;
+    const currentLang = getLocale(this.language$()).language;
     const segments = currentUrl.split('/').filter(Boolean);
 
     if (segments.length <= 1) {
@@ -117,42 +208,7 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[], data?: any, queryParams?: any, reloadURL = '/auth/redirect', lang?: string): void {
-    const currentLang = getLocale(this.languageSignal()).language;
-    const navigateUrl = `/${ lang || currentLang }${ reloadURL }`;
-    this.router.navigateByUrl(navigateUrl, { skipLocationChange: true }).then(() =>
-      this.router.navigate(url.filter(path => path), { state: data, queryParams }));
-  }
-
-  reloadPage(url?: string): void {
-    const currentLang = getLocale(this.languageSignal()).language;
-    const currentUrl = url ?? `/${ currentLang }`;
-    this.router.navigateByUrl(currentUrl).then(() => window.location.reload());
-  }
-
-  attachLang(lang?: string, currentUser?: IUser): string {
-    const language = getLocale(lang).language;
-    const currentLang = this.languageSignal();
-
-    if (language === currentLang) {
-      return language;
-    }
-
-    this.store.dispatch(setLanguage({ language }));
-
-    if (!currentUser) {
-      return language;
-    }
-
-    const userLanguage = getLocale(currentUser?.locale).language;
-
-    if (userLanguage !== language) {
-      const user: IUser = new User();
-      user.locale = language;
-
-      this.store.dispatch(updateMyUser({ user, redirectUrl: this.router.url }));
-    }
-
-    return language;
+  reload(url: string[] = this.router.url.split('/'), data?: any, queryParams?: any): void {
+    void this.router.navigate(url.filter(Boolean), { state: data, queryParams });
   }
 }

@@ -1,55 +1,44 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Discount, DiscountType, IDiscount } from '../interfaces/discount';
-import { createDiscount, getDiscount, updateDiscount } from '../store/discount.actions';
-import { Router } from '@angular/router';
-import { ICurrency } from '../interfaces/currency';
-import { fieldChange, requireMatch, valueChange } from '../util/validators';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Discount, DiscountForm, DiscountType, IDiscount, IDiscountAll } from './discount';
+import { ICurrency } from '../currency/currency';
+import { requireMatch } from '../util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import {
-  getCurrenciesPipe,
-  getCurrentDiscountIdPipe,
-  getSelectedDiscountPipe,
-  getSubErrorsPipe,
-} from '../store/selectors/discount.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../interfaces/common';
-import { DiscountState } from '../store/reducers/discount.reducers';
-
-type DiscountForm = {
-  name: FormControl<string>;
-  description: FormControl<string | undefined>;
-  amount: FormControl<number>;
-  type: FormControl<DiscountType | undefined>;
-  currency: FormControl<ICurrency | undefined>;
-}
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { ICommon, IError } from '../interfaces/common';
+import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { MatSelect } from '@angular/material/select';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { KeyValuePipe } from '@angular/common';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { DiscountStore } from '../store/discount.store';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-discount',
   templateUrl: './discount.component.html',
   styleUrls: ['./discount.component.scss'],
-  imports: [SharedModule, BackButtonDirective],
+  imports: [MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatIcon, MatButton, ReactiveFormsModule,
+    TranslatePipe, KeyValuePipe, BackButtonDirective, MatError, MatAutocomplete, MatAutocompleteTrigger, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscountComponent {
-  private readonly store: Store<DiscountState> = inject(Store<DiscountState>);
+  config = input.required<ICommon>();
+  discount = input<IDiscountAll | undefined>();
+  currencies = input<ICurrency[] | undefined>();
+
+  submitData = output<IDiscount>();
+
+  private readonly discountStore = inject(DiscountStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private discountId$ = this.store.pipe(getCurrentDiscountIdPipe);
-  private selectedDiscount$ = this.store.pipe(getSelectedDiscountPipe);
-  private allCurrencies$ = this.store.pipe(getCurrenciesPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
-  private discountIdSignal = toSignal(this.discountId$, { initialValue: null });
-  private selectedDiscountSignal = toSignal(this.selectedDiscount$);
-  private subErrorsSignal = toSignal(this.subErrors$);
+  private subErrorsSignal = this.discountStore.subErrors;
 
   form: FormGroup<DiscountForm> = this.formBuilder.group<DiscountForm>({
     name: this.formBuilder.control('', {
@@ -67,33 +56,30 @@ export class DiscountComponent {
     }),
   });
 
-  discountSignal = computed(() => this.selectedDiscountSignal());
   filteredCurrencySignal = toSignal(
     this.getForm.currency.valueChanges.pipe(
       startWith(''),
       map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(this.allCurrencies$),
+      combineLatestWith(toObservable(this.currencies)),
       map(([name, currencies]) => {
+        const allCurrencies = currencies ?? [];
         if (name) {
-          return this.filterCurrency(name, currencies);
+          return this.filterCurrency(name, allCurrencies);
         } else {
-          return currencies ? currencies.slice() : currencies;
+          return allCurrencies.slice();
         }
       }),
     ),
   );
 
-  isAddModeSignal = computed(() => !this.discountIdSignal());
   errors = signal<Record<string, unknown>>({});
-
-  private readonly language: string = this.translate.getCurrentLang();
 
   types = DiscountType;
 
   constructor() {
     effect(() => {
-      const selected = this.selectedDiscountSignal();
-      if (selected?.id) {
+      const selected = this.discount();
+      if (selected) {
         this.form.patchValue(selected);
       }
     });
@@ -113,13 +99,10 @@ export class DiscountComponent {
         this.errors.set(errorMap);
       }
     });
+  }
 
-    effect(() => {
-      const id = this.discountIdSignal();
-      if (id) {
-        this.store.dispatch(getDiscount({ id }));
-      }
-    });
+  get getConfig(): ICommon {
+    return this.config();
   }
 
   get getForm(): DiscountForm {
@@ -131,24 +114,11 @@ export class DiscountComponent {
       return;
     }
 
-    const discountSignal = this.discountSignal();
-    const discount: IDiscount = new Discount();
-    discount.name = fieldChange(this.getForm.name, discountSignal?.name);
-    discount.description = valueChange(this.getForm.description.value, discountSignal?.description);
-    discount.type = fieldChange(this.getForm.type, discountSignal?.type);
-    discount.amount = fieldChange(this.getForm.amount, discountSignal?.amount);
-
-    const id = this.discountIdSignal();
-    if (!id) {
-      discount.currencyId = this.getForm.currency.value?.id;
-      this.store.dispatch(createDiscount({ discount }));
-    } else {
-      this.store.dispatch(updateDiscount({ id, discount }));
-    }
+    this.submitData.emit(Discount.fromForm(this.getForm, this.discount()));
   }
 
   addCurrency(): void {
-    this.router.navigate([this.language, 'currency', 'add']);
+    this.navigationService.navigate(['currency', 'add']);
   }
 
   displayCurrencyFn = (currency: ICurrency): string => currency?.code ? currency.code : '';

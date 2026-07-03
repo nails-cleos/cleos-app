@@ -16,39 +16,23 @@
 }
 
 .overview-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --app-avatar-size: 112px;
+  --app-avatar-radius: 28px;
+  --app-avatar-border: none;
+  --app-avatar-placeholder-border: 1px solid var(--app-surface-card-border);
+  --app-avatar-background: var(--app-surface-card-bg);
+  --app-avatar-placeholder-background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
+    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
+  --app-avatar-font-size: 2.25rem;
+  flex: 0 0 112px;
+}
+
+.overview-avatar-skeleton {
   width: 112px;
   height: 112px;
   border-radius: 28px;
-  overflow: hidden;
   flex: 0 0 112px;
-  background: var(--app-surface-card-bg);
-}
-
-.overview-avatar--placeholder {
-  background:
-    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
-    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
-  border: 1px solid var(--app-surface-card-border);
-}
-
-.overview-avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.overview-avatar__initials {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--app-surface-text);
 }
 
 .overview-hero__copy {
@@ -82,11 +66,32 @@
   gap: 10px;
 }
 
+.overview-skeleton {
+  max-width: 100%;
+}
+
+.overview-skeleton--hero-title {
+  width: min(280px, 100%);
+  height: 28px;
+}
+
+.overview-skeleton--chip {
+  width: 148px;
+  height: 36px;
+  border-radius: 999px;
+}
+
+.overview-skeleton--button {
+  width: 156px;
+  height: 44px;
+  border-radius: 999px;
+}
+
 .overview-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 260px));
   justify-content: center;
-  gap: 14px;
+  gap: 2px;
 }
 
 .overview-stat-card {
@@ -100,6 +105,10 @@
   text-align: center;
   gap: 14px;
   padding: 22px;
+}
+
+.overview-skeleton-card {
+  justify-content: center;
 }
 
 .overview-stat-card__icon {
@@ -132,6 +141,22 @@
   font-size: 1.9rem;
   font-weight: 700;
   line-height: 1.1;
+}
+
+.overview-skeleton--stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.overview-skeleton--stat-label {
+  width: 110px;
+  height: 12px;
+}
+
+.overview-skeleton--stat-value {
+  width: 136px;
+  height: 24px;
 }
 
 .overview-stat-card__plus-button {
@@ -176,6 +201,39 @@
   width: 100%;
 }
 
+.overview-chart-skeleton {
+  width: 100%;
+  height: 100%;
+}
+
+.overview-chart-skeleton mat-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+}
+
+.overview-chart-skeleton__body {
+  flex: 1 1 auto;
+}
+
+.overview-skeleton--chart-title {
+  width: min(220px, 100%);
+  height: 18px;
+}
+
+.overview-skeleton--chart-subtitle {
+  width: min(140px, 100%);
+  height: 12px;
+}
+
+.overview-skeleton--chart {
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  border-radius: 18px;
+}
+
 :host ::ng-deep .overview-chart-grid .mat-grid-tile-content {
   padding: 0;
 }
@@ -190,6 +248,22 @@
   display: block;
 }
 
+.overview-map--skeleton {
+  padding: 0;
+}
+
+.overview-skeleton--map-title {
+  width: 120px;
+  height: 16px;
+  margin-bottom: 16px;
+}
+
+.overview-skeleton--map {
+  width: 100%;
+  min-height: 320px;
+  border-radius: 18px;
+}
+
 .overview-footer {
   display: flex;
   align-items: center;
@@ -200,14 +274,10 @@
   flex: 1 1 auto;
 }
 
-:host-context(.dark-theme) .overview-avatar--placeholder {
-  background:
+:host-context(.dark-theme) .overview-avatar {
+  --app-avatar-placeholder-background:
     radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #ceb4ac) 22%, white), transparent 24%),
     linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #ceb4ac) 38%, #3a312b), color-mix(in srgb, var(--primary-color, #9d9282) 34%, #241f1a));
-}
-
-:host-context(.dark-theme) .overview-avatar__initials {
-  color: var(--app-surface-text);
 }
 
 :host-context(.dark-theme) .overview-stat-card__icon {
@@ -235,10 +305,16 @@
   }
 
   .overview-avatar {
+    --app-avatar-size: 88px;
+    --app-avatar-radius: 24px;
+    flex-basis: 88px;
+  }
+
+  .overview-avatar-skeleton {
     width: 88px;
     height: 88px;
-    flex-basis: 88px;
     border-radius: 24px;
+    flex-basis: 88px;
   }
 
   .overview-hero__actions {

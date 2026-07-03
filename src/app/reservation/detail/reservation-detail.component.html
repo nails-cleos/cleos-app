@@ -26,7 +26,14 @@
 
         <div class="detail-hero__header app-detail-header">
           <div class="detail-hero__identity">
-            <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
+            <div class="detail-hero__title-row">
+              <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
+              @if (changeState && changeState.length) {
+                <div class="detail-hero__fab app-detail-action-shell">
+                  <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
+                </div>
+              }
+            </div>
             <div class="detail-hero__meta app-detail-meta">
               <span class="detail-chip app-detail-chip app-detail-chip--status detail-chip--status"
                     [style.background-color]="getStatusBadgeColor(currentState)"
@@ -38,7 +45,7 @@
 
               <span class="detail-chip app-detail-chip">
                 <mat-icon>event</mat-icon>
-                {{ start | date:'EEE d MMM, HH:mm':gmt:dateFormat }}
+                {{ start | date:'EEE d MMM, HH:mm':gmt:language }}
               </span>
 
               <span class="detail-chip app-detail-chip">
@@ -46,31 +53,6 @@
                 {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
               </span>
             </div>
-          </div>
-
-          <div class="app-detail-actions">
-            <button (click)="overview()" mat-stroked-button type="button">
-              <mat-icon>person</mat-icon>
-              {{ 'COMMON.BUTTON.VIEW' | translate }}
-            </button>
-
-            <button (click)="addNote()" mat-stroked-button type="button">
-              <mat-icon>note_add</mat-icon>
-              {{ 'RESERVATION.NOTE.FIELD' | translate }}
-            </button>
-
-            @if (isReservationAdmin && currentState === 'APPROVED') {
-              <button (click)="addDiscount()" mat-stroked-button type="button">
-                <mat-icon>switch_access_shortcut_add</mat-icon>
-                {{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}
-              </button>
-            }
-
-            @if (changeState && changeState.length) {
-              <div class="detail-hero__fab app-detail-action-shell">
-                <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
-              </div>
-            }
           </div>
         </div>
 
@@ -156,27 +138,27 @@
               <div class="info-item app-surface-item">
                 <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</span>
                 <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ start | date:'fullDate':gmt:dateFormat }}
+                  {{ start | date:'fullDate':gmt:language }}
                   @if (showTimeZone()) {
                     <button (click)="openDialog(start)" class="summary-slot-button" mat-icon-button type="button">
                       <mat-icon>info_outline</mat-icon>
                     </button>
                   }
                 </strong>
-                <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:dateFormat }}</p>
+                <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:language }}</p>
               </div>
 
               <div class="info-item app-surface-item">
                 <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.END' | translate }}</span>
                 <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ end | date:'fullDate':gmt:dateFormat }}
+                  {{ end | date:'fullDate':gmt:language }}
                   @if (showTimeZone()) {
                     <button (click)="openDialog(end)" class="summary-slot-button" mat-icon-button type="button">
                       <mat-icon>info_outline</mat-icon>
                     </button>
                   }
                 </strong>
-                <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:dateFormat }}</p>
+                <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:language }}</p>
               </div>
 
               @if (currentState === 'EDIT_CANCELLED') {
@@ -272,7 +254,9 @@
           </mat-card-content>
         </mat-card>
 
-        @if (currentPaymentPaid?.length) {
+        @if (paymentsLoading()) {
+          <app-table-skeleton [columns]="paymentTableColumns"></app-table-skeleton>
+        } @else if (currentPaymentPaid?.length) {
           <mat-card appearance="outlined" class="app-surface-section">
             <mat-card-content>
               <div class="section-header app-detail-section-header">
@@ -286,121 +270,97 @@
                   <ng-container matColumnDef="position">
                     <th *matHeaderCellDef mat-header-cell>#</th>
                     <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
-                      @if (payment.id) {
-                        {{ i + 1 }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                      {{ i + 1 }}
                     </td>
                     <td *matFooterCellDef class="bold" mat-footer-cell>{{ 'RESERVATION.PAYMENT.PAID' | translate }}</td>
                   </ng-container>
 
                   <ng-container matColumnDef="description">
                     <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-                    <td *matCellDef="let payment" class="column-large-text" mat-cell>
-                      @if (payment.id) {
-                        {{ payment.description }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
+                      {{ payment.description }}
                     </td>
                     <td *matFooterCellDef mat-footer-cell></td>
                   </ng-container>
 
                   <ng-container matColumnDef="status">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-                    <td *matCellDef="let payment" class="hide-xs" mat-cell>
-                      @if (payment.id) {
-                        {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+                    <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
+                      {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
                     </td>
-                    <td *matFooterCellDef class="hide-xs" mat-footer-cell></td>
+                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
                   </ng-container>
 
                   <ng-container matColumnDef="type">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-                    <td *matCellDef="let payment; let i = dataIndex;" class="hide-xs" mat-cell>
-                      @if (payment.id) {
-                        <div [formGroup]="form">
-                          <ng-container formArrayName="payments">
-                            <div [formGroupName]="i">
-                              <app-payment-option-select [control]="payments.at(i).controls.type"
-                                                         [options]="options()"
-                                                         [allowedValues]="getAllowedPaymentTypes(payment.type)"
-                                                         [valueMode]="'type'"
-                                                         [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
-                              </app-payment-option-select>
-                            </div>
-                          </ng-container>
-                        </div>
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+                    <td *matCellDef="let payment; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
+                      <div [formGroup]="form">
+                        <ng-container formArrayName="payments">
+                          <div [formGroupName]="i">
+                            <app-payment-option-select [control]="payments.at(i).controls.type"
+                                                       [options]="options()"
+                                                       [allowedValues]="getAllowedPaymentTypes(payment.type)"
+                                                       [valueMode]="'type'"
+                                                       [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
+                            </app-payment-option-select>
+                          </div>
+                        </ng-container>
+                      </div>
                     </td>
-                    <td *matFooterCellDef class="hide-xs" mat-footer-cell></td>
+                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
                   </ng-container>
 
                   <ng-container matColumnDef="actions">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-                    <td *matCellDef="let payment" class="hide-xs" mat-cell>
-                      @if (payment.id) {
-                        <div class="payment-actions">
-                          @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)) {
-                            <button [routerLink]="['/', language, 'me', 'payment', payment.id]" mat-icon-button
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+                    <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
+                      <div class="payment-actions">
+                        @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)) {
+                          <button [routerLink]="['/', language, 'me', 'payment', payment.id]" mat-icon-button
+                                  matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
+                            <mat-icon class="payment-button" color="primary">payment</mat-icon>
+                          </button>
+                        }
+                        @switch (payment.status) {
+                          @case ('PENDING') {
+                            <button (click)="notify(payment)" mat-icon-button
+                                    matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
+                              <mat-icon color="primary">published_with_changes</mat-icon>
+                            </button>
+                          }
+                          @case ('CREATED') {
+                            <button (click)="pay(payment)" mat-icon-button
                                     matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                               <mat-icon class="payment-button" color="primary">payment</mat-icon>
                             </button>
                           }
-                          @switch (payment.status) {
-                            @case ('PENDING') {
-                              <button (click)="notify(payment)" mat-icon-button
-                                      matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
-                                <mat-icon color="primary">published_with_changes</mat-icon>
-                              </button>
-                            }
-                            @case ('CREATED') {
-                              <button (click)="pay(payment)" mat-icon-button
-                                      matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
-                                <mat-icon class="payment-button" color="primary">payment</mat-icon>
-                              </button>
-                            }
-                          }
-                        </div>
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                        }
+                      </div>
                     </td>
-                    <td *matFooterCellDef class="hide-xs" mat-footer-cell></td>
+                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
                   </ng-container>
 
                   <ng-container matColumnDef="amount">
                     <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
                     <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
-                      @if (payment.id) {
-                        @if (payment.transactionAmount >= 0) {
-                          @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
-                            <div [formGroup]="form">
-                              <ng-container formArrayName="payments">
-                                <div [formGroupName]="i" class="payment-amount-edit">
-                                  <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                                  <mat-form-field appearance="outline">
-                                    <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit(i)">
-                                  </mat-form-field>
-                                </div>
-                              </ng-container>
-                            </div>
-                          } @else {
-                            <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                            {{ payment.transactionAmount | number:'1.2-2' }}
-                          }
+                      @if (payment.transactionAmount >= 0) {
+                        @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
+                          <div [formGroup]="form">
+                            <ng-container formArrayName="payments">
+                              <div [formGroupName]="i" class="payment-amount-edit">
+                                <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                                <mat-form-field appearance="outline">
+                                  <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit(i)">
+                                </mat-form-field>
+                              </div>
+                            </ng-container>
+                          </div>
                         } @else {
                           <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                          {{ payment.amount || 0 | number:'1.2-2' }}
+                          {{ payment.transactionAmount | number:'1.2-2' }}
                         }
                       } @else {
-                        <div class="ssc-line"></div>
+                        <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                        {{ payment.amount || 0 | number:'1.2-2' }}
                       }
                     </td>
                     <td *matFooterCellDef class="bold" mat-footer-cell>
@@ -411,23 +371,19 @@
 
                   <ng-container matColumnDef="expandedDetail">
                     <td *matCellDef="let payment; let i = dataIndex;" [attr.colspan]="paymentDisplayedColumns.length"
-                        class="hide-gt-xs">
-                      <div [class.detail-expanded]="payment === paymentExpanded" class="detail hide-gt-xs">
+                        class="app-surface-hide-desktop">
+                      <div [class.detail-expanded]="payment === paymentExpanded" class="detail app-surface-hide-desktop">
                         <mat-list>
                           <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
                           <div [formGroup]="form">
                             <ng-container formArrayName="payments">
                               <div [formGroupName]="i">
-                                @if (payment.id) {
-                                  <app-payment-option-select [control]="payments.at(i).controls.type"
-                                                             [options]="options()"
-                                                             [allowedValues]="getAllowedPaymentTypes(payment.type)"
-                                                             [valueMode]="'type'"
-                                                             [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
-                                  </app-payment-option-select>
-                                } @else {
-                                  <div class="ssc-line"></div>
-                                }
+                                <app-payment-option-select [control]="payments.at(i).controls.type"
+                                                           [options]="options()"
+                                                           [allowedValues]="getAllowedPaymentTypes(payment.type)"
+                                                           [valueMode]="'type'"
+                                                           [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
+                                </app-payment-option-select>
                               </div>
                             </ng-container>
                           </div>
@@ -485,7 +441,9 @@
           </mat-card>
         }
 
-        @if (dataSource(); as dataSource) {
+        @if (historyLoading()) {
+          <app-table-skeleton [columns]="historyTableColumns" [showPaginator]="true"></app-table-skeleton>
+        } @else if (dataSource(); as dataSource) {
           <mat-card appearance="outlined" class="app-surface-section">
             <mat-card-content>
               <div class="section-header app-detail-section-header">
@@ -497,41 +455,29 @@
               <div class="table-shell app-table-shell">
                 <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
                   <ng-container matColumnDef="position">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>#</th>
-                    <td *matCellDef="let history; let i = dataIndex;" class="hide-xs" mat-cell>
-                      @if (history.id) {
-                        {{ (paginatorPageIndex() * pageSize) + i + 1 }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>#</th>
+                    <td *matCellDef="let history; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
+                      {{ (paginatorPageIndex() * pageSize) + i + 1 }}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="professional">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
                       {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
                     </th>
-                    <td *matCellDef="let history" class="hide-xs" mat-cell>
-                      @if (history.id) {
-                        {{ history.professional.displayName }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
+                      {{ history.professional.displayName }}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="start">
                     <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
                     <td *matCellDef="let history" mat-cell>
-                      @if (history.id) {
-                        {{ history.timestamp | timeDetail | date:'short':gmt:dateFormat }}
-                        @if (showTimeZone(history)) {
-                          <button (click)="openHistoryDialog(history)" mat-icon-button type="button">
-                            <mat-icon>info_outline</mat-icon>
-                          </button>
-                        }
-                      } @else {
-                        <div class="ssc-line"></div>
+                      {{ history.timestamp | timeDetail | date:'short':gmt:language }}
+                      @if (showTimeZone(history)) {
+                        <button (click)="openHistoryDialog(history)" mat-icon-button type="button">
+                          <mat-icon>info_outline</mat-icon>
+                        </button>
                       }
                     </td>
                   </ng-container>
@@ -539,48 +485,38 @@
                   <ng-container matColumnDef="treatment">
                     <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
                     <td *matCellDef="let history" mat-cell>
-                      @if (history.id) {
-                        {{ history.treatment.name }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                      {{ history.treatment.name }}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="state">
-                    <th *matHeaderCellDef class="hide-xs" mat-header-cell>
+                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
                       {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
                     </th>
-                    <td *matCellDef="let history" class="hide-xs" mat-cell>
-                      @if (history.id) {
-                        <mat-icon matPrefix>{{ history.state | reservationIcon }}</mat-icon>
-                        {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
-                      } @else {
-                        <div class="ssc-line"></div>
-                      }
+                    <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
+                      <mat-icon matPrefix>{{ history.state | reservationIcon }}</mat-icon>
+                      {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="expandedDetail">
-                    <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" class="hide-gt-xs">
-                      <div [class.detail-expanded]="history === expanded" class="detail hide-gt-xs">
-                        @if (history.id) {
-                          <mat-list>
-                            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
-                            <mat-list-item role="list">
-                              <div matListItemTitle>{{ history.professional.displayName }}</div>
-                            </mat-list-item>
-                          </mat-list>
-                          <mat-list>
-                            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
-                            <mat-list-item role="list">
-                              <mat-icon matListItemIcon>{{ history.state | reservationIcon }}</mat-icon>
-                              <div matListItemTitle>
-                                {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
-                              </div>
-                            </mat-list-item>
-                          </mat-list>
-                        }
+                    <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
+                      <div [class.detail-expanded]="history === expanded" class="detail app-surface-hide-desktop">
+                        <mat-list>
+                          <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+                          <mat-list-item role="list">
+                            <div matListItemTitle>{{ history.professional.displayName }}</div>
+                          </mat-list-item>
+                        </mat-list>
+                        <mat-list>
+                          <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+                          <mat-list-item role="list">
+                            <mat-icon matListItemIcon>{{ history.state | reservationIcon }}</mat-icon>
+                            <div matListItemTitle>
+                              {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
+                            </div>
+                          </mat-list-item>
+                        </mat-list>
                       </div>
                       <mat-divider></mat-divider>
                     </td>
@@ -594,12 +530,12 @@
 
                   <tr *matFooterRowDef="['noContent']" [hidden]="historyLength > 0" mat-footer-row></tr>
                   <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-                  <tr *matRowDef="let history; columns: displayedColumns;" class="hide-xs" mat-row></tr>
+                  <tr *matRowDef="let history; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
                   <tr (click)="expanded = expanded === history ? null : history"
-                      *matRowDef="let history; columns: displayedColumns;" class="hide-gt-xs app-table-master-row" mat-row></tr>
+                      *matRowDef="let history; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
                   <tr *matRowDef="let row; columns: ['expandedDetail']"
                       [class.app-table-detail-row--expanded]="row === expanded"
-                      class="hide-gt-xs app-table-detail-row"
+                      class="app-surface-hide-desktop app-table-detail-row"
                       mat-row></tr>
                 </table>
 
@@ -622,18 +558,5 @@
   </div>
   </div>
 } @else {
-  <mat-card appearance="outlined" class="detail-loading">
-    <mat-card-header>
-      <mat-card-title>{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</mat-card-title>
-      <mat-card-subtitle><div class="ssc-line"></div></mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="ssc-hr"></div>
-      <div class="ssc-square mb"></div>
-      <div class="ssc-hr"></div>
-    </mat-card-content>
-    <mat-card-actions class="card-actions">
-      <div class="ssc-head-line"></div>
-    </mat-card-actions>
-  </mat-card>
+  <app-reservation-detail-skeleton />
 }

@@ -22,6 +22,18 @@
   min-height: 220px;
 }
 
+.spinner-parent-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner-text-inside {
+  text-align: center;
+  position: relative;
+  top: -8em;
+}
+
 .balance-skeleton-title {
   max-width: 220px;
 }

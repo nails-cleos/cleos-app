@@ -1,0 +1,60 @@
+@use 'sass:map';
+
+$black: #000;
+$white: #fff;
+$text-strong-light: #111111;
+$text-strong-dark: #ffffff;
+$cta-highlight: #d8a35d;
+$warm-warn: #b85c38;
+$neutral-grey: grey;
+$neutral-darkgrey: darkgrey;
+$neutral-gray: gray;
+
+$status-dark: (
+  partially-completed-bg: #b5ac9e,
+  birthday-bg: #ffb6c1,
+  note-bg: #eedf72,
+  transaction-bg: #ffa53e,
+  created-bg: #c0c0c0,
+  created-diagonal: #8494a4,
+  approved-bg: #b5ac9e,
+  paid-bg: #87ceeb,
+  paid-diagonal: #186cae,
+  started-bg: #e6b9ff,
+  completed-bg: #90ee90,
+  unavailable-bg: #d28d8c,
+  contrast-text: #fafafa,
+  success-text: #008b00,
+  success-contrast: #c3f69d,
+  in-process-bg: rgba(#844f29, 0.4),
+  payment-provider-bg: rgb(0, 158, 227, 0.4)
+);
+
+$status-light: (
+  birthday-bg: #eb70a5,
+  note-bg: #e7d255,
+  transaction-bg: #fe8d02,
+  created-bg: #708090,
+  created-diagonal: #c0c0c0,
+  approved-bg: #8d8270,
+  paid-bg: #04589a,
+  paid-diagonal: #87ceeb,
+  started-bg: #673ab7,
+  completed-bg: #44a244,
+  unavailable-bg: #f08080,
+  contrast-text: #000,
+  success-text: #c3f69d,
+  success-contrast: #008b00,
+  in-process-bg: rgba(#a06c3f, 0.4),
+  payment-provider-bg: rgb(0, 158, 227),
+  neutral-bg: gray,
+  neutral-bg-soft: darkgray
+);
+
+@function status-dark($token) {
+  @return map.get($status-dark, $token);
+}
+
+@function status-light($token) {
+  @return map.get($status-light, $token);
+}

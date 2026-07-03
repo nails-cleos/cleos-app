@@ -1,22 +1,52 @@
-import { inject, Injectable, Injector } from '@angular/core';
+import { computed, effect, EnvironmentInjector, inject, Injectable, Injector } from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ToastComponent } from '../shared/toast/toast.component';
 import { ToastData, ToastOptions, ToastRef, ToastType } from '../shared/toast/toast.model';
+
+const MOBILE_BREAKPOINT = '(max-width: 640px)';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ToastService {
   private overlay = inject(Overlay);
+  private environmentInjector = inject(EnvironmentInjector);
   private injector = inject(Injector);
+  private breakpointObserver = inject(BreakpointObserver);
 
   private overlayRefs: OverlayRef[] = [];
+  private toastDataByOverlayRef = new WeakMap<OverlayRef, ToastData>();
+  private breakpointState = toSignal(this.breakpointObserver.observe(MOBILE_BREAKPOINT), {
+    initialValue: {
+      matches: false,
+      breakpoints: { [MOBILE_BREAKPOINT]: false },
+    },
+  });
+  private isMobileViewport = computed(() => this.breakpointState().matches);
   private desktopTopSpace = 20;
   private mobileBottomSpace = 16;
   private desktopSpaceBetween = 110;
   private mobileSpaceBetween = 96;
+
+  constructor() {
+    let previousViewport = this.isMobileViewport();
+
+    effect(() => {
+      const currentViewport = this.isMobileViewport();
+      if (currentViewport === previousViewport) {
+        return;
+      }
+
+      previousViewport = currentViewport;
+      if (this.overlayRefs.length > 0) {
+        this.repositionToasts();
+      }
+    }, { injector: this.environmentInjector });
+  }
 
   /**
    * Show a toast with the specified message and type
@@ -43,7 +73,7 @@ export class ToastService {
 
     // Check for duplicate
     const isDuplicate = this.overlayRefs.some(ref => {
-      const data = (ref as any).toastData as ToastData;
+      const data = this.toastDataByOverlayRef.get(ref);
       return data?.message === message && data?.type === type;
     });
 
@@ -55,7 +85,7 @@ export class ToastService {
     }
 
     const toastData = { message, type, duration, action: options.action, actionType: options.actionType } as ToastData;
-    (overlayRef as any).toastData = toastData;
+    this.toastDataByOverlayRef.set(overlayRef, toastData);
     this.overlayRefs.push(overlayRef);
 
     const injector = Injector.create({
@@ -92,6 +122,7 @@ export class ToastService {
     const index = this.overlayRefs.indexOf(overlayRef);
     if (index > -1) {
       this.overlayRefs.splice(index, 1);
+      this.toastDataByOverlayRef.delete(overlayRef);
       overlayRef.dispose();
       this.repositionToasts();
     }
@@ -116,9 +147,5 @@ export class ToastService {
 
     const topOffset = this.desktopTopSpace + (index * this.desktopSpaceBetween);
     return strategy.top(`${topOffset}px`).centerHorizontally();
-  }
-
-  private isMobileViewport(): boolean {
-    return window.innerWidth <= 640;
   }
 }

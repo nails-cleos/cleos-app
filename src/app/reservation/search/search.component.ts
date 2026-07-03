@@ -10,33 +10,61 @@ import {
   viewChild,
 } from '@angular/core';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { CancelOption, IReservation, IReservationAll, States } from '../../interfaces/reservation';
-import { combineLatestWith } from 'rxjs';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { TranslateService } from '@ngx-translate/core';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { CancelOption, IReservation, IReservationAll, States } from '../reservation';
+import { combineLatestWith } from 'rxjs';
+import { createMatTableState } from 'src/app/util/mat-table-state';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
-import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/reservation.actions';
+import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
-import { IUser, IUserAll } from '../../interfaces/user';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { IUser, IUserAll } from '../../user/user';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { SharedModule } from '../../shared/shared.module';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
 import {
-  getCustomersPipe,
   getFilteredReservationsPipe,
   getReservationResponsePipe,
+  selectReservationIsLoading,
 } from '../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { requireMatch } from '../../util/validators';
+import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { MatOption } from '@angular/material/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import { MatIconButton } from '@angular/material/button';
+import { DatePipe, NgClass } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from '../../store/user.store';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -47,23 +75,30 @@ type SearchForm = {
   selector: 'app-search',
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe],
+  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatList, MatListItem,
+    MatListSubheaderCssMatStyler, MatIconButton, ReactiveFormsModule, TranslatePipe, NgClass, RouterLink, DatePipe,
+    MatAutocomplete, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
+    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
+    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatAutocompleteTrigger, MatPrefix, TimeDetailPipe,
+    ReservationIconPipe, MatChipGrid, MatChipRow, MatChipInput, MatChipRemove, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly userStore = inject(UserStore);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
   private reservationList$ = this.store.pipe(getFilteredReservationsPipe);
-  private customerList$ = this.store.pipe(getCustomersPipe);
   private response$ = this.store.pipe(getReservationResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private reservationListSignal = toSignal(this.reservationList$);
   private responseSignal = toSignal(this.response$);
@@ -79,10 +114,8 @@ export class SearchComponent {
     },
   );
 
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
+  isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
   dataSourceSignal = computed(() => {
     const now = getNowTimeZone();
     return this.reservationListSignal()?.content?.map((reservation: IReservationAll) => {
@@ -99,11 +132,18 @@ export class SearchComponent {
 
   private smallSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
 
-  displayedColumns: string[] = ['position', 'customer', 'timestamp', 'state', 'treatment', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'customer' },
+    { key: 'timestamp' },
+    { key: 'state', hideOnMobile: true },
+    { key: 'treatment', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expandedReservation?: IReservation;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language: string = this.navigationService.language;
 
   form: FormGroup<SearchForm> = this.formBuilder.group<SearchForm>({
     customer: this.formBuilder.control(undefined, {
@@ -115,12 +155,12 @@ export class SearchComponent {
   private selectCustomerSignal = toSignal(this.getForm.customer.valueChanges);
   private userId = computed(() => this.selectCustomerSignal()?.id);
 
-  customerListSignal = toSignal(this.customerList$);
+  customerListSignal = this.userStore.customers;
   filteredCustomerSignal: Signal<IUserAll[] | undefined> = toSignal(
     this.getForm.customer.valueChanges.pipe(
       startWith(undefined),
       map((value) => !value || typeof value === 'string' ? value : value.displayName),
-      combineLatestWith(this.customerList$),
+      combineLatestWith(toObservable(this.customerListSignal)),
       map(([name, customers]) => {
         if (!customers) {
           return [];
@@ -148,35 +188,19 @@ export class SearchComponent {
   );
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
+    this.userStore.loadCustomers();
     effect(() => {
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getAllFilterReservations({
-          page: this.paginatorPageIndex(),
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           userId: this.userId(),
           states: this.selectedStatesSignal(),
         }),
       );
     });
-
-    effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(cleanReservation());
-        this.paginator()?.firstPage();
-      }
-    });
+    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanReservation()));
   }
 
   get getForm(): SearchForm {
@@ -185,15 +209,15 @@ export class SearchComponent {
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
   };
 
   showTimeZone = (reservation: IReservation): boolean => !isSameTimeZone(reservation?.room?.timeZone);
 
   cancel = (reservation: IReservationAll): void => {
-    const title = this.translate.instant('RESERVATION.LIST.CANCEL.TITLE');
+    const title = this.translateService.instant('RESERVATION.LIST.CANCEL.TITLE');
     const date = newDateTimestamp(reservation.timestamp);
-    const content = this.translate.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
+    const content = this.translateService.instant('RESERVATION.LIST.CANCEL.CONTENT', { date });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: reservation.id },
     });

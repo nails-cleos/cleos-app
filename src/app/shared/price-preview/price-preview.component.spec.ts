@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PricePreviewComponent } from './price-preview.component';
-import { Price } from '../../interfaces/treatment';
+import { Price } from '../../treatment/treatment';
 import { TranslateModule } from '@ngx-translate/core';
 
 describe('PricePreviewComponent', () => {

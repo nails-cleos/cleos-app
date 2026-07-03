@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Action } from '@ngrx/store';
-import { concatMap, delay, filter, map, switchMap, tap } from 'rxjs/operators';
+import { concatMap, delay, filter, switchMap, tap } from 'rxjs/operators';
 import { from, Observable, of } from 'rxjs';
 import {
   approveReservation,
@@ -12,19 +12,12 @@ import {
   createReview,
   customerCancelReservation,
   customerSearchReservation,
-  customersSuccess,
-  customerSuccess,
   deleteReservation,
   executeTrackingByReservationId,
-  getAllAdditionalByGroupId,
   getAllFilterReservations,
   getAllGroupingByRoom,
-  getAllRooms,
-  getAllTreatments,
   getColorsByTreatmentId,
-  getCustomerInformation,
   getCustomerReservations,
-  getCustomers,
   getEditReservation,
   getPage,
   getReservation,
@@ -33,7 +26,6 @@ import {
   getTrackingByReservationId,
   getUpcomingReservation,
   paymentCompleteReservation,
-  reservationAdditionalSuccess,
   reservationAvailabilitySuccess,
   reservationFailure,
   reservationFilterPageSuccess,
@@ -43,11 +35,9 @@ import {
   reservationPageSuccess,
   reservationPaymentsSuccess,
   reservationReviewSuccess,
-  reservationRoomsSuccess,
   reservationSaveSuccess,
   reservationsCustomerSuccess,
   reservationSelected,
-  reservationTreatmentsSuccess,
   searchAvailability,
   startReservation,
   stateSuccess,
@@ -59,56 +49,44 @@ import {
   updateReservationNote,
   updateReservationTimestamp,
   updateTrackingByReservationId,
-} from '../reservation.actions';
+} from '../actions/reservation.actions';
 import { TranslateService } from '@ngx-translate/core';
 import { ReservationService } from '../../services/reservation.service';
-import { Router } from '@angular/router';
-import { UserService } from '../../services/user.service';
-import { TreatmentService } from '../../services/treatment.service';
-import { RoomService } from '../../services/room.service';
 import { TrackingService } from '../../services/tracking.service';
 import { PaymentService } from '../../services/payment.service';
-import { AdditionalService } from '../../services/additional.service';
 import { newDateTimestamp } from '../../util/dates';
 import { Role } from '../../interfaces/token';
 import { ColorService } from '../../services/color.service';
 import { Pagination } from '../../interfaces/pagination';
 import {
   IAvailableDTO,
-  ICustomerLastReservation,
   ICustomerReservation,
   IReservation,
   IReservationAll,
   IRoomReservation,
-  States,
   ITracking,
   IUpcomingAll,
-} from '../../interfaces/reservation';
-import { IUserAll } from '../../interfaces/user';
-import { ITreatmentDiscountDTO } from '../../interfaces/treatment';
-import { IRoomAll } from '../../interfaces/room';
-import { IAdditionalAll } from '../../interfaces/additional';
+  States,
+} from '../../reservation/reservation';
 import { IPaymentAll } from '../../interfaces/payment';
 import { IApiResponse } from '../../interfaces/common';
-import { IReview } from '../../interfaces/review';
-import { IColorAll } from '../../interfaces/color';
+import { IReview } from '../../me/reservation/list/review';
+import { IColorAll } from '../../color/color';
 import { ToastType } from '../../shared/toast/toast.model';
 import { effectRequest } from '../../util/rxjs';
-import { getMyEvent } from '../dashboard.actions';
+import { DashboardStore } from '../dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Injectable()
 export class ReservationEffects {
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly actions: Actions = inject(Actions);
-  private readonly router: Router = inject(Router);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly reservationService: ReservationService = inject(ReservationService);
-  private readonly userService: UserService = inject(UserService);
-  private readonly treatmentService: TreatmentService = inject(TreatmentService);
-  private readonly roomService: RoomService = inject(RoomService);
-  private readonly additionalService: AdditionalService = inject(AdditionalService);
   private readonly trackingService: TrackingService = inject(TrackingService);
   private readonly paymentService: PaymentService = inject(PaymentService);
   private readonly colorService: ColorService = inject(ColorService);
+  private readonly dashboardStore = inject(DashboardStore);
 
   getAllPage$ = createEffect(() => this.actions.pipe(
     ofType(getPage),
@@ -166,46 +144,6 @@ export class ReservationEffects {
       (availability: IAvailableDTO[]) => reservationAvailabilitySuccess(
         availability ? { availability } : { availability: [] }),
       reservationFailure,
-    )),
-  ));
-
-  getAllCustomers$ = createEffect(() => this.actions.pipe(
-    ofType(getCustomers),
-    switchMap(() => this.request(
-      this.userService.getCustomers(),
-      (customers: IUserAll[]) => customersSuccess({ customers })),
-    ),
-  ));
-
-  getCustomerInfo$ = createEffect(() => this.actions.pipe(
-    ofType(getCustomerInformation),
-    switchMap(({ id }) => this.request(
-      this.userService.getCustomerInformation(id),
-      (customer: ICustomerLastReservation) => customerSuccess({ customer })),
-    ),
-  ));
-
-  getAllTreatments$ = createEffect(() => this.actions.pipe(
-    ofType(getAllTreatments),
-    switchMap(({ roomId, customerId }) => this.request(
-      this.treatmentService.getAllTreatments(roomId, customerId),
-      (treatmentDiscount: ITreatmentDiscountDTO) => reservationTreatmentsSuccess({ treatmentDiscount }),
-    )),
-  ));
-
-  getAllRooms$ = createEffect(() => this.actions.pipe(
-    ofType(getAllRooms),
-    switchMap(({ customerId }) => this.request(
-      this.roomService.getAllRooms(customerId),
-      (rooms: IRoomAll[]) => reservationRoomsSuccess({ rooms }),
-    )),
-  ));
-
-  getAllAdditional$ = createEffect(() => this.actions.pipe(
-    ofType(getAllAdditionalByGroupId),
-    switchMap(({ roomId, groupId }) => this.request(
-      this.additionalService.getAllAdditionalByGroupId(roomId, groupId),
-      (additional: IAdditionalAll[]) => reservationAdditionalSuccess({ additional }),
     )),
   ));
 
@@ -318,7 +256,7 @@ export class ReservationEffects {
   dashboardEventsRefresh$ = createEffect(() => this.actions.pipe(
     ofType(stateSuccess),
     filter(({ isDashboard, state }) => !!isDashboard && [States.started, States.completed].includes(state!)),
-    map(({ dashboardDate }) => getMyEvent({ date: dashboardDate ?? new Date() })),
+    tap(({ dashboardDate }) => this.dashboardStore.getMyEvent(dashboardDate ?? new Date())),
   ));
 
   changeCustomer$ = createEffect(() => this.actions.pipe(
@@ -450,7 +388,7 @@ export class ReservationEffects {
         window.open(selected.paymentLink, '_self');
         return;
       }
-      this.router.navigate([this.router.url]);
+      this.navigationService.navigate();
     }),
   ), { dispatch: false });
 
@@ -458,23 +396,23 @@ export class ReservationEffects {
     ofType(reservationSaveSuccess),
     tap(({ navigate, role, paymentLink, deleted, id }) => {
       if (navigate) {
-        let navigation = [this.translate.getCurrentLang()];
+        let navigation: string[] = [];
         switch (role) {
           case Role.customer:
             if (paymentLink) {
               window.open(paymentLink, '_self');
             }
-            navigation = [...navigation, 'me', 'reservations'];
+            navigation = ['me', 'reservations'];
             break;
           case Role.professional:
             navigation =
-              deleted ? [...navigation, 'dashboard'] : [...navigation, 'reservation', id!];
+              deleted ? ['dashboard'] : ['reservation', id!];
             break;
           case Role.roomAdmin:
-            navigation = [...navigation, 'dashboard', 'events'];
+            navigation = ['dashboard', 'events'];
             break;
         }
-        this.router.navigate(navigation);
+        this.navigationService.navigate(navigation);
       }
     }),
   ), { dispatch: false });
@@ -487,10 +425,10 @@ export class ReservationEffects {
         return;
       }
       if (isDashboard) {
-        this.router.navigate([this.translate.getCurrentLang(), 'dashboard', 'events']);
+        this.navigationService.navigate(['dashboard', 'events']);
         return;
       }
-      this.router.navigate([this.translate.getCurrentLang(), 'reservation', id]);
+      this.navigationService.navigate(['reservation', id]);
     }),
   ), { dispatch: false });
 

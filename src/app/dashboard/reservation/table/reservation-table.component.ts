@@ -1,30 +1,64 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, MatSortHeader } from '@angular/material/sort';
+import { createMatTableState } from 'src/app/util/mat-table-state';
 import { Store } from '@ngrx/store';
-import { deleteReservation, getPage } from '../../../store/reservation.actions';
-import { IReservation, IReservationAll } from '../../../interfaces/reservation';
+import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
+import { IReservation, IReservationAll } from '../../../reservation/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { AuthUserService } from '../../../services/auth-user.service';
-import { SharedModule } from '../../../shared/shared.module';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
-import { getReservationErrorPipe, getReservationPaginationPipe } from '../../../store/selectors/reservation.selectors';
+import {
+  getReservationErrorPipe,
+  getReservationPaginationPipe,
+  selectReservationIsLoading,
+} from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
+import { MatIconButton } from '@angular/material/button';
+import { ReactiveFormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import {
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../../services/navigation.service';
 
 @Component({
   selector: 'app-reservation-table',
   templateUrl: './reservation-table.component.html',
   styleUrls: ['./reservation-table.component.scss'],
-  imports: [SharedModule, TimeDetailPipe, ReservationIconPipe, ErrorComponent],
+  imports: [TimeDetailPipe, ReservationIconPipe, ErrorComponent, TimeDetailPipe, MatIcon, MatList, MatListItem,
+    MatIconButton, ReactiveFormsModule, TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatHeaderCell,
+    MatCellDef, MatHeaderCellDef, MatColumnDef, MatCell, MatPrefix, MatTooltip, MatListItemIcon, MatFooterCell,
+    MatHeaderRow, MatRow, MatFooterRow, MatPaginator, MatHeaderRowDef, MatRowDef, MatFooterRowDef, MatSortHeader,
+    MatFooterCellDef, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationTableComponent {
@@ -34,7 +68,8 @@ export class ReservationTableComponent {
 
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
@@ -44,8 +79,10 @@ export class ReservationTableComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
+  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
   private reservationListSignal = toSignal(this.reservationList$);
+  private loadingSignal = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -58,42 +95,35 @@ export class ReservationTableComponent {
       },
     },
   );
-  private sortActive = computed(() => this.sort()?.active ?? 'timestamp');
-
-  private sortDirection = computed(() => this.sort()?.direction ?? 'desc');
-
   errorSignal = toSignal(this.error$);
-  paginatorPageIndex = signal(0);
+  paginatorPageIndex = this.tableState.pageIndex;
 
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
+  isLoading = computed(() => this.loadingSignal());
   dataSourceSignal = computed(() => this.reservationListSignal()?.content);
   resultsLengthSignal = computed(() => this.reservationListSignal()?.totalElements || 0);
   pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
 
-  displayedColumns: string[] = ['position', 'customer', 'professional', 'timestamp', 'treatment', 'state', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'customer' },
+    { key: 'professional', hideOnMobile: true },
+    { key: 'timestamp', hideOnMobile: true },
+    { key: 'treatment', hideOnMobile: true },
+    { key: 'state', hideOnMobile: true },
+    { key: 'actions', hideOnMobile: true },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
   expanded?: IReservationAll;
 
-  dateFormat: string = this.translate.getCurrentLang();
-  language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
-    effect((onCleanup) => {
-      const paginator = this.paginator();
-      if (paginator) {
-        const sub = paginator.page.subscribe((pageEvent) => {
-          this.paginatorPageIndex.set(pageEvent.pageIndex);
-        });
-        onCleanup(() => sub.unsubscribe());
-      }
-    });
-
     effect(() => {
-      const page = this.paginatorPageIndex();
+      const request = this.tableState.baseRequest();
       this.store.dispatch(
         getPage({
-          page,
-          sort: this.sortActive(),
-          direction: this.sortDirection(),
+          ...request,
           size: this.pageSizeSignal(),
           roomId: this.roomId(),
           all: this.all(),
@@ -107,20 +137,21 @@ export class ReservationTableComponent {
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.dateFormat, this.translate, this.dialog, time);
+    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
   };
 
   delete = (reservation: IReservation): void => {
-    const title = this.translate.instant('RESERVATION.DELETED.TITLE');
-    const content = this.translate.instant('RESERVATION.DELETED.CONTENT',
+    const title = this.translateService.instant('RESERVATION.DELETED.TITLE');
+    const content = this.translateService.instant('RESERVATION.DELETED.CONTENT',
       { date: newDateTimestamp(reservation.timestamp) });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' }, result => {
-      if (result) {
-        this.store.dispatch(
-          deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
-        );
-      }
-    });
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' },
+      result => {
+        if (result) {
+          this.store.dispatch(
+            deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
+          );
+        }
+      });
   };
 }

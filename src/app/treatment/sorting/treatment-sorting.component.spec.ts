@@ -1,23 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TreatmentSortingComponent } from './treatment-sorting.component';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
-import { ITreatmentAll, ITreatmentGroupAll } from '../../interfaces/treatment';
-import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { TreatmentState } from '../../store/reducers/treatment.reducers';
-import { getTreatmentGroup, sortTreatment } from '../../store/treatment.actions';
-import { ServiceType } from '../../interfaces/room';
+import { ServiceType } from '../../room/room';
+import { ITreatmentAll, ITreatmentGroupAll } from '../treatment';
+import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { TreatmentStore } from '../../store/treatment.store';
+import { TreatmentSortingComponent } from './treatment-sorting.component';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;
   let fixture: ComponentFixture<TreatmentSortingComponent>;
-
-  let treatmentId$: BehaviorSubject<string | undefined>;
-  let treatmentGroup$: BehaviorSubject<ITreatmentGroupAll | undefined>;
-  let response$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<TreatmentState>>;
+  let treatmentStoreSpy: {
+    selected: ReturnType<typeof signal<ITreatmentGroupAll | undefined>>;
+    response: ReturnType<typeof signal<any>>;
+    clean: jasmine.Spy;
+    loadById: jasmine.Spy;
+    sortTreatments: jasmine.Spy;
+  };
 
   const mockTreatmentList: ITreatmentAll[] = [
     {
@@ -32,7 +32,7 @@ describe('TreatmentSortingComponent', () => {
       group: {
         id: 'g1',
         name: 'Group 1',
-      },
+      } as any,
     },
     {
       id: '2',
@@ -46,69 +46,54 @@ describe('TreatmentSortingComponent', () => {
       group: {
         id: 'g1',
         name: 'Group 1',
-      },
+      } as any,
     },
   ];
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<string | undefined>(undefined);
-    treatmentGroup$ = new BehaviorSubject<ITreatmentGroupAll | undefined>(undefined);
-    response$ = new BehaviorSubject(undefined);
-
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return treatmentId$.asObservable();
-        case 2:
-          return treatmentGroup$.asObservable();
-        case 3:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
+    treatmentStoreSpy = {
+      selected: signal<ITreatmentGroupAll | undefined>({
+        id: 'g1',
+        name: 'Group 1',
+        treatments: mockTreatmentList,
+      }),
+      response: signal(undefined),
+      clean: jasmine.createSpy('clean'),
+      loadById: jasmine.createSpy('loadById'),
+      sortTreatments: jasmine.createSpy('sortTreatments'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [TreatmentSortingComponent, TranslateModule.forRoot()],
-      providers: [{ provide: Store, useValue: storeSpy }],
+      providers: [
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentSortingComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'g1');
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    treatmentGroup$.complete();
-    response$.complete();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should compute itemsSignal from treatmentGroupListSignal', () => {
-    const treatmentGroup: ITreatmentGroupAll = {
-      id: 'g1',
-      name: 'Group 1',
-      treatments: mockTreatmentList,
-    };
-    treatmentGroup$.next(treatmentGroup);
-    fixture.detectChanges();
-
-    const result = component.itemsSignal();
-
-    expect(result).toEqual([
+  it('should compute itemsSignal from the selected treatment group', () => {
+    expect(component.itemsSignal()).toEqual([
       new ItemSorting('1', 'Treatment 1', 1),
       new ItemSorting('2', 'Treatment 2', 2),
     ]);
   });
 
-  it('should dispatch sortTreatment when sorted() is called', () => {
+  it('should load the treatment group on init', () => {
+    expect(treatmentStoreSpy.clean).toHaveBeenCalled();
+    expect(treatmentStoreSpy.loadById).toHaveBeenCalledWith('g1');
+  });
+
+  it('should call sortTreatments when sorted() is called', () => {
     const sorted = [
       { order: 1, key: 'key1' },
       { order: 2, key: 'key2' },
@@ -116,16 +101,6 @@ describe('TreatmentSortingComponent', () => {
 
     component.sorted(sorted);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(sortTreatment({ treatments: sorted }));
-  });
-
-  it('should dispatch getTreatmentList when responseSignal emits', () => {
-    storeSpy.dispatch.calls.reset();
-
-    treatmentId$.next('g1');
-    response$.next({ success: true });
-    fixture.detectChanges();
-
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getTreatmentGroup({ id: 'g1', path: 'sorting' }));
+    expect(treatmentStoreSpy.sortTreatments).toHaveBeenCalledWith(sorted);
   });
 });

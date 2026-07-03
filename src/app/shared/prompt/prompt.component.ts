@@ -2,8 +2,10 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { NOT_INSTALL_PWA } from '../../services/pwa.service';
 import { CookieService } from 'ngx-cookie-service';
-import { AppMaterialModule } from '../../util/app-material.module';
 import { TranslatePipe } from '@ngx-translate/core';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import { MatToolbar } from '@angular/material/toolbar';
 
 type PromptData = {
   mobileType: 'ios' | 'android';
@@ -14,7 +16,7 @@ type PromptData = {
   selector: 'app-prompt-component',
   templateUrl: './prompt.component.html',
   styleUrls: ['./prompt.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, MatToolbar],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PromptComponent {

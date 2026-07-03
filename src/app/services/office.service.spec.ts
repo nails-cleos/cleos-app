@@ -3,9 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { OfficeService } from './office.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IOfficeAll } from '../interfaces/office';
+import { IOfficeAll } from '../office/office';
 import { createFilter } from '../util/service-helper';
-import { paginated, Pagination } from '../interfaces/pagination';
+import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('OfficeService', () => {
   let service: OfficeService;
@@ -46,7 +46,7 @@ describe('OfficeService', () => {
       expect(result).toEqual([mockOffice]);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/me');
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/me', { ...skipLoadingOverlay() });
   });
 
   it('should fetch office page with correct parameters', () => {

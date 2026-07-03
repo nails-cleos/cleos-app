@@ -1,13 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { ISummaryTotals, ITotal } from '../../interfaces/dashboard';
-import { ICurrencyAll } from '../../interfaces/currency';
-import { SharedModule } from '../../shared/shared.module';
+import { ISummaryTotals, ITotal } from '../dashboard';
+import { ICurrencyAll } from '../../currency/currency';
+import { TranslatePipe } from '@ngx-translate/core';
+import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-total-summary',
   templateUrl: './total-summary.component.html',
   styleUrls: ['./total-summary.component.scss'],
-  imports: [SharedModule],
+  imports: [TranslatePipe, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TotalSummaryComponent {

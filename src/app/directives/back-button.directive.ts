@@ -14,8 +14,8 @@ export class BackButtonDirective {
   date = input<Date>();
   step = input<number>();
 
-  private navigation: NavigationService = inject(NavigationService);
-  private translate: TranslateService = inject(TranslateService);
+  private navigationService: NavigationService = inject(NavigationService);
+  private translateService: TranslateService = inject(TranslateService);
   public dialog: MatDialog = inject(MatDialog);
 
   @HostListener('click') @HostListener('window:popstate') onClick = (): void => {
@@ -23,15 +23,15 @@ export class BackButtonDirective {
     const date = this.date();
     const step = this.step();
     if (form && !form.pristine) {
-      const title = this.translate.instant('COMMON.BACK.TITLE');
-      const content = this.translate.instant('COMMON.BACK.CONTENT');
+      const title = this.translateService.instant('COMMON.BACK.TITLE');
+      const content = this.translateService.instant('COMMON.BACK.CONTENT');
       executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: form }, result => {
         if (result) {
-          this.navigation.back(date, step);
+          this.navigationService.back(date, step);
         }
       });
     } else {
-      this.navigation.back(date, step);
+      this.navigationService.back(date, step);
     }
   };
 }

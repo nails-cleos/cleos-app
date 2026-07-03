@@ -1,37 +1,50 @@
 /* eslint-disable camelcase */
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
-import { ActivatedRoute } from '@angular/router';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../../../services/firebase.service';
-import { createReservation } from '../../../store/reservation.actions';
+import { createReservation } from '../../../store/actions/reservation.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { Role } from '../../../interfaces/token';
-import { IGroupService, ITreatmentAll, Price } from '../../../interfaces/treatment';
-import { IRoomAll, ServiceType } from '../../../interfaces/room';
-import { DiscountType, IUserDiscount } from '../../../interfaces/discount';
+import { IGroupService, ITreatmentAll, Price } from '../../../treatment/treatment';
+import { IRoomAll, ServiceType } from '../../../room/room';
+import { DiscountType, IUserDiscount } from '../../../discount/discount';
+import { ToastService } from '../../../services/toast.service';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '../../../services/navigation.service';
+import { AdditionalStore } from '../../../store/additional.store';
+import { TreatmentStore } from '../../../store/treatment.store';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
   let fixture: ComponentFixture<MeReservationComponent>;
-  let translate: TranslateService;
+  let translateService: TranslateService;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
+  let treatmentStoreSpy: {
+    treatmentDiscount: ReturnType<typeof signal>;
+    getAllTreatments: jasmine.Spy;
+  };
+  let additionalStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadAllByGroupId: jasmine.Spy;
+  };
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+  };
 
   let navigationParams$: BehaviorSubject<any>;
-  let reservationId$: BehaviorSubject<any>;
-  let additionalList$: BehaviorSubject<any>;
-  let treatmentDiscount$: BehaviorSubject<any>;
-  let rooms$: BehaviorSubject<any>;
   let selectedReservation$: BehaviorSubject<any>;
   let customerReservation$: BehaviorSubject<any>;
   let availableList$: BehaviorSubject<any>;
   let subErrors$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
-  let params$: Subject<any>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const mockCurrency = { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' };
@@ -161,46 +174,49 @@ describe('MeReservationComponent', () => {
   };
 
   let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   beforeEach(async () => {
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    treatmentStoreSpy = {
+      treatmentDiscount: signal<any>(undefined),
+      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+    };
+    additionalStoreSpy = {
+      data: signal<any>(undefined),
+      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+    };
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      getOptions: jasmine.createSpy('getOptions'),
+    };
     navigationParams$ = new BehaviorSubject(undefined);
-    reservationId$ = new BehaviorSubject(undefined);
-    additionalList$ = new BehaviorSubject(undefined);
-    treatmentDiscount$ = new BehaviorSubject(undefined);
-    rooms$ = new BehaviorSubject(undefined);
     selectedReservation$ = new BehaviorSubject(undefined);
     customerReservation$ = new BehaviorSubject(undefined);
     availableList$ = new BehaviorSubject(undefined);
     subErrors$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject(paymentOptions);
-    params$ = new Subject<any>();
 
     storeSpy = jasmine.createSpyObj<Store<ReservationState>>('Store', ['pipe', 'dispatch']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
-      snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
-      },
-      params: params$.asObservable(),
-    });
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
     firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', ['logEvent']);
+    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy.show.and.returnValue({
+      onAction: () => of(void 0),
+      onDismiss: () => of(void 0),
+    });
 
     const storeStreams = [
       navigationParams$,
-      reservationId$,
-      additionalList$,
-      treatmentDiscount$,
-      rooms$,
       selectedReservation$,
       customerReservation$,
       availableList$,
       subErrors$,
-      paymentOptions$,
     ];
     let pipeCallIndex = 0;
     storeSpy.pipe.and.callFake(
@@ -210,33 +226,31 @@ describe('MeReservationComponent', () => {
       imports: [MeReservationComponent, TranslateModule.forRoot()],
       providers: [
         { provide: Store, useValue: storeSpy },
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
+        { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(MeReservationComponent);
     component = fixture.componentInstance;
 
-    translate = TestBed.inject(TranslateService);
-    translate.use('en-GB');
+    translateService = TestBed.inject(TranslateService);
+    translateService.use(DEFAULT_LOCALE);
 
     fixture.detectChanges();
   });
 
   afterEach(() => {
     navigationParams$.complete();
-    reservationId$.complete();
-    additionalList$.complete();
-    treatmentDiscount$.complete();
-    rooms$.complete();
     selectedReservation$.complete();
     customerReservation$.complete();
     availableList$.complete();
     subErrors$.complete();
-    paymentOptions$.complete();
-    params$.complete();
   });
 
   it('should create', () => {
@@ -244,7 +258,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should log and load the reservation when reservationId is available', () => {
-    reservationId$.next('reservation-1');
+    fixture.componentRef.setInput('id', 'reservation-1');
     fixture.detectChanges();
 
     expect(firebaseServiceSpy.logEvent).toHaveBeenCalledWith('screen_view', jasmine.objectContaining({
@@ -710,10 +724,7 @@ describe('MeReservationComponent', () => {
     expect(component.firstTime).toBeTrue();
     expect(component.activeStepIndex()).toBe(1);
     expect(component['setTypes']).toHaveBeenCalled();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Reservation] Get all treatments',
-      roomId: 'room-1',
-    }));
+    expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('room-1');
     expect(component['hydratingEdit']).toBeFalse();
   });
 
@@ -724,11 +735,7 @@ describe('MeReservationComponent', () => {
 
     component['getAdditionalList']();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Reservation] find all additional by group id',
-      roomId: 'room-1',
-      groupId: 'group-1',
-    }));
+    expect(additionalStoreSpy.loadAllByGroupId).toHaveBeenCalledWith('room-1', 'group-1');
   });
 
   it('should sync rendered additional selections from the stored additional ids', async () => {
@@ -878,7 +885,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should not update anything when treatmentDiscountSignal is empty', () => {
-    treatmentDiscount$.next(undefined);
+    treatmentStoreSpy.treatmentDiscount.set(undefined);
 
     const groupsSpy = spyOn(component.groups, 'set');
     const listSpy = spyOn(component.treatmentList, 'set');
@@ -890,7 +897,7 @@ describe('MeReservationComponent', () => {
   });
 
   it('should not update when room is missing', () => {
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -907,7 +914,7 @@ describe('MeReservationComponent', () => {
   it('should create groups and set groups signal', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -925,7 +932,7 @@ describe('MeReservationComponent', () => {
   it('should select current group by groupId', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -943,7 +950,7 @@ describe('MeReservationComponent', () => {
   it('should select group using treatmentId fallback', () => {
     component.getOfficeForm.room.setValue(createRoomMock(['CASH', 'MOLLIE']));
 
-    treatmentDiscount$.next({
+    treatmentStoreSpy.treatmentDiscount.set({
       treatments: [mockTreatment],
       discounts: [],
     } as any);
@@ -960,7 +967,7 @@ describe('MeReservationComponent', () => {
 
   describe('labels (computed)', () => {
     it('should map translation values correctly', () => {
-      translate.setTranslation('en-GB', {
+      translateService.setTranslation(DEFAULT_LOCALE, {
         COMMON: {
           USER: {
             PHONE: {
@@ -991,7 +998,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should fallback to empty string when keys are missing', () => {
-      translate.setTranslation('en-GB', {});
+      translateService.setTranslation(DEFAULT_LOCALE, {});
 
       const result = component.labels();
 
@@ -1005,7 +1012,7 @@ describe('MeReservationComponent', () => {
 
   describe('discounts (computed)', () => {
     it('should return undefined when no treatmentDiscountSignal', () => {
-      treatmentDiscount$.next(undefined);
+      treatmentStoreSpy.treatmentDiscount.set(undefined);
       fixture.detectChanges();
 
       const result = component.discounts();
@@ -1014,7 +1021,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should format percentage discount correctly', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1035,7 +1042,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should format money discount correctly', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1059,7 +1066,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should fallback to original name when type is unknown', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [
           {
             ...mockDiscount,
@@ -1079,7 +1086,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should preserve original discount properties', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [mockDiscount],
       });
       fixture.detectChanges();
@@ -1091,7 +1098,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should return new objects (immutability)', () => {
-      treatmentDiscount$.next({
+      treatmentStoreSpy.treatmentDiscount.set({
         discounts: [mockDiscount],
       });
       fixture.detectChanges();

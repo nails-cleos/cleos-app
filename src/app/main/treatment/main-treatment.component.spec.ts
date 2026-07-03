@@ -1,21 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { MainState } from '../../store/reducers/main.reducers';
-import { MainContentService } from '../../services/main-content.service';
+import { of } from 'rxjs';
 import { MainTreatmentComponent } from './main-treatment.component';
 import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
 import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '../../services/navigation.service';
+import { signal } from '@angular/core';
 
 describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
-
-  let treatmentId$: BehaviorSubject<string | undefined>;
-  let lang$: BehaviorSubject<string | undefined>;
-
-  let storeSpy: jasmine.SpyObj<Store<MainState>>;
-  let mainContentSpy: jasmine.SpyObj<MainContentService>;
+  let navigationServiceSpy: {
+    navigate: jasmine.Spy;
+    language: string;
+    language$: ReturnType<typeof signal>;
+  };
 
   const createTranslations = (overrides: Partial<IBiabTreatmentTranslations> = {}): IBiabTreatmentTranslations => {
     const defaults: IBiabTreatmentTranslations = {
@@ -94,21 +93,17 @@ describe('MainTreatmentComponent', () => {
   const createComponent = (): void => {
     fixture = TestBed.createComponent(MainTreatmentComponent);
     component = fixture.componentInstance;
+    fixture.componentRef.setInput('id', 'biab-treatment');
     fixture.detectChanges();
   };
 
   beforeEach(async () => {
-    treatmentId$ = new BehaviorSubject<string | undefined>('biab-treatment');
-    lang$ = new BehaviorSubject<string | undefined>('en-GB');
+    navigationServiceSpy = {
+      language: DEFAULT_LOCALE,
+      language$: signal(DEFAULT_LOCALE),
+      navigate: jasmine.createSpy('navigate'),
+    };
 
-    storeSpy = jasmine.createSpyObj<Store<MainState>>('Store', ['pipe', 'dispatch']);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (storeSpy.pipe as any).and.callFake((..._: any[]) => {
-      const count = (storeSpy.pipe as any).calls.count();
-      return count === 1 ? treatmentId$.asObservable() : lang$.asObservable();
-    });
-
-    mainContentSpy = jasmine.createSpyObj<MainContentService>('MainContentService', ['configure']);
     spyOn(TranslateLoaderFactory, 'loadJson').and.returnValue(of({
       treatments: [],
     }) as any);
@@ -116,19 +111,16 @@ describe('MainTreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [MainTreatmentComponent],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: MainContentService, useValue: mainContentSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
   });
 
-  it('should create and configure main content', () => {
+  it('should create', () => {
     createComponent();
 
     expect(component).toBeTruthy();
-    expect(mainContentSpy.configure).toHaveBeenCalledWith(false, 'open');
-    expect(storeSpy.pipe).toHaveBeenCalled();
-    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'en-GB');
+    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', DEFAULT_LOCALE);
   });
 
   it('should return sections when treatment id exists in translations', () => {
@@ -137,7 +129,6 @@ describe('MainTreatmentComponent', () => {
     }) as any);
 
     createComponent();
-    treatmentId$.next('biab-treatment');
     fixture.detectChanges();
 
     expect(component.sections()).toBeDefined();
@@ -147,8 +138,7 @@ describe('MainTreatmentComponent', () => {
   it('should request localized treatment content when language changes', () => {
     createComponent();
     (TranslateLoaderFactory.loadJson as jasmine.Spy).calls.reset();
-
-    lang$.next('nl');
+    navigationServiceSpy.language$.set('nl');
     fixture.detectChanges();
 
     expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'nl');
@@ -160,7 +150,7 @@ describe('MainTreatmentComponent', () => {
     }) as any);
 
     createComponent();
-    treatmentId$.next('unknown');
+    fixture.componentRef.setInput('id', 'unknown');
     fixture.detectChanges();
 
     expect(component.sections()).toBeUndefined();

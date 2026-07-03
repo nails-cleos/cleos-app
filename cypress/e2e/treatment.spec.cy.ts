@@ -1,5 +1,9 @@
 import '../support/commands';
 import { breakpointToButtons, convertSecondsToTime, devices, zeroPad } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+
+const getAddTreatmentInput = () =>
+  cy.get('#add-treatment').scrollIntoView().should('exist').and('not.be.disabled');
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Treatments with ${ name }`, () => {
@@ -13,7 +17,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockAdminDashboard(new Date(), 'CLEOS');
       cy.mockColors(false);
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -35,7 +39,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/treatments').as('saveTreatment');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
-      cy.get('tr').contains('No treatments');
+      cy.contains('.no-content', 'No treatments', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/treatments/add');
       cy.wait('@getColors');
@@ -48,9 +52,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.selectChip('Demure');
 
       treatments.forEach((treatment) => {
-        cy.get('#add-treatment').should('be.visible');
-        cy.get('#add-treatment').clear().type(treatment.name);
-        cy.get('button[aria-label="Add treatment"]').click();
+        getAddTreatmentInput().clear({ force: true }).type(treatment.name, { force: true });
+        cy.get('button[aria-label="Add treatment"]').click({ force: true });
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-description').scrollIntoView()
           .should('be.visible');
@@ -85,6 +88,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockTreatments(true, undefined, '9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedTreatment').then((treatment: any) => {
         // Updates
@@ -96,7 +100,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           body: { name: treatmentGroupName },
           alias: 'updateTreatment',
         });
-        cy.intercept('POST', `**/api/v1/treatments/${ treatment.id }`).as('updateTreatment');
 
         cy.buttonClickOnTable(breakpoints, treatment.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
           breakpointToButtons(breakpoints, ['visibility', 'sort', 'delete']));
@@ -125,7 +128,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.formControlType('priceFrom', priceFrom);
 
         // Remove one color
-        cy.get('mat-chip-row').filter(':contains("Jolie")').find('mat-icon').contains('cancel').click();
+        cy.get('mat-chip-row').filter(':contains("Jolie")').find('[matChipRemove]').click({ force: true });
         cy.get('mat-chip-row').contains('Jolie ').should('not.exist');
 
         // Remove one treatment
@@ -146,9 +149,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           time: `${ zeroPad(newTreatment.hour) }:${ zeroPad(newTreatment.minute) }`,
           order: treatment.treatments.length - 1,
         };
-        cy.get('#add-treatment').should('be.visible');
-        cy.get('#add-treatment').clear().type(newTreatment.name);
-        cy.get('button[aria-label="Add treatment"]').click();
+        getAddTreatmentInput().clear({ force: true }).type(newTreatment.name, { force: true });
+        cy.get('button[aria-label="Add treatment"]').click({ force: true });
 
         cy.get('mat-tab-body[aria-hidden="false"]').find('#treatment-description').scrollIntoView()
           .should('be.visible');

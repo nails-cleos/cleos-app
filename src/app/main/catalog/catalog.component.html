@@ -1,6 +1,6 @@
 <div class="content">
   <section class="section-style">
-    <div class="frame flex-wrap">
+    <div class="frame">
       @for (catalogue of catalogues(); track catalogue) {
         <mat-card appearance="outlined" class="catalogue-card flex-item">
           @if (catalogue.group) {
@@ -17,8 +17,8 @@
           <mat-card-content class="text-center">
             <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
           </mat-card-content>
-          <mat-card-actions class="card-actions">
-            <div class="spacer"></div>
+          <mat-card-actions class="app-surface-actions">
+            <div class="app-surface-spacer"></div>
             <a [href]="catalogue.image" rel="noreferrer" target="_blank">
               <mat-icon>zoom_out_map</mat-icon>
             </a>

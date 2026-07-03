@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder } from '@angular/forms';
-import { MatDatepicker } from '@angular/material/datepicker';
+import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   dateMonthYear,
@@ -11,14 +11,7 @@ import {
   monthViewTitle,
   newDateTimestamp,
 } from '../../util/dates';
-import { Store } from '@ngrx/store';
-import {
-  getMonthlyNavigationParamsPipe,
-  getMonthlySummaryMapPipe,
-  isDashboardLoadingPipe,
-} from '../../store/selectors/dashboard.selectors';
-import { TranslateService } from '@ngx-translate/core';
-import { getMonthlySummary, updateMonthlySummary } from '../../store/dashboard.actions';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AmountFormat,
   ExpenseType,
@@ -32,7 +25,7 @@ import {
   ITotalType,
   SummaryType,
   TotalType,
-} from '../../interfaces/dashboard';
+} from '../dashboard';
 import {
   allElementsHaveSameKeyFilterValue,
   currencySymbol,
@@ -40,18 +33,41 @@ import {
   getTimeZoneFromRoom,
   titleCase,
 } from '../../util/helper';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthUserService } from '../../services/auth-user.service';
 import fs from 'file-saver';
 import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
-import { SharedModule } from '../../shared/shared.module';
 import { FilterByPipe } from '../../pipes/filterBy.pipe';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { TwoDigitsDirective } from '../../directives/two-digits.directive';
-import { DashboardState } from '../../store/reducers/dashboard.reducers';
-import { YearMonthAdapter } from '../../util/adapter/year-month.adapter';
-import { DateAdapter } from '@angular/material/core';
+import { MatOption } from '@angular/material/core';
+import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
 import { EnvService } from '../../services/env.service';
+import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import { MatSuffix } from '@angular/material/form-field';
+import { MatSelect } from '@angular/material/select';
+import { MatIcon } from '@angular/material/icon';
+import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatAccordion,
+  MatExpansionPanel,
+  MatExpansionPanelActionRow,
+  MatExpansionPanelDescription,
+  MatExpansionPanelHeader,
+  MatExpansionPanelTitle,
+} from '@angular/material/expansion';
+import { MatButton, MatIconButton } from '@angular/material/button';
+import {
+  CurrencyPipe,
+  DatePipe,
+  DecimalPipe,
+  KeyValuePipe,
+  NgClass,
+  NgTemplateOutlet,
+  SlicePipe,
+} from '@angular/common';
+import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -63,25 +79,24 @@ type MonthlySummaryForm = {
   selector: 'app-month-summary',
   templateUrl: './month-summary.component.html',
   styleUrls: ['./month-summary.component.scss'],
-  imports: [SharedModule, FilterByPipe, TimeDetailPipe, TwoDigitsDirective],
-  providers: [{ provide: DateAdapter, useClass: YearMonthAdapter }],
+  imports: [FilterByPipe, TimeDetailPipe, TwoDigitsDirective, MatFormField, MatLabel, MatInput,
+    MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, MatIcon, MatList, MatListItem,
+    MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription,
+    MatListSubheaderCssMatStyler, MatIconButton, MatExpansionPanelActionRow, MatButton, ReactiveFormsModule,
+    TranslatePipe, KeyValuePipe, CurrencyPipe, DecimalPipe, NgClass, RouterLink, NgTemplateOutlet, DatePipe,
+    SlicePipe, MatSuffix],
+  providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translate: TranslateService = inject(TranslateService);
-  private readonly store: Store<DashboardState> = inject(Store<DashboardState>);
-  private readonly router: Router = inject(Router);
+  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly dashboardStore = inject(DashboardStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private monthlySummaryMap$ = this.store.pipe(getMonthlySummaryMapPipe);
-  private navigationParams$ = this.store.pipe(getMonthlyNavigationParamsPipe);
-  private isLoading$ = this.store.pipe(isDashboardLoadingPipe);
-
   private authUserSignal = this.authUserService.authUser;
-  private navigationParams = toSignal(this.navigationParams$);
-  readonly isLoading = toSignal(this.isLoading$, { initialValue: false });
 
   private selectedRoomSignal = signal<ISummaryRoom | 'All' | undefined>(undefined);
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
@@ -108,7 +123,7 @@ export class MonthSummaryComponent {
   private dateSignal = toSignal(this.getForm.date.valueChanges);
   private amountFormatSignal = toSignal(this.getForm.amountFormat.valueChanges);
 
-  monthlySummaryMapSignal = toSignal(this.monthlySummaryMap$);
+  monthlySummaryMapSignal = this.dashboardStore.monthlySummaryMap;
 
   showCash = computed(() => this.authUserSignal().showCash);
   stepSignal = signal<number>(0);
@@ -131,15 +146,15 @@ export class MonthSummaryComponent {
   type: typeof SummaryType = SummaryType;
   locale = 'es';
 
-  dateFormat: string = this.translate.getCurrentLang();
-  readonly language: string = this.translate.getCurrentLang();
+  readonly language = this.navigationService.language;
 
   constructor() {
+    this.dashboardStore.clean();
     effect(() => {
-      const params = this.navigationParams();
-      if (params) {
-        this.stepSignal.set(params?.step || 0);
-        const dateTime = params.date;
+      const dateTime = history.state?.date;
+      const step = history.state?.step || 0;
+      if (dateTime) {
+        this.stepSignal.set(step);
         let month;
         let year;
         if (dateTime instanceof Date) {
@@ -264,7 +279,7 @@ export class MonthSummaryComponent {
   }
 
   get dateFormatted(): string {
-    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.translate.getCurrentLang()) : '';
+    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.language) : '';
   }
 
   private static groupSummary = (summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> =>
@@ -433,9 +448,9 @@ export class MonthSummaryComponent {
     if (this.getForm.date.value) {
       const year = this.getForm.date.value.getFullYear();
       const quarter = getDateQuarter(this.getForm.date.value);
-      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary'], { state: { year, quarter } });
+      this.navigationService.navigate(['dashboard', 'quarter', 'summary'], { state: { year, quarter } });
     } else {
-      this.router.navigate([this.language, 'dashboard', 'quarter', 'summary']);
+      this.navigationService.navigate(['dashboard', 'quarter', 'summary']);
     }
     return;
   }
@@ -487,7 +502,8 @@ export class MonthSummaryComponent {
 
   exportMonthlySummary = (): void => {
     const title = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
-    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()), this.translate,
+    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()),
+      this.translateService,
       this.env, this.timeZone(), this.summaryReservations as IMonthlySummarySale[],
       this.summaryExpenses as IMonthlySummaryExpense[]);
 
@@ -499,7 +515,7 @@ export class MonthSummaryComponent {
       const blob = new Blob([content], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      fs.saveAs(blob, `Report_${title.replace(' ', '_')}.xlsx`);
+      fs.saveAs(blob, `Report_${ title.replace(' ', '_') }.xlsx`);
     });
   };
 
@@ -510,8 +526,8 @@ export class MonthSummaryComponent {
     data?: IMonthlySummary[],
   ): void => {
     if (data?.length) {
-      const workbookName = `${titleCase(totalTypes.type)}-${getDateFormat(this.getForm.date.value)}`;
-      const name = this.translate.instant(`SUMMARY.${title}`);
+      const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.getForm.date.value) }`;
+      const name = this.translateService.instant(`SUMMARY.${ title }`);
 
       let workbook;
       const header = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
@@ -519,16 +535,17 @@ export class MonthSummaryComponent {
       switch (totalTypes.type) {
         case SummaryType.payment:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
+            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
             this.env, this.timeZone());
           break;
         case SummaryType.expense:
           workbook = createMonthlyExpenseWorkbook(header, data as IMonthlySummaryExpense[], this.weeks,
-            name, workbookName, this.translate, currencySymbol(this.currencySignal()), this.env, this.timeZone());
+            name, workbookName, this.translateService, currencySymbol(this.currencySignal()), this.env,
+            this.timeZone());
           break;
         case SummaryType.cash:
           workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translate, currencySymbol(this.currencySignal()),
+            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
             this.env, this.timeZone());
           break;
       }
@@ -541,7 +558,7 @@ export class MonthSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `${workbookName}.xlsx`);
+        fs.saveAs(blob, `${ workbookName }.xlsx`);
       });
 
       this.updateMonthlySummary(totalTypes, values);
@@ -564,15 +581,13 @@ export class MonthSummaryComponent {
         }));
         break;
     }
-    return this.store.dispatch(
-      updateMonthlySummary({
-        date: getDateFormat(this.getForm.date.value),
-        summaryType: totalTypes.type,
-        totals: totals,
-        summaries: summaries,
-        roomId: this.roomId()!,
-        step: this.stepSignal(),
-      }),
+    return this.dashboardStore.updateMonthlySummary(
+      getDateFormat(this.getForm.date.value),
+      totalTypes.type,
+      totals,
+      summaries,
+      this.roomId(),
+      this.stepSignal(),
     );
   };
 
@@ -616,7 +631,7 @@ export class MonthSummaryComponent {
     this.reservationMonth = new TotalType(SummaryType.payment);
     this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
     this.cashMonth = new TotalType(SummaryType.cash);
-    this.store.dispatch(getMonthlySummary({ date }));
+    this.dashboardStore.getMonthlySummary(date);
   };
 
   private calculateReservationSummary = (): void => {
@@ -645,7 +660,7 @@ export class MonthSummaryComponent {
 
   private getNewObject = (s: IMonthlySummary): any => {
     if (s?.paths) {
-      const paths = Array.isArray(s.paths) ? `/${this.language}/${s.paths.join('/')}` : s.paths;
+      const paths = Array.isArray(s.paths) ? `/${ this.language }/${ s.paths.join('/') }` : s.paths;
       return Object.assign({}, s, { paths });
     }
     return s;

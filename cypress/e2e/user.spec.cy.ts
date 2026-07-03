@@ -1,11 +1,31 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 const mapRole = new Map([
   ['Customer', { url: 'customers', displayName: 'Customer 1', otherButtons: [] }],
   ['Professional', { url: 'professionals', displayName: 'Nails Cleos', otherButtons: ['merge'] }],
   ['Manager', { url: 'offices/managers', displayName: 'Nails Cleos', otherButtons: ['merge'] }],
 ]);
+
+const waitForEmptyUsersState = () => {
+  cy.get('.app-table-shell').should('be.visible');
+  cy.contains('.no-content', 'No users', { timeout: 15000 }).should('be.visible');
+};
+
+const waitForUserRow = (displayName: string) => {
+  cy.get('.app-table-shell').should('be.visible');
+  cy.contains('tr.app-table-master-row', displayName, { timeout: 15000 }).should('exist');
+};
+
+const setColorInput = (dataCy: string, value: string) => {
+  cy.get(`[data-cy="${ dataCy }"]`, { timeout: 15000 })
+    .scrollIntoView()
+    .should('exist')
+    .and('not.be.disabled')
+    .clear({ force: true })
+    .type(value, { force: true });
+};
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Users with ${ name }`, () => {
@@ -18,7 +38,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -30,10 +50,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
         cy.intercept('POST', `**/api/v1/${ value.url }`).as('saveUser');
 
-        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(0);
+        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
-        cy.get('tr').contains('No users');
+        waitForEmptyUsersState();
         cy.get('button[id="add-button"]').click({ force: true });
         cy.get('.app-surface-eyebrow').contains('Add user');
         cy.selectOption('select-role', role);
@@ -52,8 +72,8 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         cy.get('td[data-mat-row="1"][data-mat-col="1"]').find('button').click({ force: true });
 
         if (role !== 'Customer') {
-          cy.get('[data-cy="dark-color-picker"]').clear().type('#0f0');
-          cy.get('[data-cy="light-color-picker"]').clear().type('#00f');
+          setColorInput('dark-color-picker', '#0f0');
+          setColorInput('light-color-picker', '#00f');
         }
 
         cy.get('button[type="submit"]').click({ force: true });
@@ -75,9 +95,10 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       });
 
       it(`should edit a ${ role }`, () => {
-        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.mockUsers(undefined, value.displayName);
+        cy.openMenu(breakpoints, ['App settings', 'Users']);
         cy.wait('@getUsers');
+        waitForUserRow(value.displayName);
 
         cy.get('@selectedUser').then((user: any) => {
           cy.mockApi('PATCH', `**/api/v1/users/${ user.id }`, {
@@ -100,7 +121,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
           if (user.dob) {
             const dob = new Date(user.dob);
-            const formattedDob = dob.toLocaleDateString('en-GB');
+            const formattedDob = dob.toLocaleDateString(DEFAULT_LOCALE);
             cy.get('[data-cy="dob-picker"]').should('have.value', formattedDob);
           }
 

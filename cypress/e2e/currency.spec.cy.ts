@@ -1,5 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Currency with ${ name }`, () => {
@@ -12,7 +13,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCatalogues();
       cy.mockAdminDashboard(new Date(), 'CLEOS');
 
-      cy.visit('en-GB/dashboard');
+      cy.visit(`${DEFAULT_LOCALE}/dashboard`);
       cy.mockFirebaseAppCheck();
     });
 
@@ -29,7 +30,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/currency').as('saveCurrency');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
-      cy.get('tr').contains('No currency');
+      cy.contains('.no-content', 'No currency', { timeout: 15000 }).should('be.visible');
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/currency/add');
       cy.get('.app-surface-eyebrow').contains('Add currency');
@@ -54,6 +55,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.mockCurrencyList(true, undefined, 'e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
+      cy.get('.app-table-shell').should('be.visible');
 
       cy.get('@selectedCurrency').then((currency: any) => {
         // Updates

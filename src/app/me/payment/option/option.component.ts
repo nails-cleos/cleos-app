@@ -1,44 +1,39 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { createPaymentLinkByReservationId, getPaymentByResourceId } from '../../../store/payment.actions';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
-import { FormGroup, NonNullableFormBuilder } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { getPrice, newPercentage } from '../../../util/helper';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
-import { IPrice, Price } from '../../../interfaces/treatment';
-import { IReservationAll, IReservationPayment } from '../../../interfaces/reservation';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../../shared/shared.module';
+import { IPrice, Price } from '../../../treatment/treatment';
+import { IReservationAll, IReservationPayment } from '../../../reservation/reservation';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
 import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { PaymentState } from '../../../store/reducers/payment.reducers';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { getCurrentReservationIdPipe } from '../../../store/selectors/reservation.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getPaymentOptionsPipe, getPaymentsPipe } from '../../../store/selectors/payment.selectors';
 import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { NavigationService } from '../../../services/navigation.service';
+import { PaymentStore } from '../../../store/payment.store';
 
 @Component({
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [SharedModule, BankComponent, PaymentPreviewComponent, BackButtonDirective, CurrencySymbolPipe],
+  imports: [MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, DecimalPipe, NgTemplateOutlet, BankComponent,
+    BackButtonDirective, CurrencySymbolPipe, BankComponent, PaymentPreviewComponent, BackButtonDirective,
+    CurrencySymbolPipe, MatProgressSpinner],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent {
-  private readonly store: Store<PaymentState | ReservationState> = inject(Store<PaymentState | ReservationState>);
+  id = input<string>();
+
+  private readonly paymentStore = inject(PaymentStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private reservationId$ = this.store.pipe(getCurrentReservationIdPipe);
-  private payments$ = this.store.pipe(getPaymentsPipe);
-  private paymentOptions$ = this.store.pipe(getPaymentOptionsPipe);
-
-  private readonly reservationIdSignal = toSignal(this.reservationId$);
-  private readonly paymentOptionsSignal = toSignal(this.paymentOptions$, { initialValue: [] });
-  private paymentsSignal = toSignal(this.payments$);
+  private readonly paymentOptionsSignal = this.paymentStore.options;
+  private paymentsSignal = this.paymentStore.data;
 
   form: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     option: this.formBuilder.control(undefined),
@@ -56,15 +51,13 @@ export class OptionComponent {
   first = true;
   currentStepIndex = signal(0);
 
-  private reservationId?: string;
-  private readonly language: string = this.translate.getCurrentLang();
-
   constructor() {
+    this.paymentStore.clean();
+    this.paymentStore.getOptions();
     effect(() => {
-      const id = this.reservationIdSignal();
+      const id = this.id();
       if (id) {
-        this.store.dispatch(getPaymentByResourceId({ id, path: 'reservation' }));
-        this.reservationId = id;
+        this.paymentStore.getPaymentByResourceId(id, 'reservation');
       }
     });
 
@@ -80,7 +73,7 @@ export class OptionComponent {
           const price = getPrice(reservation, payments);
           this.price.set(price);
           if (price.isPaid) {
-            this.router.navigate(['/', this.language, 'reservation', reservation.id]);
+            this.navigationService.navigate(['reservation', reservation.id]);
           } else {
             if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
               this.first = price.totalPaid === 0;
@@ -111,8 +104,11 @@ export class OptionComponent {
     const type = option.type;
     const percentage = this.getForm.percentage?.value || PaymentPercentage.total;
     const payment: IReservationPayment = { type, percentage };
-    const reservationId = this.reservationId!;
-    this.store.dispatch(createPaymentLinkByReservationId({ reservationId, payment }));
+    const reservationId = this.id();
+    if (!reservationId) {
+      return;
+    }
+    this.paymentStore.createPaymentLinkByReservationId(reservationId, payment);
   }
 
   callStepTwo = (goNext: boolean): void => {

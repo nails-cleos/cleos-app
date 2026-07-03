@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { CalendarEvent } from 'angular-calendar';
 import { ReservationCalendarService } from './reservation-calendar.service';
-import { ServiceType } from '../interfaces/room';
+import { ServiceType } from '../room/room';
 import { FrequencyEnum } from '../util/helper';
 
 describe('ReservationCalendarService', () => {

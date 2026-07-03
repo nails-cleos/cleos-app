@@ -1,0 +1,30 @@
+<table class="app-table-skeleton-table">
+  @if (showHeader()) {
+    <thead>
+    <tr>
+      @for (column of columns(); track column.key) {
+        <th [class.app-surface-hide-mobile]="column.hideOnMobile">
+          <div class="ssc-line app-table-skeleton-line app-table-skeleton-line--header"></div>
+        </th>
+      }
+    </tr>
+    </thead>
+  }
+  <tbody>
+    @for (row of rows(); track row) {
+      <tr>
+        @for (column of columns(); track column.key) {
+          <td [class.app-surface-hide-mobile]="column.hideOnMobile">
+            <div class="ssc-line app-table-skeleton-line"></div>
+          </td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>
+
+@if (showPaginator()) {
+  <div class="app-table-skeleton-paginator">
+    <div class="ssc-line app-table-skeleton-line app-table-skeleton-line--paginator"></div>
+  </div>
+}

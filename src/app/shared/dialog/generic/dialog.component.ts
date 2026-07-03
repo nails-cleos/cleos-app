@@ -1,14 +1,21 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IDialog } from '../../../interfaces/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions, MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+} from '@angular/material/dialog';
+import { IDialog } from '../dialog';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AppMaterialModule } from '../../../util/app-material.module';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
 
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
-  imports: [AppMaterialModule, TranslatePipe],
+  imports: [MatIcon, MatButton, TranslatePipe, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogComponent {

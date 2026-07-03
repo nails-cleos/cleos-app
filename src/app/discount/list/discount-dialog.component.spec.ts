@@ -1,22 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDialogComponent } from './discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { cleanUser, getAllCustomers } from '../../store/user.actions';
-import { DiscountType, IDiscountAll } from '../../interfaces/discount';
-import { IUserAll } from '../../interfaces/user';
+import { DiscountType, IDiscountAll } from '../discount';
+import { IUserAll } from '../../user/user';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { DiscountState } from '../../store/reducers/discount.reducers';
+import { signal, WritableSignal } from '@angular/core';
+import { UserStore } from '../../store/user.store';
 
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;
   let fixture: ComponentFixture<DiscountDialogComponent>;
 
-  let allCustomers$: BehaviorSubject<IUserAll[] | undefined>;
+  let customersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let storeSpy: jasmine.SpyObj<Store<DiscountState>>;
+  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<DiscountDialogComponent>>;
 
   let mockDiscount: IDiscountAll;
@@ -27,11 +25,13 @@ describe('DiscountDialogComponent', () => {
   ];
 
   beforeEach(async () => {
-    allCustomers$ = new BehaviorSubject<IUserAll[] | undefined>(undefined);
+    customersSignal = signal<IUserAll[] | undefined>(undefined);
 
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(allCustomers$.asObservable());
+    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadCustomers']);
+    Object.assign(userStoreSpy, {
+      customers: customersSignal.asReadonly(),
+    });
 
     mockDiscount = {
       currency: {
@@ -54,15 +54,13 @@ describe('DiscountDialogComponent', () => {
           useFactory: () => ({ discount: mockDiscount }),
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: UserStore, useValue: userStoreSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountDialogComponent);
     component = fixture.componentInstance;
   });
-
-  afterEach(() => allCustomers$.complete());
 
   it('should create component', () => {
     fixture.detectChanges();
@@ -73,14 +71,14 @@ describe('DiscountDialogComponent', () => {
     expect(component.title).toBe('10% Summer Promo');
   });
 
-  it('should dispatch clean and getAllCustomers on init', () => {
+  it('should clean and load customers on init', () => {
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(cleanUser());
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getAllCustomers());
+    expect(userStoreSpy.clean).toHaveBeenCalled();
+    expect(userStoreSpy.loadCustomers).toHaveBeenCalled();
   });
 
   it('should update allCustomersWritableSignal when store emits', () => {
-    allCustomers$.next(mockCustomers);
+    customersSignal.set(mockCustomers);
     fixture.detectChanges();
 
     expect(component.allCustomersWritableSignal()).toEqual(mockCustomers);

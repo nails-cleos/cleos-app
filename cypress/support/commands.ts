@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+
 declare namespace Cypress {
   interface Chainable {
     randomUUID(): Chainable<string>;
@@ -113,22 +115,30 @@ const isSmallBreakpoint = (breakpoint: string): boolean =>
 const usesDrawerMenu = (breakpoint: string): boolean =>
   DRAWER_MENU_BREAKPOINTS.includes(breakpoint as typeof DRAWER_MENU_BREAKPOINTS[number]);
 
+const clickVisibleMenuItem = (selector: string, label: string) => {
+  cy.get(selector)
+    .filter(':visible')
+    .contains(label)
+    .scrollIntoView()
+    .parents('mat-list-item')
+    .first()
+    .click({ force: true });
+};
+
 Cypress.Commands.add('randomUUID', () => cy.wrap('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
   const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
   return v.toString(16);
 })));
 
 Cypress.Commands.add('logout', () => {
-  cy.document({ log: false }).then((doc) => {
-    const body = doc.body;
-    if (!body || !body.querySelector('button[name="settings"]')) {
-      return;
-    }
-
-    cy.get('button[name="settings"]').click();
-    cy.get('div').contains('Sign out').click();
-    cy.url().should('include', 'home');
+  cy.window({ log: false }).then((win) => {
+    win.localStorage.clear();
+    win.sessionStorage.clear();
   });
+
+  cy.clearCookies({ log: false });
+  cy.visit(`${DEFAULT_LOCALE}/home`);
+  cy.url({ timeout: 20000 }).should('include', 'home');
 });
 
 Cypress.Commands.add('checkAppDialog', (title: string, message: string, buttonClick: string) => {
@@ -162,13 +172,15 @@ Cypress.Commands.add('checkMatList', (title?: string, icon?: string, ...details:
 
 Cypress.Commands.add('openMenu', (breakpoint: string, menus: string[]) => {
   if (usesDrawerMenu(breakpoint)) {
-    cy.get('button[name="cleosMenu"]').click();
+    cy.get('button[name="cleosMenu"]').should('be.visible').click({ force: true });
+    cy.get('mat-drawer').should('have.class', 'mat-drawer-opened');
   }
+
   menus.forEach((menu, index) => {
     if (index === 0) {
-      cy.get('mat-list-item').contains(menu).click();
+      clickVisibleMenuItem('mat-list-item', menu);
     } else {
-      cy.get('mat-list-item.sub-menu').contains(menu).click();
+      clickVisibleMenuItem('mat-list-item.sub-menu, mat-list-item.sub-sub-menu', menu);
     }
   });
 });
@@ -181,10 +193,12 @@ Cypress.Commands.add('buttonClickOnTable', (
   button: string,
   otherButtons?: string[],
 ) => {
+  const rowSelector = `.app-table-shell tr.${rowClass}:visible`;
+
   if (isSmallBreakpoint(breakpoint)) {
-    cy.get(`tr.${rowClass}:visible`).contains('td', column).then(($cell: any) => {
+    cy.contains(`${ rowSelector } td`, column, { timeout: 15000 }).then(($cell: any) => {
       const $row = $cell.closest('tr');
-      cy.wrap($row).click({ force: true });
+      cy.wrap($row).scrollIntoView().click({ force: true });
 
       cy.wrap($row).nextAll(`tr.${rowExpandedClass}`).first().should('exist').within(() => {
         cy.get('.detail').should('have.class', 'detail-expanded');
@@ -197,9 +211,12 @@ Cypress.Commands.add('buttonClickOnTable', (
       });
     });
   } else {
-    otherButtons?.forEach(otherButton => cy.get('table').contains('tr', column)
-      .find('button[mat-icon-button]').contains(otherButton));
-    cy.get('table').contains('tr', column).find('button[mat-icon-button]').contains(button).click({ force: true });
+    cy.contains('.app-table-shell tr', column, { timeout: 15000 }).scrollIntoView().within(() => {
+      otherButtons?.forEach(otherButton => {
+        cy.get('button[mat-icon-button]').contains(otherButton).should('exist');
+      });
+      cy.get('button[mat-icon-button]').contains(button).click({ force: true });
+    });
   }
 });
 
@@ -219,7 +236,7 @@ Cypress.Commands.add('selectChip', (chipName: string) => {
 });
 
 Cypress.Commands.add('formControlType', (formControlName: string, value: any, type: string = 'input') => {
-  cy.get(`[data-cy="${formControlName}-${type}"]`).scrollIntoView().should('be.visible');
+  cy.get(`[data-cy="${formControlName}-${type}"]`).scrollIntoView().should('exist');
   cy.get(`[data-cy="${formControlName}-${type}"]`).clear().type(value);
 });
 
@@ -1075,7 +1092,7 @@ Cypress.Commands.add('mockCreateReservation', (
             {
               statusCode: 200,
               body: {
-                createdAt: new Date().toLocaleDateString('en-GB'),
+                createdAt: new Date().toLocaleDateString(DEFAULT_LOCALE),
                 createdBy: '57ceebd2-a012-42a3-af9a-5d546c193200',
                 deleted: false,
                 id: reservationId,

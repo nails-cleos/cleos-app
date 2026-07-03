@@ -1,37 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { QuarterSummaryComponent } from './quarter-summary.component';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { getQuarterSummary } from '../../store/dashboard.actions';
-import {
-  IMonthSummary,
-  ISummaryRoom,
-  ISummaryTotal,
-  MonthSummary,
-  SummaryTotals,
-  Total,
-} from '../../interfaces/dashboard';
-import { ICurrencyAll } from '../../interfaces/currency';
+import { IMonthSummary, ISummaryRoom, ISummaryTotal, MonthSummary, SummaryTotals, Total } from '../dashboard';
+import { ICurrencyAll } from '../../currency/currency';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
+import { DEFAULT_LOCALE } from '../../util/dates';
+import { DashboardStore } from '../../store/dashboard.store';
+import { NavigationService } from '../../services/navigation.service';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
   let fixture: ComponentFixture<QuarterSummaryComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let quarterSummaryMap$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<any>;
+  let dashboardStoreSpy: {
+    quarterSummaryMap: ReturnType<typeof signal>;
+    getQuarterSummary: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store>;
-  let routerSpy: jasmine.SpyObj<Router>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
@@ -109,13 +105,16 @@ describe('QuarterSummaryComponent', () => {
   };
 
   beforeEach(async () => {
-    quarterSummaryMap$ = new BehaviorSubject<any>(undefined);
-    navigationParams$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<any>(undefined);
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    dashboardStoreSpy = {
+      quarterSummaryMap: signal<any>(undefined),
+      getQuarterSummary: jasmine.createSpy('getQuarterSummary'),
+      clean: jasmine.createSpy('clean'),
+    };
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
@@ -126,21 +125,6 @@ describe('QuarterSummaryComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return quarterSummaryMap$.asObservable();
-        case 2:
-          return navigationParams$.asObservable();
-        case 3:
-          return isLoading$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    routerSpy.currentNavigation.and.returnValue(null);
     breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
 
     paramMapSpy.get.and.returnValue('test');
@@ -148,9 +132,9 @@ describe('QuarterSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [QuarterSummaryComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        { provide: Router, useValue: routerSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
@@ -159,7 +143,7 @@ describe('QuarterSummaryComponent', () => {
     fixture = TestBed.createComponent(QuarterSummaryComponent);
 
     const translateService = TestBed.inject(TranslateService);
-    translateService.use('en-GB');
+    translateService.use(DEFAULT_LOCALE);
     component = fixture.componentInstance;
   });
 
@@ -167,11 +151,6 @@ describe('QuarterSummaryComponent', () => {
     saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
       // no-op
     });
-  });
-
-  afterEach(() => {
-    quarterSummaryMap$.complete();
-    navigationParams$.complete();
   });
 
   it('should create', () => {
@@ -201,7 +180,14 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should initialize with extras date and quarter when provided', () => {
-      navigationParams$.next({ year: 2024, quarter: 2 });
+      history.pushState({
+        year: 2024,
+        quarter: 2,
+      }, '', '/...');
+
+      fixture = TestBed.createComponent(QuarterSummaryComponent);
+      component = fixture.componentInstance;
+
       fixture.detectChanges();
 
       expect(component.year()).toBe(2024);
@@ -218,18 +204,16 @@ describe('QuarterSummaryComponent', () => {
   describe('State Management', () => {
     it('should subscribe to dashboard state via pipe', () => {
       fixture.detectChanges();
-      expect(storeSpy.pipe).toHaveBeenCalled();
+      expect(dashboardStoreSpy.clean).toHaveBeenCalled();
     });
 
     it('should handle single room in quarterSummaryMap', () => {
       fixture.detectChanges();
       const map = createMockQuarterSummaryMap();
-      quarterSummaryMap$.next(map);
-      isLoading$.next(false);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       fixture.detectChanges();
 
       expect(component.getForm.selectedRoom.value).toEqual(mockRoom);
-      expect(component.isLoading()).toBeFalse();
     });
 
     it('should select primary room when multiple rooms exist', () => {
@@ -238,7 +222,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom2, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
 
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       fixture.detectChanges();
 
       expect(component.getForm.selectedRoom.value).toEqual(mockRoom);
@@ -250,7 +234,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom2, { monthSummaries: [mockMonthSummary] });
 
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       fixture.detectChanges();
 
       expect(component.primaryRoom).toBeTruthy();
@@ -263,16 +247,12 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should get summary when selectedQuarter changes', () => {
+      dashboardStoreSpy.getQuarterSummary.calls.reset();
       component.getForm.date.setValue(new Date(2024, 0, 1));
       component.getForm.selectedQuarter.setValue(2);
       fixture.detectChanges();
 
-      const dispatched = storeSpy.dispatch.calls.mostRecent().args[0];
-      expect(dispatched).toEqual(jasmine.objectContaining({
-        year: 2024,
-        quarter: 2,
-        type: '[Dash] Get quarter summary',
-      }));
+      expect(dashboardStoreSpy.getQuarterSummary).toHaveBeenCalledWith(2024, 2);
     });
 
     it('should not get summary when selectedQuarter is null', () => {
@@ -314,7 +294,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should create data for single room', () => {
       const map = createMockQuarterSummaryMap();
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue(mockRoom);
       fixture.detectChanges();
 
@@ -324,7 +304,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should calculate totals correctly', () => {
       const map = createMockQuarterSummaryMap();
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue(mockRoom);
       fixture.detectChanges();
 
@@ -354,7 +334,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom2, { monthSummaries: [monthSummary2] });
 
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue('All');
       fixture.detectChanges();
 
@@ -377,7 +357,7 @@ describe('QuarterSummaryComponent', () => {
       map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
       map.set(mockRoom2, { monthSummaries: [monthSummary2] });
 
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue('All');
       fixture.detectChanges();
 
@@ -437,9 +417,7 @@ describe('QuarterSummaryComponent', () => {
     it('should dispatch getQuarterSummary action with correct parameters', () => {
       component['getSummary'](2024, 2);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        getQuarterSummary({ year: 2024, quarter: 2 }),
-      );
+      expect(dashboardStoreSpy.getQuarterSummary).toHaveBeenCalledWith(2024, 2);
     });
 
     it('should set year and quarter properties', () => {
@@ -447,14 +425,6 @@ describe('QuarterSummaryComponent', () => {
 
       expect(component.year()).toBe(2024);
       expect(component.quarter()).toBe(3);
-    });
-
-    it('should set isLoading to true', () => {
-      component['getSummary'](2024, 1);
-      isLoading$.next(true);
-      fixture.detectChanges();
-
-      expect(component.isLoading()).toBeTrue();
     });
 
     it('should reset data before getting new summary', () => {
@@ -505,8 +475,8 @@ describe('QuarterSummaryComponent', () => {
 
       component.goBack();
 
-      expect(routerSpy.navigate).toHaveBeenCalledWith(
-        [component.language, 'dashboard', 'year', 'summary'],
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['dashboard', 'year', 'summary'],
         { state: { year: 2024 } },
       );
     });
@@ -558,14 +528,14 @@ describe('QuarterSummaryComponent', () => {
   describe('Edge Cases', () => {
     it('should handle undefined quarterSummaryMap', () => {
       fixture.detectChanges();
-      quarterSummaryMap$.next(undefined);
+      dashboardStoreSpy.quarterSummaryMap.set(undefined);
 
       expect(() => component.getForm.selectedRoom.setValue(mockRoom)).not.toThrow();
     });
 
     it('should handle empty quarterSummaryMap', () => {
       fixture.detectChanges();
-      quarterSummaryMap$.next(new Map());
+      dashboardStoreSpy.quarterSummaryMap.set(new Map());
 
       expect(() => component.getForm.selectedRoom.setValue(mockRoom)).not.toThrow();
     });
@@ -578,7 +548,7 @@ describe('QuarterSummaryComponent', () => {
       const map = new Map();
       map.set(mockRoom, { monthSummaries: [monthSummary1, monthSummary2, monthSummary3] });
 
-      quarterSummaryMap$.next(map);
+      dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue(mockRoom);
       fixture.detectChanges();
 

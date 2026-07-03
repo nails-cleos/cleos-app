@@ -90,6 +90,7 @@
       "ONCE_A_YEAR": "Once a year"
     },
     "NOTIFICATION": {
+      "TITLE": "Notifications",
       "NO": "No notifications",
       "LOAD_MORE": "Load more"
     },
@@ -219,7 +220,25 @@
     },
     "ERROR": {
       "NO_CONTENT": "No content",
-      "TRY_LATER": "Something went wrong. Please try again later"
+      "TRY_LATER": "Something went wrong. Please try again later",
+      "PAGE": {
+        "DEFAULT": {
+          "TITLE": "We couldn't load this page",
+          "DESCRIPTION": "Something went wrong while loading this content. You can go back or try again."
+        },
+        "NOT_FOUND": {
+          "TITLE": "This page could not be found",
+          "DESCRIPTION": "The item you are looking for does not exist, is no longer available, or the link is no longer valid."
+        },
+        "BAD_REQUEST": {
+          "TITLE": "This request is not available",
+          "DESCRIPTION": "We could not open this page with the information provided. Go back and try again from the previous step."
+        },
+        "SERVER_ERROR": {
+          "TITLE": "The server is not responding",
+          "DESCRIPTION": "We ran into a server problem while loading this page. Please try again in a moment."
+        }
+      }
     },
     "LABEL": {
       "FILTER": "Filter",
@@ -330,7 +349,10 @@
       "PROFILE": "Profile",
       "SIGN_OUT": "Sign out",
       "DARK_MODE": "Dark mode",
-      "LIGHT_MODE": "Light mode"
+      "LIGHT_MODE": "Light mode",
+      "CALENDAR": "Calendar",
+      "SEARCH": "Search",
+      "BLOCK_TIME": "Block Time"
     },
     "CURRENCY": {
       "FIELD": "Currency",

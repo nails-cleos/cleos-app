@@ -1,30 +1,24 @@
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  @let isAddMode = isAddModeSignal();
-  @let note = noteSignal();
-
   <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
     <section class="app-surface-hero app-detail-panel note-hero">
       <div class="app-detail-section-header">
         <div>
-          <span class="app-surface-eyebrow">{{ (isAddMode ? 'NOTE.TITLE' : 'NOTE.DETAIL') | translate }}</span>
+          <span class="app-surface-eyebrow">
+            {{ getConfig.title | translate }}
+          </span>
         </div>
       </div>
-
-      @if (!isAddMode) {
+      @if (note(); as note) {
         <div class="app-detail-meta">
-          @if (note) {
-            <span class="app-detail-chip app-detail-chip--ghost">
-              <mat-icon>sell</mat-icon>
-              <span>{{ note.id }}</span>
-            </span>
-          } @else {
-            <div class="ssc-line"></div>
-          }
+          <span class="app-detail-chip app-detail-chip--ghost">
+            <mat-icon>sell</mat-icon>
+            <span>{{ note.id }}</span>
+          </span>
         </div>
       }
 
-      @if (isAddMode || note) {
-        <div class="app-crud-form-grid">
+      <div class="app-crud-form-grid">
+        <div class="divider">
           @if (allProfessionalsSignal()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
@@ -46,76 +40,65 @@
           } @else {
             <div class="ssc-line"></div>
           }
-
-          <mat-form-field appearance="outline" class="app-crud-form-grid__full">
-            <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>
-            <label>
-              <textarea #message [formControl]="getForm.description" matInput maxlength="256" required></textarea>
-            </label>
-            <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
-            @if (getForm.description.hasError('required')) {
-              <mat-error [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['description']) {
-              <mat-error>{{ errors()['description'] }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" color="primary">
-            <mat-label>{{ 'NOTE.DATE.FIELD' | translate }}</mat-label>
-            <button (click)="picker.open()" mat-icon-button matPrefix type="button">
-              <mat-icon>today</mat-icon>
-            </button>
-            <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepicker]="picker" matInput required>
-            <mat-datepicker #picker touchUi></mat-datepicker>
-            @if (getForm.date.hasError('required')) {
-              <mat-error [innerHTML]="'NOTE.DATE.REQUIRED' | translate"></mat-error>
-            } @else if (errors()['date']) {
-              <mat-error>{{ errors()['date'] }}</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'NOTE.REPEAT.FIELD' | translate }}</mat-label>
-            <mat-select [formControl]="getForm.repeat" required>
-              @for (t of repeats | keyvalue; track t) {
-                <mat-option [value]="t.value">{{ 'COMMON.REPEAT.' + t.value | translate }}</mat-option>
-              }
-            </mat-select>
-            @if (getForm.repeat.hasError('required')) {
-              <mat-error [innerHTML]="'NOTE.REPEAT.REQUIRED' | translate"></mat-error>
-            }
-          </mat-form-field>
         </div>
 
-        <div class="app-detail-actions">
-          <div class="spacer"></div>
-          <button [form]="form" appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            {{ 'COMMON.BUTTON.BACK' | translate }}
-          </button>
-          @if (isAddMode) {
-            <button [disabled]="form.invalid" mat-stroked-button type="submit">
-              <mat-icon>note_add</mat-icon>
-              {{ 'COMMON.BUTTON.CREATE' | translate }}
-            </button>
-          } @else {
-            <button [disabled]="form.invalid || form.pristine" mat-stroked-button type="submit">
-              <mat-icon>published_with_changes</mat-icon>
-              {{ 'COMMON.BUTTON.UPDATE' | translate }}
-            </button>
-            <button (click)="delete()" mat-stroked-button type="button">
-              <mat-icon>delete</mat-icon>
-              {{ 'COMMON.BUTTON.DELETE' | translate }}
-            </button>
+        <mat-form-field appearance="outline" class="app-crud-form-grid__full">
+          <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>
+          <label>
+            <textarea #message [formControl]="getForm.description" matInput maxlength="256" required></textarea>
+          </label>
+          <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+          @if (getForm.description.hasError('required')) {
+            <mat-error [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['description']) {
+            <mat-error>{{ errors()['description'] }}</mat-error>
           }
-        </div>
-      } @else {
-        <div class="app-crud-loading">
-          <div class="ssc-hr"></div>
-          <div class="ssc-square mb"></div>
-          <div class="ssc-hr"></div>
-        </div>
-      }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" color="primary">
+          <mat-label>{{ 'NOTE.DATE.FIELD' | translate }}</mat-label>
+          <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+            <mat-icon>today</mat-icon>
+          </button>
+          <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepicker]="picker" matInput required>
+          <mat-datepicker #picker touchUi></mat-datepicker>
+          @if (getForm.date.hasError('required')) {
+            <mat-error [innerHTML]="'NOTE.DATE.REQUIRED' | translate"></mat-error>
+          } @else if (errors()['date']) {
+            <mat-error>{{ errors()['date'] }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>{{ 'NOTE.REPEAT.FIELD' | translate }}</mat-label>
+          <mat-select [formControl]="getForm.repeat" required>
+            @for (t of repeats | keyvalue; track t) {
+              <mat-option [value]="t.value">{{ 'COMMON.REPEAT.' + t.value | translate }}</mat-option>
+            }
+          </mat-select>
+          @if (getForm.repeat.hasError('required')) {
+            <mat-error [innerHTML]="'NOTE.REPEAT.REQUIRED' | translate"></mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="app-detail-actions">
+        <div class="app-surface-spacer"></div>
+        <button [form]="form" appBackButton mat-stroked-button type="button">
+          <mat-icon>keyboard_return</mat-icon>
+          {{ 'COMMON.BUTTON.BACK' | translate }}
+        </button>
+        <button [disabled]="form.invalid" mat-stroked-button type="submit">
+          <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+          {{ getConfig.button.label | translate }}
+        </button>
+        @if (getConfig.button.showDelete) {
+          <button (click)="delete()" mat-stroked-button type="button">
+            <mat-icon>delete</mat-icon>
+            {{ 'COMMON.BUTTON.DELETE' | translate }}
+          </button>
+        }
+      </div>
     </section>
   </form>
 </div>

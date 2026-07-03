@@ -1,18 +1,11 @@
 import { inject, Injectable } from '@angular/core';
-import { GoogleAuthProvider } from 'firebase/auth';
-import { Store } from '@ngrx/store';
-import { setDriveToken } from '../store/auth.actions';
-import { getDriveTokenPipe } from '../store/selectors/auth.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FirebaseService } from './firebase.service';
+import { AuthStore } from '../store/auth.store';
 
 @Injectable({ providedIn: 'root' })
 export class DriveAccessService {
-  private readonly store: Store = inject(Store);
-  private readonly firebaseService = inject(FirebaseService);
+  private readonly authStore = inject(AuthStore);
 
-  private driveToken$ = this.store.pipe(getDriveTokenPipe);
-  private driveTokenSignal = toSignal(this.driveToken$);
+  private driveTokenSignal = this.authStore.driveToken;
 
   private tokenRequested: boolean = false;
 
@@ -25,12 +18,6 @@ export class DriveAccessService {
   }
 
   private requestDriveAccess(): void {
-    this.firebaseService.signInWithGoogle('https://www.googleapis.com/auth/drive')
-      .then(result => {
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        if (credential?.accessToken) {
-          this.store.dispatch(setDriveToken({ token: credential.accessToken }));
-        }
-      });
+    this.authStore.getDriveToken();
   }
 }

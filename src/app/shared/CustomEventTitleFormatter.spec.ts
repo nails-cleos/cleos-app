@@ -1,5 +1,6 @@
 import { TranslateService } from '@ngx-translate/core';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('CustomEventTitleFormatter', () => {
   let formatter: CustomEventTitleFormatter;
@@ -11,7 +12,7 @@ describe('CustomEventTitleFormatter', () => {
       'getCurrentLang',
     ]);
 
-    translateService.getCurrentLang.and.returnValue('en-GB');
+    translateService.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
     translateService.instant.and.callFake((key: string) => key);
 
     formatter = new CustomEventTitleFormatter(translateService);

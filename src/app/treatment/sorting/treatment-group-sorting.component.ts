@@ -1,43 +1,41 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import { TranslatePipe } from '@ngx-translate/core';
+import { ITreatmentGroupAll } from '../treatment';
+import { TreatmentStore } from '../../store/treatment.store';
 import {
   DragDropSortingComponent,
   ISorted,
   ItemSorting,
 } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { Store } from '@ngrx/store';
-import { getAllTreatmentsGroup, sortGroupTreatment } from '../../store/treatment.actions';
-import { ITreatmentGroupAll } from '../../interfaces/treatment';
-import { SharedModule } from '../../shared/shared.module';
-import { getTreatmentResponsePipe, getTreatmentGroupListPipe } from '../../store/selectors/treatment.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { TreatmentState } from '../../store/reducers/treatment.reducers';
+import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-treatment-group-sorting',
   templateUrl: './treatment-sorting.component.html',
   styleUrls: ['./treatment-group-sorting.component.scss'],
-  imports: [SharedModule, DragDropSortingComponent],
+  imports: [TranslatePipe, DragDropSortingComponent, CardListSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentGroupSortingComponent {
-  private readonly store: Store<TreatmentState> = inject(Store<TreatmentState>);
+  private readonly treatmentStore = inject(TreatmentStore);
 
-  private treatmentGroupList$ = this.store.pipe(getTreatmentGroupListPipe);
-  private response$ = this.store.pipe(getTreatmentResponsePipe);
-
-  private treatmentGroupListSignal = toSignal(this.treatmentGroupList$);
-  private responseSignal = toSignal(this.response$);
-
-  itemsSignal = computed(() => this.treatmentGroupListSignal()?.map(
-    (group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order)));
+  itemsSignal = computed(() => {
+    const data = this.treatmentStore.data();
+    return data?.kind === 'list'
+      ? data.value.map((group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order))
+      : undefined;
+  });
 
   constructor() {
+    this.treatmentStore.clean();
+    this.treatmentStore.loadAllGroups();
+
     effect(() => {
-      if (this.responseSignal()) {
-        this.store.dispatch(getAllTreatmentsGroup());
+      if (this.treatmentStore.response()) {
+        this.treatmentStore.loadAllGroups();
       }
     });
   }
 
-  sorted = (groups: ISorted[]): void => this.store.dispatch(sortGroupTreatment({ groups }));
+  sorted = (groups: ISorted[]): void => this.treatmentStore.sortGroups(groups);
 }

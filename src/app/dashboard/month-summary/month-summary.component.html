@@ -10,9 +10,9 @@
     <div class="monthly-summary-toolbar">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date">
-        <mat-datepicker-toggle matIconSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)">
+        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
         </mat-datepicker>
       </mat-form-field>
 
@@ -232,7 +232,7 @@
                             {{ summary.position + 1 }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">
-                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:language }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
@@ -285,7 +285,7 @@
               </tfoot>
             </table>
             <mat-action-row class="monthly-summary-actions-row">
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <div class="app-detail-actions">
                 <button mat-stroked-button [disabled]="!summaryReservations?.length"
                         (click)="updateMonthlySummary(reservationMonth, monthlySummaryPayment)" type="button">
@@ -366,7 +366,7 @@
                           {{ summary.position + 1 }}
                         </td>
                         <td [rowSpan]="summary.total.payments.length || 1">
-                          {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat)?.replace(',', '') }}
+                          {{ (summary.timestamp | timeDetail | date:'short':summary.timeZone:language)?.replace(',', '') }}
                         </td>
                         <td [rowSpan]="summary.total.payments.length || 1" [colSpan]="2">{{ summary.invoice }}</td>
                         <td [rowSpan]="summary.total.payments.length || 1">{{ summary.supplyStore }}</td>
@@ -405,7 +405,7 @@
               </tfoot>
             </table>
             <mat-action-row class="monthly-summary-actions-row">
-              <div class="spacer"></div>
+              <div class="app-surface-spacer"></div>
               <div class="app-detail-actions">
                 <button mat-stroked-button [disabled]="!summaryExpenses?.length"
                         (click)="updateMonthlySummary(expenseMonth, monthlySummaryExpense)" type="button">
@@ -488,7 +488,7 @@
                             {{ summary.position + 1 }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">
-                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:dateFormat }}
+                            {{ summary.timestamp | timeDetail | date:'short':summary.timeZone:language }}
                           </td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.customerName }}</td>
                           <td [rowSpan]="summary.total.payments.length || 1">{{ summary.description }}</td>
@@ -525,7 +525,7 @@
                 </tfoot>
               </table>
               <mat-action-row class="monthly-summary-actions-row">
-                <div class="spacer"></div>
+                <div class="app-surface-spacer"></div>
                 <div class="app-detail-actions">
                   <button mat-stroked-button [disabled]="!summaryCash?.length"
                           (click)="updateMonthlySummary(cashMonth, monthlySummaryCash)" type="button">
@@ -553,7 +553,7 @@
 
   <section class="app-surface-section">
     <div class="app-detail-actions">
-      <div class="spacer"></div>
+      <div class="app-surface-spacer"></div>
       <button (click)="goBack()" mat-stroked-button type="button">
         <mat-icon>keyboard_return</mat-icon>
         <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>

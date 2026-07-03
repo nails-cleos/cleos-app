@@ -2,6 +2,22 @@
   position: relative;
 }
 
+:host {
+  display: block;
+}
+
+:host ::ng-deep .mat-mdc-nav-list,
+:host ::ng-deep .mat-mdc-list-base,
+:host ::ng-deep .mdc-list {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+:host ::ng-deep .mat-mdc-list-item {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
 .menu-level--sub {
   margin-left: 26px;
   padding-left: 14px;
@@ -27,6 +43,14 @@
 
 .sub-sub-menu {
   padding-left: 8px;
+}
+
+:host-context(.dark-theme) ::ng-deep .mat-mdc-nav-list,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-base,
+:host-context(.dark-theme) ::ng-deep .mdc-list,
+:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item {
+  background: var(--app-drawer-panel-bg) !important;
+  background-color: var(--app-drawer-panel-bg) !important;
 }
 
 :host-context(.dark-theme) :is(.mat-mdc-list-item, .mat-mdc-list-item .mdc-list-item__primary-text, .mat-mdc-list-item .mdc-list-item__supporting-text, .mat-mdc-list-item .mat-icon, [matListItemTitle], [matListItemLine], [matListItemMeta]) {

@@ -5,15 +5,15 @@
 .fab-trigger,
 .menu-item {
   --mdc-outlined-button-container-height: 40px;
-  --mdc-outlined-button-label-text-color: #111111;
-  --mat-outlined-button-state-layer-color: rgba(125, 104, 82, 0.1);
+  --mdc-outlined-button-label-text-color: var(--app-detail-action-text);
+  --mat-outlined-button-state-layer-color: var(--app-detail-action-state);
   justify-content: flex-start;
   align-items: center;
   min-width: 0;
   height: 40px;
-  border-color: rgba(125, 104, 82, 0.16);
-  background: linear-gradient(180deg, rgba(255, 251, 245, 0.96), rgba(242, 232, 219, 0.96));
-  color: #111111;
+  border-color: var(--app-detail-action-border);
+  background: linear-gradient(180deg, var(--app-detail-action-bg-top), var(--app-detail-action-bg-bottom));
+  color: var(--app-detail-action-text);
   box-shadow: none;
 }
 
@@ -48,8 +48,8 @@
 
 .fab-trigger:hover,
 .menu-item:hover {
-  border-color: rgba(125, 104, 82, 0.24);
-  background: linear-gradient(180deg, rgba(250, 242, 232, 0.98), rgba(236, 222, 206, 0.98));
+  border-color: var(--app-detail-action-border-hover);
+  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
 }
 
 .menu-item-enter {
@@ -74,26 +74,30 @@
   align-items: center;
 }
 
-:host-context(.dark-theme) .fab-trigger,
-:host-context(.dark-theme) .menu-item {
-  --mdc-outlined-button-label-text-color: #ffffff;
-  --mat-outlined-button-state-layer-color: rgba(214, 184, 159, 0.12);
-  border-color: rgba(214, 184, 159, 0.2);
-  background: linear-gradient(180deg, rgba(54, 48, 43, 0.96), rgba(41, 35, 31, 0.96));
-  color: #ffffff;
+.fab-trigger .mat-icon,
+.menu-item .mat-icon,
+.fab-trigger .mdc-button__label,
+.menu-item .mdc-button__label {
+  color: var(--app-detail-action-text) !important;
 }
 
-:host-context(.dark-theme) .fab-trigger:hover,
-:host-context(.dark-theme) .menu-item:hover {
-  border-color: rgba(214, 184, 159, 0.3);
-  background: linear-gradient(180deg, rgba(68, 59, 52, 0.98), rgba(49, 42, 37, 0.98));
-}
+@media (max-width: 720px) {
+  .fab-trigger {
+    width: 40px;
+    min-width: 40px;
+    padding-inline: 0;
+    justify-content: center;
+    border-radius: 999px;
+  }
 
-:host-context(.dark-theme) .fab-trigger .mat-icon,
-:host-context(.dark-theme) .menu-item .mat-icon,
-:host-context(.dark-theme) .fab-trigger .mdc-button__label,
-:host-context(.dark-theme) .menu-item .mdc-button__label {
-  color: #ffffff !important;
+  .fab-trigger .mat-icon {
+    margin: 0 !important;
+  }
+
+  :host ::ng-deep .fab-trigger .mdc-button__label,
+  :host ::ng-deep .fab-trigger .mdc-button__label span {
+    display: none;
+  }
 }
 
 @keyframes fab-menu-item-in {

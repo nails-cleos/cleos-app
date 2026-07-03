@@ -1,32 +1,40 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../../interfaces/payment';
-import { getPaymentByResourceId } from '../../../store/payment.actions';
-import { IReservationAll } from '../../../interfaces/reservation';
+import { IReservationAll } from '../../../reservation/reservation';
 import { provideHttpClient } from '@angular/common/http';
+import { NavigationService } from '../../../services/navigation.service';
+import { provideAppIcons } from '../../../util/app-icons.provider';
+import { DEFAULT_LOCALE } from '../../../util/dates';
+import { signal } from '@angular/core';
+import { PaymentStore } from '../../../store/payment.store';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
   let fixture: ComponentFixture<OptionComponent>;
+  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<any>>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let paymentStoreSpy: {
+    options: ReturnType<typeof signal>;
+    data: ReturnType<typeof signal>;
+    getOptions: jasmine.Spy;
+    getPaymentByResourceId: jasmine.Spy;
+    createPaymentLinkByReservationId: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
-  let reservationId$: BehaviorSubject<any>;
-  let payments$: BehaviorSubject<any>;
-  let paymentOptions$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    reservationId$ = new BehaviorSubject(undefined);
-    payments$ = new BehaviorSubject(undefined);
-    paymentOptions$ = new BehaviorSubject([
+    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
+      { language: DEFAULT_LOCALE },
+    );
+    const paymentOptions = [
       {
         type: 'PAYPAL',
         label: 'PayPal',
@@ -69,37 +77,29 @@ describe('OptionComponent', () => {
         show: true,
         icon: 'transfer',
       },
-    ]);
+    ];
+    paymentStoreSpy = {
+      options: signal(paymentOptions),
+      data: signal(undefined),
+      getOptions: jasmine.createSpy('getOptions'),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      createPaymentLinkByReservationId: jasmine.createSpy('createPaymentLinkByReservationId'),
+      clean: jasmine.createSpy('clean'),
+    };
     breakpoint$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-    routerSpy = jasmine.createSpyObj('Router', ['navigate']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
-
-    // Simulate the signal order
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return reservationId$.asObservable();
-        case 2:
-          return payments$.asObservable();
-        case 3:
-          return paymentOptions$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     await TestBed.configureTestingModule({
       imports: [OptionComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
-        { provide: Router, useValue: routerSpy },
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         provideHttpClient(),
+        provideAppIcons(),
       ],
     }).compileComponents();
 
@@ -108,21 +108,14 @@ describe('OptionComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    reservationId$.complete();
-    payments$.complete();
-  });
-
   it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
   it('should dispatch getPaymentByResourceId when reservationId is emitted', () => {
-    reservationId$.next('res-123');
+    fixture.componentRef.setInput('id', 'res-123');
     fixture.detectChanges();
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPaymentByResourceId({ id: 'res-123', path: 'reservation' }),
-    );
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('res-123', 'reservation');
   });
 
   it('should derive options from the reservation room payment types', () => {
@@ -136,7 +129,7 @@ describe('OptionComponent', () => {
       amount: 100,
     }];
 
-    payments$.next(paymentsMock);
+    paymentStoreSpy.data.set(paymentsMock);
     fixture.detectChanges();
 
     expect(component.options()).toEqual(jasmine.arrayContaining([
@@ -157,14 +150,14 @@ describe('OptionComponent', () => {
       amount: 50,
     }];
 
-    payments$.next(paymentsMock);
+    paymentStoreSpy.data.set(paymentsMock);
     fixture.detectChanges();
     expect(component.options()).toEqual([]);
   });
 
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
-    reservationId$.next('res-123');
-    payments$.next([{
+    fixture.componentRef.setInput('id', 'res-123');
+    paymentStoreSpy.data.set([{
       reservation: {
         id: 'res-123',
         room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },
@@ -190,21 +183,16 @@ describe('OptionComponent', () => {
 
     component.pay();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      reservationId: 'res-123',
-      payment: jasmine.any(Object),
-    }));
+    expect(paymentStoreSpy.createPaymentLinkByReservationId).toHaveBeenCalledWith('res-123', jasmine.any(Object));
   });
 
   it('should not dispatch createPaymentLinkByReservationId if form type is undefined', () => {
-    reservationId$.next('res-123');
+    fixture.componentRef.setInput('id', 'res-123');
 
     component.form.controls.option.setValue(undefined);
     component.pay();
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(jasmine.objectContaining({
-      reservationId: 'res-123',
-    }));
+    expect(paymentStoreSpy.createPaymentLinkByReservationId).not.toHaveBeenCalledWith('res-123', jasmine.any(Object));
   });
 
   it('should move one step back without going below zero', () => {

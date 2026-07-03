@@ -1,75 +1,88 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { IPayment, IPaymentAll } from '../../interfaces/payment';
-import { cleanPayment, getPaymentByResourceId, notifyPayment, paymentSend } from '../../store/payment.actions';
-import { TranslateService } from '@ngx-translate/core';
-import { SharedModule } from '../../shared/shared.module';
+import { TranslatePipe } from '@ngx-translate/core';
+import { MatPrefix } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
+import { MatFabButton, MatIconButton } from '@angular/material/button';
+import { DecimalPipe } from '@angular/common';
 import {
-  getCurrentPathIdPipe,
-  getPaymentResponsePipe,
-  getPaymentsPipe,
-  getSubErrorsPipe,
-} from '../../store/selectors/payment.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { PaymentState } from '../../store/reducers/payment.reducers';
+  MatCell,
+  MatCellDef,
+  MatColumnDef,
+  MatFooterCell,
+  MatFooterCellDef,
+  MatFooterRow,
+  MatFooterRowDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow,
+  MatHeaderRowDef,
+  MatRow,
+  MatRowDef,
+  MatTable,
+} from '@angular/material/table';
+import { MatTooltip } from '@angular/material/tooltip';
+import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { NavigationService } from '../../services/navigation.service';
+import { PaymentStore } from '../../store/payment.store';
 
 @Component({
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [SharedModule],
+  imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, MatTable, MatColumnDef,
+    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatFabButton, TableSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
-  private readonly store: Store<PaymentState> = inject(Store<PaymentState>);
-  private readonly router: Router = inject(Router);
-  private readonly translate: TranslateService = inject(TranslateService);
+  path = input<'reservation' | 'transaction'>();
+  id = input<string>();
+  accountId = input<string>();
 
-  private currentPath$ = this.store.pipe(getCurrentPathIdPipe);
-  private paymentList$ = this.store.pipe(getPaymentsPipe);
-  private response$ = this.store.pipe(getPaymentResponsePipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
+  private readonly paymentStore = inject(PaymentStore);
+  private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private currentPath = toSignal(this.currentPath$);
-  private paymentListSignal = toSignal(this.paymentList$);
-  private subErrorsSignal = toSignal(this.subErrors$);
-  private responseSignal = toSignal(this.response$);
+  private loadingSignal = this.paymentStore.isLoading;
+  private paymentListSignal = this.paymentStore.data;
+  private subErrorsSignal = this.paymentStore.subErrors;
+  private responseSignal = this.paymentStore.response;
 
   dataSourceSignal = computed(() => this.paymentListSignal());
+  isLoading = computed(() => this.loadingSignal());
   hiddenSignal = computed(() => {
     const list = this.paymentListSignal();
     return !!list?.length;
   });
 
-  displayedColumns: string[] = ['position', 'description', 'type', 'amount', 'status', 'actions'];
+  tableColumns: TableSkeletonColumn[] = [
+    { key: 'position' },
+    { key: 'description' },
+    { key: 'type' },
+    { key: 'amount' },
+    { key: 'status', hideOnMobile: true },
+    { key: 'actions' },
+  ];
+  displayedColumns: string[] = this.tableColumns.map((column) => column.key);
 
   errorMessage?: string;
   showError = false;
-  language: string = this.translate.getCurrentLang();
-
-  private id?: string;
-  private path?: 'reservation' | 'transaction';
-  private accountId?: string;
 
   constructor() {
+    this.paymentStore.clean();
     effect(() => {
-      const currentPath = this.currentPath();
-      if (currentPath) {
-        const path = currentPath.path;
-        const id = currentPath.id;
-        this.path = path;
-        this.id = id;
-        this.accountId = currentPath.accountId;
-        this.store.dispatch(getPaymentByResourceId({ id, path }));
+      const path = this.path();
+      const id = this.id();
+      if (path && id) {
+        this.paymentStore.getPaymentByResourceId(id, path);
       }
     });
 
     effect(() => {
       const response = this.responseSignal();
       if (response?.path) {
-        this.store.dispatch(cleanPayment());
-        this.router.navigate([`${ this.language }/${ response.path }`]);
+        this.paymentStore.clearResponse();
+        this.navigationService.navigate([response.path]);
       }
     });
 
@@ -90,21 +103,16 @@ export class PaymentComponent {
   }
 
   pay = (payment: IPaymentAll): void => {
-    const link = payment.link || payment.paymentURL;
-    if (link) {
-      this.store.dispatch(paymentSend({ link }));
-    }
+    window.open(payment.link || payment.paymentURL, '_self');
   };
 
   notify = (payment: IPayment): void => {
-    this.store.dispatch(
-      notifyPayment({
-        id: payment.id!,
-        path: this.path!,
-        resourceId: this.id!,
-        preferenceId: payment.preferenceId!,
-        paymentType: payment.type!,
-      }),
+    this.paymentStore.notify(
+      payment.id!,
+      this.path()!,
+      this.id()!,
+      payment.preferenceId!,
+      payment.type!,
     );
   };
 
@@ -119,14 +127,17 @@ export class PaymentComponent {
   };
 
   goBack() {
-    if (this.path && this.id) {
-      let navigate: string[] = [this.language];
-      if (this.accountId) {
-        navigate = [...navigate, 'accounts', this.accountId, 'transactions', this.id];
+    const path = this.path();
+    const id = this.id();
+    const accountId = this.accountId();
+    if (path && id) {
+      let navigate: string[];
+      if (accountId) {
+        navigate = ['accounts', accountId, 'transactions', id];
       } else {
-        navigate = [...navigate, this.path, this.id];
+        navigate = [path, id];
       }
-      this.router.navigate(navigate);
+      this.navigationService.navigate(navigate);
     }
   }
 }
