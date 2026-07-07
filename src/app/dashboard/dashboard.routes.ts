@@ -7,8 +7,6 @@ import { YearSummaryComponent } from './year-summary/year-summary.component';
 import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
 import { DashboardEventComponent } from './events/dashboard-event.component';
 import { DashboardService } from '../services/dashboard.service';
-import { provideEffects } from '@ngrx/effects';
-import { ReservationEffects } from '../store/effects/reservation.effects';
 import { ReservationService } from '../services/reservation.service';
 import { PaymentService } from '../services/payment.service';
 import { TreatmentService } from '../services/treatment.service';
@@ -30,7 +28,6 @@ const providers = [
   AdditionalService,
   TrackingService,
   ColorService,
-  provideEffects(ReservationEffects),
 ];
 
 const children: Routes = [

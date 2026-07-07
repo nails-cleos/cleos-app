@@ -14,6 +14,7 @@ import {
   patchCrudError,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 type UpdateUnavailableArgs = {
   id: string;
@@ -36,6 +37,21 @@ export const UnavailableStore = signalStore(
     unavailableService = inject(UnavailableService),
     translateService = inject(TranslateService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let createBlockAgendaSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      createBlockAgendaSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     const createResponse = (key: string, timestamp: number | undefined, path?: string): IResponseSuccess => ({
@@ -46,6 +62,7 @@ export const UnavailableStore = signalStore(
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -58,27 +75,31 @@ export const UnavailableStore = signalStore(
       },
 
       loadPage(request: PageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription =
+          unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
+            next: (data) => patchState(store, { data, isLoading: false }),
+            error: patchError,
+          });
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        unavailableService.getUnavailable(id).subscribe({
+        loadByIdSubscription = unavailableService.getUnavailable(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       create(unavailable: IUnavailable, isRoomAdmin: boolean): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        unavailableService.createUnavailable(unavailable).subscribe({
+        createSubscription = unavailableService.createUnavailable(unavailable).subscribe({
           next: (response) => patchState(store, {
             response: createResponse(
               'UNAVAILABLE.CREATED',
@@ -92,9 +113,10 @@ export const UnavailableStore = signalStore(
       },
 
       createBlockAgenda(unavailable: IUnavailable, isRoomAdmin: boolean): void {
+        createBlockAgendaSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        unavailableService.createBlockAgenda(unavailable).subscribe({
+        createBlockAgendaSubscription = unavailableService.createBlockAgenda(unavailable).subscribe({
           next: (response) => patchState(store, {
             response: createResponse(
               'UNAVAILABLE.CREATED',
@@ -108,9 +130,10 @@ export const UnavailableStore = signalStore(
       },
 
       update({ id, unavailable, path }: UpdateUnavailableArgs): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        unavailableService.updateUnavailable(id, unavailable).subscribe({
+        updateSubscription = unavailableService.updateUnavailable(id, unavailable).subscribe({
           next: (response) => patchState(store, {
             response: createResponse('UNAVAILABLE.UPDATED.MESSAGE', response.timestamp, `${ path }/${ response.id }`),
             isLoading: false,
@@ -120,9 +143,10 @@ export const UnavailableStore = signalStore(
       },
 
       delete({ id, timestamp, timeZone }: DeleteUnavailableArgs): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        unavailableService.deleteUnavailable(id).subscribe({
+        deleteSubscription = unavailableService.deleteUnavailable(id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('UNAVAILABLE.DELETED.MESSAGE', {

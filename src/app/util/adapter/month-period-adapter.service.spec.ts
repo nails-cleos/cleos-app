@@ -22,11 +22,7 @@ describe('MonthPeriodAdapter', () => {
     ]);
     dateAdapterMock.createDate.and.callFake((year: number, month: number, day: number) => new Date(year, month, day));
 
-    adapter = new MonthPeriodAdapter<Date>(translateServiceMock, dateAdapterMock);
-  });
-
-  it('should set locale from current translate language', () => {
-    expect(dateAdapterMock.setLocale).toHaveBeenCalledWith('en-US');
+    adapter = new MonthPeriodAdapter<Date>(dateAdapterMock);
   });
 
   it('should create full month range from a selected date', () => {

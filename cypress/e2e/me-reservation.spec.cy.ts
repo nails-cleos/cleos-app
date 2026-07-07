@@ -47,7 +47,7 @@ devices.forEach(({ name, width, height }) => {
 
     it('should create a reservation from the customer flow', () => {
       cy.wait('@getPaymentOptions');
-      cy.wait('@getUpcomingReservation');
+      cy.wait('@loadUpcoming');
       cy.wait('@getRooms');
 
       cy.contains('mat-form-field', 'Office').find('input').should('have.value', 'Nails Cleos');
@@ -100,7 +100,7 @@ devices.forEach(({ name, width, height }) => {
         expect(request.body.payment).to.eq(undefined);
       });
 
-      cy.wait('@getCustomerReservations');
+      cy.wait('@loadAllByCustomer');
       cy.url().should('include', '/me/reservations');
       cy.get('.upcoming-section').should('exist');
       cy.contains('.app-surface-eyebrow', reservationId).should('exist');
@@ -144,7 +144,7 @@ devices.forEach(({ name, width, height }) => {
     });
 
     it('should render customer upcoming reservation and reservation list', () => {
-      cy.wait('@getCustomerReservations').its('response.statusCode').should('eq', 200);
+      cy.wait('@loadAllByCustomer').its('response.statusCode').should('eq', 200);
 
       cy.get('.upcoming-section').should('exist').within(() => {
         cy.contains('.app-surface-eyebrow', '7de89ece-c39c-4f9f-99fe-fb6133315cab').should('exist');
@@ -166,7 +166,7 @@ devices.forEach(({ name, width, height }) => {
     });
 
     it('should open reservation detail from customer reservation view', () => {
-      cy.wait('@getCustomerReservations');
+      cy.wait('@loadAllByCustomer');
 
       cy.get('.upcoming-section').contains('button', 'View').click({ force: true });
 

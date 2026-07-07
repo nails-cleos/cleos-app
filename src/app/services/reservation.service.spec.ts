@@ -157,11 +157,11 @@ describe('ReservationService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getPage', () => {
+  describe('loadPage', () => {
     it('should get all reservations when all is true', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getPage(0, 'start', 'asc', 10, true).subscribe(result => {
+      service.loadPage(0, 'start', 'asc', 10, true).subscribe(result => {
         expect(result).toEqual(mockPagination);
       });
 
@@ -173,7 +173,7 @@ describe('ReservationService', () => {
     it('should get reservations by room when roomId provided', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getPage(0, 'start', 'desc', 20, false, 'room-123').subscribe(result => {
+      service.loadPage(0, 'start', 'desc', 20, false, 'room-123').subscribe(result => {
         expect(result).toEqual(mockPagination);
       });
 
@@ -185,7 +185,7 @@ describe('ReservationService', () => {
     it('should get reservations by professional when professionalId provided', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getPage(1, 'customer', 'asc', 15, false, undefined, 'prof-123').subscribe(result => {
+      service.loadPage(1, 'customer', 'asc', 15, false, undefined, 'prof-123').subscribe(result => {
         expect(result).toEqual(mockPagination);
       });
 
@@ -196,11 +196,11 @@ describe('ReservationService', () => {
     });
   });
 
-  describe('getCustomerReservations', () => {
+  describe('loadAllByCustomer', () => {
     it('should get customer reservations with all parameters', () => {
       httpSpy.get.and.returnValue(of(mockCustomerReservation));
 
-      service.getCustomerReservations('start', 'desc', 0, 10).subscribe(result => {
+      service.loadAllByCustomer(0, 'start', 'desc', 10).subscribe(result => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
@@ -212,7 +212,7 @@ describe('ReservationService', () => {
     it('should get customer reservations without sort and direction', () => {
       httpSpy.get.and.returnValue(of(mockCustomerReservation));
 
-      service.getCustomerReservations('', '', 1, 20).subscribe(result => {
+      service.loadAllByCustomer(1, '', '', 20).subscribe(result => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
@@ -222,14 +222,14 @@ describe('ReservationService', () => {
     });
   });
 
-  describe('getAllFilterReservations', () => {
+  describe('loadAllFiltered', () => {
     it('should get filtered reservations with all parameters', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getAllFilterReservations(
+      service.loadAllFiltered(
+        0,
         'start',
         'asc',
-        0,
         10,
         'user-123',
         ['confirmed', 'pending'],
@@ -245,7 +245,7 @@ describe('ReservationService', () => {
     it('should get filtered reservations without optional parameters', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getAllFilterReservations('start', 'desc', 1, 20).subscribe(result => {
+      service.loadAllFiltered(1, 'start', 'desc', 20).subscribe(result => {
         expect(result).toEqual(mockPagination);
       });
 
@@ -255,12 +255,12 @@ describe('ReservationService', () => {
     });
   });
 
-  describe('getAllGroupingByRoom', () => {
+  describe('loadAllByRoom', () => {
     it('should get room reservations grouping with professional', () => {
       const date = new Date('2024-01-15');
       httpSpy.get.and.returnValue(of([mockRoomReservation]));
 
-      service.getAllGroupingByRoom(7, date, 'room-123', 'prof-123').subscribe(result => {
+      service.loadAllByRoom(7, date, 'room-123', 'prof-123').subscribe(result => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
@@ -273,7 +273,7 @@ describe('ReservationService', () => {
       const date = new Date('2024-01-15');
       httpSpy.get.and.returnValue(of([mockRoomReservation]));
 
-      service.getAllGroupingByRoom(3, date, 'room-123').subscribe(result => {
+      service.loadAllByRoom(3, date, 'room-123').subscribe(result => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
@@ -283,12 +283,12 @@ describe('ReservationService', () => {
     });
   });
 
-  describe('searchAvailability', () => {
+  describe('loadCalendar', () => {
     it('should search availability with professional', () => {
       const dates = [new Date('2024-01-15'), new Date('2024-01-16')];
       httpSpy.get.and.returnValue(of([mockRoomReservation]));
 
-      service.searchAvailability('room-123', 2, dates, 'prof-123').subscribe(result => {
+      service.loadCalendar('room-123', 2, dates, 'prof-123').subscribe(result => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
@@ -301,7 +301,7 @@ describe('ReservationService', () => {
       const dates = [new Date('2024-01-15')];
       httpSpy.get.and.returnValue(of([mockRoomReservation]));
 
-      service.searchAvailability('room-123', 1, dates).subscribe(result => {
+      service.loadCalendar('room-123', 1, dates).subscribe(result => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
@@ -361,11 +361,11 @@ describe('ReservationService', () => {
     it('should get reservation with edit path', () => {
       httpSpy.get.and.returnValue(of(mockReservation));
 
-      service.getReservation('res-123', 'edit').subscribe(result => {
+      service.getReservation('res-123').subscribe(result => {
         expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/edit', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', { ...skipLoadingOverlay() });
     });
   });
 
@@ -374,7 +374,7 @@ describe('ReservationService', () => {
       const history = [mockReservationAll];
       httpSpy.get.and.returnValue(of(history));
 
-      service.getReservationHistory('res-123').subscribe(result => {
+      service.loadHistory('res-123').subscribe(result => {
         expect(result).toEqual(history);
       });
 
@@ -401,11 +401,9 @@ describe('ReservationService', () => {
 
   describe('deleteReservation', () => {
     it('should delete reservation', () => {
-      httpSpy.delete.and.returnValue(of(mockReservation));
+      httpSpy.delete.and.returnValue(of(void 0));
 
-      service.deleteReservation('res-123').subscribe(result => {
-        expect(result).toEqual(mockReservation);
-      });
+      service.deleteReservation('res-123');
 
       expect(httpSpy.delete).toHaveBeenCalledWith('v1/reservations/res-123');
     });
@@ -431,10 +429,10 @@ describe('ReservationService', () => {
   describe('changeState', () => {
     it('should change reservation state with extras', () => {
       const extras = { reason: 'Customer request' };
-      httpSpy.post.and.returnValue(of(mockReservation));
+      httpSpy.post.and.returnValue(of(mockApiResponse));
 
       service.changeState('res-123', 'cancel', extras).subscribe(result => {
-        expect(result).toEqual(mockReservation);
+        expect(result).toEqual(mockApiResponse);
       });
 
       expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations/res-123/cancel', extras);
@@ -479,11 +477,11 @@ describe('ReservationService', () => {
     });
   });
 
-  describe('getUpcomingReservation', () => {
+  describe('loadUpcoming', () => {
     it('should get upcoming reservation', () => {
       httpSpy.get.and.returnValue(of(mockCustomerReservation));
 
-      service.getUpcomingReservation().subscribe(result => {
+      service.loadUpcoming().subscribe(result => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
@@ -627,7 +625,7 @@ describe('ReservationService', () => {
     it('should handle empty states array in filter', () => {
       httpSpy.get.and.returnValue(of(mockPagination));
 
-      service.getAllFilterReservations('start', 'asc', 0, 10, 'user-123', []).subscribe();
+      service.loadAllFiltered(0, 'start', 'asc', 10, 'user-123', []).subscribe();
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/filter', jasmine.objectContaining({
         params: jasmine.any(Object),

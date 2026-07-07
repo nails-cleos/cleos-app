@@ -17,8 +17,6 @@ import { combineLatestWith } from 'rxjs';
 import { createMatTableState } from 'src/app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
-import { cancelReservation, cleanReservation, getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
 import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
@@ -29,13 +27,7 @@ import { openCancel, openDialog } from '../../util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
-import {
-  getFilteredReservationsPipe,
-  getReservationResponsePipe,
-  selectReservationIsLoading,
-} from '../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { requireMatch } from '../../util/validators';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
@@ -65,6 +57,7 @@ import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/m
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
 import { UserStore } from '../../store/user.store';
+import { ReservationStore } from '../../store/reservation.store';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;
@@ -85,7 +78,7 @@ type SearchForm = {
 })
 export class SearchComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly userStore = inject(UserStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
@@ -93,15 +86,16 @@ export class SearchComponent {
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private reservationList$ = this.store.pipe(getFilteredReservationsPipe);
-  private response$ = this.store.pipe(getReservationResponsePipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
-  private reservationListSignal = toSignal(this.reservationList$);
-  private responseSignal = toSignal(this.response$);
+  private reservationListSignal = computed(() => {
+    const data = this.reservationStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private responseSignal = this.reservationStore.response;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -115,7 +109,7 @@ export class SearchComponent {
   );
 
   paginatorPageIndex = this.tableState.pageIndex;
-  isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
+  isLoading = this.reservationStore.isLoading;
   dataSourceSignal = computed(() => {
     const now = getNowTimeZone();
     return this.reservationListSignal()?.content?.map((reservation: IReservationAll) => {
@@ -188,19 +182,19 @@ export class SearchComponent {
   );
 
   constructor() {
+    this.reservationStore.clean();
     this.userStore.loadCustomers();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getAllFilterReservations({
-          ...request,
-          size: this.pageSizeSignal(),
-          userId: this.userId(),
-          states: this.selectedStatesSignal(),
-        }),
+      this.reservationStore.loadAllFiltered({
+        ...request,
+        size: this.pageSizeSignal(),
+      },
+      this.userId(),
+      this.selectedStatesSignal(),
       );
     });
-    this.tableState.resetOn(this.responseSignal, () => this.store.dispatch(cleanReservation()));
+    this.tableState.resetOn(this.responseSignal, () => this.reservationStore.clearResponse());
   }
 
   get getForm(): SearchForm {
@@ -227,7 +221,7 @@ export class SearchComponent {
         const options = Object.values(CancelOption).filter(co => co !== CancelOption.chargeAndAccount);
         openCancel(this.dialog, reservation.room, this.smallSignal(), options, result => {
           if (result) {
-            this.store.dispatch(cancelReservation(reservationId, result));
+            this.reservationStore.cancel(reservationId, result);
           }
         });
       }

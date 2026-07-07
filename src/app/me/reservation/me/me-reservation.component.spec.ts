@@ -1,14 +1,11 @@
 /* eslint-disable camelcase */
-import { BehaviorSubject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../../../services/firebase.service';
-import { createReservation } from '../../../store/actions/reservation.actions';
 import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
 import { Role } from '../../../interfaces/token';
 import { IGroupService, ITreatmentAll, Price } from '../../../treatment/treatment';
@@ -20,12 +17,24 @@ import { NavigationService } from '../../../services/navigation.service';
 import { AdditionalStore } from '../../../store/additional.store';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
   let fixture: ComponentFixture<MeReservationComponent>;
   let translateService: TranslateService;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+
+  let reservationStoreSpy: {
+    data: ReturnType<typeof signal>;
+    availability: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    selected: ReturnType<typeof signal>;
+    loadById: jasmine.Spy;
+    loadUpcoming: jasmine.Spy;
+    loadAvailability: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   let treatmentStoreSpy: {
     treatmentDiscount: ReturnType<typeof signal>;
@@ -39,12 +48,6 @@ describe('MeReservationComponent', () => {
     options: ReturnType<typeof signal>;
     getOptions: jasmine.Spy;
   };
-
-  let navigationParams$: BehaviorSubject<any>;
-  let selectedReservation$: BehaviorSubject<any>;
-  let customerReservation$: BehaviorSubject<any>;
-  let availableList$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
   const mockCurrency = { id: 'eur', code: 'EUR', name: 'Euro', icon: '€' };
@@ -173,7 +176,6 @@ describe('MeReservationComponent', () => {
     },
   };
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -182,6 +184,16 @@ describe('MeReservationComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      data: signal(undefined),
+      availability: signal(undefined),
+      subErrors: signal(undefined),
+      selected: signal(undefined),
+      loadById: jasmine.createSpy('loadById'),
+      loadUpcoming: jasmine.createSpy('loadUpcoming'),
+      loadAvailability: jasmine.createSpy('loadAvailability'),
+      clean: jasmine.createSpy('clean'),
+    };
     treatmentStoreSpy = {
       treatmentDiscount: signal<any>(undefined),
       getAllTreatments: jasmine.createSpy('getAllTreatments'),
@@ -194,13 +206,7 @@ describe('MeReservationComponent', () => {
       options: signal(paymentOptions),
       getOptions: jasmine.createSpy('getOptions'),
     };
-    navigationParams$ = new BehaviorSubject(undefined);
-    selectedReservation$ = new BehaviorSubject(undefined);
-    customerReservation$ = new BehaviorSubject(undefined);
-    availableList$ = new BehaviorSubject(undefined);
-    subErrors$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj<Store<ReservationState>>('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -211,21 +217,10 @@ describe('MeReservationComponent', () => {
       onDismiss: () => of(void 0),
     });
 
-    const storeStreams = [
-      navigationParams$,
-      selectedReservation$,
-      customerReservation$,
-      availableList$,
-      subErrors$,
-    ];
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(
-      () => storeStreams[pipeCallIndex++]?.asObservable() ?? new BehaviorSubject(undefined).asObservable());
-
     await TestBed.configureTestingModule({
       imports: [MeReservationComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
@@ -245,14 +240,6 @@ describe('MeReservationComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    navigationParams$.complete();
-    selectedReservation$.complete();
-    customerReservation$.complete();
-    availableList$.complete();
-    subErrors$.complete();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -264,10 +251,7 @@ describe('MeReservationComponent', () => {
     expect(firebaseServiceSpy.logEvent).toHaveBeenCalledWith('screen_view', jasmine.objectContaining({
       firebase_screen: 'Edit customer reservation reservation-1',
     }));
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(jasmine.objectContaining({
-      type: '[Reservation] Find edit',
-      id: 'reservation-1',
-    }));
+    expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('reservation-1');
   });
 
   it('should map sub errors through the shared reservation error service', () => {
@@ -326,6 +310,8 @@ describe('MeReservationComponent', () => {
   });
 
   it('should use the selected payment type when creating a reservation payment', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
 
@@ -347,7 +333,7 @@ describe('MeReservationComponent', () => {
 
     component.create();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(createReservation({
+    expect(emitSpy).toHaveBeenCalledWith({
       reservation: jasmine.objectContaining({
         customerId: 'customer-1',
         roomId: 'room-1',
@@ -357,12 +343,15 @@ describe('MeReservationComponent', () => {
           type: 'MOLLIE',
           percentage: PaymentPercentage.total,
         }),
-      }) as any,
+      }),
       role: Role.customer,
-    }));
+    });
   });
 
   it('should default the payment percentage to total when none is selected', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
     component.getOfficeForm.room.setValue(createRoomMock([
@@ -378,14 +367,21 @@ describe('MeReservationComponent', () => {
 
     component.create();
 
-    const action = storeSpy.dispatch.calls.mostRecent().args[0] as any;
-    expect(action.reservation.payment).toEqual({
-      type: 'MOLLIE',
-      percentage: PaymentPercentage.total,
+    expect(emitSpy).toHaveBeenCalledWith({
+      reservation: jasmine.objectContaining({
+        payment: jasmine.objectContaining({
+          type: 'MOLLIE',
+          percentage: PaymentPercentage.total,
+        }),
+      }),
+      role: Role.customer,
     });
   });
 
   it('should not create reservation payment when account credit is selected', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1' }));
     component.date = new Date('2026-03-26T10:00:00');
     component.getOfficeForm.room.setValue(createRoomMock([
@@ -400,10 +396,7 @@ describe('MeReservationComponent', () => {
 
     component.create();
 
-    const action = storeSpy.dispatch.calls.mostRecent().args[0] as any;
-    expect(action.type).toBe(createReservation.type);
-    expect(action.role).toBe(Role.customer);
-    expect(action.reservation.payment).toBeUndefined();
+    expect(emitSpy).toHaveBeenCalledWith({ reservation: jasmine.objectContaining({}), role: Role.customer });
   });
 
   it('should calculate paymentToPay using account balance when there is no old price', () => {
@@ -1139,7 +1132,7 @@ describe('MeReservationComponent', () => {
 
       component.getTreatmentForm.startDate.setValue(date2);
 
-      availableList$.next([
+      reservationStoreSpy.availability.set([
         { dateTime: date1.getTime() },
         { dateTime: date2.getTime() },
       ]);
@@ -1153,7 +1146,7 @@ describe('MeReservationComponent', () => {
       const date1 = new Date(2026, 0, 1);
 
       component.getTreatmentForm.startDate.setValue(undefined);
-      availableList$.next([
+      reservationStoreSpy.availability.set([
         { dateTime: date1.getTime() },
       ]);
 
@@ -1169,7 +1162,7 @@ describe('MeReservationComponent', () => {
       component.price.set({ isPaid: false } as any);
 
       component.getTreatmentForm.startDate.setValue(new Date());
-      availableList$.next([
+      reservationStoreSpy.availability.set([
         { dateTime: new Date().getTime() },
       ]);
 
@@ -1187,7 +1180,7 @@ describe('MeReservationComponent', () => {
       component.price.set({ isPaid: true } as any);
 
       component.getTreatmentForm.startDate.setValue(new Date());
-      availableList$.next([
+      reservationStoreSpy.availability.set([
         { dateTime: new Date().getTime() },
       ]);
 
@@ -1199,7 +1192,7 @@ describe('MeReservationComponent', () => {
     });
 
     it('should NOT run effect when availableList is undefined', () => {
-      availableList$.next(undefined);
+      reservationStoreSpy.availability.set(undefined);
 
       fixture.detectChanges();
 
@@ -1213,7 +1206,7 @@ describe('MeReservationComponent', () => {
 
       // initial run (not paid)
       component.price.set({ isPaid: false } as any);
-      availableList$.next([
+      reservationStoreSpy.availability.set([
         { dateTime: new Date().getTime() },
       ]);
       fixture.detectChanges();

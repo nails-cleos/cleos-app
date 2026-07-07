@@ -70,7 +70,7 @@ export class NotificationListComponent {
       this.router.navigate([notification.navigation]);
     } else {
       this.navigationService.reload();
-      this.notificationStore.readNotification(notification.id);
+      this.notificationStore.read(notification.id);
     }
   };
 
@@ -91,7 +91,7 @@ export class NotificationListComponent {
     this.notifications.update(currents => currents.map((current, currentIndex) => currentIndex === index
       ? { ...current, deleted: true }
       : current));
-    this.notificationStore.deleteNotification({ ...notification, deleted: true });
+    this.notificationStore.delete({ ...notification, deleted: true });
 
     if (!notification.read) {
       --this.badge;

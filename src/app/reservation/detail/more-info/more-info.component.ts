@@ -1,13 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { IPaymentAll } from '../../../interfaces/payment';
-import {
-  executeTrackingByReservationId,
-  getReview,
-  getTrackingByReservationId,
-  reservationFindPayments,
-  updateTrackingByReservationId,
-} from '../../../store/actions/reservation.actions';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '../../../util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -18,9 +10,6 @@ import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { RatingComponent } from '../../../shared/rating/rating.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { ToastService } from '../../../services/toast.service';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import { getPaymentsPipe, getReviewPipe, getTrackingPipe } from '../../../store/selectors/reservation.selectors';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
@@ -44,6 +33,8 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../../services/navigation.service';
 import { PaymentStore } from '../../../store/payment.store';
+import { TrackingStore } from '../../../store/tracking.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 @Component({
   selector: 'app-more-info',
@@ -59,20 +50,17 @@ export class MoreInfoComponent {
   id = input<string>();
 
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly paymentStore = inject(PaymentStore);
+  private readonly trackingStore = inject(TrackingStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
 
-  private payments$ = this.store.pipe(getPaymentsPipe);
-  private tracking$ = this.store.pipe(getTrackingPipe);
-  private review$ = this.store.pipe(getReviewPipe);
-
-  paymentsSignal = toSignal(this.payments$);
-  trackingSignal = toSignal(this.tracking$);
-  reviewSignal = toSignal(this.review$);
+  paymentsSignal = this.paymentStore.data;
+  trackingSignal = this.trackingStore.selected;
+  reviewSignal = this.reservationStore.review;
   paymentsLoading = computed(() => this.paymentsSignal() === undefined);
 
   tableColumns: TableSkeletonColumn[] = [
@@ -97,12 +85,13 @@ export class MoreInfoComponent {
   });
 
   constructor() {
+    this.reservationStore.clean();
     effect(() => {
       const id = this.id();
       if (id) {
-        this.store.dispatch(getTrackingByReservationId({ id }));
-        this.store.dispatch(reservationFindPayments({ id }));
-        this.store.dispatch(getReview({ id }));
+        this.trackingStore.getByReservationId(id);
+        this.paymentStore.getPaymentByResourceId(id, 'reservation');
+        this.reservationStore.loadReview(id);
       }
     });
   }
@@ -110,7 +99,7 @@ export class MoreInfoComponent {
   execute() {
     const id = this.id();
     if (id) {
-      this.store.dispatch(executeTrackingByReservationId({ id }));
+      this.trackingStore.executeByReservationId(id);
     }
   }
 
@@ -123,9 +112,7 @@ export class MoreInfoComponent {
         completedTimestamp: tracking?.completedTimestamp,
       }, result => {
         if (result) {
-          this.store.dispatch(updateTrackingByReservationId(
-            { id, started: result.started, completed: result.completed }),
-          );
+          this.trackingStore.updateByReservationId(id, result.started, result.completed);
         }
       }, true);
     }

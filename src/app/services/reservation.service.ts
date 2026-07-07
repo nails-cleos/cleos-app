@@ -24,7 +24,7 @@ export class ReservationService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getPage = (
+  loadPage = (
     page: number,
     sort: string,
     direction: SortDirection,
@@ -47,10 +47,10 @@ export class ReservationService {
     return this.http.get<Pagination<IReservationAll>>(`${ baseUrl }/pages`, { ...paginated(), params });
   };
 
-  getCustomerReservations = (
+  loadAllByCustomer = (
+    page: number,
     sort: string,
     direction: SortDirection,
-    page: number,
     size: number,
   ): Observable<ICustomerReservation> => {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
@@ -64,10 +64,10 @@ export class ReservationService {
     return this.http.get<ICustomerReservation>(toUrl(this.urlV1, 'customer'), { ...skipLoadingOverlay(), params });
   };
 
-  getAllFilterReservations = (
+  loadAllFiltered = (
+    page: number,
     sort: string,
     direction: SortDirection,
-    page: number,
     size: number,
     userId?: string,
     states?: string[],
@@ -84,7 +84,7 @@ export class ReservationService {
     return this.http.get<Pagination<IReservationAll>>(toUrl(this.urlV1, 'filter'), { ...paginated(), params });
   };
 
-  getAllGroupingByRoom = (
+  loadAllByRoom = (
     days: number,
     date: Date,
     roomId: string,
@@ -97,7 +97,7 @@ export class ReservationService {
     return this.http.get<IRoomReservation[]>(toUrl(this.urlV1, 'rooms', roomId), { params });
   };
 
-  searchAvailability = (
+  loadCalendar = (
     roomId: string,
     days: number,
     dates: Date[],
@@ -134,12 +134,11 @@ export class ReservationService {
     return this.http.get<IAvailableDTO[]>(toUrl(this.urlV1, 'search'), { params });
   };
 
-  getReservation = (id: string, editPath?: string): Observable<IUpcomingAll | undefined> => {
-    const url = toUrl(this.urlV1, id);
-    return this.http.get<IUpcomingAll>(editPath ? `${ url }/${ editPath }` : url, { ...skipLoadingOverlay() });
+  getReservation = (id: string): Observable<IUpcomingAll | undefined> => {
+    return this.http.get<IUpcomingAll>(toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
   };
 
-  getReservationHistory = (id: string): Observable<IReservationAll[]> => this.http.get<IReservationAll[]>(
+  loadHistory = (id: string): Observable<IReservationAll[]> => this.http.get<IReservationAll[]>(
     toUrl(this.urlV1, id, 'history'),
     skipLoadingOverlay(),
   );
@@ -148,7 +147,7 @@ export class ReservationService {
     reservation: IReservation,
   ): Observable<IApiResponse[]> => this.http.post<IApiResponse[]>(this.urlV1, reservation);
 
-  deleteReservation = (id: string): Observable<IReservation> => this.http.delete<IReservation>(
+  deleteReservation = (id: string): Observable<void> => this.http.delete<void>(
     toUrl(this.urlV1, id));
 
   updateReservationById = (
@@ -160,7 +159,7 @@ export class ReservationService {
     reservationId: string,
     event: string,
     extras?: any,
-  ): Observable<IReservation | void> => this.http.post<IReservation | void>(
+  ): Observable<IApiResponse | void> => this.http.post<IApiResponse | void>(
     toUrl(this.urlV1, reservationId, event), extras);
 
   updateReservationCustomer = (
@@ -175,7 +174,7 @@ export class ReservationService {
   ): Observable<IApiResponse> => this.http.patch<IApiResponse>(toUrl(this.urlV1, reservationId, 'colors', colorId),
     null);
 
-  getUpcomingReservation = (): Observable<ICustomerReservation> => this.http.get<ICustomerReservation>(
+  loadUpcoming = (): Observable<ICustomerReservation> => this.http.get<ICustomerReservation>(
     toUrl(this.urlV1, 'upcoming'),
   );
 

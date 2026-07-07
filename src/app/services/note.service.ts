@@ -21,7 +21,7 @@ export class NoteService {
 
   createNote = (note: INote): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, note);
 
-  deleteNote = (id: string): Observable<INote> => this.http.delete<INote>(toUrl(this.urlV1, id));
+  deleteNote = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
 
   updateNote = (id: string, note: INote): Observable<IApiResponse> => this.http.patch<IApiResponse>(
     toUrl(this.urlV1, id), note);

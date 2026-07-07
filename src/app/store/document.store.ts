@@ -7,6 +7,7 @@ import { getDateFormat } from '../util/dates';
 import { cleanCrudCreate, createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageRequest } from '../interfaces/common';
+import type { Subscription } from 'rxjs';
 
 type DocumentStoreState = StoreState<Pagination<IDocument>>;
 
@@ -36,10 +37,20 @@ export const DocumentStore = signalStore(
     store,
     documentService = inject(DocumentService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let downloadSubscription: Subscription | undefined;
+    let downloadZipSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      downloadSubscription?.unsubscribe();
+      downloadZipSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -52,27 +63,31 @@ export const DocumentStore = signalStore(
       },
 
       loadPage({ officeId, date, page, sort, direction, size }: DocumentPageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        documentService.getDocumentsPage(officeId, getDateFormat(date), page, sort, direction, size).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription = documentService
+          .getDocumentsPage(officeId, getDateFormat(date), page, sort, direction, size).subscribe({
+            next: (data) => patchState(store, { data, isLoading: false }),
+            error: patchError,
+          });
       },
 
       download({ id, fileName }: DocumentDownloadRequest): void {
+        downloadSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        documentService.view(id).subscribe({
+        downloadSubscription = documentService.view(id).subscribe({
           next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
           error: patchError,
         });
       },
 
       downloadZip({ officeId, date, fileName }: DocumentZipRequest): void {
+        downloadZipSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        documentService.documentDownloadZip(officeId, getDateFormat(date)).subscribe({
+        downloadZipSubscription = documentService.documentDownloadZip(officeId, getDateFormat(date)).subscribe({
           next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
           error: patchError,
         });

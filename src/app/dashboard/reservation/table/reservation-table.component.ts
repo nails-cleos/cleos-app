@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, vi
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from 'src/app/util/mat-table-state';
-import { Store } from '@ngrx/store';
-import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
 import { IReservation, IReservationAll } from '../../../reservation/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
@@ -16,13 +14,7 @@ import { AuthUserService } from '../../../services/auth-user.service';
 import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
-import {
-  getReservationErrorPipe,
-  getReservationPaginationPipe,
-  selectReservationIsLoading,
-} from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatList, MatListItem, MatListItemIcon } from '@angular/material/list';
@@ -49,6 +41,7 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../../services/navigation.service';
+import { ReservationStore } from '../../../store/reservation.store';
 
 @Component({
   selector: 'app-reservation-table',
@@ -67,22 +60,23 @@ export class ReservationTableComponent {
   all = input<boolean>(false);
 
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private reservationList$ = this.store.pipe(getReservationPaginationPipe);
-  private error$ = this.store.pipe(getReservationErrorPipe);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
-  private reservationListSignal = toSignal(this.reservationList$);
-  private loadingSignal = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
+  private reservationListSignal = computed(() => {
+    const data = this.reservationStore.data();
+    return data?.kind === 'pagination' ? data.value : undefined;
+  });
+  private loadingSignal = this.reservationStore.isLoading;
   private authUserSignal = this.authUserService.authUser;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -95,7 +89,7 @@ export class ReservationTableComponent {
       },
     },
   );
-  errorSignal = toSignal(this.error$);
+  errorSignal = this.reservationStore.error;
   paginatorPageIndex = this.tableState.pageIndex;
 
   hasAdminRole = computed(() => this.authUserSignal().hasAdminRole);
@@ -121,14 +115,14 @@ export class ReservationTableComponent {
   constructor() {
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getPage({
+      this.reservationStore.loadPage(
+        {
           ...request,
           size: this.pageSizeSignal(),
-          roomId: this.roomId(),
-          all: this.all(),
-          professionalId: this.professionalId(),
-        }),
+        },
+        this.roomId(),
+        this.all(),
+        this.professionalId(),
       );
     });
   }
@@ -148,9 +142,7 @@ export class ReservationTableComponent {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: reservation, variant: 'warning' },
       result => {
         if (result) {
-          this.store.dispatch(
-            deleteReservation({ id: result.id, timestamp: result.timestamp, timeZone: result.room.timeZone }),
-          );
+          this.reservationStore.delete(result.id, result.timestamp, result.room.timeZone);
         }
       });
   };

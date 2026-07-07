@@ -12,6 +12,7 @@ import {
   StoreState,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 type AccountStoreState = StoreState<IAccountTransaction, IAccountAll> & {
   selectedTransaction: ITransaction | undefined;
@@ -29,10 +30,27 @@ export const AccountStore = signalStore(
     accountService = inject(AccountService),
     translateService = inject(TranslateService),
   ) => {
+    let loadAccountSubscription: Subscription | undefined;
+    let loadAccountByCustomerIdSubscription: Subscription | undefined;
+    let loadTransactionsSubscription: Subscription | undefined;
+    let loadTransactionSubscription: Subscription | undefined;
+    let createTransactionSubscription: Subscription | undefined;
+    let updateAccountSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadAccountSubscription?.unsubscribe();
+      loadAccountByCustomerIdSubscription?.unsubscribe();
+      loadTransactionsSubscription?.unsubscribe();
+      loadTransactionSubscription?.unsubscribe();
+      createTransactionSubscription?.unsubscribe();
+      updateAccountSubscription?.unsubscribe();
+    };
+
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -45,49 +63,52 @@ export const AccountStore = signalStore(
       },
 
       loadAccount(id: string): void {
+        loadAccountSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        accountService.getAccount(id).subscribe({
+        loadAccountSubscription = accountService.getAccount(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadAccountByCustomerId(customerId: string): void {
+        loadAccountByCustomerIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        accountService.getAccountByCustomerId(customerId).subscribe({
+        loadAccountByCustomerIdSubscription = accountService.getAccountByCustomerId(customerId).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadTransactions(id: string, request: PageRequest): void {
-        patchState(store, {
-          data: undefined,
-          isLoading: true,
-        });
+        loadTransactionsSubscription?.unsubscribe();
+        patchState(store, { data: undefined, isLoading: true });
 
-        accountService.getTransactionsByAccountId(id, request.page, request.sort, request.direction, request.size)
-          .subscribe({
-            next: (data) => patchState(store, { data, isLoading: false }),
-            error: patchError,
-          });
+        loadTransactionsSubscription =
+          accountService.getTransactionsByAccountId(id, request.page, request.sort, request.direction, request.size)
+            .subscribe({
+              next: (data) => patchState(store, { data, isLoading: false }),
+              error: patchError,
+            });
       },
 
       loadTransaction(id: string, transactionId: string): void {
+        loadTransactionSubscription?.unsubscribe();
         patchState(store, { selectedTransaction: undefined, isLoading: true });
 
-        accountService.getTransaction(id, transactionId).subscribe({
+        loadTransactionSubscription = accountService.getTransaction(id, transactionId).subscribe({
           next: (selectedTransaction) => patchState(store, { selectedTransaction, isLoading: false }),
           error: patchError,
         });
       },
 
       createTransaction(id: string, transaction: ITransaction): void {
+        createTransactionSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        accountService.createTransaction(id, transaction).subscribe({
+        createTransactionSubscription = accountService.createTransaction(id, transaction).subscribe({
           next: (response) => {
             if (response.paymentLink) {
               patchState(store, { isLoading: false });
@@ -108,9 +129,10 @@ export const AccountStore = signalStore(
       },
 
       updateAccount(id: string, transaction: ITransaction): void {
+        updateAccountSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        accountService.updateAccount(id, transaction).subscribe({
+        updateAccountSubscription = accountService.updateAccount(id, transaction).subscribe({
           next: (response) => patchState(store, {
             response: {
               message: translateService.instant('ACCOUNT.UPDATED', { id: response.id }),

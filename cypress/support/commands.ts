@@ -614,7 +614,7 @@ Cypress.Commands.add('mockCustomerReservations', () => {
         },
       },
     },
-  ).as('getCustomerReservations');
+  ).as('loadAllByCustomer');
 });
 
 Cypress.Commands.add('mockMeReservations', (
@@ -716,7 +716,7 @@ Cypress.Commands.add('mockMeReservations', (
             },
           },
         },
-      ).as('getCustomerReservations');
+      ).as('loadAllByCustomer');
 
       cy.intercept(
         'GET',
@@ -780,7 +780,7 @@ Cypress.Commands.add('mockMeReservationFlow', (
           phone: '+31 6 25250787',
           balance: 200,
         },
-      }).as('getUpcomingReservation');
+      }).as('loadUpcoming');
 
       cy.intercept('GET', '**/api/v1/rooms', {
         statusCode: 200,
@@ -858,7 +858,7 @@ Cypress.Commands.add('mockMeReservationFlow', (
             },
           },
         },
-      ).as('getCustomerReservations');
+      ).as('loadAllByCustomer');
     },
   );
 });

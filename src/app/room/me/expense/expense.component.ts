@@ -139,8 +139,6 @@ export class ExpenseComponent {
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
   private selectedSupplyStore = toSignal(this.getForm.supplyStore.valueChanges);
 
-  private readonly language: string = this.navigationService.language;
-
   constructor() {
     effect(() => {
       const selected = this.expense();

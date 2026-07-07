@@ -1,19 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
-import { Store } from '@ngrx/store';
-import {
-  approveReservation,
-  cancelReservation,
-  customerCancelReservation,
-  getReservation,
-  getReservationHistory,
-  paymentCompleteReservation,
-  reservationFindPayments,
-  startReservation,
-  updateReservationColor,
-  updateReservationCustomer,
-  updateReservationDiscount,
-  updateReservationNote,
-} from '../../store/actions/reservation.actions';
 import { CancelOption, IFabMenu, IReservationAll, IUpcomingAll, States } from '../reservation';
 import { RouterLink } from '@angular/router';
 import {
@@ -69,14 +54,7 @@ import { TwoDigitsDirective } from '../../directives/two-digits.directive';
 import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
 import { BackButtonDirective } from '../../directives/back-button.directive';
 import { FabMenuComponent } from './fab-menu/fab-menu.component';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  getDetailNavigationParamsPipe,
-  getHistoriesPipe,
-  getPaymentsPipe,
-  getSelectedReservationPipe,
-} from '../../store/selectors/reservation.selectors';
 import {
   MatCell,
   MatCellDef,
@@ -114,6 +92,7 @@ import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skelet
 import { ReservationDetailSkeletonComponent } from './reservation-detail-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
 import { PaymentStore } from '../../store/payment.store';
+import { ReservationStore } from '../../store/reservation.store';
 
 type PaymentForm = {
   amount: FormControl<string>;
@@ -145,7 +124,7 @@ export class ReservationDetailComponent {
 
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
@@ -155,13 +134,15 @@ export class ReservationDetailComponent {
   private paginator = viewChild(MatPaginator);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private navigationParams$ = this.store.pipe(getDetailNavigationParamsPipe);
-  private reservationSelected$ = this.store.pipe(getSelectedReservationPipe);
-  private payments$ = this.store.pipe(getPaymentsPipe);
-  private histories$ = this.store.pipe(getHistoriesPipe);
 
   private readonly authUserSignal = this.authUserService.authUser;
-  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly params = computed(() => {
+    const navigationState = history.state;
+    if (navigationState) {
+      return { step: navigationState['step'] };
+    }
+    return undefined;
+  });
   private readonly paymentOptionsSignal = this.paymentStore.options;
   private readonly breakpointsSignal = toSignal(
     this.breakpointObserver$, {
@@ -175,9 +156,12 @@ export class ReservationDetailComponent {
     },
   );
 
-  reservation = toSignal(this.reservationSelected$);
-  historiesSignal = toSignal(this.histories$);
-  paymentsSignal = toSignal(this.payments$);
+  reservation = this.reservationStore.selected;
+  private historiesSignal = computed(() => {
+    const data = this.reservationStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
+  paymentsSignal = this.paymentStore.data;
   paymentsLoading = computed(() => !!this.reservation() && this.paymentsSignal() === undefined);
   historyLoading = computed(() => !!this.reservation() && this.historiesSignal() === undefined);
 
@@ -204,7 +188,7 @@ export class ReservationDetailComponent {
     { key: 'amount' },
   ];
   displayedColumns: string[] = this.historyTableColumns.map((column) => column.key);
-  dataSource = computed(() => new MatTableDataSource(this.historiesSignal() ?? []));
+  dataSource = computed(() => new MatTableDataSource(this.historiesSignal()));
 
   expanded?: IReservationAll;
   pageSize = 5;
@@ -242,7 +226,7 @@ export class ReservationDetailComponent {
   customerId = computed(() => this.authUserSignal()?.customerId);
   isReservationAdmin?: boolean;
   isCustomer = signal(false);
-  step = computed(() => this.navigationParams()?.step);
+  step = computed(() => this.params()?.step);
 
   private static stateMachineDefinition: any;
   private machine: any;
@@ -303,9 +287,9 @@ export class ReservationDetailComponent {
       const id = this.id();
       if (id && !this.hasFetched()) {
         this.hasFetched.set(true);
-        this.store.dispatch(getReservation({ id }));
-        this.store.dispatch(reservationFindPayments({ id }));
-        this.store.dispatch(getReservationHistory({ id }));
+        this.reservationStore.loadById(id);
+        this.paymentStore.getPaymentByResourceId(id, 'reservation');
+        this.reservationStore.loadHistory(id);
       }
     });
 
@@ -393,6 +377,7 @@ export class ReservationDetailComponent {
 
     effect(() => {
       const payments = this.paymentsSignal();
+      // TODO: check why payment list has always 1.
       if (!payments?.length) {
         this.paymentPaid.set([]);
         return;
@@ -543,16 +528,14 @@ export class ReservationDetailComponent {
         isCustomer: this.isCustomer(),
       }, result => {
         if (result) {
-          this.store.dispatch(
-            updateReservationNote({
-              id: reservation.id,
-              role: this.professionalId() ? Role.professional : Role.customer,
-              note: result.note,
-              customerNote: result.customerNote,
-              paymentLink: reservation.paymentLink,
-              timestamp: reservation.timestamp,
-              timeZone: reservation.room.timeZone,
-            }),
+          this.reservationStore.updateNote(
+            reservation.id,
+            this.professionalId() ? Role.professional : Role.customer,
+            result.note,
+            result.customerNote,
+            reservation.paymentLink,
+            reservation.timestamp,
+            reservation.room.timeZone,
           );
         }
       }, true);
@@ -565,7 +548,7 @@ export class ReservationDetailComponent {
       executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: reservation.customer.id },
         result => {
           if (result) {
-            this.store.dispatch(updateReservationDiscount({ id: reservation.id, discountId: result.discountId }));
+            this.reservationStore.updateDiscount(reservation.id, result.discountId);
           }
         }, true);
     }
@@ -704,7 +687,7 @@ export class ReservationDetailComponent {
     const roomId = reservation.room.id;
     const customerId = reservation.customer.id;
     const initialState = reservation.state;
-    const store = self.store;
+    const reservationStore = self.reservationStore;
     const translateService = self.translateService;
 
     const approve = this.createAction(translateService.instant('RESERVATION.ACTION.APPROVE'),
@@ -754,7 +737,7 @@ export class ReservationDetailComponent {
     approveActions = [...approveActions, more, clone, cancel];
 
     const approveTransaction = ReservationDetailComponent.createTransaction('approved', (): void => {
-      store.dispatch(approveReservation(id));
+      reservationStore.approve(id);
     });
 
     const sendMessageTransaction = ReservationDetailComponent.createTransaction('send', (): void => {
@@ -787,7 +770,7 @@ export class ReservationDetailComponent {
     });
 
     const startTransaction = ReservationDetailComponent.createTransaction('started', (): void => {
-      store.dispatch(startReservation(id));
+      reservationStore.start(id);
     });
 
     const editTransaction = ReservationDetailComponent.createTransaction('edited', (): void => {
@@ -816,12 +799,12 @@ export class ReservationDetailComponent {
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, options, self.price, result => {
         if (result) {
-          this.store.dispatch(cancelReservation(reservation.id, result));
+          this.reservationStore.cancel(reservation.id, result);
         }
       }));
 
     const finishTransaction = ReservationDetailComponent.createTransaction('completed', (): void => {
-      self.store.dispatch(paymentCompleteReservation(id));
+      self.reservationStore.paymentComplete(id);
     });
 
     const bookTransaction = ReservationDetailComponent.createTransaction('booked', (): void => {
@@ -958,7 +941,7 @@ export class ReservationDetailComponent {
     const cancelTransaction = ReservationDetailComponent.createTransaction('cancelled', (): void =>
       self.cancel(reservation, cancelOptions, price, result => {
         if (result) {
-          this.store.dispatch(customerCancelReservation(reservation.id, result));
+          this.reservationStore.customerCancel(reservation.id, result);
         }
       }, showPenalty, self.options()));
 
@@ -1130,7 +1113,7 @@ export class ReservationDetailComponent {
     },
     result => {
       if (result) {
-        this.store.dispatch(updateReservationCustomer({ id: reservation.id, customerId: result.customerId }));
+        this.reservationStore.updateCustomer(reservation.id, result.customerId);
       }
     },
     true,
@@ -1146,7 +1129,7 @@ export class ReservationDetailComponent {
     },
     result => {
       if (result) {
-        this.store.dispatch(updateReservationColor({ id: reservation.id, colorId: result.colorId }));
+        this.reservationStore.updateColor(reservation.id, result.colorId);
       }
     },
     true,

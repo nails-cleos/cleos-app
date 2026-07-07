@@ -2,51 +2,50 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { ReservationDetailComponent } from './reservation-detail.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { CancelOption, IReservationAll, States } from '../reservation';
 import { IPaymentAll } from '../../interfaces/payment';
-import {
-  approveReservation,
-  cancelReservation,
-  customerCancelReservation,
-  getReservation,
-  getReservationHistory,
-  paymentCompleteReservation,
-  reservationFindPayments,
-  startReservation,
-  updateReservationColor,
-  updateReservationCustomer,
-} from '../../store/actions/reservation.actions';
 import { ServiceType } from '../../room/room';
 import { IUserAll } from '../../user/user';
 import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { ICurrencyAll } from '../../currency/currency';
 import { IAdditionalAll } from '../../additional/additional';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { NavigationService } from '../../services/navigation.service';
 import { PaymentStore } from '../../store/payment.store';
+import { ReservationStore } from '../../store/reservation.store';
 
 describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
   let fixture: ComponentFixture<ReservationDetailComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let navigationParams$: BehaviorSubject<any>;
-  let reservationSelected$: BehaviorSubject<any>;
-  let payments$: BehaviorSubject<any>;
-  let histories$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    data: ReturnType<typeof signal>;
+    selected: ReturnType<typeof signal>;
+    loadById: jasmine.Spy;
+    loadHistory: jasmine.Spy;
+    updateNote: jasmine.Spy;
+    updateDiscount: jasmine.Spy;
+    updateColor: jasmine.Spy;
+    updateCustomer: jasmine.Spy;
+    start: jasmine.Spy;
+    approve: jasmine.Spy;
+    cancel: jasmine.Spy;
+    customerCancel: jasmine.Spy;
+    paymentComplete: jasmine.Spy;
+  };
   let paymentStoreSpy: {
+    data: ReturnType<typeof signal>;
     options: ReturnType<typeof signal>;
     getOptions: jasmine.Spy;
     notify: jasmine.Spy;
     adjust: jasmine.Spy;
+    getPaymentByResourceId: jasmine.Spy;
   };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
@@ -145,6 +144,21 @@ describe('ReservationDetailComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      data: signal(undefined),
+      selected: signal(undefined),
+      loadById: jasmine.createSpy('loadById'),
+      loadHistory: jasmine.createSpy('loadHistory'),
+      updateNote: jasmine.createSpy('updateNote'),
+      updateDiscount: jasmine.createSpy('updateDiscount'),
+      updateColor: jasmine.createSpy('updateColor'),
+      updateCustomer: jasmine.createSpy('updateCustomer'),
+      start: jasmine.createSpy('start'),
+      approve: jasmine.createSpy('approve'),
+      cancel: jasmine.createSpy('cancel'),
+      customerCancel: jasmine.createSpy('customerCancel'),
+      paymentComplete: jasmine.createSpy('paymentComplete'),
+    };
     paymentStoreSpy = {
       options: signal([
         {
@@ -172,42 +186,22 @@ describe('ReservationDetailComponent', () => {
           icon: 'transfer',
         },
       ]),
+      data: signal(undefined),
       getOptions: jasmine.createSpy('getOptions'),
       notify: jasmine.createSpy('notify'),
       adjust: jasmine.createSpy('adjust'),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
     };
-    navigationParams$ = new BehaviorSubject(undefined);
-    reservationSelected$ = new BehaviorSubject(undefined);
-    payments$ = new BehaviorSubject(undefined);
-    histories$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
-    });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return reservationSelected$.asObservable();
-        case 3:
-          return payments$.asObservable();
-        case 4:
-          return histories$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
     });
 
     await TestBed.configureTestingModule({
       imports: [ReservationDetailComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
@@ -222,13 +216,6 @@ describe('ReservationDetailComponent', () => {
     fixture.componentRef.setInput('id', 'reservation-id');
 
     dialogSpy = spyOn(component['dialog'], 'open');
-  });
-
-  afterEach(() => {
-    navigationParams$.complete();
-    reservationSelected$.complete();
-    payments$.complete();
-    histories$.complete();
   });
 
   it('should create', () => {
@@ -263,9 +250,9 @@ describe('ReservationDetailComponent', () => {
     fixture.componentRef.setInput('id', 'reservation-123');
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'reservation-123' }));
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id: 'reservation-123' }));
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservationHistory({ id: 'reservation-123' }));
+    expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('reservation-123');
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('reservation-123', 'reservation');
+    expect(reservationStoreSpy.loadHistory).toHaveBeenCalledWith('reservation-123');
   });
 
   it('should return form payments array', () => {
@@ -298,7 +285,7 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should return GMT timezone string', () => {
-    reservationSelected$.next(mockReservation);
+    reservationStoreSpy.selected.set(mockReservation);
     fixture.detectChanges();
 
     const gmt = component.gmt;
@@ -306,14 +293,14 @@ describe('ReservationDetailComponent', () => {
   });
 
   it('should handle missing payment data gracefully', () => {
-    payments$.next(undefined);
+    paymentStoreSpy.data.set(undefined);
     fixture.detectChanges();
     expect(() => component.total).not.toThrow();
     expect(component.total).toBe(0);
   });
 
   it('should handle undefined reservation gracefully', () => {
-    reservationSelected$.next(undefined);
+    reservationStoreSpy.selected.set(undefined);
     fixture.detectChanges();
 
     expect(() => component.gmt).not.toThrow();
@@ -334,8 +321,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should create professional machine with created state', () => {
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
@@ -351,8 +338,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should transition from created to approved state', () => {
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -361,13 +348,13 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('approve');
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(approveReservation('reservation-123'));
+      expect(reservationStoreSpy.approve).toHaveBeenCalledWith('reservation-123');
     });
 
     it('should transition from approve to start state', () => {
       const approvedReservation = { ...mockReservation, state: States.approved };
-      reservationSelected$.next(approvedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(approvedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -376,7 +363,7 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('start');
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation(mockReservation.id));
+      expect(reservationStoreSpy.start).toHaveBeenCalledWith(mockReservation.id);
     });
 
     it('should send tomorrow message', () => {
@@ -385,8 +372,8 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (Date.now() / 1000) + 86400, // Tomorrow
       };
-      reservationSelected$.next(approvedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(approvedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -408,8 +395,8 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (Date.now() / 1000) + 86400, // Tomorrow
       };
-      reservationSelected$.next(approvedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(approvedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -430,8 +417,8 @@ describe('ReservationDetailComponent', () => {
         state: States.approved,
         timestamp: (getNowTimeZone().getTime() / 1000), // Today
       };
-      reservationSelected$.next(approvedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(approvedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -461,8 +448,8 @@ describe('ReservationDetailComponent', () => {
         timestamp: (getNowTimeZone().getTime() / 1000) + (86400 * 2), // 2 days later
         additional: [additional],
       };
-      reservationSelected$.next(approvedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(approvedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -479,8 +466,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow editing from created state', () => {
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -497,8 +484,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should transition from started to completed state', () => {
       const startedReservation = { ...mockReservation, state: States.started };
-      reservationSelected$.next(startedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(startedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -514,7 +501,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should navigate to me overview for customer users', () => {
       authUserSignal.update(prev => ({ ...prev, customerId: 'customer-1223', isCustomer: true }));
-      reservationSelected$.next({ ...mockReservation, customer: { ...mockReservation.customer, id: 'customer-1223' } });
+      reservationStoreSpy.selected.set(
+        { ...mockReservation, customer: { ...mockReservation.customer, id: 'customer-1223' } });
 
       fixture.detectChanges();
 
@@ -525,7 +513,7 @@ describe('ReservationDetailComponent', () => {
 
     it('should navigate to customer overview for non-customer users', () => {
       authUserSignal.update(prev => ({ ...prev, customerId: undefined, isCustomer: false }));
-      reservationSelected$.next(mockReservation);
+      reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
 
       component.overview();
@@ -535,8 +523,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow clone from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      reservationSelected$.next(startedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(startedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       const today = new Date();
@@ -568,8 +556,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow change color from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      reservationSelected$.next(startedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(startedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -580,14 +568,13 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('color');
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(updateReservationColor({ id: mockReservation.id, colorId: 'color-2' }));
+      expect(reservationStoreSpy.updateColor).toHaveBeenCalledWith(mockReservation.id, 'color-2');
     });
 
     it('should allow change customer from completed state', () => {
       const startedReservation = { ...mockReservation, state: States.completed };
-      reservationSelected$.next(startedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(startedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -598,16 +585,15 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('change');
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(updateReservationCustomer({ id: mockReservation.id, customerId: 'customer-2' }));
+      expect(reservationStoreSpy.updateCustomer).toHaveBeenCalledWith(mockReservation.id, 'customer-2');
     });
 
     it('should allow canceling from created state', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('cancel');
@@ -624,13 +610,13 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(cancelReservation('reservation-123', { option: CancelOption.none }));
+      expect(reservationStoreSpy.cancel)
+        .toHaveBeenCalledWith('reservation-123', { option: CancelOption.none });
     });
 
     it('should navigate to more info page', () => {
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('more');
@@ -640,8 +626,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should transition from partiallyCompleted to completed', () => {
       const partiallyCompletedReservation = { ...mockReservation, state: States.partiallyCompleted };
-      reservationSelected$.next(partiallyCompletedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(partiallyCompletedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -650,13 +636,13 @@ describe('ReservationDetailComponent', () => {
 
       component.onChangeState('complete');
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(paymentCompleteReservation('reservation-123'));
+      expect(reservationStoreSpy.paymentComplete).toHaveBeenCalledWith('reservation-123');
     });
 
     it('should allow booking from completed state', () => {
       const completedReservation = { ...mockReservation, state: States.completed };
-      reservationSelected$.next(completedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(completedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('book');
@@ -685,8 +671,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should create customer machine with created state', () => {
-      reservationSelected$.next(mockReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       expect(component.changeState).toBeDefined();
@@ -700,8 +686,8 @@ describe('ReservationDetailComponent', () => {
 
     it('should allow booking from completed state', () => {
       const completedReservation = { ...mockReservation, state: States.completed };
-      reservationSelected$.next(completedReservation);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(completedReservation);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('book');
@@ -715,8 +701,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow edit a reservation', () => {
-      reservationSelected$.next({ ...mockReservation, canEdit: true });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: true });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -737,10 +723,11 @@ describe('ReservationDetailComponent', () => {
         type: 'IDEAL',
         reservation: mockReservation,
       } as any;
-      payments$.next([pendingPayment]);
+      paymentStoreSpy.data.set([pendingPayment]);
       addPaymentForm('100.00', 'IDEAL');
-      reservationSelected$.next({ ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
-      histories$.next([]);
+      reservationStoreSpy.selected.set(
+        { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('notify');
@@ -763,10 +750,11 @@ describe('ReservationDetailComponent', () => {
         type: 'IDEAL',
         reservation: mockReservation,
       } as any;
-      payments$.next([createdPayment]);
+      paymentStoreSpy.data.set([createdPayment]);
       addPaymentForm('100.00', 'IDEAL');
-      reservationSelected$.next({ ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
-      histories$.next([]);
+      reservationStoreSpy.selected.set(
+        { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('pay');
@@ -776,8 +764,8 @@ describe('ReservationDetailComponent', () => {
 
 
     it('should allow paid when reservation is approved', () => {
-      reservationSelected$.next({ ...mockReservation, state: States.approved });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, state: States.approved });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('pay');
@@ -787,8 +775,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow cancel and edit a reservation', () => {
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -813,8 +801,8 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow canceling when is edit mode and no payments', () => {
-      reservationSelected$.next({ ...mockReservation, canEdit: true });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: true });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -836,16 +824,15 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.none }));
+      expect(reservationStoreSpy.customerCancel).toHaveBeenCalledWith('reservation-123', { option: CancelOption.none });
     });
 
     it('should allow canceling when is edit mode with payments', () => {
-      payments$.next(
+      paymentStoreSpy.data.set(
         [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
       addPaymentForm('100.00', 'TRANSFER');
-      reservationSelected$.next({ ...mockReservation, canEdit: true });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: true });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       dialogSpy.and.returnValue({
@@ -867,16 +854,16 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.account }));
+      expect(reservationStoreSpy.customerCancel)
+        .toHaveBeenCalledWith('reservation-123', { option: CancelOption.account });
     });
 
     it('should allow canceling with a penalty when is not edit mode', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('cancel');
@@ -895,19 +882,19 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.chargeAndAccount }));
+      expect(reservationStoreSpy.customerCancel)
+        .toHaveBeenCalledWith('reservation-123', { option: CancelOption.chargeAndAccount });
     });
 
     it('should allow canceling with a penalty when is not edit mode and has paid the penalty', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
-      payments$.next(
+      paymentStoreSpy.data.set(
         [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: 'TRANSFER' } as any]);
       addPaymentForm('50.00', 'TRANSFER');
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('cancel');
@@ -926,19 +913,19 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(customerCancelReservation('reservation-123', { option: CancelOption.none }));
+      expect(reservationStoreSpy.customerCancel)
+        .toHaveBeenCalledWith('reservation-123', { option: CancelOption.none });
     });
 
     it('should allow canceling when is not edit mode and has paid more than the penalty', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
-      payments$.next(
+      paymentStoreSpy.data.set(
         [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
       addPaymentForm('100.00', 'TRANSFER');
-      reservationSelected$.next({ ...mockReservation, canEdit: false });
-      histories$.next([]);
+      reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       component.onChangeState('cancel');
@@ -957,9 +944,8 @@ describe('ReservationDetailComponent', () => {
           }),
         }));
 
-      expect(storeSpy.dispatch)
-        .toHaveBeenCalledWith(
-          customerCancelReservation('reservation-123', { option: CancelOption.chargeAndAccount }));
+      expect(reservationStoreSpy.customerCancel)
+        .toHaveBeenCalledWith('reservation-123', { option: CancelOption.chargeAndAccount });
     });
   });
 
@@ -977,9 +963,9 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should populate payment form when payments are loaded', () => {
-      reservationSelected$.next(mockReservation);
-      payments$.next(mockPayments);
-      histories$.next([]);
+      reservationStoreSpy.selected.set(mockReservation);
+      paymentStoreSpy.data.set(mockPayments);
+      reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 
       expect(component.payments.length).toBe(2);

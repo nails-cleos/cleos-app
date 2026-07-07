@@ -4,77 +4,70 @@ import { ActivatedRoute, provideRouter } from '@angular/router';
 import { ReservationListComponent } from './reservation-list.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { Price } from '../../../treatment/treatment';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { DiscountStore } from '../../../store/discount.store';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
+import { signal } from '@angular/core';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
   let fixture: ComponentFixture<ReservationListComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    loadAllByCustomer: jasmine.Spy;
+    createReview: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let discountStoreSpy: { clean: jasmine.Spy };
 
-  let customerReservation$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<boolean>;
   let breakpoints$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
-    customerReservation$ = new BehaviorSubject<any>(undefined);
-    response$ = new BehaviorSubject<any>(undefined);
-    error$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<boolean>(false);
+    reservationStoreSpy = {
+      isLoading: signal(false),
+      data: signal(undefined),
+      response: signal(undefined),
+      error: signal(undefined),
+      loadAllByCustomer: jasmine.createSpy('loadAllByCustomer'),
+      createReview: jasmine.createSpy('createReview'),
+      clean: jasmine.createSpy('clean'),
+    };
     breakpoints$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {},
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
       snapshot: {
         paramMap: jasmine.createSpyObj('ParamMap', ['get']),
       },
     });
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     discountStoreSpy = { clean: jasmine.createSpy('clean') };
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return customerReservation$.asObservable();
-        case 2:
-          return response$.asObservable();
-        case 3:
-          return error$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     breakpointObserverSpy.observe.and.returnValue(breakpoints$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ReservationListComponent, TranslateModule.forRoot()],
       providers: [
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -104,20 +97,18 @@ describe('ReservationListComponent', () => {
   });
 
   it('should dispatch getCustomerReservations on initialization', () => {
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      jasmine.objectContaining({
-        type: '[Reservation] Get customer reservations',
-      }),
-    );
+    expect(reservationStoreSpy.loadAllByCustomer).toHaveBeenCalled();
   });
 
   it('should compute resultsLength from reservationSignal', () => {
-    customerReservation$.next({
-      reservations: {
-        totalElements: 42,
-        content: [],
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: {
+          totalElements: 42,
+          content: [],
+        },
+        upcoming: [],
       },
-      upcoming: [],
     });
     fixture.detectChanges();
 
@@ -147,7 +138,7 @@ describe('ReservationListComponent', () => {
   });
 
   it('should expose loading state from the store', () => {
-    isLoading$.next(true);
+    reservationStoreSpy.isLoading.set(true);
     fixture.detectChanges();
 
     expect(component.isLoading()).toBeTrue();
@@ -175,12 +166,14 @@ describe('ReservationListComponent', () => {
       },
     ];
 
-    customerReservation$.next({
-      reservations: {
-        totalElements: 2,
-        content: mockReservations,
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: {
+          totalElements: 2,
+          content: mockReservations,
+        },
+        upcoming: [],
       },
-      upcoming: [],
     });
     fixture.detectChanges();
 
@@ -189,12 +182,14 @@ describe('ReservationListComponent', () => {
   });
 
   it('should set noContent to true when no upcoming reservations', () => {
-    customerReservation$.next({
-      reservations: {
-        totalElements: 0,
-        content: [],
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: {
+          totalElements: 0,
+          content: [],
+        },
+        upcoming: [],
       },
-      upcoming: [],
     });
     fixture.detectChanges();
 
@@ -202,29 +197,31 @@ describe('ReservationListComponent', () => {
   });
 
   it('should set noContent to false when upcoming reservations exist', () => {
-    customerReservation$.next({
-      reservations: {
-        totalElements: 1,
-        content: [],
-      },
-      upcoming: [{
-        id: '1',
-        state: 'completed',
-        timestamp: 1734012000000,
-        price: new Price(100, 0, 0, 0, 100),
-        treatment: { name: 'Treatment 1', price: 100, duration: 60 },
-        professional: { displayName: 'Dr. Smith' },
-        room: {
-          timeZone: 'UTC',
-          id: 'room-1',
-          address: { name: 'Address' },
-          currency: 'USD',
-          paymentTypes: ['CASH'],
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: {
+          totalElements: 1,
+          content: [],
         },
-        office: { id: 'office-1', name: 'Office' },
-        payments: [],
-        additional: [],
-      }],
+        upcoming: [{
+          id: '1',
+          state: 'completed',
+          timestamp: 1734012000000,
+          price: new Price(100, 0, 0, 0, 100),
+          treatment: { name: 'Treatment 1', price: 100, duration: 60 },
+          professional: { displayName: 'Dr. Smith' },
+          room: {
+            timeZone: 'UTC',
+            id: 'room-1',
+            address: { name: 'Address' },
+            currency: 'USD',
+            paymentTypes: ['CASH'],
+          },
+          office: { id: 'office-1', name: 'Office' },
+          payments: [],
+          additional: [],
+        }],
+      },
     });
     fixture.detectChanges();
 
@@ -232,7 +229,7 @@ describe('ReservationListComponent', () => {
   });
 
   it('should reset discount store when response emits', () => {
-    response$.next({ success: true });
+    reservationStoreSpy.response.set({ success: true });
     fixture.detectChanges();
 
     expect(discountStoreSpy.clean).toHaveBeenCalled();
@@ -240,7 +237,7 @@ describe('ReservationListComponent', () => {
 
   it('should show error when errorSignal emits', () => {
     const mockError = { message: 'Test error' };
-    error$.next(mockError);
+    reservationStoreSpy.error.set(mockError);
     fixture.detectChanges();
 
     expect(component.errorSignal()).toEqual(mockError);
@@ -268,9 +265,11 @@ describe('ReservationListComponent', () => {
       },
     ];
 
-    customerReservation$.next({
-      reservations: { totalElements: 0, content: [] },
-      upcoming: mockUpcoming,
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: { totalElements: 0, content: [] },
+        upcoming: mockUpcoming,
+      },
     });
     fixture.detectChanges();
 
@@ -337,9 +336,11 @@ describe('ReservationListComponent', () => {
       ],
     };
 
-    customerReservation$.next({
-      reservations: mockReservations,
-      upcoming: [],
+    reservationStoreSpy.data.set({
+      kind: 'customerReservation', value: {
+        reservations: mockReservations,
+        upcoming: [],
+      },
     });
     fixture.detectChanges();
 

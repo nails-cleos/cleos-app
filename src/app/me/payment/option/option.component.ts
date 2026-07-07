@@ -52,6 +52,7 @@ export class OptionComponent {
   currentStepIndex = signal(0);
 
   constructor() {
+    // TODO: clean reservation
     this.paymentStore.clean();
     this.paymentStore.getOptions();
     effect(() => {

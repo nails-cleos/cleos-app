@@ -7,6 +7,7 @@ import { Pagination } from '../interfaces/pagination';
 import { InvoiceService } from '../services/invoice.service';
 import { cleanCrudCreate, createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 type InvoiceStoreState = StoreState<IInvoice[], never> & {
   page: Pagination<IInvoiceData> | undefined;
@@ -24,10 +25,20 @@ export const InvoiceStore = signalStore(
     invoiceService = inject(InvoiceService),
     translateService = inject(TranslateService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadOfficeToInvoiceSubscription: Subscription | undefined;
+    let uploadInvoicesSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadOfficeToInvoiceSubscription?.unsubscribe();
+      uploadInvoicesSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -40,24 +51,27 @@ export const InvoiceStore = signalStore(
       },
 
       loadPage({ sort, direction, page, size, officeId }: PageRequest & { officeId: string }): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { page: undefined, isLoading: true });
 
-        invoiceService.getInvoicesPage(officeId, page, sort, direction, size).subscribe({
+        loadPageSubscription = invoiceService.getInvoicesPage(officeId, page, sort, direction, size).subscribe({
           next: (page) => patchState(store, { page, isLoading: false }),
           error: patchError,
         });
       },
 
       loadOfficeToInvoice(officeId: string, start: string, end: string, types?: string[]): void {
+        loadOfficeToInvoiceSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        invoiceService.getOfficeToInvoice(officeId, start, end, types).subscribe({
+        loadOfficeToInvoiceSubscription = invoiceService.getOfficeToInvoice(officeId, start, end, types).subscribe({
           next: (data) => patchState(store, { data: data, isLoading: false }),
           error: patchError,
         });
       },
 
       uploadInvoices(officeId: string, blob: Blob, fileName: string, upload: boolean): void {
+        uploadInvoicesSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
         const response: IResponseSuccess = {
@@ -67,14 +81,11 @@ export const InvoiceStore = signalStore(
         };
 
         if (!upload) {
-          patchState(store, {
-            response,
-            isLoading: false,
-          });
+          patchState(store, { response, isLoading: false });
           return;
         }
 
-        invoiceService.uploadInvoices(officeId, blob, fileName).subscribe({
+        uploadInvoicesSubscription = invoiceService.uploadInvoices(officeId, blob, fileName).subscribe({
           next: () => patchState(store, {
             response,
             isLoading: false,

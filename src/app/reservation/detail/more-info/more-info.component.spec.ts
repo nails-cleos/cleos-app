@@ -1,41 +1,43 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MoreInfoComponent } from './more-info.component';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { IReservationAll, ITracking } from '../../reservation';
 import { DEFAULT_LOCALE, getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
 import { IRoomAll } from '../../../room/room';
 import { ICurrencyAll } from '../../../currency/currency';
 import { IReview } from '../../../me/reservation/list/review';
 import { addHours } from 'date-fns';
-import {
-  executeTrackingByReservationId,
-  getReview,
-  getTrackingByReservationId,
-  reservationFindPayments,
-  updateTrackingByReservationId,
-} from '../../../store/actions/reservation.actions';
 import { IPaymentAll } from '../../../interfaces/payment';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ToastService } from '../../../services/toast.service';
 import { NavigationService } from '../../../services/navigation.service';
 import { PaymentStore } from '../../../store/payment.store';
+import { signal } from '@angular/core';
+import { TrackingStore } from '../../../store/tracking.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
   let fixture: ComponentFixture<MoreInfoComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let payments$: BehaviorSubject<any>;
-  let tracking$: BehaviorSubject<any>;
-  let review$: BehaviorSubject<any>;
-
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    review: ReturnType<typeof signal>;
+    loadReview: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
+  let trackingStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    getByReservationId: jasmine.Spy;
+    executeByReservationId: jasmine.Spy;
+    updateByReservationId: jasmine.Spy;
+  };
   let paymentStoreSpy: {
+    data: ReturnType<typeof signal>;
     recreate: jasmine.Spy;
+    getPaymentByResourceId: jasmine.Spy;
   };
   let clipboardSpy: jasmine.SpyObj<Clipboard>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -67,38 +69,33 @@ describe('MoreInfoComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
-    paymentStoreSpy = {
-      recreate: jasmine.createSpy('recreate'),
+    reservationStoreSpy = {
+      review: signal(undefined),
+      loadReview: jasmine.createSpy('loadReview'),
+      clean: jasmine.createSpy('clean'),
     };
-    payments$ = new BehaviorSubject<any>(undefined);
-    tracking$ = new BehaviorSubject<any>(undefined);
-    review$ = new BehaviorSubject<any>(undefined);
+    trackingStoreSpy = {
+      selected: signal(undefined),
+      getByReservationId: jasmine.createSpy('getByReservationId'),
+      executeByReservationId: jasmine.createSpy('executeByReservationId'),
+      updateByReservationId: jasmine.createSpy('updateByReservationId'),
+    };
+    paymentStoreSpy = {
+      data: signal(undefined),
+      recreate: jasmine.createSpy('recreate'),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return payments$.asObservable();
-        case 2:
-          return tracking$.asObservable();
-        case 3:
-          return review$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
 
     await TestBed.configureTestingModule({
       imports: [MoreInfoComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: TrackingStore, useValue: trackingStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
@@ -111,15 +108,9 @@ describe('MoreInfoComponent', () => {
     dialogSpy = spyOn(component['dialog'], 'open');
   });
 
-  afterEach(() => {
-    payments$.complete();
-    tracking$.complete();
-    review$.complete();
-  });
-
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(reservationStoreSpy.loadReview).not.toHaveBeenCalled();
   });
 
   describe('should initialize signals', () => {
@@ -128,27 +119,27 @@ describe('MoreInfoComponent', () => {
       fixture.componentRef.setInput('id', id);
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(getTrackingByReservationId({ id }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id }));
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(getReview({ id }));
+      expect(trackingStoreSpy.getByReservationId).toHaveBeenCalledWith(id);
+      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(id, 'reservation');
+      expect(reservationStoreSpy.loadReview).toHaveBeenCalledWith(id);
     });
     it('should initialize paymentsSignal', () => {
       const payments = [{ id: 'payment-1', reservation: mockReservation } as IPaymentAll];
-      payments$.next(payments);
+      paymentStoreSpy.data.set(payments);
       fixture.detectChanges();
 
       expect(component.paymentsSignal()).toBe(payments);
     });
     it('should initialize trackingSignal', () => {
       const tracking: ITracking = { reservation: mockReservation };
-      tracking$.next(tracking);
+      trackingStoreSpy.selected.set(tracking);
       fixture.detectChanges();
 
       expect(component.trackingSignal()).toBe(tracking);
     });
     it('should initialize reviewSignal', () => {
       const review: IReview = { rating: 5, reservationId: mockReservation.id };
-      review$.next(review);
+      reservationStoreSpy.review.set(review);
       fixture.detectChanges();
 
       expect(component.reviewSignal()).toBe(review);
@@ -157,7 +148,7 @@ describe('MoreInfoComponent', () => {
 
   it('should return undefined when tracking is not complete', () => {
     const tracking: ITracking = { reservation: mockReservation, startedTimestamp: getNowTimeZone().getTime() / 1000 };
-    tracking$.next(tracking);
+    trackingStoreSpy.selected.set(tracking);
     fixture.detectChanges();
 
     expect(component.totalTime()).toBeUndefined();
@@ -170,7 +161,7 @@ describe('MoreInfoComponent', () => {
       startedTimestamp: addHours(now, -2).getTime() / 1000,
       completedTimestamp: now.getTime() / 1000,
     };
-    tracking$.next(tracking);
+    trackingStoreSpy.selected.set(tracking);
     fixture.detectChanges();
 
     expect(component.totalTime()).toBe('02:00');
@@ -183,17 +174,17 @@ describe('MoreInfoComponent', () => {
 
     component.execute();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(executeTrackingByReservationId({ id }));
+    expect(trackingStoreSpy.executeByReservationId).toHaveBeenCalledWith(id);
   });
 
   it('should not call execute when reservationId is not defined', () => {
     component.execute();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(reservationStoreSpy.loadReview).not.toHaveBeenCalled();
   });
 
   it('should not call update when reservationId is not defined', () => {
     component.update();
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(reservationStoreSpy.loadReview).not.toHaveBeenCalled();
   });
 
   it('should call update when dialog is completed', () => {
@@ -207,7 +198,7 @@ describe('MoreInfoComponent', () => {
     };
 
     fixture.componentRef.setInput('id', id);
-    tracking$.next(tracking);
+    trackingStoreSpy.selected.set(tracking);
 
     fixture.detectChanges();
 
@@ -219,9 +210,7 @@ describe('MoreInfoComponent', () => {
 
     component.update();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(updateTrackingByReservationId(
-      { id, started: started.toISOString(), completed: now.toISOString() }),
-    );
+    expect(trackingStoreSpy.updateByReservationId).toHaveBeenCalledWith(id, started.toISOString(), now.toISOString());
   });
 
   it('should call resend', () => {

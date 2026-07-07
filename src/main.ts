@@ -9,7 +9,6 @@ import { environment } from './environments/environment';
 import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
-import { provideStore } from '@ngrx/store';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
 import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -29,13 +28,10 @@ import localeNl from '@angular/common/locales/nl';
 import localeEs from '@angular/common/locales/es';
 import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
-import { provideRouterStore } from '@ngrx/router-store';
-import { reservationReducer } from './app/store/reducers/reservation.reducers';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideAppIcons } from './app/util/app-icons.provider';
 import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
-import { AppRouterStateSerializer } from './app/util/router-state.serializer';
 import { DEFAULT_LOCALE } from './app/util/dates';
 import { AuthStore } from './app/store/auth.store';
 import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
@@ -82,14 +78,18 @@ export function initializePwaService(pwaService: PwaService) {
 
 const providers = [
   provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
-  provideStore({ reservation: reservationReducer }),
   provideRouter(
     routes,
     withRouterConfig({ onSameUrlNavigation: 'reload' }),
     withComponentInputBinding(),
     withInMemoryScrolling({ anchorScrolling: 'enabled' }),
   ),
-  provideRouterStore({ serializer: AppRouterStateSerializer }),
+  provideRouter(
+    routes,
+    withRouterConfig({ onSameUrlNavigation: 'reload' }),
+    withComponentInputBinding(),
+    withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+  ),
   importProvidersFrom(
     BrowserModule,
     TranslateModule.forRoot({
