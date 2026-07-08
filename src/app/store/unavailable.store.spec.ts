@@ -126,11 +126,7 @@ describe('UnavailableStore', () => {
       of({ id: 'u1', timestamp: date } as any),
     );
 
-    store.update({
-      id: 'u1',
-      unavailable: {} as any,
-      path: 'unavailable',
-    });
+    store.update('u1', {} as any, 'unavailable');
 
     expect(store.response()).toEqual({
       message: `UNAVAILABLE.UPDATED.MESSAGE:${ date }`,
@@ -145,11 +141,7 @@ describe('UnavailableStore', () => {
     serviceSpy.deleteUnavailable.and.returnValue(of(void 0));
 
     const date = new Date();
-    store.delete({
-      id: 'u1',
-      timestamp: date.getTime() / 1000,
-      timeZone: 'Europe/Amsterdam',
-    });
+    store.delete('u1', date.getTime() / 1000, 'Europe/Amsterdam');
 
     expect(serviceSpy.deleteUnavailable).toHaveBeenCalledWith('u1');
 

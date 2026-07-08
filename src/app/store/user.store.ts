@@ -33,6 +33,8 @@ type UserStoreState = StoreState<Pagination<IUserAll>, IUserAll> & {
   overview: IOverview | undefined;
 };
 
+type userPageRequest = PageRequest & { filter?: string; };
+
 const initialState: UserStoreState = {
   ...createStoreInitialState<Pagination<IUserAll>, IUserAll>(),
   customers: undefined,
@@ -138,16 +140,14 @@ export const UserStore = signalStore(
         navigationService.navigate(['users', selected.id]);
       },
 
-      loadPage(request: PageRequest & { filter?: string }): void {
+      loadPage({ page, sort, direction, size, filter }: userPageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription = userService
-          .getUsersPage(request.page, request.sort, request.direction, request.size, request.filter)
-          .subscribe({
-            next: (data) => patchState(store, { data, isLoading: false }),
-            error: patchError,
-          });
+        loadPageSubscription = userService.getUsersPage(page, sort, direction, size, filter).subscribe({
+          next: (data) => patchState(store, { data, isLoading: false }),
+          error: patchError,
+        });
       },
 
       loadCustomers(): void {

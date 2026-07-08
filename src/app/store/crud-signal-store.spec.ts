@@ -221,4 +221,77 @@ describe('crud-signal-store', () => {
     });
     expect(store.isLoading()).toBeFalse();
   });
+
+  it('should patch response on update success', () => {
+    api.update.and.returnValue(of({ id: '1', name: 'Updated' }));
+
+    store.update('1', { name: 'Updated' });
+
+    expect(api.update).toHaveBeenCalledWith('1', { name: 'Updated' });
+
+    expect(store.response()).toEqual({
+      message: 'updated:Updated',
+      path: 'items/1',
+    });
+
+    expect(store.selected()).toBeUndefined();
+    expect(store.isLoading()).toBeFalse();
+  });
+
+
+  it('should patch response on delete success', () => {
+    api.delete.and.returnValue(of(void 0));
+
+    store.delete({
+      id: '1',
+      name: 'Blue',
+    });
+
+    expect(api.delete).toHaveBeenCalledWith({
+      id: '1',
+      name: 'Blue',
+    });
+
+    expect(store.response()).toEqual({
+      message: 'deleted:Blue',
+      reload: true,
+      toastType: 'warning',
+    });
+
+    expect(store.data()).toBeUndefined();
+    expect(store.selected()).toBeUndefined();
+    expect(store.isLoading()).toBeFalse();
+  });
+
+  it('should ignore previous create response after a newer create request starts', () => {
+    const firstCreate$ = new Subject<TestResponse>();
+    const secondCreate$ = new Subject<TestResponse>();
+
+    api.create.and.returnValues(
+      firstCreate$.asObservable(),
+      secondCreate$.asObservable(),
+    );
+
+    store.create({ name: 'first' });
+    store.create({ name: 'second' });
+
+    firstCreate$.next({
+      id: '1',
+      name: 'first',
+    });
+    firstCreate$.complete();
+
+    expect(store.response()).toBeUndefined();
+
+    secondCreate$.next({
+      id: '2',
+      name: 'second',
+    });
+    secondCreate$.complete();
+
+    expect(store.response()).toEqual({
+      message: 'created:second',
+      path: 'items/2',
+    });
+  });
 });

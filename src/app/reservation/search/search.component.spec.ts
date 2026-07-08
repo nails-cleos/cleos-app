@@ -223,9 +223,9 @@ describe('SearchComponent', () => {
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
+        userId: component['selectCustomerSignal']()?.id,
+        states: component.selectedStatesSignal(),
       },
-      component['selectCustomerSignal']()?.id,
-      component.selectedStatesSignal(),
     );
   });
 
@@ -242,9 +242,9 @@ describe('SearchComponent', () => {
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
+        userId: component['selectCustomerSignal']()?.id,
+        states: component.selectedStatesSignal(),
       },
-      component['selectCustomerSignal']()?.id,
-      component.selectedStatesSignal(),
     );
   });
 

@@ -189,9 +189,9 @@ export class SearchComponent {
       this.reservationStore.loadAllFiltered({
         ...request,
         size: this.pageSizeSignal(),
+        userId: this.userId(),
+        states: this.selectedStatesSignal(),
       },
-      this.userId(),
-      this.selectedStatesSignal(),
       );
     });
     this.tableState.resetOn(this.responseSignal, () => this.reservationStore.clearResponse());

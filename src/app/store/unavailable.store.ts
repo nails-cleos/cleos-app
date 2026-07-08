@@ -16,18 +16,6 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import type { Subscription } from 'rxjs';
 
-type UpdateUnavailableArgs = {
-  id: string;
-  unavailable: IUnavailable;
-  path: string;
-};
-
-type DeleteUnavailableArgs = {
-  id: string;
-  timestamp: number;
-  timeZone?: string;
-};
-
 const initialState = createStoreInitialState<Pagination<IUnavailableAll>, IUnavailableAll>();
 
 export const UnavailableStore = signalStore(
@@ -74,12 +62,12 @@ export const UnavailableStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage(request: PageRequest): void {
+      loadPage({ page, sort, direction, size }: PageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
         loadPageSubscription =
-          unavailableService.getUnavailablePage(request.page, request.sort, request.direction, request.size).subscribe({
+          unavailableService.getUnavailablePage(page, sort, direction, size).subscribe({
             next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
           });
@@ -129,7 +117,7 @@ export const UnavailableStore = signalStore(
         });
       },
 
-      update({ id, unavailable, path }: UpdateUnavailableArgs): void {
+      update(id: string, unavailable: IUnavailable, path: string): void {
         updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
@@ -142,7 +130,7 @@ export const UnavailableStore = signalStore(
         });
       },
 
-      delete({ id, timestamp, timeZone }: DeleteUnavailableArgs): void {
+      delete(id: string, timestamp: number, timeZone?: string): void {
         deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 

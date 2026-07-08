@@ -75,23 +75,23 @@ export const DiscountStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage(request: PageRequest): void {
+      loadPage({ page, sort, direction, size }: PageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
         loadPageSubscription =
-          discountService.getDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
+          discountService.getDiscountsPage(page, sort, direction, size).subscribe({
             next: (value) => patchState(store, { data: { kind: 'paginationDiscount', value }, isLoading: false }),
             error: patchError,
           });
       },
 
-      loadMyPage(request: PageRequest): void {
+      loadMyPage({ page, sort, direction, size }: PageRequest): void {
         loadMyPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
         loadMyPageSubscription =
-          discountService.getMyDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
+          discountService.getMyDiscountsPage(page, sort, direction, size).subscribe({
             next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
             error: patchError,
           });

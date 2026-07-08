@@ -117,7 +117,7 @@ export class TreatmentListComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.treatmentStore.delete({ id: result.id, name: result.name });
+        this.treatmentStore.delete(result.id, result.name);
       }
     });
   };

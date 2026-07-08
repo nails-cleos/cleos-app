@@ -53,12 +53,12 @@ export const NotificationStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage(request: PageRequest): void {
+      loadPage({ page, sort, direction, size }: PageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
         loadPageSubscription = notificationService
-          .getNotificationsPage(request.page, request.sort, request.direction, request.size).subscribe({
+          .getNotificationsPage(page, sort, direction, size).subscribe({
             next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
           });

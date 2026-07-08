@@ -147,11 +147,7 @@ export class UnavailableListComponent {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
       result => {
         if (result) {
-          this.unavailableStore.delete({
-            id: result.id,
-            timestamp: result.timestamp,
-            timeZone: result.timeZone,
-          });
+          this.unavailableStore.delete(result.id, result.timestamp, result.timeZone);
         }
       });
   };

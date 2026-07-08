@@ -11,9 +11,7 @@ import type { Subscription } from 'rxjs';
 
 type DocumentStoreState = StoreState<Pagination<IDocument>>;
 
-const initialState: DocumentStoreState = {
-  ...createStoreInitialState<Pagination<IDocument>, never>(),
-};
+const initialState: DocumentStoreState = createStoreInitialState<Pagination<IDocument>, never>();
 
 export type DocumentPageRequest = PageRequest & {
   officeId: string;

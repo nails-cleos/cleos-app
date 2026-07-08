@@ -40,6 +40,17 @@ type ReservationState = StoreState<ReservationData, IUpcomingAll> & {
   review: IReview | undefined;
 };
 
+type ReservationPageRequest = PageRequest & {
+  roomId?: string;
+  all?: boolean;
+  professionalId?: string;
+}
+
+type ReservationFilteredRequest = PageRequest & {
+  userId?: string;
+  states?: string[];
+}
+
 const initialState: ReservationState = {
   ...createStoreInitialState<ReservationData, IUpcomingAll>(),
   calendar: undefined,
@@ -145,8 +156,14 @@ export const ReservationStore = signalStore(
 
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
-    const navigate = (role: Role, message: string, id?: string, paymentLink?: string, deleted: boolean = false,
-      toastType: ToastType = 'success') => {
+    const navigate = (
+      role: Role,
+      message: string,
+      id?: string,
+      paymentLink?: string,
+      deleted: boolean = false,
+      toastType: ToastType = 'success',
+    ) => {
       const path = id ? `reservation/${ id }` : undefined;
       patchState(store, { response: { message, toastType, path }, isLoading: false });
       let navigation: string[] = [];
@@ -167,8 +184,14 @@ export const ReservationStore = signalStore(
       navigationService.navigate(navigation);
     };
 
-    const stateSuccess = (id: string, key: string, isDashboard: boolean = false, paymentLink?: string,
-      state?: States, date?: Date) => {
+    const stateSuccess = (
+      id: string,
+      key: string,
+      isDashboard: boolean = false,
+      paymentLink?: string,
+      state?: States,
+      date?: Date,
+    ) => {
       const message = translateService.instant(key);
       patchState(store, { response: { message }, isLoading: false });
       if (paymentLink) {
@@ -223,12 +246,7 @@ export const ReservationStore = signalStore(
         patchState(store, { error: undefined });
       },
 
-      loadPage(
-        { sort, direction, page, size }: PageRequest,
-        roomId?: string,
-        all?: boolean,
-        professionalId?: string,
-      ): void {
+      loadPage({ sort, direction, page, size, roomId, all, professionalId }: ReservationPageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
@@ -239,11 +257,7 @@ export const ReservationStore = signalStore(
           });
       },
 
-      loadAllFiltered(
-        { sort, direction, page, size }: PageRequest,
-        userId?: string,
-        states?: string[],
-      ): void {
+      loadAllFiltered({ sort, direction, page, size, userId, states }: ReservationFilteredRequest): void {
         loadAllFilteredSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 

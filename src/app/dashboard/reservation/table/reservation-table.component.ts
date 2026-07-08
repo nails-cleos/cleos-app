@@ -119,10 +119,10 @@ export class ReservationTableComponent {
         {
           ...request,
           size: this.pageSizeSignal(),
+          roomId: this.roomId(),
+          all: this.all(),
+          professionalId: this.professionalId(),
         },
-        this.roomId(),
-        this.all(),
-        this.professionalId(),
       );
     });
   }

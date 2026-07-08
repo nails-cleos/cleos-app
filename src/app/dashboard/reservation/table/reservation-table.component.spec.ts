@@ -177,10 +177,10 @@ describe('ReservationTableComponent', () => {
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
+        roomId: room.id,
+        all: true,
+        professionalId: professional.id,
       },
-      room.id,
-      true,
-      professional.id,
     );
   });
 
@@ -193,10 +193,10 @@ describe('ReservationTableComponent', () => {
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
+        roomId: undefined,
+        professionalId: undefined,
+        all: false,
       },
-      undefined,
-      false,
-      undefined,
     );
   });
 

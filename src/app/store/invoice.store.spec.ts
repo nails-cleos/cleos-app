@@ -13,7 +13,6 @@ describe('InvoiceStore', () => {
 
   beforeEach(() => {
     invoiceServiceSpy = jasmine.createSpyObj<InvoiceService>('InvoiceService', [
-      'getInvoicesPage',
       'getOfficeToInvoice',
       'uploadInvoices',
     ]);
@@ -21,7 +20,7 @@ describe('InvoiceStore', () => {
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
     translateSpy.instant.and.callFake(
       (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['fileName'] ?? ''}`,
+        `${ key }:${ params?.['fileName'] ?? '' }`,
     );
 
     TestBed.configureTestingModule({
@@ -33,30 +32,6 @@ describe('InvoiceStore', () => {
     });
 
     store = TestBed.inject(InvoiceStore);
-  });
-
-  it('should load invoice page and set page state', () => {
-    const page = { content: [] } as any;
-    invoiceServiceSpy.getInvoicesPage.and.returnValue(of(page));
-
-    store.loadPage({
-      officeId: 'office-1',
-      page: 0,
-      size: 10,
-      sort: 'date',
-      direction: 'desc',
-    });
-
-    expect(invoiceServiceSpy.getInvoicesPage).toHaveBeenCalledWith(
-      'office-1',
-      0,
-      'date',
-      'desc',
-      10,
-    );
-
-    expect(store.page()).toEqual(page);
-    expect(store.isLoading()).toBeFalse();
   });
 
   it('should load office to invoice data', () => {
@@ -120,7 +95,7 @@ describe('InvoiceStore', () => {
   });
 
   it('should map HTTP errors into store error state', () => {
-    invoiceServiceSpy.getInvoicesPage.and.returnValue(
+    invoiceServiceSpy.getOfficeToInvoice.and.returnValue(
       throwError(() =>
         new HttpErrorResponse({
           status: 400,
@@ -129,13 +104,12 @@ describe('InvoiceStore', () => {
       ),
     );
 
-    store.loadPage({
-      officeId: 'office-1',
-      page: 0,
-      size: 10,
-      sort: 'date',
-      direction: 'asc',
-    });
+    store.loadOfficeToInvoice(
+      'office-1',
+      '2026-01-01',
+      '2026-01-31',
+      ['A', 'B'],
+    );
 
     expect(store.error()).toEqual(
       jasmine.objectContaining({
@@ -147,32 +121,28 @@ describe('InvoiceStore', () => {
   });
 
   it('should clean state and reset everything', () => {
-    invoiceServiceSpy.getInvoicesPage.and.returnValue(of({ content: [] } as any));
+    invoiceServiceSpy.getOfficeToInvoice.and.returnValue(of({ content: [] } as any));
 
-    store.loadPage({
-      officeId: 'office-1',
-      page: 0,
-      size: 10,
-      sort: 'date',
-      direction: 'asc',
-    });
+    store.loadOfficeToInvoice(
+      'office-1',
+      '2026-01-01',
+      '2026-01-31',
+      ['A', 'B'],
+    );
 
     store.clean();
 
-    expect(store.page()).toBeUndefined();
     expect(store.data()).toBeUndefined();
   });
 
   it('should clear response and error', () => {
-    invoiceServiceSpy.getInvoicesPage.and.returnValue(of({ content: [] } as any));
-
-    store.loadPage({
-      officeId: 'office-1',
-      page: 0,
-      size: 10,
-      sort: 'date',
-      direction: 'asc',
-    });
+    invoiceServiceSpy.uploadInvoices.and.returnValue(of(void 0));
+    store.uploadInvoices(
+      'office-1',
+      new Blob(['test'], { type: 'application/pdf' }),
+      'fileName',
+      true,
+    );
 
     store.clearResponse();
     expect(store.response()).toBeUndefined();
