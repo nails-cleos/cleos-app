@@ -47,12 +47,12 @@ devices.forEach(({ name, width, height }) => {
 
     it('should create a reservation from the customer flow', () => {
       cy.wait('@getPaymentOptions');
-      cy.wait('@getUpcomingReservation');
+      cy.wait('@loadUpcoming');
       cy.wait('@getRooms');
 
       cy.contains('mat-form-field', 'Office').find('input').should('have.value', 'Nails Cleos');
 
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepTwo"]').click({ force: true });
 
       cy.wait('@getTreatments');
       cy.get('[data-cy="date-picker"]').click({ force: true });
@@ -71,23 +71,23 @@ devices.forEach(({ name, width, height }) => {
       cy.get('[data-cy="group-input"]').should('have.value', 'Biab Treatment ');
       cy.get('[data-cy="treatment-input"]').should('have.value', 'Biab + Single Color ');
 
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepThree"]').click({ force: true });
 
       cy.wait('@getAdditional').its('response.statusCode').should('eq', 200);
 
       cy.contains('mat-list-option', 'Biab Removal').click({ force: true });
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepFour"]').click({ force: true });
 
       cy.wait('@searchCustomerReservation');
 
       cy.contains('.availability-grid button', '13:30').click({ force: true });
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepFive"]').click({ force: true });
 
       cy.contains('.step-heading h2', 'Booking summary').should('exist');
       cy.contains('.booking-summary__price', '€ 90.00').should('exist');
       cy.get('mat-checkbox').contains('Accept').click({ force: true });
 
-      cy.contains('.step-actions button', 'Reserve').click({ force: true });
+      cy.get('button[name="create"]').click({ force: true });
 
       cy.wait('@createReservation').then(({ request, response }) => {
         expect(response?.statusCode).to.eq(201);
@@ -100,7 +100,7 @@ devices.forEach(({ name, width, height }) => {
         expect(request.body.payment).to.eq(undefined);
       });
 
-      cy.wait('@getCustomerReservations');
+      cy.wait('@loadAllByCustomer');
       cy.url().should('include', '/me/reservations');
       cy.get('.upcoming-section').should('exist');
       cy.contains('.app-surface-eyebrow', reservationId).should('exist');
@@ -144,7 +144,7 @@ devices.forEach(({ name, width, height }) => {
     });
 
     it('should render customer upcoming reservation and reservation list', () => {
-      cy.wait('@getCustomerReservations').its('response.statusCode').should('eq', 200);
+      cy.wait('@loadAllByCustomer').its('response.statusCode').should('eq', 200);
 
       cy.get('.upcoming-section').should('exist').within(() => {
         cy.contains('.app-surface-eyebrow', '7de89ece-c39c-4f9f-99fe-fb6133315cab').should('exist');
@@ -166,7 +166,7 @@ devices.forEach(({ name, width, height }) => {
     });
 
     it('should open reservation detail from customer reservation view', () => {
-      cy.wait('@getCustomerReservations');
+      cy.wait('@loadAllByCustomer');
 
       cy.get('.upcoming-section').contains('button', 'View').click({ force: true });
 

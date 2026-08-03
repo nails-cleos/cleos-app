@@ -13,6 +13,7 @@ import {
   patchCrudError,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 export type OfficeData =
   | { kind: 'pagination'; value: Pagination<IOfficeAll> }
@@ -27,10 +28,26 @@ export const OfficeStore = signalStore(
     officeService = inject(OfficeService),
     translateService = inject(TranslateService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadMyOfficesSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadMyOfficesSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -43,36 +60,40 @@ export const OfficeStore = signalStore(
       },
 
       loadPage({ page, sort, direction, size }: PageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        officeService.getOfficesPage(page, sort, direction, size).subscribe({
+        loadPageSubscription = officeService.getOfficesPage(page, sort, direction, size).subscribe({
           next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadMyOffices(): void {
+        loadMyOfficesSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        officeService.getAllMyOffices().subscribe({
+        loadMyOfficesSubscription = officeService.getAllMyOffices().subscribe({
           next: (value) => patchState(store, { data: { kind: 'list', value: value }, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        officeService.getOffice(id).subscribe({
+        loadByIdSubscription = officeService.getOffice(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       create(office: IOffice): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        officeService.createOffice(office).subscribe({
+        createSubscription = officeService.createOffice(office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('OFFICE.CREATED', { name: response.name }),
@@ -86,9 +107,10 @@ export const OfficeStore = signalStore(
       },
 
       update(id: string, office: IOffice): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        officeService.updateOffice(id, office).subscribe({
+        updateSubscription = officeService.updateOffice(id, office).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('OFFICE.UPDATED.MESSAGE', { name: response.name }),
@@ -102,9 +124,10 @@ export const OfficeStore = signalStore(
       },
 
       delete(id: string, name: string): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        officeService.deleteOffice(id).subscribe({
+        deleteSubscription = officeService.deleteOffice(id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('OFFICE.DELETED.MESSAGE', { name }),

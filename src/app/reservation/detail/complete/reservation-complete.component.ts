@@ -9,12 +9,6 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { Store } from '@ngrx/store';
-import {
-  completeReservation,
-  getReservation,
-  reservationFindPayments,
-} from '../../../store/actions/reservation.actions';
 import { IExtras } from '../../reservation';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -52,12 +46,6 @@ import { FormFieldAdderComponent } from '../../../shared/form-field-adder/form-f
 import { PaymentOptionSelectComponent } from '../../../shared/payment-option-select/payment-option-select.component';
 import { PricePreviewComponent } from '../../../shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import {
-  getNavigationParamsPipe,
-  getPaymentsPipe,
-  getSelectedReservationPipe,
-} from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
@@ -74,6 +62,7 @@ import { NavigationService } from '../../../services/navigation.service';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { AdditionalStore } from '../../../store/additional.store';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;
@@ -103,7 +92,7 @@ export class ReservationCompleteComponent {
   customerId = input<string>();
 
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
   private readonly paymentStore = inject(PaymentStore);
@@ -111,22 +100,24 @@ export class ReservationCompleteComponent {
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-  private reservationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
-  private payments$ = this.store.pipe(getPaymentsPipe);
-
-  private readonly reservationParamsSignal = toSignal(this.reservationParams$);
   private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
-  private readonly paymentsSignal = toSignal(this.payments$);
+  private readonly paymentResource = this.paymentStore.data;
   private readonly paymentOptionsSignal = this.paymentStore.options;
 
-  readonly selectedReservationSignal = toSignal(this.selectedReservation$);
+  readonly selectedReservationSignal = this.reservationStore.selected;
   readonly additionalListSignal = computed(() => {
     const data = this.additionalStore.data();
     return data?.kind === 'list' ? data.value : undefined;
   });
 
-  private readonly isDashboard = computed(() => this.reservationParamsSignal()?.isDashboard ?? false);
+  private readonly params = computed(() => {
+    const navigationState = history.state;
+    if (navigationState) {
+      return { isDashboard: navigationState['isDashboard'] };
+    }
+    return undefined;
+  });
+  private readonly isDashboard = computed(() => this.params()?.isDashboard ?? false);
 
   readonly language = this.navigationService.language;
 
@@ -156,7 +147,7 @@ export class ReservationCompleteComponent {
   private readonly selectGroupSignal = toSignal(this.getForm.group.valueChanges);
   private readonly selectTreatmentSignal = toSignal(this.getForm.treatment.valueChanges);
 
-  private readonly payments = computed(() => this.paymentsSignal());
+  private readonly payments = computed(() => this.paymentResource()?.payments);
   private readonly additionalList = computed(() => this.additionalListSignal());
   private additionalSelected = signal<IAdditionalAll[]>([]);
 
@@ -227,6 +218,7 @@ export class ReservationCompleteComponent {
   private currentSplitData?: IExtras[];
 
   constructor() {
+    this.reservationStore.clean();
     this.paymentStore.getOptions();
     effect(() => {
       const reservation = this.selectedReservationSignal();
@@ -252,8 +244,8 @@ export class ReservationCompleteComponent {
       if (!id) {
         return;
       }
-      this.store.dispatch(reservationFindPayments({ id }));
-      this.store.dispatch(getReservation({ id }));
+      this.paymentStore.getPaymentByResourceId(id, 'reservation');
+      this.reservationStore.loadById(id);
     });
 
     effect(() => {
@@ -445,24 +437,22 @@ export class ReservationCompleteComponent {
         ...this.currentSplitData,
       ];
     }
-    this.store.dispatch(
-      completeReservation(
-        reservation.id,
-        {
-          treatmentId: valueChange(this.getForm.treatment.value?.key, reservation?.treatment.key),
-          paymentType: splitData ? undefined : this.getForm.type.value,
-          additionalIds: this.additionalSelected().map(additional => additional.id),
-          transfer: this.getForm.transfer.value,
-          color: this.getForm.color.value?.id,
-          startDateTime: this.startDate.toLocaleString(DEFAULT_LOCALE),
-          endDateTime: this.endDate.toLocaleString(DEFAULT_LOCALE),
-          extras: this.currentExtraData,
-          split: splitData,
-          pointOfSale: true,
-        },
-        this.isDashboard(),
-        this.startDate,
-      ),
+    this.reservationStore.complete(
+      reservation.id,
+      {
+        treatmentId: valueChange(this.getForm.treatment.value?.key, reservation?.treatment.key),
+        paymentType: splitData ? undefined : this.getForm.type.value,
+        additionalIds: this.additionalSelected().map(additional => additional.id),
+        transfer: this.getForm.transfer.value,
+        color: this.getForm.color.value?.id,
+        startDateTime: this.startDate.toLocaleString(DEFAULT_LOCALE),
+        endDateTime: this.endDate.toLocaleString(DEFAULT_LOCALE),
+        extras: this.currentExtraData,
+        split: splitData,
+        pointOfSale: true,
+      },
+      this.isDashboard(),
+      this.startDate,
     );
   };
 }

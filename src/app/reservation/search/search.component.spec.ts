@@ -1,11 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CancelOption, IReservationAll, States } from '../reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { getAllFilterReservations } from '../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
@@ -14,17 +12,26 @@ import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
 import { ICurrencyAll } from '../../currency/currency';
 import { ServiceType } from '../../room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { NavigationService } from '../../services/navigation.service';
 import { UserStore } from '../../store/user.store';
+import { ReservationStore } from '../../store/reservation.store';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+
+  let reservationStoreSpy: {
+    data: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    response: ReturnType<typeof signal>;
+    loadAllFiltered: jasmine.Spy;
+    clearResponse: jasmine.Spy;
+    cancel: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   let userStoreSpy: {
     customers: ReturnType<typeof signal>;
@@ -99,22 +106,25 @@ describe('SearchComponent', () => {
     totalElements: 2,
   };
 
-  let reservationList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<boolean>;
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      data: signal({ kind: 'pagination', value: mockPagination }),
+      isLoading: signal(false),
+      response: signal(undefined),
+      loadAllFiltered: jasmine.createSpy('loadAllFiltered'),
+      clearResponse: jasmine.createSpy('clearResponse'),
+      cancel: jasmine.createSpy('cancel'),
+      clean: jasmine.createSpy('clean'),
+    };
     userStoreSpy = {
       customers: signal<any>(undefined),
       loadCustomers: jasmine.createSpy('loadCustomers'),
     };
-    reservationList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<boolean>(false);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -123,7 +133,6 @@ describe('SearchComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
 
     activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
@@ -132,20 +141,6 @@ describe('SearchComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return reservationList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
@@ -153,7 +148,7 @@ describe('SearchComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
@@ -168,19 +163,14 @@ describe('SearchComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    reservationList$.complete();
-    response$.complete();
-    isLoading$.complete();
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    reservationList$.next(mockPagination);
+    reservationStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -188,7 +178,7 @@ describe('SearchComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    reservationList$.next(mockPagination);
+    reservationStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -227,15 +217,15 @@ describe('SearchComponent', () => {
     paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getAllFilterReservations({
+    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith(
+      {
         page: 1,
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
         userId: component['selectCustomerSignal']()?.id,
         states: component.selectedStatesSignal(),
-      }),
+      },
     );
   });
 
@@ -243,18 +233,18 @@ describe('SearchComponent', () => {
     const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
     component['paginator'] = signal(paginatorMock);
 
-    response$.next({ success: true });
+    reservationStoreSpy.response.set({ success: true });
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getAllFilterReservations({
+    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith(
+      {
         page: 0,
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
         userId: component['selectCustomerSignal']()?.id,
         states: component.selectedStatesSignal(),
-      }),
+      },
     );
   });
 

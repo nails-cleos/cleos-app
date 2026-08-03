@@ -1,4 +1,4 @@
-name: Deploy
+name: Continue Deployment flow
 
 on:
   workflow_call:

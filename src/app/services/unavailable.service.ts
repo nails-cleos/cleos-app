@@ -36,7 +36,7 @@ export class UnavailableService {
   createBlockAgenda = (unavailable: IUnavailable): Observable<IApiResponse> => this.http.post<IApiResponse>(
     `${ this.urlV1 }/block/agenda`, unavailable);
 
-  deleteUnavailable = (id: string): Observable<IUnavailable> => this.http.delete<IUnavailable>(toUrl(this.urlV1, id));
+  deleteUnavailable = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
 
   updateUnavailable = (
     id: string,

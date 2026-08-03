@@ -7,12 +7,14 @@ import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
 import {
   cleanCrudCreate,
-  cleanCrudDelete, cleanCrudUpdate,
+  cleanCrudDelete,
+  cleanCrudUpdate,
   createStoreInitialState,
   patchCrudError,
   StoreState,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 export type DiscountData =
   | { kind: 'paginationDiscount'; value: Pagination<IDiscountAll> }
@@ -35,10 +37,33 @@ export const DiscountStore = signalStore(
     discountService = inject(DiscountService),
     translateService = inject(TranslateService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadMyPageSubscription: Subscription | undefined;
+    let loadReferralsSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let loadUserDiscountsSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+    let sendToCustomersSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadMyPageSubscription?.unsubscribe();
+      loadReferralsSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      loadUserDiscountsSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+      sendToCustomersSubscription?.unsubscribe();
+    };
+
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -50,55 +75,63 @@ export const DiscountStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage(request: PageRequest): void {
+      loadPage({ page, sort, direction, size }: PageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        discountService.getDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'paginationDiscount', value }, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription =
+          discountService.getDiscountsPage(page, sort, direction, size).subscribe({
+            next: (value) => patchState(store, { data: { kind: 'paginationDiscount', value }, isLoading: false }),
+            error: patchError,
+          });
       },
 
-      loadMyPage(request: PageRequest): void {
+      loadMyPage({ page, sort, direction, size }: PageRequest): void {
+        loadMyPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        discountService.getMyDiscountsPage(request.page, request.sort, request.direction, request.size).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
-          error: patchError,
-        });
+        loadMyPageSubscription =
+          discountService.getMyDiscountsPage(page, sort, direction, size).subscribe({
+            next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
+            error: patchError,
+          });
       },
 
       loadReferrals(): void {
+        loadReferralsSubscription?.unsubscribe();
         patchState(store, { referrals: undefined, isLoading: true });
 
-        discountService.getMyReferrals().subscribe({
+        loadReferralsSubscription = discountService.getMyReferrals().subscribe({
           next: (referrals) => patchState(store, { referrals, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        discountService.getDiscount(id).subscribe({
+        loadByIdSubscription = discountService.getDiscount(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       loadUserDiscounts(customerId: string): void {
+        loadUserDiscountsSubscription?.unsubscribe();
         patchState(store, { data: { kind: 'list', value: [] }, isLoading: true });
 
-        discountService.getUserDiscountByCustomerId(customerId).subscribe({
+        loadUserDiscountsSubscription = discountService.getUserDiscountByCustomerId(customerId).subscribe({
           next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
           error: patchError,
         });
       },
 
       create(discount: IDiscount): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        discountService.createDiscount(discount).subscribe({
+        createSubscription = discountService.createDiscount(discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('DISCOUNT.CREATED', { name: response.name }),
@@ -112,9 +145,10 @@ export const DiscountStore = signalStore(
       },
 
       update(id: string, discount: IDiscount): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        discountService.updateDiscount(id, discount).subscribe({
+        updateSubscription = discountService.updateDiscount(id, discount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name }),
@@ -128,9 +162,10 @@ export const DiscountStore = signalStore(
       },
 
       delete(id: string, name: string): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        discountService.deleteDiscount(id).subscribe({
+        deleteSubscription = discountService.deleteDiscount(id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('DISCOUNT.DELETED.MESSAGE', { name }),
@@ -144,9 +179,10 @@ export const DiscountStore = signalStore(
       },
 
       sendToCustomers(id: string, customersDiscount: string[]): void {
+        sendToCustomersSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        discountService.sendDiscounts(id, customersDiscount).subscribe({
+        sendToCustomersSubscription = discountService.sendDiscounts(id, customersDiscount).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('DISCOUNT.SEND', { name: response.name }),

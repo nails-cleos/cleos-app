@@ -85,16 +85,11 @@ export const TreatmentStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage(request: PageRequest): void {
+      loadPage({ page, sort, direction, size }: PageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription = treatmentService.getTreatmentsPage(
-          request.page,
-          request.sort,
-          request.direction,
-          request.size,
-        ).subscribe({
+        loadPageSubscription = treatmentService.getTreatmentsPage(page, sort, direction, size).subscribe({
           next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
           error: patchError,
         });
@@ -178,14 +173,14 @@ export const TreatmentStore = signalStore(
         });
       },
 
-      delete(args: { id: string; name: string }): void {
+      delete(id: string, name: string): void {
         deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        deleteSubscription = treatmentService.deleteTreatmentGroup(args.id).subscribe({
+        deleteSubscription = treatmentService.deleteTreatmentGroup(id).subscribe({
           next: () => patchState(store, {
             response: {
-              message: translateService.instant('TREATMENT.DELETED.MESSAGE', { name: args.name }),
+              message: translateService.instant('TREATMENT.DELETED.MESSAGE', { name }),
               reload: true,
               toastType: 'warning',
             },

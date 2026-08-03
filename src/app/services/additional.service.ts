@@ -40,13 +40,13 @@ export class AdditionalService {
   createAdditional = (additional: IAdditional): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1,
     additional);
 
-  deleteAdditional = (id: string): Observable<IAdditional> => this.http.delete<IAdditional>(toUrl(this.urlV1, id));
+  deleteAdditional = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
 
   updateAdditional = (id: string, additional: IAdditional): Observable<IApiResponse> => this.http.patch<IApiResponse>(
     toUrl(this.urlV1, id), additional,
   );
 
-  sortAdditional = (additionalList: ISorted[]): Observable<IAdditionalAll[]> => this.http.patch<IAdditionalAll[]>(
+  sortAdditional = (additionalList: ISorted[]): Observable<void> => this.http.patch<void>(
     this.urlV1, additionalList,
   );
 }

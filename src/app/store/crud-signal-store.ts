@@ -72,6 +72,7 @@ type CrudStoreConfig<TEntity, TCreateResponse, TUpdateResponse, TDeleteArgs> = {
   delete?: (args: TDeleteArgs) => Observable<unknown>;
   deleteResponse?: (args: TDeleteArgs) => IResponseSuccess;
   loadById?: (id: string) => Observable<TEntity | undefined>;
+  loadByExternalId?: (id: string) => Observable<TEntity[] | undefined>;
   loadAll?: () => Observable<TEntity[] | undefined>;
   loadPage?: (request: PageRequest) => Observable<Pagination<TEntity>>;
   update?: (id: string, entity: TEntity) => Observable<TUpdateResponse>;
@@ -88,6 +89,7 @@ export const withCrudStoreMethods =
       const config = configFactory();
       let loadPageSubscription: Subscription | undefined;
       let loadByIdSubscription: Subscription | undefined;
+      let loadByExternalIdSubscription: Subscription | undefined;
       let loadAllSubscription: Subscription | undefined;
       let createSubscription: Subscription | undefined;
       let updateSubscription: Subscription | undefined;
@@ -97,6 +99,7 @@ export const withCrudStoreMethods =
       const cancelAllRequests = (): void => {
         loadPageSubscription?.unsubscribe();
         loadByIdSubscription?.unsubscribe();
+        loadByExternalIdSubscription?.unsubscribe();
         loadAllSubscription?.unsubscribe();
         createSubscription?.unsubscribe();
         updateSubscription?.unsubscribe();
@@ -135,17 +138,11 @@ export const withCrudStoreMethods =
 
           loadPageSubscription?.unsubscribe();
 
-          patchState(store, {
-            data: undefined,
-            isLoading: true,
-          });
+          patchState(store, { data: undefined, isLoading: true });
 
           loadPageSubscription = config.loadPage(request).subscribe({
             next: (value) => {
-              patchState(store, {
-                data: { kind: 'pagination', value },
-                isLoading: false,
-              });
+              patchState(store, { data: { kind: 'pagination', value }, isLoading: false });
             },
             error: patchError,
           });
@@ -158,14 +155,28 @@ export const withCrudStoreMethods =
 
           loadByIdSubscription?.unsubscribe();
 
-          patchState(store, {
-            selected: undefined,
-            isLoading: true,
-          });
+          patchState(store, { selected: undefined, isLoading: true });
 
           loadByIdSubscription = config.loadById(id).subscribe({
             next: (selected) => {
               patchState(store, { selected, isLoading: false });
+            },
+            error: patchError,
+          });
+        },
+
+        loadByExternalId(id: string): void {
+          if (!config.loadByExternalId) {
+            return;
+          }
+
+          loadByExternalIdSubscription?.unsubscribe();
+
+          patchState(store, { data: undefined, isLoading: true });
+
+          loadByExternalIdSubscription = config.loadByExternalId(id).subscribe({
+            next: (value) => {
+              patchState(store, { data: { kind: 'list', value }, isLoading: false });
             },
             error: patchError,
           });
@@ -178,10 +189,7 @@ export const withCrudStoreMethods =
 
           loadAllSubscription?.unsubscribe();
 
-          patchState(store, {
-            data: undefined,
-            isLoading: true,
-          });
+          patchState(store, { data: undefined, isLoading: true });
 
           loadAllSubscription = config.loadAll().subscribe({
             next: (value) => {
@@ -199,17 +207,11 @@ export const withCrudStoreMethods =
           const createResponse = config.createResponse;
           createSubscription?.unsubscribe();
 
-          patchState(store, {
-            response: undefined,
-            isLoading: true,
-          });
+          patchState(store, { response: undefined, isLoading: true });
 
           createSubscription = create(entity).subscribe({
             next: (response) => {
-              patchState(store, {
-                response: createResponse(response, entity),
-                isLoading: false,
-              });
+              patchState(store, { response: createResponse(response, entity), isLoading: false });
             },
             error: patchError,
           });
@@ -223,18 +225,11 @@ export const withCrudStoreMethods =
           const updateResponse = config.updateResponse;
           updateSubscription?.unsubscribe();
 
-          patchState(store, {
-            response: undefined,
-            selected: undefined,
-            isLoading: true,
-          });
+          patchState(store, { response: undefined, selected: undefined, isLoading: true });
 
           updateSubscription = update(id, entity).subscribe({
             next: (response) => {
-              patchState(store, {
-                response: updateResponse(response, id, entity),
-                isLoading: false,
-              });
+              patchState(store, { response: updateResponse(response, id, entity), isLoading: false });
             },
             error: patchError,
           });
@@ -257,10 +252,7 @@ export const withCrudStoreMethods =
 
           deleteSubscription = remove(args).subscribe({
             next: () => {
-              patchState(store, {
-                response: deleteResponse(args),
-                isLoading: false,
-              });
+              patchState(store, { response: deleteResponse(args), isLoading: false });
             },
             error: patchError,
           });
@@ -274,18 +266,11 @@ export const withCrudStoreMethods =
           const sortResponse = config.sortResponse;
           sortSubscription?.unsubscribe();
 
-          patchState(store, {
-            data: undefined,
-            response: undefined,
-            isLoading: true,
-          });
+          patchState(store, { data: undefined, response: undefined, isLoading: true });
 
           sortSubscription = sort(items).subscribe({
             next: () => {
-              patchState(store, {
-                response: sortResponse(items),
-                isLoading: false,
-              });
+              patchState(store, { response: sortResponse(items), isLoading: false });
             },
             error: patchError,
           });

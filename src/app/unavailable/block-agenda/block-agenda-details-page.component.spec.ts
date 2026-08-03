@@ -103,12 +103,12 @@ describe('BlockAgendaDetailsPageComponent', () => {
 
     component.submit(mockUnavailable as any);
 
-    expect(unavailableStoreSpy.update).toHaveBeenCalledWith({
+    expect(unavailableStoreSpy.update).toHaveBeenCalledWith(
       id,
-      unavailable: jasmine.objectContaining({
+      jasmine.objectContaining({
         duration: '00:30',
       }),
-      path: 'unavailable/block-agenda',
-    });
+      'unavailable/block-agenda',
+    );
   });
 });

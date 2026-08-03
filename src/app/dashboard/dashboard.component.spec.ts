@@ -12,9 +12,8 @@ import { States } from '../reservation/reservation';
 import { FrequencyEnum } from '../util/helper';
 import { provideAppCalendar } from '../util/adapter/app-date.provider';
 import { DashboardStore } from '../store/dashboard.store';
-import { Store } from '@ngrx/store';
-import { BehaviorSubject } from 'rxjs';
 import { NavigationService } from '../services/navigation.service';
+import { ReservationStore } from '../store/reservation.store';
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
@@ -24,10 +23,17 @@ describe('DashboardComponent', () => {
   let dashboardStoreSpy: {
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
-    isLoading: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal<boolean>>;
     getEvents: jasmine.Spy;
     getCards: jasmine.Spy;
     clean: jasmine.Spy;
+  };
+  let reservationStoreSpy: {
+    data: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal<boolean>>;
+    loadPage: jasmine.Spy;
+    delete: jasmine.Spy;
   };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -72,28 +78,31 @@ describe('DashboardComponent', () => {
     );
     history.replaceState({}, '');
     dashboardStoreSpy = {
-      data: signal<any>(undefined),
-      error: signal<any>(undefined),
-      isLoading: signal<any>(undefined),
+      data: signal(undefined),
+      error: signal(undefined),
+      isLoading: signal(false),
       getEvents: jasmine.createSpy('getEvents'),
       getCards: jasmine.createSpy('getCards'),
       clean: jasmine.createSpy('clean'),
     };
+    reservationStoreSpy = {
+      data: signal(undefined),
+      error: signal(undefined),
+      isLoading: signal(false),
+      loadPage: jasmine.createSpy('loadPage'),
+      delete: jasmine.createSpy('delete'),
+    };
 
-    const storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
-
-    storeSpy.pipe.and.callFake(() => new BehaviorSubject(undefined).asObservable());
-    storeSpy.select.and.returnValue(new BehaviorSubject(false).asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DashboardComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideAppCalendar(),
       ],

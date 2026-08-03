@@ -14,6 +14,7 @@ import {
   StoreState,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 type ExpenseStoreState = StoreState<Pagination<IExpenseAll>, IExpenseAll> & {
   info: IExpenseInfo | undefined;
@@ -37,10 +38,26 @@ export const ExpenseStore = signalStore(
     expenseService = inject(ExpenseService),
     translateService = inject(TranslateService),
   ) => {
+    let loadPageSubscription: Subscription | undefined;
+    let loadInfoSubscription: Subscription | undefined;
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadPageSubscription?.unsubscribe();
+      loadInfoSubscription?.unsubscribe();
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -53,36 +70,41 @@ export const ExpenseStore = signalStore(
       },
 
       loadPage({ roomId, sort, direction, page, size, filter, dateFilter }: ExpensePageRequest): void {
+        loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription =
+          expenseService.getExpensesPage(roomId, sort, direction, page, size, filter, dateFilter).subscribe({
+            next: (data) => patchState(store, { data, isLoading: false }),
+            error: patchError,
+          });
       },
 
       loadInfo(roomId: string): void {
+        loadInfoSubscription?.unsubscribe();
         patchState(store, { info: undefined, isLoading: true });
 
-        expenseService.getAllExpensesInfo(roomId).subscribe({
+        loadInfoSubscription = expenseService.getAllExpensesInfo(roomId).subscribe({
           next: (info) => patchState(store, { info, isLoading: false }),
           error: patchError,
         });
       },
 
       loadById(roomId: string, id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: false });
 
-        expenseService.getExpense(roomId, id).subscribe({
+        loadByIdSubscription = expenseService.getExpense(roomId, id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       create(roomId: string, expense: IExpense, file: File): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        expenseService.createExpense(roomId, expense, file).subscribe({
+        createSubscription = expenseService.createExpense(roomId, expense, file).subscribe({
           next: (response: IApiResponse) => {
             patchState(store, {
               response: {
@@ -97,9 +119,10 @@ export const ExpenseStore = signalStore(
       },
 
       update(id: string, roomId: string, expense: IExpense, file?: File): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        expenseService.updateExpense(id, roomId, expense, file).subscribe({
+        updateSubscription = expenseService.updateExpense(id, roomId, expense, file).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('EXPENSE.UPDATED.MESSAGE', { invoice: response.name }),
@@ -112,9 +135,10 @@ export const ExpenseStore = signalStore(
       },
 
       delete(roomId: string, id: string, invoice: string): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        expenseService.deleteExpense(roomId, id).subscribe({
+        deleteSubscription = expenseService.deleteExpense(roomId, id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('EXPENSE.DELETED.MESSAGE', { invoice }),

@@ -122,11 +122,9 @@ describe('AdditionalService', () => {
   });
 
   it('should delete additional by id', () => {
-    httpSpy.delete.and.returnValue(of(mockAdditional));
+    httpSpy.delete.and.returnValue(of(void 0));
 
-    service.deleteAdditional('1').subscribe((result) => {
-      expect(result).toEqual(mockAdditional);
-    });
+    service.deleteAdditional('1');
 
     expect(httpSpy.delete).toHaveBeenCalledWith('v1/additional/1');
   });
@@ -143,12 +141,9 @@ describe('AdditionalService', () => {
 
   it('should sort additionals', () => {
     const mockSortedList: ISorted[] = [{ key: '1', order: 0 }];
-    const mockResult = [mockAdditionalAll];
-    httpSpy.patch.and.returnValue(of(mockResult));
+    httpSpy.patch.and.returnValue(of(void 0));
 
-    service.sortAdditional(mockSortedList).subscribe((result) => {
-      expect(result).toEqual(mockResult);
-    });
+    service.sortAdditional(mockSortedList);
 
     expect(httpSpy.patch).toHaveBeenCalledWith('v1/additional', mockSortedList);
   });

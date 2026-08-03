@@ -1,14 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCompleteComponent } from './reservation-complete.component';
-import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
-import {
-  completeReservation,
-  getReservation,
-  reservationFindPayments,
-} from '../../../store/actions/reservation.actions';
 import { IExtras } from '../../reservation';
 import { MatListOption } from '@angular/material/list';
 import { ServiceType } from '../../../room/room';
@@ -18,13 +11,19 @@ import { signal } from '@angular/core';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { AdditionalStore } from '../../../store/additional.store';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
   let fixture: ComponentFixture<ReservationCompleteComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    loadById: jasmine.Spy;
+    complete: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
 
   let treatmentStoreSpy: {
     treatmentDiscount: ReturnType<typeof signal>;
@@ -36,13 +35,11 @@ describe('ReservationCompleteComponent', () => {
     loadAllByGroupId: jasmine.Spy;
   };
   let paymentStoreSpy: {
+    data: ReturnType<typeof signal>;
     options: ReturnType<typeof signal>;
     getOptions: jasmine.Spy;
+    getPaymentByResourceId: jasmine.Spy;
   };
-
-  let navigationParams$: BehaviorSubject<any>;
-  let selectedReservation$: BehaviorSubject<any>;
-  let payments$: BehaviorSubject<any>;
 
   const mockReservation = {
     id: 'reservation-1',
@@ -143,6 +140,12 @@ describe('ReservationCompleteComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      selected: signal(undefined),
+      loadById: jasmine.createSpy('loadById'),
+      complete: jasmine.createSpy('complete'),
+      clean: jasmine.createSpy('clean'),
+    };
     treatmentStoreSpy = {
       treatmentDiscount: signal<any>(mockTreatmentDiscount),
       getAllTreatments: jasmine.createSpy('getAllTreatments'),
@@ -152,39 +155,20 @@ describe('ReservationCompleteComponent', () => {
       loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
     };
     paymentStoreSpy = {
+      data: signal(mockPayments),
       options: signal(mockPaymentOptions),
       getOptions: jasmine.createSpy('getOptions'),
+      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
     };
-    navigationParams$ = new BehaviorSubject(undefined);
-    selectedReservation$ = new BehaviorSubject(undefined);
-    payments$ = new BehaviorSubject(mockPayments);
-
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return selectedReservation$.asObservable();
-        case 3:
-          return payments$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
 
     await TestBed.configureTestingModule({
       imports: [ReservationCompleteComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
-        { provide: Store, useValue: storeSpy },
       ],
     }).compileComponents();
 
@@ -195,12 +179,6 @@ describe('ReservationCompleteComponent', () => {
     component = fixture.componentInstance;
 
     fixture.detectChanges();
-  });
-
-  afterEach(() => {
-    navigationParams$.complete();
-    selectedReservation$.complete();
-    payments$.complete();
   });
 
   it('should create', () => {
@@ -235,7 +213,7 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should initialize signals', () => {
-      selectedReservation$.next(mockReservation);
+      reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
       expect(component.selectedReservationSignal()).toBeDefined();
       expect(component.additionalListSignal()).toBeDefined();
@@ -246,7 +224,7 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should initialize types array', () => {
-      selectedReservation$.next(mockReservation);
+      reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
 
       expect(component.options().map(type => type.type)).toContain('CASH');
@@ -256,13 +234,13 @@ describe('ReservationCompleteComponent', () => {
 
   describe('Computed Properties', () => {
     it('should compute balance from selected reservation', () => {
-      selectedReservation$.next(mockReservation);
+      reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
       expect(component.balance).toBe(50);
     });
 
     it('should return 0 when reservation has no balance', () => {
-      selectedReservation$.next({ ...mockReservation, balance: undefined });
+      reservationStoreSpy.selected.set({ ...mockReservation, balance: undefined });
       fixture.detectChanges();
       expect(component.balance).toBe(0);
     });
@@ -466,53 +444,39 @@ describe('ReservationCompleteComponent', () => {
       };
       const dialogSpyInstance = spyOn(component['dialog'], 'open');
       dialogSpyInstance.and.returnValue(mockDialogRef as any);
-      const dispatchSpy = storeSpy.dispatch;
-      dispatchSpy.calls.reset();
 
       component.complete();
 
-      // Wait for async operations
-      setTimeout(() => {
-        expect(dispatchSpy).not.toHaveBeenCalledWith(jasmine.objectContaining({
-          type: completeReservation.type,
-        }));
-      }, 100);
+      setTimeout(() => expect(reservationStoreSpy.complete).not.toHaveBeenCalled(), 100);
     });
 
     it('should complete reservation directly when isValid is true', () => {
       component.isValid = true;
-      selectedReservation$.next(mockReservation);
+      reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
 
       component.complete();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: completeReservation.type,
-        }),
-      );
+      expect(reservationStoreSpy.complete).toHaveBeenCalled();
     });
   });
 
   describe('Store Dispatching', () => {
     it('should dispatch reservationFindPayments when reservationId changes', () => {
-      storeSpy.dispatch.calls.reset();
       fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(reservationFindPayments({ id: 'new-reservation-id' }));
+      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('new-reservation-id', 'reservation');
     });
 
     it('should dispatch getReservation when reservationId changes', () => {
-      storeSpy.dispatch.calls.reset();
       fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(getReservation({ id: 'new-reservation-id' }));
+      expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('new-reservation-id');
     });
 
     it('should dispatch getAllTreatments when roomId changes', () => {
-      storeSpy.dispatch.calls.reset();
       fixture.componentRef.setInput('roomId', 'new-room-id');
       fixture.componentRef.setInput('customerId', 'customer-1');
       fixture.detectChanges();
@@ -521,7 +485,6 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should dispatch getAllAdditionalByGroupId when group is selected', () => {
-      storeSpy.dispatch.calls.reset();
       fixture.componentRef.setInput('roomId', 'room-1');
       fixture.detectChanges();
 

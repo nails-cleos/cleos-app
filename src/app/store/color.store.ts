@@ -20,6 +20,7 @@ export const ColorStore = signalStore(
     return {
       loadPage: ({ page, sort, direction, size }) => colorService.getColorsPage(page, sort, direction, size),
       loadById: (id) => colorService.getColor(id),
+      loadByExternalId: (treatmentId: string) => colorService.getColorsByTreatmentId(treatmentId),
       loadAll: () => colorService.getAllColors(),
       create: (color) => colorService.createColor(color),
       update: (id, color) => colorService.updateColor(id, color),

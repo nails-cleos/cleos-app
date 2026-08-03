@@ -1,5 +1,5 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
@@ -26,6 +26,7 @@ describe('NavigationService', () => {
   let themeServiceSpy: jasmine.SpyObj<ThemeService>;
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
   let routerSpy: jasmine.SpyObj<Router>;
+  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let routerEventsSubject: Subject<any>;
 
   beforeEach(() => {
@@ -55,6 +56,11 @@ describe('NavigationService', () => {
 
     routerSpy.navigate.and.returnValue(Promise.resolve(true));
     routerSpy.navigateByUrl.and.returnValue(Promise.resolve(true));
+    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+      snapshot: {
+        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+      },
+    });
 
     TestBed.configureTestingModule({
       imports: [TranslateModule.forRoot()],
@@ -68,6 +74,7 @@ describe('NavigationService', () => {
         { provide: ThemeService, useValue: themeServiceSpy },
         { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
         { provide: Router, useValue: routerSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteSpy },
         {
           provide: ElementRef,
           useValue: new ElementRef(document.createElement('div')),

@@ -138,6 +138,6 @@ describe('TreatmentListComponent', () => {
         },
       }));
 
-    expect(treatmentStoreSpy.delete).toHaveBeenCalledWith({ id: item.id!, name: item.name! });
+    expect(treatmentStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
   });
 });

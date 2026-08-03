@@ -36,7 +36,7 @@ export class OfficeService {
 
   createOffice = (office: IOffice): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, office);
 
-  deleteOffice = (id: string): Observable<IOffice> => this.http.delete<IOffice>(toUrl(this.urlV1, id));
+  deleteOffice = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
 
   updateOffice = (
     id: string,

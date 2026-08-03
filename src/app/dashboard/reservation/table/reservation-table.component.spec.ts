@@ -1,29 +1,33 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IReservation } from '../../../reservation/reservation';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { deleteReservation, getPage } from '../../../store/actions/reservation.actions';
 import { ActivatedRoute } from '@angular/router';
 import { ReservationTableComponent } from './reservation-table.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
 import { IUser } from '../../../user/user';
 import { IRoom } from '../../../room/room';
 import { ITreatment } from '../../../treatment/treatment';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
   let fixture: ComponentFixture<ReservationTableComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    isLoading: ReturnType<typeof signal<boolean>>;
+    data: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    loadPage: jasmine.Spy;
+    delete: jasmine.Spy;
+  };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -59,19 +63,20 @@ describe('ReservationTableComponent', () => {
     totalElements: 2,
   };
 
-  let reservationList$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
-  let response$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<boolean>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
-    reservationList$ = new BehaviorSubject(mockPagination);
-    response$ = new BehaviorSubject<any>(undefined);
-    isLoading$ = new BehaviorSubject<boolean>(false);
+    reservationStoreSpy = {
+      isLoading: signal(false),
+      data: signal({ kind: 'pagination', value: mockPagination }),
+      error: signal(undefined),
+      loadPage: jasmine.createSpy('loadPage'),
+      delete: jasmine.createSpy('delete'),
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -80,26 +85,11 @@ describe('ReservationTableComponent', () => {
       },
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
-
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return reservationList$.asObservable();
-        case 2:
-          return response$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
 
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
@@ -107,7 +97,7 @@ describe('ReservationTableComponent', () => {
       imports: [ReservationTableComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -124,19 +114,14 @@ describe('ReservationTableComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    reservationList$.complete();
-    response$.complete();
-    isLoading$.complete();
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    reservationList$.next(mockPagination);
+    reservationStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -144,7 +129,7 @@ describe('ReservationTableComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    reservationList$.next(mockPagination);
+    reservationStoreSpy.data.set({ kind: 'pagination', value: mockPagination });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -186,24 +171,24 @@ describe('ReservationTableComponent', () => {
     fixture.componentRef.setInput('roomId', room.id);
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPage({
+    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith(
+      {
         page: 1,
         sort: 'timestamp',
         direction: 'desc',
         size: PAGE_SIZE,
         roomId: room.id,
-        professionalId: professional.id,
         all: true,
-      }),
+        professionalId: professional.id,
+      },
     );
   });
 
   it('should dispatch getReservationPage first time', () => {
     fixture.detectChanges();
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      getPage({
+    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith(
+      {
         page: 0,
         sort: 'timestamp',
         direction: 'desc',
@@ -211,7 +196,7 @@ describe('ReservationTableComponent', () => {
         roomId: undefined,
         professionalId: undefined,
         all: false,
-      }),
+      },
     );
   });
 
@@ -223,7 +208,6 @@ describe('ReservationTableComponent', () => {
 
     component.delete(item);
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(
-      deleteReservation({ id: item.id!, timestamp: item.timestamp!, timeZone: item.room!.timeZone! }));
+    expect(reservationStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.timestamp!, item.room!.timeZone!);
   });
 });

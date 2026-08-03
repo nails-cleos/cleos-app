@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationComponent } from './reservation.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
@@ -30,6 +29,7 @@ import { RoomStore } from '../store/room.store';
 import { TreatmentStore } from '../store/treatment.store';
 import { AdditionalStore } from '../store/additional.store';
 import { PaymentStore } from '../store/payment.store';
+import { ReservationStore } from '../store/reservation.store';
 
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
@@ -37,6 +37,13 @@ describe('ReservationComponent', () => {
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
   const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
+  let reservationStoreSpy: {
+    calendar: ReturnType<typeof signal>;
+    subErrors: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
+    loadCalendar: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let userStoreSpy: {
     customers: ReturnType<typeof signal>;
     customerInfo: ReturnType<typeof signal>;
@@ -60,12 +67,6 @@ describe('ReservationComponent', () => {
   };
 
   let matches$: BehaviorSubject<any>;
-  let navigationParams$: BehaviorSubject<any>;
-  let calendar$: BehaviorSubject<any>;
-  let subErrors$: BehaviorSubject<any>;
-  let isLoading$: BehaviorSubject<boolean>;
-
-  let storeSpy: jasmine.SpyObj<Store>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
@@ -159,6 +160,13 @@ describe('ReservationComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      calendar: signal(undefined),
+      subErrors: signal(undefined),
+      isLoading: signal(false),
+      loadCalendar: jasmine.createSpy('loadCalendar'),
+      clean: jasmine.createSpy('clean'),
+    };
     userStoreSpy = {
       customers: signal<any>(undefined),
       customerInfo: signal<any>(undefined),
@@ -193,13 +201,8 @@ describe('ReservationComponent', () => {
       getOptions: jasmine.createSpy('getOptions'),
     };
     authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
-    navigationParams$ = new BehaviorSubject(undefined);
-    calendar$ = new BehaviorSubject(undefined);
-    subErrors$ = new BehaviorSubject(undefined);
-    isLoading$ = new BehaviorSubject<boolean>(false);
     matches$ = new BehaviorSubject(undefined);
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch', 'select']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
       observe: () => matches$.asObservable(),
@@ -214,27 +217,11 @@ describe('ReservationComponent', () => {
       onDismiss: () => of(void 0),
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return navigationParams$.asObservable();
-        case 2:
-          return calendar$.asObservable();
-        case 3:
-          return subErrors$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-    storeSpy.select.and.returnValue(isLoading$.asObservable());
-
     await TestBed.configureTestingModule({
       imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
@@ -250,7 +237,6 @@ describe('ReservationComponent', () => {
       ],
     }).compileComponents();
 
-    storeSpy = TestBed.inject(Store) as jasmine.SpyObj<Store>;
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
@@ -575,17 +561,15 @@ describe('ReservationComponent', () => {
     });
 
     it('should not dispatch action if no dates are provided', () => {
-      // Clear all events
+      const emitSpy = jasmine.createSpy('emit');
+      component.submitData.subscribe(emitSpy);
       while (component.events.length > 0) {
         component.events.removeAt(0);
       }
 
-      const dispatchCountBefore = storeSpy.dispatch.calls.count();
       component.create();
-      const dispatchCountAfter = storeSpy.dispatch.calls.count();
 
-      // Should not have dispatched any new actions
-      expect(dispatchCountAfter).toBe(dispatchCountBefore);
+      expect(emitSpy).not.toHaveBeenCalled();
     });
   });
 

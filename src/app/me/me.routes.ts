@@ -11,7 +11,6 @@ import { ReferralsComponent } from './referrals/referrals.component';
 import { ReservationListComponent } from './reservation/list/reservation-list.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
-import { provideEffects } from '@ngrx/effects';
 import { AdditionalService } from '../services/additional.service';
 import { ColorService } from '../services/color.service';
 import { CurrencyService } from '../services/currency.service';
@@ -23,8 +22,7 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { ReservationEffects } from '../store/effects/reservation.effects';
-import { MeNavigationEffects } from './me-navigation.effects';
+import { EmptyComponent } from '../util/empty.component';
 
 const providers = [
   provideFeatureTranslations('me'),
@@ -38,15 +36,45 @@ const providers = [
   DiscountService,
   CurrencyService,
   ColorService,
-  provideEffects(ReservationEffects, MeNavigationEffects),
 ];
 
 const children: Routes = [
-  { path: 'reservations', component: ReservationListComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation', component: MeReservationCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id', component: MeReservationDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'reservation/:id/payment/option', component: OptionComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: ':path/:id/payment', component: PaymentComponent, canActivate: [authGuard, PaymentRedirectGuard], data: { roles: [Role.customer] } },
+  {
+    path: 'reservations',
+    component: ReservationListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'reservation',
+    component: MeReservationCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'reservation/:id',
+    component: MeReservationDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'reservation/:id/payment/option',
+    component: OptionComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: ':path/:id/payment',
+    canActivate: [authGuard, PaymentRedirectGuard],
+    component: EmptyComponent,
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: ':path/:id/payments',
+    component: PaymentComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
   { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'referrals', component: ReferralsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
   { path: 'discounts', component: MeDiscountComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },

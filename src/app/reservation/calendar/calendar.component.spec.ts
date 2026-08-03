@@ -3,15 +3,12 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CalendarComponent } from './calendar.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
 import { CalendarEvent } from 'angular-calendar';
 import { addDays, addMonths } from 'date-fns';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { Role } from '../../interfaces/token';
 import { IOfficeAll } from '../../office/office';
 import { IRoomAll } from '../../room/room';
@@ -23,24 +20,30 @@ import { signal } from '@angular/core';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { NavigationService } from '../../services/navigation.service';
 import { RoomStore } from '../../store/room.store';
+import { ReservationStore } from '../../store/reservation.store';
+import anything = jasmine.anything;
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
+  let reservationStoreSpy: {
+    calendar: ReturnType<typeof signal>;
+    loadAllByRoom: jasmine.Spy;
+    updateTimestamp: jasmine.Spy;
+    clean: jasmine.Spy;
+  };
   let roomStoreSpy: {
     data: ReturnType<typeof signal>;
     loadAll: jasmine.Spy;
   };
 
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
 
-  let calendar$: BehaviorSubject<any>;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
@@ -133,6 +136,12 @@ describe('CalendarComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
       { language: DEFAULT_LOCALE },
     );
+    reservationStoreSpy = {
+      calendar: signal<any>([mockCalendarData]),
+      loadAllByRoom: jasmine.createSpy('loadAllByRoom'),
+      updateTimestamp: jasmine.createSpy('updateTimestamp'),
+      clean: jasmine.createSpy('clean'),
+    };
     roomStoreSpy = {
       data: signal<any>(undefined),
       loadAll: jasmine.createSpy('loadCustomers'),
@@ -143,13 +152,11 @@ describe('CalendarComponent', () => {
       professionalId: 'professional-id',
       isRoomAdmin: false,
     }));
-    calendar$ = new BehaviorSubject([mockCalendarData]);
     breakpoint$ = new BehaviorSubject({
       matches: false,
       breakpoints: {},
     });
 
-    storeSpy = jasmine.createSpyObj('Store', ['dispatch', 'pipe']);
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
@@ -161,24 +168,13 @@ describe('CalendarComponent', () => {
       },
     });
 
-    let pipeCallIndex = 0;
-    storeSpy.pipe.and.callFake(() => {
-      pipeCallIndex++;
-      switch (pipeCallIndex) {
-        case 1:
-          return calendar$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CalendarComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -197,10 +193,7 @@ describe('CalendarComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    calendar$.complete();
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -528,17 +521,13 @@ describe('CalendarComponent', () => {
   });
 
   describe('Store Dispatching', () => {
-    it('should dispatch getAllGroupingByRoom on room selection', () => {
+    it('should dispatch loadAllByRoom on room selection', () => {
       roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1, mockRoom2] });
       component.getForm.office.setValue(component.offices()[0]);
       component.getForm.room.setValue(mockRoom1);
       fixture.detectChanges();
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: getAllGroupingByRoom.type,
-        }),
-      );
+      expect(reservationStoreSpy.loadAllByRoom).toHaveBeenCalled();
     });
 
     it('should dispatch updateReservationTimestamp when event times changed is confirmed', () => {
@@ -565,11 +554,7 @@ describe('CalendarComponent', () => {
       component.eventTimesChanged({ event, newStart, newEnd, type: '' } as any);
 
       expect(dialogSpy.open).toHaveBeenCalled();
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          type: updateReservationTimestamp.type,
-        }),
-      );
+      expect(reservationStoreSpy.updateTimestamp).toHaveBeenCalled();
     });
 
     it('should revert event times when eventTimesChanged is cancelled', () => {
@@ -715,10 +700,11 @@ describe('CalendarComponent', () => {
         type: '',
       } as any);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          role: Role.roomAdmin,
-        }),
+      expect(reservationStoreSpy.updateTimestamp).toHaveBeenCalledWith(
+        event.id,
+        anything(),
+        Role.roomAdmin,
+        anything(),
       );
     });
 
@@ -749,10 +735,11 @@ describe('CalendarComponent', () => {
         type: '',
       } as any);
 
-      expect(storeSpy.dispatch).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          role: Role.professional,
-        }),
+      expect(reservationStoreSpy.updateTimestamp).toHaveBeenCalledWith(
+        event.id,
+        anything(),
+        Role.professional,
+        anything(),
       );
     });
   });

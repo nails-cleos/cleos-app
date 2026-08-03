@@ -51,9 +51,7 @@ export const I18NStore = signalStore(
       if (data) {
         patchState(store, data);
       } else {
-        patchState(store, {
-          language: translateService.getCurrentLang(),
-        });
+        patchState(store, { language: translateService.getCurrentLang() });
       }
     },
 
@@ -72,10 +70,7 @@ export const I18NStore = signalStore(
     },
 
     clearError(): void {
-      patchState(store, {
-        error: undefined,
-        subErrors: undefined,
-      });
+      patchState(store, { error: undefined, subErrors: undefined });
     },
   })),
 

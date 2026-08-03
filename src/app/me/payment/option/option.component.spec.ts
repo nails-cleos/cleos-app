@@ -12,6 +12,7 @@ import { provideAppIcons } from '../../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { signal } from '@angular/core';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
@@ -25,6 +26,11 @@ describe('OptionComponent', () => {
     getPaymentByResourceId: jasmine.Spy;
     createPaymentLinkByReservationId: jasmine.Spy;
     clean: jasmine.Spy;
+  };
+
+  let reservationStoreSpy: {
+    selected: ReturnType<typeof signal>;
+    loadById: jasmine.Spy;
   };
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
 
@@ -86,6 +92,10 @@ describe('OptionComponent', () => {
       createPaymentLinkByReservationId: jasmine.createSpy('createPaymentLinkByReservationId'),
       clean: jasmine.createSpy('clean'),
     };
+    reservationStoreSpy = {
+      selected: signal(undefined),
+      loadById: jasmine.createSpy('loadById'),
+    };
     breakpoint$ = new BehaviorSubject(undefined);
 
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
@@ -96,6 +106,7 @@ describe('OptionComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         provideHttpClient(),
@@ -116,41 +127,45 @@ describe('OptionComponent', () => {
     fixture.componentRef.setInput('id', 'res-123');
     fixture.detectChanges();
     expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('res-123', 'reservation');
+    expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('res-123');
   });
 
   it('should derive options from the reservation room payment types', () => {
     const paymentsMock = [{
-      reservation: {
-        id: 'res1',
-        room: { paymentTypes: ['PAYPAL', 'IDEAL'], currency: { icon: 'euro' } },
-        state: 'CONFIRMED',
-        treatment: { price: 100 },
-      } as IReservationAll,
       amount: 100,
     }];
+    const reservation = {
+      id: 'res1',
+      room: { paymentTypes: ['PAYPAL', 'IDEAL'], currency: { icon: 'euro' } },
+      state: 'CONFIRMED',
+      treatment: { price: 100 },
+    } as IReservationAll;
 
     paymentStoreSpy.data.set(paymentsMock);
+    reservationStoreSpy.selected.set(reservation);
     fixture.detectChanges();
 
     expect(component.options()).toEqual(jasmine.arrayContaining([
       jasmine.objectContaining({ type: 'PAYPAL' }),
       jasmine.objectContaining({ type: 'IDEAL' }),
     ]));
-    expect(component.reservation()).toEqual(paymentsMock[0].reservation);
+    expect(component.reservation()).toEqual(reservation);
   });
 
   it('should keep local options empty when no online payment type is available', () => {
     const paymentsMock = [{
-      reservation: {
-        id: 'res2',
-        room: { paymentTypes: ['CASH', 'TRANSFER'], currency: { icon: 'euro' } },
-        state: 'CONFIRMED',
-        treatment: { price: 100 },
-      },
       amount: 50,
     }];
 
+    const reservation = {
+      id: 'res2',
+      room: { paymentTypes: ['CASH', 'TRANSFER'], currency: { icon: 'euro' } },
+      state: 'CONFIRMED',
+      treatment: { price: 100 },
+    };
+
     paymentStoreSpy.data.set(paymentsMock);
+    reservationStoreSpy.selected.set(reservation);
     fixture.detectChanges();
     expect(component.options()).toEqual([]);
   });
@@ -158,14 +173,14 @@ describe('OptionComponent', () => {
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
     fixture.componentRef.setInput('id', 'res-123');
     paymentStoreSpy.data.set([{
-      reservation: {
-        id: 'res-123',
-        room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },
-        state: 'CONFIRMED',
-        treatment: { price: 100 },
-      },
       amount: 100,
     }]);
+    reservationStoreSpy.selected.set({
+      id: 'res-123',
+      room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },
+      state: 'CONFIRMED',
+      treatment: { price: 100 },
+    });
 
     fixture.detectChanges();
 

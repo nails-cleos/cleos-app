@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
-import { CustomDateAdapter } from './customDateAdapter';
-import { TranslateService } from '@ngx-translate/core';
+import { Inject, Injectable } from '@angular/core';
+import { CustomDateAdapter } from './custom-date-adapter';
+import { MAT_DATE_LOCALE } from '@angular/material/core';
 
 @Injectable()
 export class YearMonthDateAdapter extends CustomDateAdapter {
 
-  constructor(readonly translate: TranslateService) {
-    super();
-    this.setLocale(translate.getCurrentLang());
+  constructor(@Inject(MAT_DATE_LOCALE) locale: string) {
+    super(locale);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

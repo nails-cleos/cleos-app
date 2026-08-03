@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardEventComponent } from './dashboard-event.component';
-import { Store } from '@ngrx/store';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
@@ -11,11 +10,10 @@ import { States } from '../../reservation/reservation';
 import { FrequencyEnum } from '../../util/helper';
 import { daysOfWeek, DEFAULT_LOCALE } from '../../util/dates';
 import { signal } from '@angular/core';
-import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
 import { DashboardStore } from '../../store/dashboard.store';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { NavigationService } from '../../services/navigation.service';
+import { ReservationStore } from '../../store/reservation.store';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
@@ -25,7 +23,10 @@ describe('DashboardEventComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let dialogSpy: jasmine.Spy<any>;
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let reservationStoreSpy: {
+    approve: jasmine.Spy;
+    start: jasmine.Spy;
+  };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dashboardStoreSpy: {
     dashboard: ReturnType<typeof signal>;
@@ -44,8 +45,11 @@ describe('DashboardEventComponent', () => {
       getMyEvent: jasmine.createSpy('getMyEvent'),
       clean: jasmine.createSpy('clean'),
     };
+    reservationStoreSpy = {
+      approve: jasmine.createSpy('approve'),
+      start: jasmine.createSpy('start'),
+    };
 
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
       authUser: authUserSignal.asReadonly(),
     });
@@ -55,7 +59,7 @@ describe('DashboardEventComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         DayViewSchedulerCalendarUtils,
         provideAppDateAdapter(),
@@ -494,8 +498,7 @@ describe('DashboardEventComponent', () => {
     }
     startAction.onClick({ event, sourceEvent: {} as MouseEvent });
 
-    expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(startReservation('reservation-3', undefined, true, component.viewDate()));
+    expect(reservationStoreSpy.start).toHaveBeenCalledWith('reservation-3', undefined, true, component.viewDate());
   });
 
   it('should return empty status label when no state is provided', () => {
@@ -513,7 +516,7 @@ describe('DashboardEventComponent', () => {
 
     component['eventClick'](event, 'APPROVE');
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(approveReservation('reservation-1', undefined, true));
+    expect(reservationStoreSpy.approve).toHaveBeenCalledWith('reservation-1', undefined, true);
   });
 
   it('should dispatch start reservation with dashboard date', () => {
@@ -531,6 +534,6 @@ describe('DashboardEventComponent', () => {
 
     component['eventClick'](event, 'START');
 
-    expect(storeSpy.dispatch).toHaveBeenCalledWith(startReservation('reservation-2', undefined, true, viewDate));
+    expect(reservationStoreSpy.start).toHaveBeenCalledWith('reservation-2', undefined, true, viewDate);
   });
 });

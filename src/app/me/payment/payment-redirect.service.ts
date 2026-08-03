@@ -38,12 +38,12 @@ export class PaymentRedirectService {
     // Generic Mollie redirect that only carries the payment_type flag.
     // The dedicated payment page will handle fetching the correct state.
     if (query.payment_type) {
-      // No store update required – the PaymentComponent will load its own data.
+      this.paymentStore.notify(query.payment_id, path, id, query.reference_id, query.payment_type);
       return;
     }
 
     // Anything else is considered an error / incomplete payment.
-    const reason = 'missing required data';
+    const reason = query.reason ?? 'missing required data';
     this.paymentStore.notComplete(reason);
   }
 }

@@ -4,7 +4,6 @@ import { NavComponent } from './nav.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TokenService } from '../services/token.service';
 import { BehaviorSubject, of } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { MessagingService } from '../services/messaging.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -21,6 +20,7 @@ import { UserStore } from '../store/user.store';
 import { NotificationStore } from '../store/notification.store';
 import { AuthStore } from '../store/auth.store';
 import { DateAdapter } from '@angular/material/core';
+import { GLOBAL_FEEDBACK_SOURCE } from '../store/global-feedback-source';
 
 describe('NavComponent', () => {
   let component: NavComponent;
@@ -33,10 +33,13 @@ describe('NavComponent', () => {
     resetConfig: jasmine.Spy;
   };
 
-  let response$: BehaviorSubject<any>;
-  let error$: BehaviorSubject<any>;
   let message$: BehaviorSubject<any>;
   let action$: BehaviorSubject<any>;
+  let userStoreSpy: {
+    response: ReturnType<typeof signal>;
+    error: ReturnType<typeof signal>;
+    updateMyUser: jasmine.Spy;
+  };
   let notificationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
@@ -46,8 +49,8 @@ describe('NavComponent', () => {
     clean: jasmine.Spy;
     loadPage: jasmine.Spy;
     clearResponse: jasmine.Spy;
-    readNotification: jasmine.Spy;
-    deleteNotification: jasmine.Spy;
+    read: jasmine.Spy;
+    delete: jasmine.Spy;
   };
 
   let authStoreSpy: {
@@ -65,11 +68,9 @@ describe('NavComponent', () => {
   let cookieServiceSpy: jasmine.SpyObj<CookieService>;
   let tokenServiceSpy: jasmine.SpyObj<TokenService>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let storeSpy: jasmine.SpyObj<Store>;
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let messagingServiceSpy: jasmine.SpyObj<MessagingService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
 
   const authUserSignal = signal<IAuthUser>(
     {
@@ -103,6 +104,14 @@ describe('NavComponent', () => {
     image: 'AAA',
   };
 
+  const responseSignal = signal<IResponseSuccess | undefined>(undefined);
+  const errorSignal = signal<any>(undefined);
+
+  const feedbackSourceMock = {
+    response: responseSignal,
+    error: errorSignal,
+  };
+
   beforeEach(async () => {
     navigationServiceSpy = {
       language: DEFAULT_LOCALE,
@@ -111,8 +120,11 @@ describe('NavComponent', () => {
       navigate: jasmine.createSpy('navigate'),
       resetConfig: jasmine.createSpy('resetConfig'),
     };
-    response$ = new BehaviorSubject(undefined);
-    error$ = new BehaviorSubject(undefined);
+    userStoreSpy = {
+      response: signal(undefined),
+      error: signal(undefined),
+      updateMyUser: jasmine.createSpy('updateMyUser'),
+    };
     message$ = new BehaviorSubject(undefined);
     action$ = new BehaviorSubject(undefined);
 
@@ -125,8 +137,8 @@ describe('NavComponent', () => {
       clean: jasmine.createSpy('clean'),
       loadPage: jasmine.createSpy('loadPage'),
       clearResponse: jasmine.createSpy('clearResponse'),
-      readNotification: jasmine.createSpy('readNotification'),
-      deleteNotification: jasmine.createSpy('deleteNotification'),
+      read: jasmine.createSpy('read'),
+      delete: jasmine.createSpy('delete'),
     };
     authStoreSpy = {
       isAuthenticated: signal(false),
@@ -141,8 +153,6 @@ describe('NavComponent', () => {
 
     const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
     cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'select', 'dispatch']);
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['updateMyUser']);
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser', 'updateMode'], {
       authUser: authUserSignal.asReadonly(),
@@ -161,25 +171,11 @@ describe('NavComponent', () => {
 
     paramMapSpy.get.and.returnValue(null);
 
-    let selectCallIndex = 0;
-    storeSpy.select.and.callFake(() => {
-      selectCallIndex++;
-      switch (selectCallIndex) {
-        case 1:
-          return response$.asObservable();
-        case 2:
-          return error$.asObservable();
-        default:
-          return new BehaviorSubject(undefined).asObservable();
-      }
-    });
-
     await TestBed.configureTestingModule({
       imports: [NavComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
-        { provide: Store, useValue: storeSpy },
         { provide: MessagingService, useValue: messagingServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -189,6 +185,7 @@ describe('NavComponent', () => {
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: NotificationStore, useValue: notificationStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
+        { provide: GLOBAL_FEEDBACK_SOURCE, useValue: [feedbackSourceMock] },
       ],
     }).compileComponents();
 
@@ -287,7 +284,7 @@ describe('NavComponent', () => {
 
     expect(component.countNotifications()).toBe(1);
     expect(component.notifications()).toContain({ ...unreadNotification, read: true });
-    expect(notificationStoreSpy.readNotification).toHaveBeenCalledWith(unreadNotification.id);
+    expect(notificationStoreSpy.read).toHaveBeenCalledWith(unreadNotification.id);
   });
 
   it('should handle auth state changes', () => {
@@ -580,7 +577,7 @@ describe('NavComponent', () => {
       toastType: 'warning',
       redirect: 'path/to/redirect',
     };
-    response$.next(response);
+    responseSignal.set(response);
     fixture.detectChanges();
 
     expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([response.redirect]);
@@ -614,7 +611,7 @@ describe('NavComponent', () => {
 
     spyOn(document, 'createElement').and.returnValue(anchorMock);
 
-    response$.next(response);
+    responseSignal.set(response);
     fixture.detectChanges();
 
     expect(URL.createObjectURL).toHaveBeenCalledWith(response.blob);

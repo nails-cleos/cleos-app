@@ -236,10 +236,6 @@ describe('UnavailableListComponent', () => {
 
     component.delete(item);
 
-    expect(unavailableStoreSpy.delete).toHaveBeenCalledWith({
-      id: item.id,
-      timestamp: item.timestamp,
-      timeZone: item.timeZone,
-    });
+    expect(unavailableStoreSpy.delete).toHaveBeenCalledWith(item.id, item.timestamp, item.timeZone);
   });
 });

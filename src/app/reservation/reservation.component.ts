@@ -21,8 +21,6 @@ import {
 import { map, startWith } from 'rxjs/operators';
 import { IUser, IUserAll } from '../user/user';
 import { combineLatestWith, Subject } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { searchAvailability } from '../store/actions/reservation.actions';
 import { noDuplicateDatesValidator, requireMatch } from '../util/validators';
 import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../treatment/treatment';
 import { IRoom, IRoomAll, IService } from '../room/room';
@@ -98,13 +96,6 @@ import { DurationTimePipe } from '../pipes/durationTime.pipe';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { PaymentOptionSelectComponent } from '../shared/payment-option-select/payment-option-select.component';
-import { ReservationState } from '../store/reducers/reservation.reducers';
-import {
-  getCalendarPipe,
-  getNavigationParamsPipe,
-  getSubErrorsPipe,
-  selectReservationIsLoading,
-} from '../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { IError } from '../interfaces/common';
 import {
@@ -143,6 +134,7 @@ import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { AdditionalStore } from '../store/additional.store';
 import { PaymentStore } from '../store/payment.store';
+import { ReservationStore } from '../store/reservation.store';
 import PlaceResult = google.maps.places.PlaceResult;
 
 const RESERVATION_ERROR_FIELDS = [
@@ -186,7 +178,7 @@ export class ReservationComponent {
   private readonly toastService: ToastService = inject(ToastService);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly userStore = inject(UserStore);
   private readonly roomStore = inject(RoomStore);
   private readonly treatmentStore = inject(TreatmentStore);
@@ -198,16 +190,30 @@ export class ReservationComponent {
   private readonly formErrorService = inject(ReservationFormErrorService);
   private readonly reservationCalendarService = inject(ReservationCalendarService);
 
-  private navigationParams$ = this.store.pipe(getNavigationParamsPipe);
-  private calendar$ = this.store.pipe(getCalendarPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private readonly navigationParams = toSignal(this.navigationParams$);
+  private readonly params = computed(() => {
+    const navigationState = history.state;
+    if (navigationState) {
+      return {
+        customerId: navigationState['customerId'],
+        isDashboard: navigationState['isDashboard'],
+        treatmentId: navigationState['treatmentId'],
+        groupId: navigationState['groupId'],
+        roomId: navigationState['roomId'],
+        professionalId: navigationState['professionalId'],
+        skip: navigationState['skip'],
+        date: navigationState['date'],
+        additionalIds: navigationState['additionalIds'],
+        discountId: navigationState['discountId'],
+      };
+    }
+    return undefined;
+  });
   private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
   private readonly customerInfoSignal = this.userStore.customerInfo;
-  private readonly calendarSignal = toSignal(this.calendar$);
-  private readonly subErrorsSignal = toSignal(this.subErrors$);
+  private readonly calendarSignal = this.reservationStore.calendar;
+  private readonly subErrorsSignal = this.reservationStore.subErrors;
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly paymentOptionsSignal = this.paymentStore.options;
   private readonly roomsSignal = computed(() => {
@@ -231,7 +237,7 @@ export class ReservationComponent {
   );
 
   additionalSelected = signal<IAdditionalAll[]>([]);
-  isLoading = toSignal(this.store.select(selectReservationIsLoading), { initialValue: false });
+  isLoading = this.reservationStore.isLoading;
 
   dataEvents: Map<string, IDataEvent> = new Map();
   private additionalLists = viewChildren<MatSelectionList>('additional');
@@ -475,6 +481,7 @@ export class ReservationComponent {
   private hydratingEdit = false;
 
   constructor() {
+    this.reservationStore.clean();
     this.paymentStore.getOptions();
     const preview = new Step(6, 'preview', () => this.create());
     const book = new Step(5, 'book_online', (goNext: boolean) => this.callStepSeven(goNext), preview);
@@ -486,7 +493,7 @@ export class ReservationComponent {
     this.steps = [customer, room, treatment, additional, settings, book, preview];
 
     effect(() => {
-      const params = this.navigationParams();
+      const params = this.params();
       this.skip.set(params?.skip ?? false);
       this.roomId.set(params?.roomId);
       this.customerId = params?.customerId;
@@ -1188,13 +1195,11 @@ export class ReservationComponent {
         dates.push(value.date);
       });
 
-      this.store.dispatch(
-        searchAvailability({
-          days: this.daysInWeek(),
-          dates,
-          roomId: room.id,
-          professionalId: this.professionalId(),
-        }),
+      this.reservationStore.loadCalendar(
+        room.id,
+        this.daysInWeek(),
+        dates,
+        this.professionalId(),
       );
     }
     if (goNext) {
@@ -1752,7 +1757,8 @@ export class ReservationComponent {
     this.additionalSelected.set(reservation.additional ? reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
     this.getConfigurationForm.note.setValue(reservation.note, { emitEvent: false });
-    if (reservation.configurationCanCustomerChange !== undefined || reservation.configurationReference) {
+    const isConfigurationCanCustomerChange = reservation.configurationCanCustomerChange !== undefined;
+    if (isConfigurationCanCustomerChange || reservation.configurationReference) {
       this.getConfigurationForm.reference.setValue(reservation.configurationReference, { emitEvent: false });
       this.getConfigurationForm.customerChange.setValue(reservation.configurationCanCustomerChange ?? false, {
         emitEvent: false,

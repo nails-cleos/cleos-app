@@ -104,12 +104,12 @@ describe('UnavailableDetailsPageComponent', () => {
 
     component.submit(mockUnavailable as any);
 
-    expect(unavailableStoreSpy.update).toHaveBeenCalledWith({
+    expect(unavailableStoreSpy.update).toHaveBeenCalledWith(
       id,
-      unavailable: jasmine.objectContaining({
+      jasmine.objectContaining({
         description: 'Test Description',
       }),
-      path: 'unavailable',
-    });
+      'unavailable',
+    );
   });
 });
