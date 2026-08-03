@@ -2,11 +2,22 @@
 set -euo pipefail
 
 SNAPSHOT_SUFFIX="-rc"
-VERSION_PART="${1:-}"  # optional: major, minor, patch
+MODE="finalize"
+VERSION_PART=""
+
+if [[ "${1:-}" == "release" ]]; then
+    MODE="release"
+    VERSION_PART="${2:-patch}"
+elif [[ "${1:-}" == "rc" ]]; then
+    MODE="rc"
+elif [[ -n "${1:-}" ]]; then
+    MODE="snapshot"
+    VERSION_PART="$1"
+fi
 
 if [[ -n "$VERSION_PART" && ! "$VERSION_PART" =~ ^(major|minor|patch)$ ]]; then
     echo "Invalid version part: $VERSION_PART" >&2
-    echo "Valid values: <major|minor|patch>" >&2
+    echo "Valid values: rc, release <major|minor|patch>, or <major|minor|patch>" >&2
     exit 1
 fi
 
@@ -42,11 +53,20 @@ increment_version() {
     echo "$major.$minor.$patch"
 }
 
-if [[ -n "$VERSION_PART" ]]; then
-    NEW_VERSION="$(increment_version "$PACKAGE_VERSION" "$VERSION_PART")${SNAPSHOT_SUFFIX}"
-else
-    NEW_VERSION="$PACKAGE_VERSION"
-fi
+case "$MODE" in
+    finalize)
+        NEW_VERSION="$PACKAGE_VERSION"
+        ;;
+    release)
+        NEW_VERSION="$(increment_version "$PACKAGE_VERSION" "$VERSION_PART")"
+        ;;
+    rc)
+        NEW_VERSION="${PACKAGE_VERSION}${SNAPSHOT_SUFFIX}"
+        ;;
+    snapshot)
+        NEW_VERSION="$(increment_version "$PACKAGE_VERSION" "$VERSION_PART")${SNAPSHOT_SUFFIX}"
+        ;;
+esac
 
 if [[ "$CURRENT_VERSION" != "$NEW_VERSION" ]]; then
     npm version --no-git-tag-version "$NEW_VERSION" >/dev/null

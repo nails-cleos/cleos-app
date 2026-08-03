@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: false
 
 ### Increments the part of the version
+### Used only if the finalized RC tag already exists.
 ### Options for version parts: major, minor, patch
 env:
   VERSION_PART: 'patch'
@@ -54,29 +55,34 @@ jobs:
           TAG_NAME="v${VERSION}"
           RELEASE_CREATED=false
 
+          git fetch --tags origin
+
+          while git rev-parse "${TAG_NAME}" >/dev/null 2>&1; do
+            TAG_COMMIT="$(git rev-list -n 1 "${TAG_NAME}")"
+            HEAD_COMMIT="$(git rev-parse HEAD)"
+
+            if [ "${TAG_COMMIT}" = "${HEAD_COMMIT}" ]; then
+              echo "Tag ${TAG_NAME} already exists on this commit; skipping release creation."
+              echo "release_version=${VERSION}" >> "$GITHUB_OUTPUT"
+              echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+              echo "release_created=${RELEASE_CREATED}" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Tag ${TAG_NAME} already exists on ${TAG_COMMIT}; bumping ${VERSION_PART} before release."
+            VERSION=$("${GITHUB_WORKSPACE}/version-update.sh" release "${VERSION_PART}")
+            TAG_NAME="v${VERSION}"
+          done
+
           if ! git diff --quiet -- package.json package-lock.json; then
             git add package.json package-lock.json
             git commit -m "Release version ${VERSION}"
             git push origin "${GITHUB_REF_NAME}"
           fi
 
-          git fetch --tags origin
-
-          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
-            TAG_COMMIT="$(git rev-list -n 1 "${TAG_NAME}")"
-            HEAD_COMMIT="$(git rev-parse HEAD)"
-
-            if [ "${TAG_COMMIT}" = "${HEAD_COMMIT}" ]; then
-              echo "Tag ${TAG_NAME} already exists on this commit; skipping release creation."
-            else
-              echo "Tag ${TAG_NAME} already exists on ${TAG_COMMIT}, not ${HEAD_COMMIT}" >&2
-              exit 1
-            fi
-          else
-            git tag -a "${TAG_NAME}" -m "Release ${TAG_NAME}"
-            git push origin "${TAG_NAME}"
-            RELEASE_CREATED=true
-          fi
+          git tag -a "${TAG_NAME}" -m "Release ${TAG_NAME}"
+          git push origin "${TAG_NAME}"
+          RELEASE_CREATED=true
 
           echo "release_version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
@@ -140,7 +146,7 @@ jobs:
       - name: Run snapshot bump
         id: snapshot
         run: |
-          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh" "${VERSION_PART}")
+          VERSION=$("${GITHUB_WORKSPACE}/version-update.sh" rc)
 
           if ! git diff --quiet -- package.json package-lock.json; then
             git add package.json package-lock.json
