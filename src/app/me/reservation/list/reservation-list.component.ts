@@ -6,9 +6,7 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
 import { IReservationAll, States } from '../../../reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { createReview, getCustomerReservations } from '../../../store/actions/reservation.actions';
 import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
 import { executeDialogNoWidth, openDialog } from '../../../util/helper';
 import { IReview, Review } from './review';
@@ -21,14 +19,7 @@ import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
 import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
 import { ErrorComponent } from '../../../shared/error/error.component';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import {
-  getCustomerReservationPipe,
-  getReservationErrorPipe,
-  getReservationResponsePipe,
-  selectReservationIsLoading,
-} from '../../../store/selectors/reservation.selectors';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { FirebaseService } from '../../../services/firebase.service';
 import { DiscountStore } from '../../../store/discount.store';
 import { MatIcon } from '@angular/material/icon';
@@ -55,6 +46,7 @@ import { DatePipe } from '@angular/common';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { UpcomingSkeletonComponent } from '../../../shared/skeleton/upcoming-skeleton.component';
 import { NavigationService } from '../../../services/navigation.service';
+import { ReservationStore } from '../../../store/reservation.store';
 
 @Component({
   selector: 'app-reservation-list',
@@ -69,7 +61,7 @@ import { NavigationService } from '../../../services/navigation.service';
 })
 export class ReservationListComponent {
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
@@ -77,18 +69,17 @@ export class ReservationListComponent {
   private readonly discountStore = inject(DiscountStore);
 
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
-  private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
-  private response$ = this.store.pipe(getReservationResponsePipe);
-  private error$ = this.store.pipe(getReservationErrorPipe);
-  private isLoading$ = this.store.select(selectReservationIsLoading);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
   private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
 
-  private customerReservationSignal = toSignal(this.customerReservation$);
-  private responseSignal = toSignal(this.response$);
-  private isLoadingSignal = toSignal(this.isLoading$, { initialValue: false });
+  private customerReservationSignal = computed(() => {
+    const data = this.reservationStore.data();
+    return data?.kind === 'customerReservation' ? data.value : undefined;
+  });
+  private responseSignal = this.reservationStore.response;
+  errorSignal = this.reservationStore.error;
   private breakpointsSignal = toSignal(
     this.breakpointObserver$, {
       initialValue: {
@@ -112,8 +103,7 @@ export class ReservationListComponent {
     { key: 'actions' },
   ];
 
-  errorSignal = toSignal(this.error$);
-  isLoading = computed(() => this.isLoadingSignal());
+  isLoading = this.reservationStore.isLoading;
   reservationSignal = computed(() => this.customerReservationSignal()?.reservations);
   upcomingSignal = computed(() => this.customerReservationSignal()?.upcoming);
   dataSourceSignal = computed(() => this.reservationSignal()?.content?.map((reservation: IReservationAll) => {
@@ -136,14 +126,10 @@ export class ReservationListComponent {
   private showReview = true;
 
   constructor() {
+    this.reservationStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.store.dispatch(
-        getCustomerReservations({
-          ...request,
-          size: this.pageSizeSignal(),
-        }),
-      );
+      this.reservationStore.loadAllByCustomer({ ...request, size: this.pageSizeSignal() });
     });
     this.tableState.resetOn(this.responseSignal, () => this.discountStore.clean());
 
@@ -198,7 +184,7 @@ export class ReservationListComponent {
         review.reservationId = reservation?.id;
         review.detail = result.detail ? result.detail :
           this.translateService.instant(`ME.REVIEW.RATING.${ result.rating }`);
-        this.store.dispatch(createReview({ review }));
+        this.reservationStore.createReview(review);
       }
     },
   );

@@ -1,20 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateModule } from '@ngx-translate/core';
-import { BehaviorSubject } from 'rxjs';
-import { Store } from '@ngrx/store';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '../../color/color';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
-import { getColorsByTreatmentId } from '../../store/actions/reservation.actions';
+import { signal } from '@angular/core';
+import { ColorStore } from '../../store/color.store';
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;
   let fixture: ComponentFixture<ChangeColorDialogComponent>;
 
-  let colors$: BehaviorSubject<IColorAll[] | undefined>;
-
-  let storeSpy: jasmine.SpyObj<Store<ReservationState>>;
+  let colorStoreSpy: {
+    data: ReturnType<typeof signal>;
+    loadByExternalId: jasmine.Spy;
+  };
   let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ChangeColorDialogComponent>>;
 
   const mockChangeColor = {
@@ -28,11 +27,12 @@ describe('ChangeColorDialogComponent', () => {
   ];
 
   beforeEach(async () => {
-    colors$ = new BehaviorSubject<IColorAll[] | undefined>(undefined);
+    colorStoreSpy = {
+      data: signal(undefined),
+      loadByExternalId: jasmine.createSpy('loadByExternalId'),
+    };
 
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    storeSpy = jasmine.createSpyObj('Store', ['pipe', 'dispatch']);
-    storeSpy.pipe.and.returnValue(colors$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ChangeColorDialogComponent, TranslateModule.forRoot()],
@@ -42,15 +42,13 @@ describe('ChangeColorDialogComponent', () => {
           useFactory: () => (mockChangeColor),
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: Store, useValue: storeSpy },
+        { provide: ColorStore, useValue: colorStoreSpy },
       ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChangeColorDialogComponent);
     component = fixture.componentInstance;
   });
-
-  afterEach(() => colors$.complete());
 
   it('should create component', () => {
     fixture.detectChanges();
@@ -59,12 +57,11 @@ describe('ChangeColorDialogComponent', () => {
 
   it('should dispatch clean and getAllColors on init', () => {
     fixture.detectChanges();
-    expect(storeSpy.dispatch)
-      .toHaveBeenCalledWith(getColorsByTreatmentId({ treatmentId: mockChangeColor.treatmentId }));
+    expect(colorStoreSpy.loadByExternalId).toHaveBeenCalledWith(mockChangeColor.treatmentId);
   });
 
   it('should update colorsWritableSignal when store emits', () => {
-    colors$.next(mockColors);
+    colorStoreSpy.data.set({ kind: 'list', value: mockColors });
     fixture.detectChanges();
 
     expect(component.colorsSignal()).toEqual(mockColors);

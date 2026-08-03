@@ -8,7 +8,6 @@ import { ReservationDetailComponent } from './detail/reservation-detail.componen
 import { ReservationCreatePageComponent } from './reservation-create-page.component';
 import { ReservationEditPageComponent } from './reservation-edit-page.component';
 import { SearchComponent } from './search/search.component';
-import { provideEffects } from '@ngrx/effects';
 import { AdditionalService } from '../services/additional.service';
 import { ColorService } from '../services/color.service';
 import { CurrencyService } from '../services/currency.service';
@@ -20,7 +19,6 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { ReservationEffects } from '../store/effects/reservation.effects';
 
 const providers = [
   provideFeatureTranslations('reservation'),
@@ -34,7 +32,6 @@ const providers = [
   ColorService,
   DiscountService,
   CurrencyService,
-  provideEffects(ReservationEffects),
 ];
 
 const children: Routes = [

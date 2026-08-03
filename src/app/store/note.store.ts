@@ -12,6 +12,7 @@ import {
   patchCrudError,
 } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
+import type { Subscription } from 'rxjs';
 
 const initialState = createStoreInitialState<INote, INoteAll>();
 
@@ -22,10 +23,24 @@ export const NoteStore = signalStore(
     noteService = inject(NoteService),
     translateService = inject(TranslateService),
   ) => {
+    let loadByIdSubscription: Subscription | undefined;
+    let createSubscription: Subscription | undefined;
+    let updateSubscription: Subscription | undefined;
+    let deleteSubscription: Subscription | undefined;
+    let completeSubscription: Subscription | undefined;
+
+    const cancelAll = (): void => {
+      loadByIdSubscription?.unsubscribe();
+      createSubscription?.unsubscribe();
+      updateSubscription?.unsubscribe();
+      deleteSubscription?.unsubscribe();
+      completeSubscription?.unsubscribe();
+    };
     const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
 
     return {
       clean(): void {
+        cancelAll();
         patchState(store, initialState);
       },
 
@@ -38,18 +53,20 @@ export const NoteStore = signalStore(
       },
 
       loadById(id: string): void {
+        loadByIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        noteService.getNote(id).subscribe({
+        loadByIdSubscription = noteService.getNote(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
           error: patchError,
         });
       },
 
       create(note: INote): void {
+        createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        noteService.createNote(note).subscribe({
+        createSubscription = noteService.createNote(note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('NOTE.CREATED.MESSAGE', { description: response.name }),
@@ -63,9 +80,10 @@ export const NoteStore = signalStore(
       },
 
       update(id: string, note: INote): void {
+        updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        noteService.updateNote(id, note).subscribe({
+        updateSubscription = noteService.updateNote(id, note).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('NOTE.UPDATED.MESSAGE', { description: response.name }),
@@ -79,9 +97,10 @@ export const NoteStore = signalStore(
       },
 
       delete(id: string, description: string): void {
+        deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        noteService.deleteNote(id).subscribe({
+        deleteSubscription = noteService.deleteNote(id).subscribe({
           next: () => patchState(store, {
             response: {
               message: translateService.instant('NOTE.UPDATED.MESSAGE', { description }),
@@ -94,9 +113,10 @@ export const NoteStore = signalStore(
       },
 
       complete(id: string): void {
+        completeSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        noteService.completeNote(id).subscribe({
+        completeSubscription = noteService.completeNote(id).subscribe({
           next: (response: IApiResponse) => patchState(store, {
             response: {
               message: translateService.instant('NOTE.COMPLETED.MESSAGE', { description: response.name }),

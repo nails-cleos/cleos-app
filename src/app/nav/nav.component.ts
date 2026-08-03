@@ -1,7 +1,6 @@
 import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { IUser, User } from '../user/user';
 import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,12 +21,10 @@ import { ToastService } from '../services/toast.service';
 import { PAGE_SIZE } from '../interfaces/pagination';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
-import { selectGlobalError, selectGlobalResponse } from '../store/selectors/global.selectors';
 import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
-import { clearGlobalError, clearGlobalResponse } from '../store/actions/global.actions';
 import { GLOBAL_FEEDBACK_SOURCE, GlobalFeedbackSource } from '../store/global-feedback-source';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
@@ -60,7 +57,6 @@ export class NavComponent {
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
-  private readonly store: Store = inject(Store);
   private readonly authStore = inject(AuthStore);
   private readonly notificationStore = inject(NotificationStore);
   private readonly messagingService: MessagingService = inject(MessagingService);
@@ -100,8 +96,6 @@ export class NavComponent {
   private dataDeletedSignal = computed(() => this.notificationStore.dataDeleted());
   private dataReadSignal = computed(() => this.notificationStore.dataRead());
   private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
-  private globalResponseSignal = toSignal(this.store.select(selectGlobalResponse));
-  private globalErrorSignal = toSignal(this.store.select(selectGlobalError));
   private readonly feedbackResponse = computed(() => this.findFeedbackSource(source => source.response()));
   private readonly feedbackError = computed(() => this.findFeedbackSource(source => source.error()));
 
@@ -129,7 +123,7 @@ export class NavComponent {
 
   isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
   pageError = computed(() => {
-    const error = this.globalErrorSignal() ?? this.feedbackError()?.value;
+    const error = this.feedbackError()?.value;
     return this.isBlockingPageError(error) ? error : undefined;
   });
   notifications = signal<INotification[]>([]);
@@ -151,12 +145,9 @@ export class NavComponent {
     this.authUserService.cookieConsent(this.translateService);
     this.router.events.subscribe(event => {
       if (event instanceof NavigationStart) {
-        const globalError = this.globalErrorSignal();
         const feedbackError = this.findFeedbackSource(source => source.error());
 
-        if (this.isBlockingPageError(globalError)) {
-          this.store.dispatch(clearGlobalError());
-        } else if (this.isBlockingPageError(feedbackError?.value)) {
+        if (this.isBlockingPageError(feedbackError?.value)) {
           feedbackError?.source.clearError();
         }
       }
@@ -167,9 +158,7 @@ export class NavComponent {
     this.seoService.setMetaTitle(meta.TITLE);
 
     effect(() => {
-      const globalResponse = this.globalResponseSignal();
-      const feedbackResponse = this.feedbackResponse();
-      const response = globalResponse ?? feedbackResponse?.value;
+      const response = this.feedbackResponse()?.value;
       if (!response) {
         return;
       }
@@ -197,16 +186,11 @@ export class NavComponent {
           this.navigationService.reload();
         }
       }
-
-      if (globalResponse) {
-        this.store.dispatch(clearGlobalResponse());
-      }
     });
 
     effect(() => {
-      const globalError = this.globalErrorSignal();
       const feedbackError = this.feedbackError();
-      const err = globalError ?? feedbackError?.value;
+      const err = feedbackError?.value;
       if (!err?.message) {
         return;
       }
@@ -214,11 +198,7 @@ export class NavComponent {
       this.toastService.show(err.message, 'error');
 
       if (!this.isBlockingPageError(err)) {
-        if (globalError) {
-          this.store.dispatch(clearGlobalError());
-        } else {
-          feedbackError?.source.clearError();
-        }
+        feedbackError?.source.clearError();
       }
     });
 
@@ -397,7 +377,7 @@ export class NavComponent {
         }
         return value;
       }));
-      this.notificationStore.readNotification(notification.id);
+      this.notificationStore.read(notification.id);
     }
   };
 

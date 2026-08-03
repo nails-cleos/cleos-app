@@ -89,7 +89,7 @@ describe('PaymentComponent', () => {
   });
 
   it('should hide footer when paymentList has items', () => {
-    paymentStoreSpy.data.set([{ id: '1' }]);
+    paymentStoreSpy.data.set({ remainingAmount: 0, payments: [{ id: '1' }] });
 
     fixture.detectChanges();
 

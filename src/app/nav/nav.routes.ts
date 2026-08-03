@@ -1,12 +1,8 @@
 import { Routes } from '@angular/router';
 import { NavComponent } from './nav.component';
-import { provideEffects } from '@ngrx/effects';
-import { ReservationEffects } from '../store/effects/reservation.effects';
 import { AuthService } from '../services/auth.service';
 import { NotificationService } from '../services/notification.service';
 import { UserService } from '../services/user.service';
-import { provideState } from '@ngrx/store';
-import { RESERVATION_FEATURE_KEY, reservationReducer } from '../store/reducers/reservation.reducers';
 import { RoomService } from '../services/room.service';
 import { TreatmentService } from '../services/treatment.service';
 import { CatalogueService } from '../services/catalogue.service';
@@ -51,6 +47,8 @@ import { provideFeatureTranslations } from '../shared/feature-providers';
 import { MessagingService } from '../services/messaging.service';
 import { AuthStore } from '../store/auth.store';
 import { PaymentStore } from '../store/payment.store';
+import { TrackingStore } from '../store/tracking.store';
+import { ReservationStore } from '../store/reservation.store';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
@@ -98,6 +96,8 @@ const providers = [
   RoomStore,
   DashboardStore,
   PaymentStore,
+  ReservationStore,
+  TrackingStore,
   provideGlobalFeedbackSource(UserStore),
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),
@@ -116,10 +116,8 @@ const providers = [
   provideGlobalFeedbackSource(RoomStore),
   provideGlobalFeedbackSource(AuthStore),
   provideGlobalFeedbackSource(PaymentStore),
-  provideState(RESERVATION_FEATURE_KEY, reservationReducer),
-  provideEffects(
-    ReservationEffects,
-  ),
+  provideGlobalFeedbackSource(TrackingStore),
+  provideGlobalFeedbackSource(ReservationStore),
 ];
 
 const children: Routes = [

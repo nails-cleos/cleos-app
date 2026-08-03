@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { DateRange, MatDateRangeSelectionStrategy } from '@angular/material/datepicker';
 import { DateAdapter } from '@angular/material/core';
-import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
-  constructor(translate: TranslateService, private dateAdapter: DateAdapter<D>) {
-    this.dateAdapter.setLocale(translate.getCurrentLang());
+  constructor(private dateAdapter: DateAdapter<D>) {
   }
 
   selectionFinished = (date: D | null): DateRange<D> => this.createPeriodRange(date);

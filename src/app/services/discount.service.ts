@@ -54,7 +54,7 @@ export class DiscountService {
     customersDiscount,
   );
 
-  deleteDiscount = (id: string): Observable<IDiscount> => this.http.delete<IDiscount>(toUrl(this.urlV1, id));
+  deleteDiscount = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
 
   updateDiscount = (id: string, discount: IDiscount): Observable<IApiResponse> => this.http.patch<IApiResponse>(
     toUrl(this.urlV1, id),

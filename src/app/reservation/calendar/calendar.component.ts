@@ -1,7 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { combineLatestWith, Subject } from 'rxjs';
-import { getAllGroupingByRoom, updateReservationTimestamp } from '../../store/actions/reservation.actions';
 import { Day, IDay, IRoomReservation, MAX_RESERVATION_MONTH, States } from '../reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -53,9 +51,7 @@ import { INoteAll } from '../../note/note';
 import { AuthUserService } from '../../services/auth-user.service';
 import { Role } from '../../interfaces/token';
 import { RoomNamePipe } from '../../pipes/room-name.pipe';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { getCalendarPipe } from '../../store/selectors/reservation.selectors';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
@@ -65,6 +61,7 @@ import { DatePipe, NgClass } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { NavigationService } from '../../services/navigation.service';
 import { RoomStore } from '../../store/room.store';
+import { ReservationStore } from '../../store/reservation.store';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {
@@ -104,13 +101,12 @@ export class CalendarComponent {
   private readonly dialog = inject(MatDialog);
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly roomStore = inject(RoomStore);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private calendar$ = this.store.pipe(getCalendarPipe);
   private breakpoints$ = this.breakpointObserver.observe(
     Object.values(CALENDAR_RESPONSIVE).map(({ breakpoint }) => breakpoint),
   );
@@ -131,7 +127,7 @@ export class CalendarComponent {
 
   private isRoomAdmin = computed(() => this.authUserSignal()?.isRoomAdmin ?? false);
 
-  calendarSignal = toSignal(this.calendar$);
+  calendarSignal = this.reservationStore.calendar;
   isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
   daysInWeekSignal = computed(() => {
     const state = this.breakpointsSignal();
@@ -230,6 +226,7 @@ export class CalendarComponent {
   private previousDarkMode?: boolean;
 
   constructor() {
+    this.reservationStore.clean();
     this.roomStore.loadAll();
     effect(() => {
       const calendarRooms = this.calendarSignal();
@@ -449,13 +446,11 @@ export class CalendarComponent {
     const content = this.translateService.instant('RESERVATION.MOVE.CONTENT', { from, to });
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: event }, result => {
       if (result) {
-        this.store.dispatch(
-          updateReservationTimestamp({
-            id: event.meta.id,
-            start: event.start.toLocaleString(DEFAULT_LOCALE),
-            role: this.isRoomAdmin() ? Role.roomAdmin : Role.professional,
-            timeZone: event.meta.timeZone,
-          }),
+        this.reservationStore.updateTimestamp(
+          event.meta.id,
+          event.start.toLocaleString(DEFAULT_LOCALE),
+          this.isRoomAdmin() ? Role.roomAdmin : Role.professional,
+          event.meta.timeZone,
         );
       } else {
         event.start = oldStart;
@@ -636,13 +631,11 @@ export class CalendarComponent {
     this.calendar.resetEvents();
     this.isLoading = true;
     this.isCalendarLoading = true;
-    this.store.dispatch(
-      getAllGroupingByRoom({
-        days: this.daysInWeekSignal(),
-        date: this.searchDate,
-        roomId,
-        professionalId: this.professionalSelectedId(),
-      }),
+    this.reservationStore.loadAllByRoom(
+      this.daysInWeekSignal(),
+      this.searchDate,
+      roomId,
+      this.professionalSelectedId(),
     );
   };
 }

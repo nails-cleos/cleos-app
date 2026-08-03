@@ -81,7 +81,7 @@
   }
 </ng-template>
 
-<div class="app-surface-canvas app-surface-shell app-surface-stack">
+<div class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell">
   @switch (currentStepIndex()) {
     @case (0) {
       <div class="step-layout step-layout--single">
@@ -90,7 +90,7 @@
         </div>
       </div>
 
-      <div class="step-actions">
+      <div class="app-detail-actions app-detail-actions--mobile">
         <button [form]="form" appBackButton mat-stroked-button type="button">
           <mat-icon>keyboard_return</mat-icon>
           <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
@@ -108,7 +108,7 @@
         </div>
       </div>
 
-      <div class="step-actions">
+      <div class="app-detail-actions app-detail-actions--mobile">
         <button (click)="back()" mat-stroked-button type="button">
           <mat-icon>arrow_back</mat-icon>
           <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>

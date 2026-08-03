@@ -50,11 +50,11 @@ export class UnavailableDetailsPageComponent {
   }
 
   submit(unavailable: IUnavailable) {
-    this.unavailableStore.update({
-      id: this.id(),
+    this.unavailableStore.update(
+      this.id(),
       unavailable,
-      path: this.authUserService.authUser()?.isRoomAdmin ? 'dashboard/events' : 'unavailable',
-    });
+      this.authUserService.authUser()?.isRoomAdmin ? 'dashboard/events' : 'unavailable',
+    );
   }
 
   delete() {
@@ -69,11 +69,7 @@ export class UnavailableDetailsPageComponent {
     executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
       result => {
         if (result) {
-          this.unavailableStore.delete({
-            id: result.id,
-            timestamp: result.timestamp,
-            timeZone: result.timeZone,
-          });
+          this.unavailableStore.delete(result.id, result.timestamp, result.timeZone);
         }
       });
   }

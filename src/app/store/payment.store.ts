@@ -5,11 +5,11 @@ import { type Subscription } from 'rxjs';
 import { PaymentService } from '../services/payment.service';
 import { createStoreInitialState, patchCrudError, StoreState } from './crud-signal-store';
 import { HttpErrorResponse } from '@angular/common/http';
-import { IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
+import { IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentResource, IPaymentStatus } from '../interfaces/payment';
 import { IReservationPayment } from '../reservation/reservation';
 import { ToastType } from '../shared/toast/toast.model';
 
-type PaymentStoreState = StoreState<IPaymentAll[], IPaymentAll> & {
+type PaymentStoreState = StoreState<IPaymentResource, IPaymentAll> & {
   options: IPaymentOption[];
   paths: string[] | undefined;
   paymentResultParams: {
@@ -29,7 +29,7 @@ type PaymentStoreState = StoreState<IPaymentAll[], IPaymentAll> & {
 };
 
 const initialState: PaymentStoreState = {
-  ...createStoreInitialState<IPaymentAll[], IPaymentAll>(),
+  ...createStoreInitialState<IPaymentResource, IPaymentAll>(),
   options: [],
   paths: undefined,
   paymentResultParams: undefined,
@@ -82,7 +82,7 @@ export const PaymentStore = signalStore(
 
       getPayment(id: string): void {
         getPaymentSubscription?.unsubscribe();
-        patchState(store, { data: undefined, isLoading: true });
+        patchState(store, { selected: undefined, isLoading: true });
 
         getPaymentSubscription = paymentService.getPayment(id).subscribe({
           next: (selected) => patchState(store, { selected, isLoading: false }),
@@ -232,7 +232,7 @@ export const PaymentStore = signalStore(
 
       getOptions(): void {
         optionsSubscription?.unsubscribe();
-        patchState(store, { data: undefined, isLoading: true });
+        patchState(store, { options: undefined, isLoading: true });
 
         optionsSubscription = paymentService.getPaymentOptions().subscribe({
           next: (options) => patchState(store, { options, isLoading: false }),

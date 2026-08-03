@@ -1,17 +1,17 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, NavigationExtras, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, NavigationExtras, Router } from '@angular/router';
 import { currentLanguageFromUrl, getLocale } from '../util/helper';
 import { I18NStore } from '../store/i18n.store';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
 import { resetTheme, Theme } from '../util/theme';
 import { TranslateService } from '@ngx-translate/core';
 import { SeoService } from './seo.service';
-import { DateAdapter } from '@angular/material/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { CookieService } from 'ngx-cookie-service';
 import { ThemeService } from 'ng2-charts';
 import { goTo } from '../util/animation';
+import { DateLocaleService } from '../util/adapter/date-locale.service';
 
 @Injectable({
   providedIn: 'root',
@@ -26,8 +26,9 @@ export class NavigationService {
   private readonly themeService = inject(ThemeService);
   private readonly i18nStore = inject(I18NStore);
   private readonly router: Router = inject(Router);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly dateAdapter = inject(DateAdapter<Date>);
+  private readonly dateLocaleService = inject(DateLocaleService);
   private readonly overlayContainer = inject(OverlayContainer);
 
   private history: string[] = this.readHistory();
@@ -107,7 +108,7 @@ export class NavigationService {
       this.seoService.setMetaDescription(meta.CONTENT);
       this.seoService.setMetaTitle(meta.TITLE);
 
-      this.dateAdapter.setLocale(currentLocale.language);
+      this.dateLocaleService.setLanguage(currentLocale.language);
     }
 
     this.cssClass.set(resetTheme(
@@ -208,7 +209,16 @@ export class NavigationService {
     }
   }
 
-  reload(url: string[] = this.router.url.split('/'), data?: any, queryParams?: any): void {
-    void this.router.navigate(url.filter(Boolean), { state: data, queryParams });
+  reload(url?: string[], data?: any, queryParams?: any): void {
+    if (url) {
+      void this.router.navigate(url.filter(Boolean), { state: data, queryParams });
+    } else {
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        state: data,
+        queryParams,
+        queryParamsHandling: 'merge',
+      });
+    }
   }
 }

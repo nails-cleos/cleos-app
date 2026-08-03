@@ -24,6 +24,12 @@ import { fromZonedTime, toZonedTime } from 'date-fns-tz';
 
 export const DEFAULT_LOCALE = 'en-GB';
 
+export const LOCALE_MAP: Record<string, string> = {
+  en: 'en-GB',
+  es: 'es-ES',
+  nl: 'nl-NL',
+};
+
 export interface IDuration {
   hour: number;
   minute: number;

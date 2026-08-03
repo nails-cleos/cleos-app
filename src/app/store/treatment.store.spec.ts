@@ -26,7 +26,8 @@ describe('TreatmentStore', () => {
     ]);
     colorServiceSpy = jasmine.createSpyObj<ColorService>('ColorService', ['getAllColors']);
     translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
+    translateSpy.instant.and.callFake(
+      (key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
 
     TestBed.configureTestingModule({
       providers: [
@@ -97,7 +98,7 @@ describe('TreatmentStore', () => {
     store.sortGroups([{ key: 'group-1', order: 1 }]);
     expect(store.response()).toEqual({ message: 'TREATMENT.SORTED.MESSAGE:' });
 
-    store.delete({ id: 'group-1', name: 'Hands' });
+    store.delete('group-1', 'Hands');
     expect(store.response()).toEqual({
       message: 'TREATMENT.DELETED.MESSAGE:Hands',
       reload: true,

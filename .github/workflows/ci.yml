@@ -1,4 +1,4 @@
-name: Pull request flow
+name: Continue Integration flow
 
 on:
   push:
@@ -107,6 +107,14 @@ jobs:
           lcov-file: ./coverage/cleos/lcov.info
           github-token: ${{ secrets.GITHUB_TOKEN }}
           delete-old-comments: true
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-coverage
+          path: coverage/cleos/
+          retention-days: 7
 
       - name: Unit test & coverage summary
         if: always()

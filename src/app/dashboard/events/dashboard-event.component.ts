@@ -19,10 +19,8 @@ import {
   startOfPeriod,
   subPeriod,
 } from '../../util/dates';
-import { Store } from '@ngrx/store';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../dashboard';
-import { approveReservation, startReservation } from '../../store/actions/reservation.actions';
 import {
   DayViewSchedulerCalendarUtils,
   DayViewSchedulerComponent,
@@ -41,12 +39,12 @@ import { CounterComponent } from '../../util/counter/counter.component';
 import { findStateColor } from '../../util/theme';
 import { DataEvent, IDataEvent } from '../../util/event';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatInput } from '@angular/material/input';
 import { DashboardStore } from '../../store/dashboard.store';
 import { NavigationService } from '../../services/navigation.service';
+import { ReservationStore } from '../../store/reservation.store';
 
 @Component({
   selector: 'app-dashboard',
@@ -59,7 +57,7 @@ import { NavigationService } from '../../services/navigation.service';
 })
 export class DashboardEventComponent {
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly dashboardStore = inject(DashboardStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly translateService: TranslateService = inject(TranslateService);
@@ -659,13 +657,13 @@ export class DashboardEventComponent {
         break;
       case 'APPROVE':
         this.calendar.filterEvent(event);
-        this.store.dispatch(approveReservation(reservationId, undefined, true));
+        this.reservationStore.approve(reservationId, undefined, true);
         event.meta.state = States.approved;
         setTimeout(() => this.calendar.addEvent(event), 1);
         break;
       case 'START':
         this.calendar.filterEvent(event);
-        this.store.dispatch(startReservation(reservationId, undefined, true, event.meta.viewDate ?? this.viewDate()));
+        this.reservationStore.start(reservationId, undefined, true, event.meta.viewDate ?? this.viewDate());
         event.meta.state = States.started;
         event.meta.started = dateToTimestamp();
         event.draggable = false;

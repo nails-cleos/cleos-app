@@ -22,8 +22,8 @@ describe('NotificationListComponent', () => {
     clean: jasmine.Spy;
     loadPage: jasmine.Spy;
     clearResponse: jasmine.Spy;
-    readNotification: jasmine.Spy;
-    deleteNotification: jasmine.Spy;
+    read: jasmine.Spy;
+    delete: jasmine.Spy;
   };
 
   const mockNoteDate = getNowTimeZone();
@@ -57,8 +57,8 @@ describe('NotificationListComponent', () => {
       clean: jasmine.createSpy('clean'),
       loadPage: jasmine.createSpy('loadPage'),
       clearResponse: jasmine.createSpy('clearResponse'),
-      readNotification: jasmine.createSpy('readNotification'),
-      deleteNotification: jasmine.createSpy('deleteNotification'),
+      read: jasmine.createSpy('read'),
+      delete: jasmine.createSpy('delete'),
     };
     routerSpy = jasmine.createSpyObj('Router', ['navigate'], { url: '/test/url' });
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload', 'navigate'],
@@ -102,10 +102,10 @@ describe('NotificationListComponent', () => {
     };
     component.notification(notif);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/test']);
-    expect(notificationStoreSpy.readNotification).not.toHaveBeenCalledWith(notif.id);
+    expect(notificationStoreSpy.read).not.toHaveBeenCalledWith(notif.id);
   });
 
-  it('should dispatch readNotification if notification is unread', () => {
+  it('should dispatch read notification if notification is unread', () => {
     const notif: INotification = {
       id: '1',
       read: false,
@@ -117,7 +117,7 @@ describe('NotificationListComponent', () => {
     };
     component.notification(notif);
     expect(navigationServiceSpy.reload).toHaveBeenCalled();
-    expect(notificationStoreSpy.readNotification).toHaveBeenCalledWith(notif.id);
+    expect(notificationStoreSpy.read).toHaveBeenCalledWith(notif.id);
   });
 
   it('should mark notification as deleted and dispatch deleteNotification', fakeAsync(() => {
@@ -137,7 +137,7 @@ describe('NotificationListComponent', () => {
 
     const updated = component.notifications();
     expect(updated[0].deleted).toBeTrue();
-    expect(notificationStoreSpy.deleteNotification).toHaveBeenCalledWith(updated[0]);
+    expect(notificationStoreSpy.delete).toHaveBeenCalledWith(updated[0]);
     expect(component.badge).toBe(0);
 
     tick(260);
@@ -166,7 +166,7 @@ describe('NotificationListComponent', () => {
     component.remove(5);
     tick(260);
 
-    expect(notificationStoreSpy.deleteNotification).not.toHaveBeenCalledWith(jasmine.anything() as any);
+    expect(notificationStoreSpy.delete).not.toHaveBeenCalledWith(jasmine.anything() as any);
     expect(component.notifications()).toEqual([notif]);
     expect(component.badge).toBe(1);
   }));

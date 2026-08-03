@@ -10,18 +10,15 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { Store } from '@ngrx/store';
 import { map, startWith } from 'rxjs/operators';
-import { getColorsByTreatmentId } from '../../store/actions/reservation.actions';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ReservationState } from '../../store/reducers/reservation.reducers';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { getColorsPipe } from '../../store/selectors/reservation.selectors';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { ColorStore } from '../../store/color.store';
 
 type ChangeColorForm = {
   color: FormControl<IColorAll | undefined>,
@@ -41,15 +38,16 @@ type ChangeColorDialogData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeColorDialogComponent {
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly colorStore = inject(ColorStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly dialogRef: MatDialogRef<ChangeColorDialogComponent> = inject(
     MatDialogRef<ChangeColorDialogComponent>);
   readonly data = inject<ChangeColorDialogData>(MAT_DIALOG_DATA);
 
-  private colors$ = this.store.pipe(getColorsPipe);
-
-  colorsSignal = toSignal(this.colors$);
+  readonly colorsSignal = computed(() => {
+    const data = this.colorStore.data();
+    return data?.kind === 'list' ? data.value : undefined;
+  });
 
   form: FormGroup<ChangeColorForm> = this.formBuilder.group<ChangeColorForm>({
     color: this.formBuilder.control<IColorAll | undefined>(undefined, {
@@ -61,7 +59,7 @@ export class ChangeColorDialogComponent {
     this.getForm.color.valueChanges.pipe(
       startWith(''),
       map(value => typeof value === 'string' ? value : value?.name),
-      combineLatestWith(this.colors$),
+      combineLatestWith(toObservable(this.colorsSignal)),
       map(([name, colorList]) => {
         if (name) {
           return this.filterColor(name, colorList);
@@ -77,7 +75,7 @@ export class ChangeColorDialogComponent {
   constructor() {
     effect(() => {
       const treatmentId = this.treatmentId();
-      this.store.dispatch(getColorsByTreatmentId({ treatmentId }));
+      this.colorStore.loadByExternalId(treatmentId);
     });
 
     effect(() => {
@@ -108,6 +106,6 @@ export class ChangeColorDialogComponent {
     }
   };
 
-  private filterColor = (name: string, colors: IColorAll[]): IColorAll[] | undefined => colors?.filter(
+  private filterColor = (name: string, colors?: IColorAll[]): IColorAll[] | undefined => colors?.filter(
     option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

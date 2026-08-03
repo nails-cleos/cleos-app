@@ -1,13 +1,21 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IPay, IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, IPaymentStatus } from '../interfaces/payment';
+import {
+  IPay,
+  IPayment,
+  IPaymentAll,
+  IPaymentOption,
+  IPaymentRequest,
+  IPaymentResource,
+  IPaymentStatus,
+} from '../interfaces/payment';
 import { IReservationPayment } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 import { skipLoadingOverlay } from '../interfaces/pagination';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PaymentService {
 
   private url = 'payments';
@@ -54,7 +62,7 @@ export class PaymentService {
   getPaymentByResourceId = (
     id: string,
     path: 'reservation' | 'transaction',
-  ): Observable<IPaymentAll[]> => this.http.get<IPaymentAll[]>(
+  ): Observable<IPaymentResource> => this.http.get<IPaymentResource>(
     toUrl(this.getKey(path), id, this.url),
     skipLoadingOverlay(),
   );

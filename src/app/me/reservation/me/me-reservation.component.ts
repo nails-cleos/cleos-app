@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
   untracked,
   viewChild,
@@ -17,6 +18,7 @@ import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../..
 import { IRoom, IRoomAll, IService } from '../../../room/room';
 import {
   IAvailableDTO,
+  IReservation,
   IReservationAll,
   IUpcomingAll,
   MAX_RESERVATION_CUSTOMER_MONTH,
@@ -41,15 +43,7 @@ import {
   totalDuration,
 } from '../../../util/dates';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Store } from '@ngrx/store';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {
-  cleanReservation,
-  createReservation,
-  customerSearchReservation,
-  getEditReservation,
-  updateReservationById,
-} from '../../../store/actions/reservation.actions';
 import { map, startWith } from 'rxjs/operators';
 import {
   createRoomOffice,
@@ -87,17 +81,9 @@ import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment
 import { GoogleMapComponent } from '../../../shared/google-map/google-map.component';
 import { BackButtonDirective } from '../../../directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
-import {
-  getAvailableListPipe,
-  getCustomerReservationPipe,
-  getMeNavigationParamsPipe,
-  getSelectedReservationPipe,
-  getSubErrorsPipe,
-} from '../../../store/selectors/reservation.selectors';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ToastService } from '../../../services/toast.service';
 import { IError } from '../../../interfaces/common';
-import { ReservationState } from '../../../store/reducers/reservation.reducers';
 import { BankForm } from '../../../shared/bank/bank.component';
 import { FirebaseService } from '../../../services/firebase.service';
 import {
@@ -126,6 +112,8 @@ import { NavigationService } from '../../../services/navigation.service';
 import { TreatmentStore } from '../../../store/treatment.store';
 import { AdditionalStore } from '../../../store/additional.store';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
+import { MeReservationParams } from '../../../util/models/reservation.models';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
@@ -160,10 +148,13 @@ const ME_RESERVATION_ERROR_FIELDS = [
 export class MeReservationComponent {
   id = input<string>();
   rooms = input<IRoomAll[]>();
+  params = input<MeReservationParams>();
+
+  submitData = output<{ reservation: IReservation; role: Role }>();
 
   private readonly translateService: TranslateService = inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly store: Store<ReservationState> = inject(Store<ReservationState>);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
   private readonly paymentStore = inject(PaymentStore);
@@ -175,20 +166,16 @@ export class MeReservationComponent {
   private readonly firebaseService = inject(FirebaseService);
   private readonly formErrorService = inject(ReservationFormErrorService);
 
-  private navigationParams$ = this.store.pipe(getMeNavigationParamsPipe);
-  private selectedReservation$ = this.store.pipe(getSelectedReservationPipe);
-  private customerReservation$ = this.store.pipe(getCustomerReservationPipe);
-  private availableList$ = this.store.pipe(getAvailableListPipe);
-  private subErrors$ = this.store.pipe(getSubErrorsPipe);
-
   private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
 
-  private readonly navigationParams = toSignal(this.navigationParams$);
   private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
-  private readonly selectedReservationSignal = toSignal(this.selectedReservation$);
-  private readonly customerReservationSignal = toSignal(this.customerReservation$);
-  private readonly availableListSignal = toSignal(this.availableList$);
-  private readonly subErrorsSignal = toSignal(this.subErrors$);
+  private readonly selectedReservationSignal = this.reservationStore.selected;
+  private readonly customerReservationSignal = computed(() => {
+    const data = this.reservationStore.data();
+    return data?.kind === 'customerReservation' ? data.value : undefined;
+  });
+  private readonly availableListSignal = this.reservationStore.availability;
+  private readonly subErrorsSignal = this.reservationStore.subErrors;
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly paymentOptionsSignal = this.paymentStore.options;
 
@@ -455,7 +442,9 @@ export class MeReservationComponent {
   penalty = PENALTY;
 
   constructor() {
+    this.reservationStore.clean();
     this.paymentStore.getOptions();
+    this.reservationStore.loadUpcoming();
     const preview = new Step(5, 'preview', () => this.create());
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
@@ -465,7 +454,7 @@ export class MeReservationComponent {
     this.steps = [room, treatment, additional, book, payment, preview];
 
     effect(() => {
-      const params = this.navigationParams();
+      const params = this.params();
       this.treatmentId = params?.treatmentId;
       this.roomId = params?.roomId;
       this.professionalId = params?.professionalId;
@@ -500,7 +489,7 @@ export class MeReservationComponent {
               return value;
           }
         });
-        this.store.dispatch(getEditReservation({ id: reservationId }));
+        this.reservationStore.loadById(reservationId);
       }
     });
 
@@ -959,11 +948,7 @@ export class MeReservationComponent {
       payment,
       this.isEditing ? this.reservation : undefined,
     );
-    if (this.isEditing && this.reservation) {
-      this.store.dispatch(updateReservationById({ id: this.reservation.id, reservation, role }));
-    } else {
-      this.store.dispatch(createReservation({ reservation, role }));
-    }
+    this.submitData.emit({ reservation, role });
   }
 
   callStepTwo = (goNext: boolean): void => {
@@ -1010,14 +995,12 @@ export class MeReservationComponent {
     const duration = totalDuration(treatment, additionalSelected);
     this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.language);
 
-    this.store.dispatch(
-      customerSearchReservation({
-        roomId: room.id,
-        treatmentId: treatment.id,
-        date: startDate,
-        professionalId: professional.id,
-        additionalIds: additionalSelected?.map(additional => additional.id),
-      }),
+    this.reservationStore.loadAvailability(
+      room.id,
+      treatment.id,
+      startDate,
+      professional.id,
+      additionalSelected?.map(additional => additional.id),
     );
     if (goNext) {
       this.completeAndGoToNextStep(2);
@@ -1242,7 +1225,7 @@ export class MeReservationComponent {
     this.canCreate = false;
     const toastRef = this.toastService.show(message, 'error', 5000);
     toastRef.onDismiss().subscribe(() => {
-      this.store.dispatch(cleanReservation());
+      this.reservationStore.clean();
       this.navigationService.navigate(['me', 'reservations']);
     });
   };

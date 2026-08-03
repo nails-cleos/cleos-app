@@ -5,8 +5,8 @@ import { of, throwError } from 'rxjs';
 import { PaymentService } from './payment.service';
 import {
   IPay,
-  IPaymentOption,
   IPaymentAll,
+  IPaymentOption,
   IPaymentRequest,
   IPaymentStatus,
   PaymentPercentage,
@@ -197,25 +197,26 @@ describe('PaymentService', () => {
 
   describe('getPaymentByResourceId', () => {
     it('should get payments by reservation id', () => {
-      const payments = [mockPayment];
-      httpSpy.get.and.returnValue(of(payments));
+      const paymentResource = { payments: [mockPayment], remainingAmount: 0 };
+      httpSpy.get.and.returnValue(of(paymentResource));
 
       service.getPaymentByResourceId('res-123', 'reservation').subscribe(result => {
-        expect(result).toEqual(payments);
+        expect(result).toEqual(paymentResource);
       });
 
       expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/payments', { ...skipLoadingOverlay() });
     });
 
     it('should get payments by transaction id', () => {
-      const payments = [mockPayment];
-      httpSpy.get.and.returnValue(of(payments));
+      const paymentResource = { payments: [mockPayment], remainingAmount: 0 };
+      httpSpy.get.and.returnValue(of(paymentResource));
 
       service.getPaymentByResourceId('trans-123', 'transaction').subscribe(result => {
-        expect(result).toEqual(payments);
+        expect(result).toEqual(paymentResource);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
+      expect(httpSpy.get)
+        .toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
     });
   });
 
@@ -273,7 +274,8 @@ describe('PaymentService', () => {
 
       service.getPaymentByResourceId('trans-123', 'transaction').subscribe();
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
+      expect(httpSpy.get)
+        .toHaveBeenCalledWith('v1/accounts/transactions/trans-123/payments', { ...skipLoadingOverlay() });
     });
   });
 
