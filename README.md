@@ -133,11 +133,13 @@ npm run cypress:run
 Production releases are created from `main`, because AWS Amplify deploys the `main` branch for this app.
 
 1. Merge feature branches into `develop`.
-2. Open and merge a pull request from `develop` to `main`.
-3. The `Versioning` workflow finalizes the `package.json` version on `main`, creates the `vX.Y.Z` Git tag, creates the GitHub release, and deploys the `main` branch through Amplify.
-4. The workflow then syncs `main` back into `develop` and bumps `develop` to the next `-rc` version.
+2. Before opening the release pull request, make sure `develop` has the release-candidate version you intend to release, for example `1.4.0-rc`.
+3. Open and merge a pull request from `develop` to `main`.
+4. The `Versioning` workflow finalizes the `package.json` version on `main`, creates the `vX.Y.Z` Git tag, creates the GitHub release, and deploys the `main` branch through Amplify.
+5. If the finalized tag already exists, the workflow bumps the configured version part on `main` before creating the tag.
+6. The workflow then syncs `main` back into `develop` and sets `develop` to the released version with the `-rc` suffix.
 
-This keeps `main` as the released source of truth and keeps `develop` on the next release-candidate version, which avoids repeated version conflicts between the two long-lived branches.
+This keeps `main` as the released source of truth and keeps `develop` as the release-candidate branch for the version that will be released next.
 
 ## PWA Notes
 
