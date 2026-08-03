@@ -6,6 +6,11 @@ on:
       - main
     tags-ignore:
       - "**"
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
 
 ### Increments the part of the version
 ### Options for version parts: major, minor, patch
@@ -20,6 +25,7 @@ jobs:
     outputs:
       release_version: ${{ steps.release.outputs.release_version }}
       tag_name: ${{ steps.release.outputs.tag_name }}
+      release_created: ${{ steps.release.outputs.release_created }}
 
     steps:
       - uses: actions/checkout@v6
@@ -46,6 +52,7 @@ jobs:
         run: |
           VERSION=$("${GITHUB_WORKSPACE}/version-update.sh")
           TAG_NAME="v${VERSION}"
+          RELEASE_CREATED=false
 
           if ! git diff --quiet -- package.json package-lock.json; then
             git add package.json package-lock.json
@@ -53,18 +60,30 @@ jobs:
             git push origin "${GITHUB_REF_NAME}"
           fi
 
-          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
-            echo "Tag ${TAG_NAME} already exists locally" >&2
-            exit 1
-          fi
+          git fetch --tags origin
 
-          git tag -a "${TAG_NAME}" -m "Release ${TAG_NAME}"
-          git push origin "${TAG_NAME}"
+          if git rev-parse "${TAG_NAME}" >/dev/null 2>&1; then
+            TAG_COMMIT="$(git rev-list -n 1 "${TAG_NAME}")"
+            HEAD_COMMIT="$(git rev-parse HEAD)"
+
+            if [ "${TAG_COMMIT}" = "${HEAD_COMMIT}" ]; then
+              echo "Tag ${TAG_NAME} already exists on this commit; skipping release creation."
+            else
+              echo "Tag ${TAG_NAME} already exists on ${TAG_COMMIT}, not ${HEAD_COMMIT}" >&2
+              exit 1
+            fi
+          else
+            git tag -a "${TAG_NAME}" -m "Release ${TAG_NAME}"
+            git push origin "${TAG_NAME}"
+            RELEASE_CREATED=true
+          fi
 
           echo "release_version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "release_created=${RELEASE_CREATED}" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
+        if: steps.release.outputs.release_created == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.release.outputs.tag_name }}
@@ -79,7 +98,7 @@ jobs:
           echo "- **Branch:** main" >> $GITHUB_STEP_SUMMARY
           echo "- **Released Version:** ${{ steps.release.outputs.release_version }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Tag:** ${{ steps.release.outputs.tag_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **GitHub Release:** created automatically" >> $GITHUB_STEP_SUMMARY
+          echo "- **New Release Created:** ${{ steps.release.outputs.release_created }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ job.status }}" == "success" ]; then
@@ -90,6 +109,7 @@ jobs:
 
   snapshot:
     needs: release
+    if: needs.release.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -103,7 +123,10 @@ jobs:
         run: |
           git config --global user.email "nails.cleos@gmail.com"
           git config --global user.name "Nails Cleos"
-          git checkout develop
+          git fetch origin main develop --tags
+          git checkout -B develop origin/develop
+          git pull --ff-only origin develop
+          git merge --no-edit origin/main
 
       - name: Use Node.js 24.12.0
         uses: actions/setup-node@v6
@@ -146,7 +169,8 @@ jobs:
 
   deploy:
     needs: release
-    uses: ./.github/workflows/deploy.yml
+    if: needs.release.outputs.release_created == 'true'
+    uses: ./.github/workflows/cd.yml
     permissions:
       id-token: write
       contents: read
