@@ -15,6 +15,7 @@ import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import { NavigationService } from '../../../services/navigation.service';
 import { PaymentStore } from '../../../store/payment.store';
+import { ReservationStore } from '../../../store/reservation.store';
 
 @Component({
   selector: 'app-option',
@@ -29,11 +30,12 @@ export class OptionComponent {
   id = input<string>();
 
   private readonly paymentStore = inject(PaymentStore);
+  private readonly reservationStore = inject(ReservationStore);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
   private readonly paymentOptionsSignal = this.paymentStore.options;
-  private paymentsSignal = this.paymentStore.data;
+  private readonly paymentResource = this.paymentStore.data;
 
   form: FormGroup<BankForm> = this.formBuilder.group<BankForm>({
     option: this.formBuilder.control(undefined),
@@ -59,34 +61,32 @@ export class OptionComponent {
       const id = this.id();
       if (id) {
         this.paymentStore.getPaymentByResourceId(id, 'reservation');
+        this.reservationStore.loadById(id);
       }
     });
 
     effect(() => {
-      const payments = this.paymentsSignal();
-      if (payments) {
-        const reservation = payments[0]?.reservation;
-        if (reservation) {
-          const options = this.paymentOptions();
-          const types = reservation.room.paymentTypes.filter(
-            p => !['cash', 'transfer'].includes(p.toLowerCase()));
-          this.options.set(options.filter(option => types?.includes(option.type)));
-          const price = getPrice(reservation, payments);
-          this.price.set(price);
-          if (price.isPaid) {
-            this.navigationService.navigate(['reservation', reservation.id]);
-          } else {
-            if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
-              this.first = price.totalPaid === 0;
-            } else {
-              this.price.set(new Price(0, 0, 0, 0, 0, payments[payments.length - 1].amount));
-            }
-            this.reservation.set(reservation);
+      const reservation = this.reservationStore.selected();
+      const payments = this.paymentResource()?.payments;
+      if (reservation) {
+        const options = this.paymentOptions();
+        const types = reservation.room.paymentTypes.filter(
+          p => !['cash', 'transfer'].includes(p.toLowerCase()));
+        this.options.set(options.filter(option => types?.includes(option.type)));
+        const price = getPrice(reservation, payments);
+        this.price.set(price);
+        if (price.isPaid) {
+          this.navigationService.navigate(['reservation', reservation.id]);
+        } else {
+          if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
+            this.first = price.totalPaid === 0;
+          } else if (payments) {
+            this.price.set(new Price(0, 0, 0, 0, 0, payments[payments.length - 1].amount));
           }
+          this.reservation.set(reservation);
         }
       }
     });
-
   }
 
   get getForm(): BankForm {

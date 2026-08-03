@@ -52,7 +52,7 @@ devices.forEach(({ name, width, height }) => {
 
       cy.contains('mat-form-field', 'Office').find('input').should('have.value', 'Nails Cleos');
 
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepTwo"]').click({ force: true });
 
       cy.wait('@getTreatments');
       cy.get('[data-cy="date-picker"]').click({ force: true });
@@ -71,23 +71,23 @@ devices.forEach(({ name, width, height }) => {
       cy.get('[data-cy="group-input"]').should('have.value', 'Biab Treatment ');
       cy.get('[data-cy="treatment-input"]').should('have.value', 'Biab + Single Color ');
 
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepThree"]').click({ force: true });
 
       cy.wait('@getAdditional').its('response.statusCode').should('eq', 200);
 
       cy.contains('mat-list-option', 'Biab Removal').click({ force: true });
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepFour"]').click({ force: true });
 
       cy.wait('@searchCustomerReservation');
 
       cy.contains('.availability-grid button', '13:30').click({ force: true });
-      cy.get('.step-actions button').last().click({ force: true });
+      cy.get('button[name="toStepFive"]').click({ force: true });
 
       cy.contains('.step-heading h2', 'Booking summary').should('exist');
       cy.contains('.booking-summary__price', '€ 90.00').should('exist');
       cy.get('mat-checkbox').contains('Accept').click({ force: true });
 
-      cy.contains('.step-actions button', 'Reserve').click({ force: true });
+      cy.get('button[name="create"]').click({ force: true });
 
       cy.wait('@createReservation').then(({ request, response }) => {
         expect(response?.statusCode).to.eq(201);

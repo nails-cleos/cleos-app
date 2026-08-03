@@ -1757,7 +1757,8 @@ export class ReservationComponent {
     this.additionalSelected.set(reservation.additional ? reservation.additional
       .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
     this.getConfigurationForm.note.setValue(reservation.note, { emitEvent: false });
-    if (reservation.configurationCanCustomerChange !== undefined || reservation.configurationReference) {
+    const isConfigurationCanCustomerChange = reservation.configurationCanCustomerChange !== undefined;
+    if (isConfigurationCanCustomerChange || reservation.configurationReference) {
       this.getConfigurationForm.reference.setValue(reservation.configurationReference, { emitEvent: false });
       this.getConfigurationForm.customerChange.setValue(reservation.configurationCanCustomerChange ?? false, {
         emitEvent: false,

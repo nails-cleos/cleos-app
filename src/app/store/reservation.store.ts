@@ -193,6 +193,7 @@ export const ReservationStore = signalStore(
       date?: Date,
     ) => {
       const message = translateService.instant(key);
+      // TODO update selected state
       patchState(store, { response: { message }, isLoading: false });
       if (paymentLink) {
         window.open(paymentLink, '_self');

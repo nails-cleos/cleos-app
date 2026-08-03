@@ -100,9 +100,8 @@ export class ReservationCompleteComponent {
   private readonly navigationService: NavigationService = inject(NavigationService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
 
-
   private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
-  private readonly paymentsSignal = this.paymentStore.data;
+  private readonly paymentResource = this.paymentStore.data;
   private readonly paymentOptionsSignal = this.paymentStore.options;
 
   readonly selectedReservationSignal = this.reservationStore.selected;
@@ -148,7 +147,7 @@ export class ReservationCompleteComponent {
   private readonly selectGroupSignal = toSignal(this.getForm.group.valueChanges);
   private readonly selectTreatmentSignal = toSignal(this.getForm.treatment.valueChanges);
 
-  private readonly payments = computed(() => this.paymentsSignal());
+  private readonly payments = computed(() => this.paymentResource()?.payments);
   private readonly additionalList = computed(() => this.additionalListSignal());
   private additionalSelected = signal<IAdditionalAll[]>([]);
 

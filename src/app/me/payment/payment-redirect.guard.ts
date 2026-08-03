@@ -15,12 +15,13 @@ export class PaymentRedirectGuard implements CanActivate {
     const path = route.paramMap.get('path') as 'reservation' | 'transaction';
     const id = route.paramMap.get('id')!;
     const query = route.queryParams;
+    const paymentType = query.payment_type;
 
     // Update store / handle payment data
     this.paymentRedirect.handleRedirect(path, id, query);
 
     // If the URL contains a generic payment_type, keep user on the generic payment page
-    if (query.payment_type) {
+    if (paymentType) {
       return this.router.createUrlTree([lang, 'me', path, id, 'payment']);
     }
 

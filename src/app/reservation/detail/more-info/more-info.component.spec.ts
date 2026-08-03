@@ -38,6 +38,7 @@ describe('MoreInfoComponent', () => {
     data: ReturnType<typeof signal>;
     recreate: jasmine.Spy;
     getPaymentByResourceId: jasmine.Spy;
+    isLoading: jasmine.Spy;
   };
   let clipboardSpy: jasmine.SpyObj<Clipboard>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
@@ -84,6 +85,7 @@ describe('MoreInfoComponent', () => {
       data: signal(undefined),
       recreate: jasmine.createSpy('recreate'),
       getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      isLoading: jasmine.createSpy('isLoading'),
     };
 
     clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
@@ -125,10 +127,10 @@ describe('MoreInfoComponent', () => {
     });
     it('should initialize paymentsSignal', () => {
       const payments = [{ id: 'payment-1', reservation: mockReservation } as IPaymentAll];
-      paymentStoreSpy.data.set(payments);
+      paymentStoreSpy.data.set({ payments, remainingAmount: 0 });
       fixture.detectChanges();
 
-      expect(component.paymentsSignal()).toBe(payments);
+      expect(component.paymentList()).toBe(payments);
     });
     it('should initialize trackingSignal', () => {
       const tracking: ITracking = { reservation: mockReservation };

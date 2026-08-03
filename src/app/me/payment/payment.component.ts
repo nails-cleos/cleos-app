@@ -3,7 +3,7 @@ import { IPayment, IPaymentAll } from '../../interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
-import { MatFabButton, MatIconButton } from '@angular/material/button';
+import { MatButton, MatIconButton } from '@angular/material/button';
 import { DecimalPipe } from '@angular/common';
 import {
   MatCell,
@@ -25,6 +25,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
 import { NavigationService } from '../../services/navigation.service';
 import { PaymentStore } from '../../store/payment.store';
+import { BackButtonDirective } from '../../directives/back-button.directive';
 
 @Component({
   selector: 'app-payment',
@@ -32,7 +33,8 @@ import { PaymentStore } from '../../store/payment.store';
   styleUrls: ['./payment.component.scss'],
   imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, MatTable, MatColumnDef,
     MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
-    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatFabButton, TableSkeletonComponent],
+    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatButton, TableSkeletonComponent,
+    BackButtonDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
@@ -43,15 +45,15 @@ export class PaymentComponent {
   private readonly paymentStore = inject(PaymentStore);
   private readonly navigationService: NavigationService = inject(NavigationService);
 
-  private loadingSignal = this.paymentStore.isLoading;
-  private paymentListSignal = this.paymentStore.data;
-  private subErrorsSignal = this.paymentStore.subErrors;
-  private responseSignal = this.paymentStore.response;
+  private readonly loadingSignal = this.paymentStore.isLoading;
+  private readonly paymentResource = this.paymentStore.data;
+  private readonly subErrorsSignal = this.paymentStore.subErrors;
+  private readonly responseSignal = this.paymentStore.response;
 
-  dataSourceSignal = computed(() => this.paymentListSignal());
+  dataSourceSignal = computed(() => this.paymentResource()?.payments);
   isLoading = computed(() => this.loadingSignal());
   hiddenSignal = computed(() => {
-    const list = this.paymentListSignal();
+    const list = this.dataSourceSignal();
     return !!list?.length;
   });
 

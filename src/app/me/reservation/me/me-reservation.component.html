@@ -852,7 +852,8 @@
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
-              <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button">
+              <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button"
+                      name="toStepTwo">
                 <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
                 <mat-icon>arrow_forward</mat-icon>
               </button>
@@ -876,7 +877,8 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button">
+            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button"
+                    name="toStepThree">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -892,7 +894,7 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepFour(true)" mat-stroked-button type="button">
+            <button (click)="callStepFour(true)" mat-stroked-button type="button" name="toStepFour">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -908,7 +910,8 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button">
+            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button"
+                    name="toStepFive">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -924,7 +927,8 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button">
+            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button"
+                    name="toStepSix">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -939,7 +943,7 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button">
+            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button" name="create">
               <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
               <mat-icon>add_task</mat-icon>
             </button>
@@ -962,7 +966,8 @@
               <mat-icon>keyboard_return</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button">
+            <button (click)="callStepTwo(true)" [disabled]="officeForm.invalid" mat-stroked-button type="button"
+                    name="toStepTwo">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -989,7 +994,8 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button">
+            <button (click)="callStepThree(true)" [disabled]="treatmentForm.invalid" mat-stroked-button type="button"
+                    name="toStepThree">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1009,7 +1015,7 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepFour(true)" mat-stroked-button type="button">
+            <button (click)="callStepFour(true)" mat-stroked-button type="button" name="toStepFour">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1029,7 +1035,8 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button">
+            <button (click)="callStepFive(true)" [disabled]="eventGroup.invalid" mat-stroked-button type="button"
+                    name="toStepFive">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1049,7 +1056,8 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button">
+            <button (click)="callStepSix(true)" [disabled]="typeForm.invalid" mat-stroked-button type="button"
+                    name="toStepSix">
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1066,7 +1074,7 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button">
+            <button (click)="create()" [disabled]="acceptForm.invalid" mat-stroked-button type="button" name="create">
               <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
               <mat-icon>add_task</mat-icon>
             </button>

@@ -103,6 +103,7 @@
       }
     },
     "PAYMENT": {
+      "TITLE": "Pagos",
       "ERROR_TEXT": "Error",
       "DETAIL": "Detalle de pago",
       "FLOW": {

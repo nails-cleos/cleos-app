@@ -22,6 +22,7 @@ import { TrackingService } from '../services/tracking.service';
 import { TreatmentService } from '../services/treatment.service';
 import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
+import { EmptyComponent } from '../util/empty.component';
 
 const providers = [
   provideFeatureTranslations('me'),
@@ -64,8 +65,14 @@ const children: Routes = [
   },
   {
     path: ':path/:id/payment',
-    component: PaymentComponent,
     canActivate: [authGuard, PaymentRedirectGuard],
+    component: EmptyComponent,
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: ':path/:id/payments',
+    component: PaymentComponent,
+    canActivate: [authGuard],
     data: { roles: [Role.customer] },
   },
   { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },

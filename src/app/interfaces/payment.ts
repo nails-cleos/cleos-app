@@ -43,6 +43,11 @@ export interface IPaymentRequest {
   pointOfSale?: boolean;
 }
 
+export interface IPaymentResource {
+  remainingAmount: number,
+  payments: IPaymentAll[];
+}
+
 export interface IPayment {
   id?: string;
   description?: string;

@@ -156,16 +156,18 @@ export class ReservationDetailComponent {
     },
   );
 
-  reservation = this.reservationStore.selected;
-  private historiesSignal = computed(() => {
+  private readonly historiesSignal = computed(() => {
     const data = this.reservationStore.data();
     return data?.kind === 'list' ? data.value : undefined;
   });
-  paymentsSignal = this.paymentStore.data;
-  paymentsLoading = computed(() => !!this.reservation() && this.paymentsSignal() === undefined);
-  historyLoading = computed(() => !!this.reservation() && this.historiesSignal() === undefined);
+  private readonly paymentResource = this.paymentStore.data;
 
-  paginatorPageIndex = signal(0);
+  reservationSignal = this.reservationStore.selected;
+  readonly isLoading = this.reservationStore.isLoading;
+  readonly paymentsLoading = computed(() => !!this.reservationSignal() && this.paymentStore.isLoading());
+  readonly historyLoading = computed(() => !!this.reservationSignal() && this.historiesSignal() === undefined);
+
+  readonly paginatorPageIndex = signal(0);
   duration: IDuration = new Duration();
   start: Date = getNowTimeZone();
   end: Date = getNowTimeZone();
@@ -312,7 +314,7 @@ export class ReservationDetailComponent {
     });
 
     effect(() => {
-      const reservation = this.reservation();
+      const reservation = this.reservationSignal();
       if (reservation) {
         const isCustomer = this.customerId() === reservation.customer.id;
         this.duration = reservationDuration(reservation);
@@ -376,8 +378,7 @@ export class ReservationDetailComponent {
     });
 
     effect(() => {
-      const payments = this.paymentsSignal();
-      // TODO: check why payment list has always 1.
+      const payments = this.paymentResource()?.payments;
       if (!payments?.length) {
         this.paymentPaid.set([]);
         return;
@@ -407,7 +408,7 @@ export class ReservationDetailComponent {
     });
     effect(() => {
       const history = this.historiesSignal();
-      const reservation = this.reservation();
+      const reservation = this.reservationSignal();
 
       if (!history || !reservation) {
         return;
@@ -478,7 +479,7 @@ export class ReservationDetailComponent {
   }
 
   get gmt(): string {
-    return getReservationGMT(this.reservation());
+    return getReservationGMT(this.reservationSignal());
   }
 
   get total(): number {
@@ -515,12 +516,12 @@ export class ReservationDetailComponent {
     if (this.isCustomer()) {
       this.navigationService.navigate(['me', 'overview']);
     } else {
-      this.navigationService.navigate(['users', this.reservation()?.customer?.id, 'overview']);
+      this.navigationService.navigate(['users', this.reservationSignal()?.customer?.id, 'overview']);
     }
   }
 
   addNote() {
-    const reservation = this.reservation();
+    const reservation = this.reservationSignal();
     if (reservation) {
       executeDialog(this.dialog, AddNoteDialogComponent, {
         note: reservation.note,
@@ -543,7 +544,7 @@ export class ReservationDetailComponent {
   }
 
   addDiscount() {
-    const reservation = this.reservation();
+    const reservation = this.reservationSignal();
     if (reservation) {
       executeDialog(this.dialog, AddDiscountDialogComponent, { customerId: reservation.customer.id },
         result => {
@@ -617,14 +618,14 @@ export class ReservationDetailComponent {
     ReservationDetailComponent.getDateTimeDetail(history));
 
   openDialog = (reservationDate: Date): void => {
-    const reservation = this.reservation();
+    const reservation = this.reservationSignal();
     if (reservation) {
       openDialog(reservation.room, this.language, this.translateService, this.dialog, reservationDate);
     }
   };
 
   showTimeZone = (reservation?: IUpcomingAll): boolean => !isSameTimeZone(
-    (reservation || this.reservation())?.room.timeZone);
+    (reservation || this.reservationSignal())?.room.timeZone);
 
   onChangeState = (id: string): void => {
     const list = ['send', 'coffee', 'book', 'more', 'change', 'cancel', 'cancel_edit', 'notify', 'pay', 'color',
@@ -679,7 +680,7 @@ export class ReservationDetailComponent {
   ): IFabMenu => ({ name, icon, id });
 
   private professionalMachine = (self: this): any => {
-    const reservation = self.reservation();
+    const reservation = self.reservationSignal();
     if (!reservation) {
       return;
     }
@@ -897,7 +898,7 @@ export class ReservationDetailComponent {
   };
 
   private customerMachine = (self: this): any => {
-    const reservation = self.reservation();
+    const reservation = self.reservationSignal();
     if (!reservation) {
       return;
     }

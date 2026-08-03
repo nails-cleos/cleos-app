@@ -38,7 +38,7 @@ export class PaymentRedirectService {
     // Generic Mollie redirect that only carries the payment_type flag.
     // The dedicated payment page will handle fetching the correct state.
     if (query.payment_type) {
-      this.paymentStore.notify(id, path, query.payment_id, query.reference_id, query.payment_type);
+      this.paymentStore.notify(query.payment_id, path, id, query.reference_id, query.payment_type);
       return;
     }
 

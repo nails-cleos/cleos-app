@@ -38,6 +38,7 @@ describe('ReservationDetailComponent', () => {
     cancel: jasmine.Spy;
     customerCancel: jasmine.Spy;
     paymentComplete: jasmine.Spy;
+    isLoading: jasmine.Spy;
   };
   let paymentStoreSpy: {
     data: ReturnType<typeof signal>;
@@ -46,6 +47,7 @@ describe('ReservationDetailComponent', () => {
     notify: jasmine.Spy;
     adjust: jasmine.Spy;
     getPaymentByResourceId: jasmine.Spy;
+    isLoading: jasmine.Spy;
   };
   let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
   let dialogSpy: jasmine.Spy<any>;
@@ -158,6 +160,7 @@ describe('ReservationDetailComponent', () => {
       cancel: jasmine.createSpy('cancel'),
       customerCancel: jasmine.createSpy('customerCancel'),
       paymentComplete: jasmine.createSpy('paymentComplete'),
+      isLoading: jasmine.createSpy('isLoading'),
     };
     paymentStoreSpy = {
       options: signal([
@@ -191,6 +194,7 @@ describe('ReservationDetailComponent', () => {
       notify: jasmine.createSpy('notify'),
       adjust: jasmine.createSpy('adjust'),
       getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      isLoading: jasmine.createSpy('isLoading'),
     };
 
     authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
@@ -722,8 +726,8 @@ describe('ReservationDetailComponent', () => {
         status: 'PENDING',
         type: 'IDEAL',
         reservation: mockReservation,
-      } as any;
-      paymentStoreSpy.data.set([pendingPayment]);
+      };
+      paymentStoreSpy.data.set({ remainingAmount: 0, payments: [pendingPayment] });
       addPaymentForm('100.00', 'IDEAL');
       reservationStoreSpy.selected.set(
         { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
@@ -749,8 +753,8 @@ describe('ReservationDetailComponent', () => {
         status: 'CREATED',
         type: 'IDEAL',
         reservation: mockReservation,
-      } as any;
-      paymentStoreSpy.data.set([createdPayment]);
+      };
+      paymentStoreSpy.data.set({ remainingAmount: 0, payments: [createdPayment] });
       addPaymentForm('100.00', 'IDEAL');
       reservationStoreSpy.selected.set(
         { ...mockReservation, state: States.cancelledPaymentRequired, paymentRequired: true });
@@ -828,8 +832,10 @@ describe('ReservationDetailComponent', () => {
     });
 
     it('should allow canceling when is edit mode with payments', () => {
-      paymentStoreSpy.data.set(
-        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      paymentStoreSpy.data.set({
+        remainingAmount: 0,
+        payments: [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' }],
+      });
       addPaymentForm('100.00', 'TRANSFER');
       reservationStoreSpy.selected.set({ ...mockReservation, canEdit: true });
       reservationStoreSpy.data.set({ kind: 'list', value: [] });
@@ -890,8 +896,10 @@ describe('ReservationDetailComponent', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.none }),
       });
-      paymentStoreSpy.data.set(
-        [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      paymentStoreSpy.data.set({
+        remainingAmount: 0,
+        payments: [{ id: 'payment-1', transactionAmount: 50, status: 'APPROVED', type: 'TRANSFER' }],
+      });
       addPaymentForm('50.00', 'TRANSFER');
       reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
       reservationStoreSpy.data.set({ kind: 'list', value: [] });
@@ -921,8 +929,12 @@ describe('ReservationDetailComponent', () => {
       dialogSpy.and.returnValue({
         afterClosed: () => of({ option: CancelOption.chargeAndAccount }),
       });
-      paymentStoreSpy.data.set(
-        [{ id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' } as any]);
+      paymentStoreSpy.data.set({
+        remainingAmount: 0,
+        payments: [
+          { id: 'payment-1', transactionAmount: 100, status: 'APPROVED', type: 'TRANSFER' },
+        ],
+      });
       addPaymentForm('100.00', 'TRANSFER');
       reservationStoreSpy.selected.set({ ...mockReservation, canEdit: false });
       reservationStoreSpy.data.set({ kind: 'list', value: [] });
@@ -964,7 +976,7 @@ describe('ReservationDetailComponent', () => {
 
     it('should populate payment form when payments are loaded', () => {
       reservationStoreSpy.selected.set(mockReservation);
-      paymentStoreSpy.data.set(mockPayments);
+      paymentStoreSpy.data.set({ remainingAmount: 0, payments: mockPayments });
       reservationStoreSpy.data.set({ kind: 'list', value: [] });
       fixture.detectChanges();
 

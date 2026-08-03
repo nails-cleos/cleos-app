@@ -1,4 +1,6 @@
-@if (reservation(); as reservation) {
+@if (isLoading()) {
+  <app-reservation-detail-skeleton/>
+} @else if (reservationSignal(); as reservation) {
   @let currentIsCustomer = isCustomer();
   @let currentState = state();
   @let currentPaymentPaid = paymentPaid();
@@ -13,28 +15,30 @@
         </div>
       }
 
-    <mat-card appearance="outlined" class="detail-hero app-detail-panel app-surface-hero" [class.row-is-canceled]="currentState === 'CANCELLED'">
-      <mat-card-content>
-        <div class="detail-hero__topline app-detail-topline">
-          <div class="detail-hero__eyebrow app-surface-eyebrow">
-            {{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}
-          </div>
-          @if (reservation.configurationCanCustomerChange) {
-            <span class="detail-chip app-detail-chip app-detail-chip--ghost detail-chip--ghost">{{ reservation.configurationReference }}</span>
-          }
-        </div>
-
-        <div class="detail-hero__header app-detail-header">
-          <div class="detail-hero__identity">
-            <div class="detail-hero__title-row">
-              <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
-              @if (changeState && changeState.length) {
-                <div class="detail-hero__fab app-detail-action-shell">
-                  <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
-                </div>
-              }
+      <mat-card appearance="outlined" class="detail-hero app-detail-panel app-surface-hero"
+                [class.row-is-canceled]="currentState === 'CANCELLED'">
+        <mat-card-content>
+          <div class="detail-hero__topline app-detail-topline">
+            <div class="detail-hero__eyebrow app-surface-eyebrow">
+              {{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}
             </div>
-            <div class="detail-hero__meta app-detail-meta">
+            @if (reservation.configurationCanCustomerChange) {
+              <span
+                class="detail-chip app-detail-chip app-detail-chip--ghost detail-chip--ghost">{{ reservation.configurationReference }}</span>
+            }
+          </div>
+
+          <div class="detail-hero__header app-detail-header">
+            <div class="detail-hero__identity">
+              <div class="detail-hero__title-row">
+                <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
+                @if (changeState && changeState.length) {
+                  <div class="detail-hero__fab app-detail-action-shell">
+                    <app-fab-menu (fabMenuItemSelected)="onChangeState($event)" [fabMenus]="changeState"></app-fab-menu>
+                  </div>
+                }
+              </div>
+              <div class="detail-hero__meta app-detail-meta">
               <span class="detail-chip app-detail-chip app-detail-chip--status detail-chip--status"
                     [style.background-color]="getStatusBadgeColor(currentState)"
                     [style.color]="getStatusBadgeTextColor(currentState)"
@@ -43,520 +47,557 @@
                 {{ 'COMMON.STATUS.RESERVATION.' + currentState | translate }}
               </span>
 
-              <span class="detail-chip app-detail-chip">
+                <span class="detail-chip app-detail-chip">
                 <mat-icon>event</mat-icon>
-                {{ start | date:'EEE d MMM, HH:mm':gmt:language }}
+                  {{ start | date:'EEE d MMM, HH:mm':gmt:language }}
               </span>
 
-              <span class="detail-chip app-detail-chip">
+                <span class="detail-chip app-detail-chip">
                 <mat-icon>schedule</mat-icon>
-                {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
+                  {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
               </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="detail-summary-grid app-surface-grid app-surface-grid--quad">
-          <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-            <strong class="app-surface-item__value app-detail-summary-value">{{ reservation.room | roomName }}</strong>
+          <div class="detail-summary-grid app-surface-grid app-surface-grid--quad">
+            <div class="summary-item app-surface-item">
+              <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
+              <strong
+                class="app-surface-item__value app-detail-summary-value">{{ reservation.room | roomName }}</strong>
+            </div>
+
+            <div class="summary-item app-surface-item">
+              <span
+                class="summary-item__label app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
+              <strong
+                class="app-surface-item__value app-detail-summary-value">{{ reservation.professional.displayName }}</strong>
+            </div>
+
+            <div class="summary-item app-surface-item">
+              <span
+                class="summary-item__label app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              <strong class="app-surface-item__value app-detail-summary-value">{{ reservation.treatment.name }}</strong>
+            </div>
+
+            <div class="summary-item app-surface-item">
+              <span class="summary-item__label app-surface-item__label">{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
+              <strong class="app-surface-item__value app-detail-summary-value">
+                <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
+                {{ price.total | number:'1.2-2' }}
+              </strong>
+            </div>
           </div>
 
-          <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-            <strong class="app-surface-item__value app-detail-summary-value">{{ reservation.professional.displayName }}</strong>
-          </div>
+        </mat-card-content>
+      </mat-card>
 
-          <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-            <strong class="app-surface-item__value app-detail-summary-value">{{ reservation.treatment.name }}</strong>
-          </div>
+      <div class="detail-layout">
+        <div class="detail-main detail-main--full">
+          @if (reservation.note || reservation.customerNote) {
+            <mat-card appearance="outlined" class="app-surface-section">
+              <mat-card-content>
+                <div class="section-header app-detail-section-header">
+                  <div>
+                    <div
+                      class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.NOTE.FIELD' | translate }}
+                    </div>
+                  </div>
+                </div>
 
-          <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
-            <strong class="app-surface-item__value app-detail-summary-value">
-              <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
-              {{ price.total | number:'1.2-2' }}
-            </strong>
-          </div>
-        </div>
+                <div class="detail-note-grid app-surface-grid app-surface-grid--auto">
+                  @if (reservation.note && !currentIsCustomer) {
+                    <div class="detail-note-card app-surface-item">
+                      <span class="app-surface-item__label">{{ 'RESERVATION.NOTE.FIELD' | translate }}</span>
+                      <p class="app-surface-item__value app-detail-body">{{ reservation.note }}</p>
+                    </div>
+                  }
 
-      </mat-card-content>
-    </mat-card>
+                  @if (reservation.customerNote) {
+                    <div class="detail-note-card app-surface-item">
+                      <span
+                        class="app-surface-item__label">{{ 'RESERVATION.NOTE.' + (currentIsCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</span>
+                      <p class="app-surface-item__value app-detail-body">{{ reservation.customerNote }}</p>
+                    </div>
+                  }
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
 
-    <div class="detail-layout">
-      <div class="detail-main detail-main--full">
-        @if (reservation.note || reservation.customerNote) {
           <mat-card appearance="outlined" class="app-surface-section">
             <mat-card-content>
               <div class="section-header app-detail-section-header">
                 <div>
-                  <div class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.NOTE.FIELD' | translate }}</div>
+                  <div class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.APPOINTMENT' | translate }}
+                  </div>
                 </div>
               </div>
 
-              <div class="detail-note-grid app-surface-grid app-surface-grid--auto">
-                @if (reservation.note && !currentIsCustomer) {
-                  <div class="detail-note-card app-surface-item">
-                    <span class="app-surface-item__label">{{ 'RESERVATION.NOTE.FIELD' | translate }}</span>
-                    <p class="app-surface-item__value app-detail-body">{{ reservation.note }}</p>
-                  </div>
-                }
+              <div class="info-grid app-surface-grid app-surface-grid--auto">
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value">
+                    <a
+                      [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
+                      class="app-detail-link"
+                      rel="noreferrer" target="_blank">
+                      {{ reservation.room.address.name }}
+                    </a>
+                  </strong>
+                  <p class="app-surface-item__muted">{{ reservation.room.address.description }}</p>
+                </div>
 
-                @if (reservation.customerNote) {
-                  <div class="detail-note-card app-surface-item">
-                    <span class="app-surface-item__label">{{ 'RESERVATION.NOTE.' + (currentIsCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</span>
-                    <p class="app-surface-item__value app-detail-body">{{ reservation.customerNote }}</p>
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                    {{ start | date:'fullDate':gmt:language }}
+                    @if (showTimeZone()) {
+                      <button (click)="openDialog(start)" class="summary-slot-button" mat-icon-button type="button">
+                        <mat-icon>info_outline</mat-icon>
+                      </button>
+                    }
+                  </strong>
+                  <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:language }}</p>
+                </div>
+
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.END' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                    {{ end | date:'fullDate':gmt:language }}
+                    @if (showTimeZone()) {
+                      <button (click)="openDialog(end)" class="summary-slot-button" mat-icon-button type="button">
+                        <mat-icon>info_outline</mat-icon>
+                      </button>
+                    }
+                  </strong>
+                  <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:language }}</p>
+                </div>
+
+                @if (currentState === 'EDIT_CANCELLED') {
+                  <div class="info-item app-surface-item">
+                    <span
+                      class="app-surface-item__label">{{ 'COMMON.STATUS.RESERVATION.EDIT_CANCELLED' | translate }}</span>
+                    <strong class="app-surface-item__value app-detail-value">
+                      <a [routerLink]="['/', language, 'reservation', reservation.relatedReservationId]"
+                         class="app-detail-link">
+                        {{ reservation.relatedReservationId }}
+                      </a>
+                    </strong>
                   </div>
                 }
               </div>
             </mat-card-content>
           </mat-card>
-        }
 
-        <mat-card appearance="outlined" class="app-surface-section">
-          <mat-card-content>
-            <div class="section-header app-detail-section-header">
-              <div>
-                <div class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.APPOINTMENT' | translate }}</div>
-              </div>
-            </div>
-
-            <div class="info-grid app-surface-grid app-surface-grid--auto">
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value">
-                  <a [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-                     class="app-detail-link"
-                     rel="noreferrer" target="_blank">
-                    {{ reservation.room.address.name }}
-                  </a>
-                </strong>
-                <p class="app-surface-item__muted">{{ reservation.room.address.description }}</p>
-              </div>
-
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ start | date:'fullDate':gmt:language }}
-                  @if (showTimeZone()) {
-                    <button (click)="openDialog(start)" class="summary-slot-button" mat-icon-button type="button">
-                      <mat-icon>info_outline</mat-icon>
-                    </button>
-                  }
-                </strong>
-                <p class="app-surface-item__muted">{{ start | date:'shortTime':gmt:language }}</p>
-              </div>
-
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'COMMON.RESERVATION.LIST.COLUMN.END' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  {{ end | date:'fullDate':gmt:language }}
-                  @if (showTimeZone()) {
-                    <button (click)="openDialog(end)" class="summary-slot-button" mat-icon-button type="button">
-                      <mat-icon>info_outline</mat-icon>
-                    </button>
-                  }
-                </strong>
-                <p class="app-surface-item__muted">{{ end | date:'shortTime':gmt:language }}</p>
-              </div>
-
-              @if (currentState === 'EDIT_CANCELLED') {
-                <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{ 'COMMON.STATUS.RESERVATION.EDIT_CANCELLED' | translate }}</span>
-                  <strong class="app-surface-item__value app-detail-value">
-                    <a [routerLink]="['/', language, 'reservation', reservation.relatedReservationId]" class="app-detail-link">
-                      {{ reservation.relatedReservationId }}
-                    </a>
-                  </strong>
-                </div>
-              }
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card appearance="outlined" class="app-surface-section">
-          <mat-card-content>
-            <div class="section-header app-detail-section-header">
-              <div>
-                <div class="section-header__eyebrow app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}</div>
-              </div>
-            </div>
-
-            <div class="info-grid app-surface-grid app-surface-grid--auto">
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value">{{ reservation.treatment.name }}</strong>
-              </div>
-
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
-                  {{ reservation.treatment.price | number:'1.2-2' }}
-                </strong>
-              </div>
-
-              <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                  <mat-icon>schedule</mat-icon>
-                  {{ reservation.treatment.duration | durationTime }}
-                </strong>
-              </div>
-
-              @if (!customerId() && reservation.treatment.color) {
-                <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</span>
-                  <strong class="app-surface-item__value app-detail-value">{{ reservation.treatment.color.name }}</strong>
-                </div>
-              }
-            </div>
-
-            <div class="price-stack">
-              @if ((reservation.extras && reservation.extras.length) || (reservation.additional && reservation.additional.length)) {
-                <div class="extras-panel">
-                  @if (reservation.additional && reservation.additional.length) {
-                    <div class="extras-panel__section app-surface-item app-surface-item--section">
-                      <div class="extras-panel__title app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</div>
-                      <app-price-extras key="" [extras]="reservation.additional"
-                                        [currency]="reservation.room.currency" [total]="price.additional"></app-price-extras>
-                    </div>
-                  }
-                  @if (reservation.extras && reservation.extras.length) {
-                    <div class="extras-panel__section app-surface-item app-surface-item--section">
-                      <div class="extras-panel__title app-surface-item__label">{{ 'RESERVATION.TREATMENT.EXTRAS.TITLE' | translate }}</div>
-                      <app-price-extras key="" [extras]="reservation.extras"
-                                        [currency]="reservation.room.currency" [total]="price.extra"></app-price-extras>
-                    </div>
-                  }
-                </div>
-              }
-
-              <div class="detail-totals-grid app-surface-grid app-surface-grid--auto">
-                <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">Total price</span>
-                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                    <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
-                    {{ price.total | number:'1.2-2' }}
-                  </strong>
-                </div>
-
-                <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">Total duration</span>
-                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
-                    <mat-icon>schedule</mat-icon>
-                    {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
-                  </strong>
-                </div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        @if (paymentsLoading()) {
-          <app-table-skeleton [columns]="paymentTableColumns"></app-table-skeleton>
-        } @else if (currentPaymentPaid?.length) {
           <mat-card appearance="outlined" class="app-surface-section">
             <mat-card-content>
               <div class="section-header app-detail-section-header">
                 <div>
-                  <div class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.PAYMENT.TITLE' | translate }}</div>
+                  <div class="section-header__eyebrow app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}
+                  </div>
                 </div>
               </div>
 
-              <div class="app-table-shell">
-                <table [dataSource]="currentPaymentPaid" mat-table matSort matSortActive="status" multiTemplateDataRows>
-                  <ng-container matColumnDef="position">
-                    <th *matHeaderCellDef mat-header-cell>#</th>
-                    <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
-                      {{ i + 1 }}
-                    </td>
-                    <td *matFooterCellDef class="bold" mat-footer-cell>{{ 'RESERVATION.PAYMENT.PAID' | translate }}</td>
-                  </ng-container>
+              <div class="info-grid app-surface-grid app-surface-grid--auto">
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value">{{ reservation.treatment.name }}</strong>
+                </div>
 
-                  <ng-container matColumnDef="description">
-                    <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-                    <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
-                      {{ payment.description }}
-                    </td>
-                    <td *matFooterCellDef mat-footer-cell></td>
-                  </ng-container>
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                    <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
+                    {{ reservation.treatment.price | number:'1.2-2' }}
+                  </strong>
+                </div>
 
-                  <ng-container matColumnDef="status">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-                    <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
-                      {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
-                    </td>
-                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
-                  </ng-container>
+                <div class="info-item app-surface-item">
+                  <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
+                  <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                    <mat-icon>schedule</mat-icon>
+                    {{ reservation.treatment.duration | durationTime }}
+                  </strong>
+                </div>
 
-                  <ng-container matColumnDef="type">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-                    <td *matCellDef="let payment; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
-                      <div [formGroup]="form">
-                        <ng-container formArrayName="payments">
-                          <div [formGroupName]="i">
-                            <app-payment-option-select [control]="payments.at(i).controls.type"
-                                                       [options]="options()"
-                                                       [allowedValues]="getAllowedPaymentTypes(payment.type)"
-                                                       [valueMode]="'type'"
-                                                       [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
-                            </app-payment-option-select>
-                          </div>
-                        </ng-container>
+                @if (!customerId() && reservation.treatment.color) {
+                  <div class="info-item app-surface-item">
+                    <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</span>
+                    <strong
+                      class="app-surface-item__value app-detail-value">{{ reservation.treatment.color.name }}</strong>
+                  </div>
+                }
+              </div>
+
+              <div class="price-stack">
+                @if ((reservation.extras && reservation.extras.length) || (reservation.additional && reservation.additional.length)) {
+                  <div class="extras-panel">
+                    @if (reservation.additional && reservation.additional.length) {
+                      <div class="extras-panel__section app-surface-item app-surface-item--section">
+                        <div
+                          class="extras-panel__title app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}
+                        </div>
+                        <app-price-extras key="" [extras]="reservation.additional"
+                                          [currency]="reservation.room.currency"
+                                          [total]="price.additional"></app-price-extras>
                       </div>
-                    </td>
-                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
-                  </ng-container>
+                    }
+                    @if (reservation.extras && reservation.extras.length) {
+                      <div class="extras-panel__section app-surface-item app-surface-item--section">
+                        <div
+                          class="extras-panel__title app-surface-item__label">{{ 'RESERVATION.TREATMENT.EXTRAS.TITLE' | translate }}
+                        </div>
+                        <app-price-extras key="" [extras]="reservation.extras"
+                                          [currency]="reservation.room.currency"
+                                          [total]="price.extra"></app-price-extras>
+                      </div>
+                    }
+                  </div>
+                }
 
-                  <ng-container matColumnDef="actions">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-                    <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
-                      <div class="payment-actions">
-                        @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)) {
-                          <button [routerLink]="['/', language, 'me', 'payment', payment.id]" mat-icon-button
-                                  matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
-                            <mat-icon class="payment-button" color="primary">payment</mat-icon>
-                          </button>
-                        }
-                        @switch (payment.status) {
-                          @case ('PENDING') {
-                            <button (click)="notify(payment)" mat-icon-button
-                                    matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
-                              <mat-icon color="primary">published_with_changes</mat-icon>
-                            </button>
-                          }
-                          @case ('CREATED') {
-                            <button (click)="pay(payment)" mat-icon-button
+                <div class="detail-totals-grid app-surface-grid app-surface-grid--auto">
+                  <div class="info-item app-surface-item">
+                    <span class="app-surface-item__label">Total price</span>
+                    <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                      <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
+                      {{ price.total | number:'1.2-2' }}
+                    </strong>
+                  </div>
+
+                  <div class="info-item app-surface-item">
+                    <span class="app-surface-item__label">Total duration</span>
+                    <strong class="app-surface-item__value app-detail-value app-detail-value--rich">
+                      <mat-icon>schedule</mat-icon>
+                      {{ duration.hour | number:'2.0-0' }}:{{ duration.minute | number:'2.0-0' }}
+                    </strong>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          @if (paymentsLoading()) {
+            <app-table-skeleton [columns]="paymentTableColumns"></app-table-skeleton>
+          } @else if (currentPaymentPaid) {
+            <mat-card appearance="outlined" class="app-surface-section">
+              <mat-card-content>
+                <div class="section-header app-detail-section-header">
+                  <div>
+                    <div
+                      class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.PAYMENT.TITLE' | translate }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="app-table-shell">
+                  <table [dataSource]="currentPaymentPaid" mat-table matSort matSortActive="status"
+                         multiTemplateDataRows>
+                    <ng-container matColumnDef="position">
+                      <th *matHeaderCellDef mat-header-cell>#</th>
+                      <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
+                        {{ i + 1 }}
+                      </td>
+                      <td *matFooterCellDef class="bold" mat-footer-cell>{{ 'RESERVATION.PAYMENT.PAID' | translate }}
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="description">
+                      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
+                      <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
+                        {{ payment.description }}
+                      </td>
+                      <td *matFooterCellDef mat-footer-cell></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile"
+                          mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}
+                      </th>
+                      <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
+                        {{ 'COMMON.STATUS.PAYMENT.' + (payment.status ? payment.status.toUpperCase() : 'NONE') | translate }}
+                      </td>
+                      <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="type">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile"
+                          mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}
+                      </th>
+                      <td *matCellDef="let payment; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
+                        <div [formGroup]="form">
+                          <ng-container formArrayName="payments">
+                            <div [formGroupName]="i">
+                              <app-payment-option-select [control]="payments.at(i).controls.type"
+                                                         [options]="options()"
+                                                         [allowedValues]="getAllowedPaymentTypes(payment.type)"
+                                                         [valueMode]="'type'"
+                                                         [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
+                              </app-payment-option-select>
+                            </div>
+                          </ng-container>
+                        </div>
+                      </td>
+                      <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="actions">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile"
+                          mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                      </th>
+                      <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
+                        <div class="payment-actions">
+                          @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING', 'CREATED'].includes(payment.status)) {
+                            <button [routerLink]="['/', language, 'me', 'payment', payment.id]" mat-icon-button
                                     matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
                               <mat-icon class="payment-button" color="primary">payment</mat-icon>
                             </button>
                           }
-                        }
-                      </div>
-                    </td>
-                    <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="amount">
-                    <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-                    <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
-                      @if (payment.transactionAmount >= 0) {
-                        @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
-                          <div [formGroup]="form">
-                            <ng-container formArrayName="payments">
-                              <div [formGroupName]="i" class="payment-amount-edit">
-                                <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                                <mat-form-field appearance="outline">
-                                  <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit(i)">
-                                </mat-form-field>
-                              </div>
-                            </ng-container>
-                          </div>
-                        } @else {
-                          <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                          {{ payment.transactionAmount | number:'1.2-2' }}
-                        }
-                      } @else {
-                        <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                        {{ payment.amount || 0 | number:'1.2-2' }}
-                      }
-                    </td>
-                    <td *matFooterCellDef class="bold" mat-footer-cell>
-                      <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
-                      {{ total | number:'1.2-2' }}
-                    </td>
-                  </ng-container>
-
-                  <ng-container matColumnDef="expandedDetail">
-                    <td *matCellDef="let payment; let i = dataIndex;" [attr.colspan]="paymentDisplayedColumns.length"
-                        class="app-surface-hide-desktop">
-                      <div [class.detail-expanded]="payment === paymentExpanded" class="detail app-surface-hide-desktop">
-                        <mat-list>
-                          <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
-                          <div [formGroup]="form">
-                            <ng-container formArrayName="payments">
-                              <div [formGroupName]="i">
-                                <app-payment-option-select [control]="payments.at(i).controls.type"
-                                                           [options]="options()"
-                                                           [allowedValues]="getAllowedPaymentTypes(payment.type)"
-                                                           [valueMode]="'type'"
-                                                           [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
-                                </app-payment-option-select>
-                              </div>
-                            </ng-container>
-                          </div>
-                        </mat-list>
-                        <mat-list>
-                          <div mat-subheader>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
-                          <mat-list-item role="list">
-                            <div matListItemTitle>
-                              {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
-                            </div>
-                          </mat-list-item>
-                        </mat-list>
-                        @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)) {
-                          <mat-list>
-                            <mat-list-item role="list">
-                              <div matListItemTitle>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
-                              <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button>
-                                <mat-icon class="payment-button" color="primary">payment</mat-icon>
-                              </button>
-                            </mat-list-item>
-                          </mat-list>
-                        }
-                        @if (payment.status === 'PENDING') {
-                          <mat-list>
-                            <mat-list-item role="list">
-                              <div matListItemTitle>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</div>
-                              <button (click)="notify(payment)" mat-icon-button>
+                          @switch (payment.status) {
+                            @case ('PENDING') {
+                              <button (click)="notify(payment)" mat-icon-button
+                                      matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
                                 <mat-icon color="primary">published_with_changes</mat-icon>
                               </button>
+                            }
+                            @case ('CREATED') {
+                              <button (click)="pay(payment)" mat-icon-button
+                                      matTooltip="{{ 'COMMON.BUTTON.PAYMENT' | translate }}" matTooltipPosition="right">
+                                <mat-icon class="payment-button" color="primary">payment</mat-icon>
+                              </button>
+                            }
+                          }
+                        </div>
+                      </td>
+                      <td *matFooterCellDef class="app-surface-hide-mobile" mat-footer-cell></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="amount">
+                      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+                      <td *matCellDef="let payment; let i = dataIndex;" mat-cell>
+                        @if (payment.transactionAmount >= 0) {
+                          @if (currentProfessionalId && ['CASH', 'TRANSFER'].includes(payment.type)) {
+                            <div [formGroup]="form">
+                              <ng-container formArrayName="payments">
+                                <div [formGroupName]="i" class="payment-amount-edit">
+                                  <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                                  <mat-form-field appearance="outline">
+                                    <input matInput appTwoDigits formControlName="amount" (focusout)="twoDigit(i)">
+                                  </mat-form-field>
+                                </div>
+                              </ng-container>
+                            </div>
+                          } @else {
+                            <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                            {{ payment.transactionAmount | number:'1.2-2' }}
+                          }
+                        } @else {
+                          <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                          {{ payment.amount || 0 | number:'1.2-2' }}
+                        }
+                      </td>
+                      <td *matFooterCellDef class="bold" mat-footer-cell>
+                        <mat-icon matPrefix>{{ reservation.room.currency.icon }}</mat-icon>
+                        {{ total | number:'1.2-2' }}
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="expandedDetail">
+                      <td *matCellDef="let payment; let i = dataIndex;" [attr.colspan]="paymentDisplayedColumns.length"
+                          class="app-surface-hide-desktop">
+                        <div [class.detail-expanded]="payment === paymentExpanded"
+                             class="detail app-surface-hide-desktop">
+                          <mat-list>
+                            <div mat-subheader>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+                            <div [formGroup]="form">
+                              <ng-container formArrayName="payments">
+                                <div [formGroupName]="i">
+                                  <app-payment-option-select [control]="payments.at(i).controls.type"
+                                                             [options]="options()"
+                                                             [allowedValues]="getAllowedPaymentTypes(payment.type)"
+                                                             [valueMode]="'type'"
+                                                             [variant]="isEditablePaymentType(payment.type) ? 'field' : 'list-item'">
+                                  </app-payment-option-select>
+                                </div>
+                              </ng-container>
+                            </div>
+                          </mat-list>
+                          <mat-list>
+                            <div mat-subheader>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
+                            <mat-list-item role="list">
+                              <div matListItemTitle>
+                                {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
+                              </div>
                             </mat-list-item>
                           </mat-list>
-                        }
-                      </div>
-                      <mat-divider></mat-divider>
-                    </td>
-                  </ng-container>
+                          @if (!['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND_PENDING', 'REFUND', 'PENDING'].includes(payment.status)) {
+                            <mat-list>
+                              <mat-list-item role="list">
+                                <div matListItemTitle>{{ 'COMMON.BUTTON.PAYMENT' | translate }}</div>
+                                <button [routerLink]="['/me', 'payment', payment.id]" mat-icon-button>
+                                  <mat-icon class="payment-button" color="primary">payment</mat-icon>
+                                </button>
+                              </mat-list-item>
+                            </mat-list>
+                          }
+                          @if (payment.status === 'PENDING') {
+                            <mat-list>
+                              <mat-list-item role="list">
+                                <div matListItemTitle>{{ 'COMMON.BUTTON.NOTIFY' | translate }}</div>
+                                <button (click)="notify(payment)" mat-icon-button>
+                                  <mat-icon color="primary">published_with_changes</mat-icon>
+                                </button>
+                              </mat-list-item>
+                            </mat-list>
+                          }
+                        </div>
+                        <mat-divider></mat-divider>
+                      </td>
+                    </ng-container>
 
-                  <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
-                  <tr (click)="paymentExpanded = paymentExpanded === payment ? null : payment"
-                      *matRowDef="let payment; columns: paymentDisplayedColumns;" mat-row
-                      [ngClass]="{'cash row': payment.status && ['APPROVED', 'APPROVED_REFUND'].includes(payment.status)}"></tr>
-                  <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
-                  <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
-                </table>
-              </div>
-
-              <div class="app-detail-actions">
-                <button [disabled]="disableUpdateButton()" (click)="updatePayment()" mat-stroked-button
-                        type="button">
-                  <mat-icon>published_with_changes</mat-icon>
-                  {{ 'COMMON.BUTTON.UPDATE' | translate }}
-                </button>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        }
-
-        @if (historyLoading()) {
-          <app-table-skeleton [columns]="historyTableColumns" [showPaginator]="true"></app-table-skeleton>
-        } @else if (dataSource(); as dataSource) {
-          <mat-card appearance="outlined" class="app-surface-section">
-            <mat-card-content>
-              <div class="section-header app-detail-section-header">
-                <div>
-                  <div class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.LIST.HISTORY.TITLE' | translate }}</div>
+                    <tr *matHeaderRowDef="paymentDisplayedColumns" mat-header-row></tr>
+                    <tr (click)="paymentExpanded = paymentExpanded === payment ? null : payment"
+                        *matRowDef="let payment; columns: paymentDisplayedColumns;" mat-row
+                        [ngClass]="{'cash row': payment.status && ['APPROVED', 'APPROVED_REFUND'].includes(payment.status)}"></tr>
+                    <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+                    <tr *matFooterRowDef="paymentDisplayedColumns" mat-footer-row></tr>
+                  </table>
                 </div>
-              </div>
 
-              <div class="table-shell app-table-shell">
-                <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
-                  <ng-container matColumnDef="position">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>#</th>
-                    <td *matCellDef="let history; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
-                      {{ (paginatorPageIndex() * pageSize) + i + 1 }}
-                    </td>
-                  </ng-container>
+                <div class="app-detail-actions">
+                  <button [disabled]="disableUpdateButton()" (click)="updatePayment()" mat-stroked-button
+                          type="button">
+                    <mat-icon>published_with_changes</mat-icon>
+                    {{ 'COMMON.BUTTON.UPDATE' | translate }}
+                  </button>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
 
-                  <ng-container matColumnDef="professional">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
-                      {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
-                    </th>
-                    <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
-                      {{ history.professional.displayName }}
-                    </td>
-                  </ng-container>
+          @if (historyLoading()) {
+            <app-table-skeleton [columns]="historyTableColumns" [showPaginator]="true"></app-table-skeleton>
+          } @else if (dataSource(); as dataSource) {
+            <mat-card appearance="outlined" class="app-surface-section">
+              <mat-card-content>
+                <div class="section-header app-detail-section-header">
+                  <div>
+                    <div
+                      class="section-header__eyebrow app-surface-eyebrow">{{ 'RESERVATION.LIST.HISTORY.TITLE' | translate }}
+                    </div>
+                  </div>
+                </div>
 
-                  <ng-container matColumnDef="start">
-                    <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}</th>
-                    <td *matCellDef="let history" mat-cell>
-                      {{ history.timestamp | timeDetail | date:'short':gmt:language }}
-                      @if (showTimeZone(history)) {
-                        <button (click)="openHistoryDialog(history)" mat-icon-button type="button">
-                          <mat-icon>info_outline</mat-icon>
-                        </button>
-                      }
-                    </td>
-                  </ng-container>
+                <div class="table-shell app-table-shell">
+                  <table [dataSource]="dataSource" mat-table multiTemplateDataRows>
+                    <ng-container matColumnDef="position">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>#</th>
+                      <td *matCellDef="let history; let i = dataIndex;" class="app-surface-hide-mobile" mat-cell>
+                        {{ (paginatorPageIndex() * pageSize) + i + 1 }}
+                      </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="treatment">
-                    <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</th>
-                    <td *matCellDef="let history" mat-cell>
-                      {{ history.treatment.name }}
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="professional">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
+                        {{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}
+                      </th>
+                      <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
+                        {{ history.professional.displayName }}
+                      </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="state">
-                    <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
-                      {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
-                    </th>
-                    <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
-                      <mat-icon matPrefix>{{ history.state | reservationIcon }}</mat-icon>
-                      {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="start">
+                      <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
+                      </th>
+                      <td *matCellDef="let history" mat-cell>
+                        {{ history.timestamp | timeDetail | date:'short':gmt:language }}
+                        @if (showTimeZone(history)) {
+                          <button (click)="openHistoryDialog(history)" mat-icon-button type="button">
+                            <mat-icon>info_outline</mat-icon>
+                          </button>
+                        }
+                      </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="expandedDetail">
-                    <td *matCellDef="let history" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
-                      <div [class.detail-expanded]="history === expanded" class="detail app-surface-hide-desktop">
-                        <mat-list>
-                          <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
-                          <mat-list-item role="list">
-                            <div matListItemTitle>{{ history.professional.displayName }}</div>
-                          </mat-list-item>
-                        </mat-list>
-                        <mat-list>
-                          <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
-                          <mat-list-item role="list">
-                            <mat-icon matListItemIcon>{{ history.state | reservationIcon }}</mat-icon>
-                            <div matListItemTitle>
-                              {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
-                            </div>
-                          </mat-list-item>
-                        </mat-list>
-                      </div>
-                      <mat-divider></mat-divider>
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="treatment">
+                      <th *matHeaderCellDef
+                          mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+                      </th>
+                      <td *matCellDef="let history" mat-cell>
+                        {{ history.treatment.name }}
+                      </td>
+                    </ng-container>
 
-                  <ng-container matColumnDef="noContent">
-                    <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-                      {{ 'RESERVATION.LIST.HISTORY.ERROR.NO_CONTENT' | translate }}
-                    </td>
-                  </ng-container>
+                    <ng-container matColumnDef="state">
+                      <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
+                        {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
+                      </th>
+                      <td *matCellDef="let history" class="app-surface-hide-mobile" mat-cell>
+                        <mat-icon matPrefix>{{ history.state | reservationIcon }}</mat-icon>
+                        {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
+                      </td>
+                    </ng-container>
 
-                  <tr *matFooterRowDef="['noContent']" [hidden]="historyLength > 0" mat-footer-row></tr>
-                  <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-                  <tr *matRowDef="let history; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
-                  <tr (click)="expanded = expanded === history ? null : history"
-                      *matRowDef="let history; columns: displayedColumns;" class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
-                  <tr *matRowDef="let row; columns: ['expandedDetail']"
-                      [class.app-table-detail-row--expanded]="row === expanded"
-                      class="app-surface-hide-desktop app-table-detail-row"
-                      mat-row></tr>
-                </table>
+                    <ng-container matColumnDef="expandedDetail">
+                      <td *matCellDef="let history" [attr.colspan]="displayedColumns.length"
+                          class="app-surface-hide-desktop">
+                        <div [class.detail-expanded]="history === expanded" class="detail app-surface-hide-desktop">
+                          <mat-list>
+                            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</div>
+                            <mat-list-item role="list">
+                              <div matListItemTitle>{{ history.professional.displayName }}</div>
+                            </mat-list-item>
+                          </mat-list>
+                          <mat-list>
+                            <div mat-subheader>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
+                            <mat-list-item role="list">
+                              <mat-icon matListItemIcon>{{ history.state | reservationIcon }}</mat-icon>
+                              <div matListItemTitle>
+                                {{ 'COMMON.STATUS.RESERVATION.' + history.state | translate }}
+                              </div>
+                            </mat-list-item>
+                          </mat-list>
+                        </div>
+                        <mat-divider></mat-divider>
+                      </td>
+                    </ng-container>
 
-                <mat-paginator [pageSize]="pageSize" [length]="historyLength"
-                               (page)="paginatorPageIndex.set($event.pageIndex)" showFirstLastButtons>
-                </mat-paginator>
-              </div>
-            </mat-card-content>
-          </mat-card>
-        }
+                    <ng-container matColumnDef="noContent">
+                      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold"
+                          mat-footer-cell>
+                        {{ 'RESERVATION.LIST.HISTORY.ERROR.NO_CONTENT' | translate }}
+                      </td>
+                    </ng-container>
 
-        <div class="app-detail-actions reservation-detail-footer-actions">
-          <button appBackButton mat-stroked-button type="button">
-            <mat-icon>keyboard_return</mat-icon>
-            <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-          </button>
+                    <tr *matFooterRowDef="['noContent']" [hidden]="historyLength > 0" mat-footer-row></tr>
+                    <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+                    <tr *matRowDef="let history; columns: displayedColumns;" class="app-surface-hide-mobile"
+                        mat-row></tr>
+                    <tr (click)="expanded = expanded === history ? null : history"
+                        *matRowDef="let history; columns: displayedColumns;"
+                        class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
+                    <tr *matRowDef="let row; columns: ['expandedDetail']"
+                        [class.app-table-detail-row--expanded]="row === expanded"
+                        class="app-surface-hide-desktop app-table-detail-row"
+                        mat-row></tr>
+                  </table>
+
+                  <mat-paginator [pageSize]="pageSize" [length]="historyLength"
+                                 (page)="paginatorPageIndex.set($event.pageIndex)" showFirstLastButtons>
+                  </mat-paginator>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          }
+
+          <div class="app-detail-actions reservation-detail-footer-actions">
+            <button appBackButton mat-stroked-button type="button">
+              <mat-icon>keyboard_return</mat-icon>
+              <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
-} @else {
-  <app-reservation-detail-skeleton />
 }

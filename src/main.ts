@@ -84,12 +84,6 @@ const providers = [
     withComponentInputBinding(),
     withInMemoryScrolling({ anchorScrolling: 'enabled' }),
   ),
-  provideRouter(
-    routes,
-    withRouterConfig({ onSameUrlNavigation: 'reload' }),
-    withComponentInputBinding(),
-    withInMemoryScrolling({ anchorScrolling: 'enabled' }),
-  ),
   importProvidersFrom(
     BrowserModule,
     TranslateModule.forRoot({

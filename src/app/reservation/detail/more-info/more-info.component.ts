@@ -58,10 +58,10 @@ export class MoreInfoComponent {
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
 
-  paymentsSignal = this.paymentStore.data;
+  private readonly paymentResource = this.paymentStore.data;
   trackingSignal = this.trackingStore.selected;
   reviewSignal = this.reservationStore.review;
-  paymentsLoading = computed(() => this.paymentsSignal() === undefined);
+  paymentsLoading = this.paymentStore.isLoading;
 
   tableColumns: TableSkeletonColumn[] = [
     { key: 'position' },
@@ -75,7 +75,9 @@ export class MoreInfoComponent {
 
   readonly language: string = this.navigationService.language;
 
-  totalTime = computed(() => {
+  readonly paymentList = computed(() => this.paymentResource()?.payments);
+
+  readonly totalTime = computed(() => {
     const tracking = this.trackingSignal();
     if (tracking?.startedTimestamp && tracking?.completedTimestamp) {
       return getDiffTime(newDateTimestamp(tracking.completedTimestamp),
