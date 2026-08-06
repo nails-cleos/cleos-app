@@ -9,7 +9,9 @@ import { CookieService } from 'ngx-cookie-service';
 
 export const NOT_INSTALL_PWA = 'not_install_pwa';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class PwaService {
   private bottomSheet: MatBottomSheet = inject(MatBottomSheet);
   private platform: Platform = inject(Platform);

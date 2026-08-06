@@ -5,25 +5,15 @@ import { CatalogComponent } from './catalog/catalog.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { TermsAndConditionsComponent } from './terms-and-conditions/terms-and-conditions.component';
 import { MainTreatmentComponent } from './treatment/main-treatment.component';
-import { MainService } from '../services/main.service';
-import { TreatmentService } from '../services/treatment.service';
-import { UserService } from '../services/user.service';
-import { AuthService } from '../services/auth.service';
 import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { MainStore } from '../store/main.store';
 
 const providers = [
   provideFeatureTranslations('main'),
-  MainService,
-  TreatmentService,
-  UserService,
-  AuthService,
   {
     provide: LocationStrategy,
     useClass: HashLocationStrategy,
   },
-  MainStore,
 ];
 
 const children: Routes = [

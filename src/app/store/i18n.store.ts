@@ -38,9 +38,7 @@ const persist = (language: string): void => {
 
 export const I18NStore = signalStore(
   { providedIn: 'root' },
-
   withState(initialState),
-
   withMethods((
     store,
     translateService = inject(TranslateService),

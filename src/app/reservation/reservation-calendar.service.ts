@@ -40,7 +40,9 @@ type SelectionEventParams = {
   isDarkMode: boolean;
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class ReservationCalendarService {
   private readonly translateService = inject(TranslateService);
 

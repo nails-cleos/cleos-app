@@ -7,7 +7,9 @@ import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 import { skipLoadingOverlay } from '../interfaces/pagination';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class CatalogueService {
 
   private url = 'catalogues';

@@ -11,6 +11,7 @@ import type { Subscription } from 'rxjs';
 const initialState = createStoreInitialState<IInvoice[], never>();
 
 export const InvoiceStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

@@ -9,7 +9,9 @@ import { SortDirection } from '@angular/material/sort';
 import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 import { IApiResponse } from '../interfaces/common';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TreatmentService {
 
   private url = 'treatments';

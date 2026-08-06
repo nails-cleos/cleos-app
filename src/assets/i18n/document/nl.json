@@ -1,9 +1,19 @@
 {
   "DOCUMENT": {
+    "TITLE": "Documenten",
+    "UPLOAD_SUCCESS": "Documenten {{fileName}} succesvol geüpload",
     "LIST": {
       "ERROR": {
         "NO_CONTENT": "Geen documenten"
       }
+    },
+    "DELETED": {
+      "TITLE": "Documenten verwijderen",
+      "CONTENT": "Weet je zeker dat je documenten {{name}} wilt verwijderen?",
+      "MESSAGE": "Documenten {{name}} verwijderd"
+    },
+    "STATEMENT": {
+      "TITLE": "Verklaring toevoegen"
     }
   }
 }

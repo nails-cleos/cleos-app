@@ -24,6 +24,7 @@ const initialState: AccountStoreState = {
 };
 
 export const AccountStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

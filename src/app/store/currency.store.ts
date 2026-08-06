@@ -12,6 +12,7 @@ type CurrencyData =
   | { kind: 'list'; value?: ICurrencyAll[] };
 
 export const CurrencyStore = signalStore(
+  { providedIn: 'root' },
   withCrudStoreState<ICurrencyAll, CurrencyData, ICurrencyAll>(),
   withCrudStoreMethods<ICurrency, IApiResponse, IApiResponse, { id: string; code: string }>(() => {
     const currencyService = inject(CurrencyService);

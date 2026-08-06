@@ -17,6 +17,7 @@ import type { Subscription } from 'rxjs';
 const initialState = createStoreInitialState<ICatalogueAll[], ICatalogueAll>();
 
 export const CatalogueStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

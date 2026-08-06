@@ -43,6 +43,7 @@ const initialState: RoomStoreState = {
 };
 
 export const RoomStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

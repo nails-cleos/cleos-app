@@ -15,7 +15,9 @@ import {
 import { IReservation } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class DashboardService {
 
   private url = 'dashboard';

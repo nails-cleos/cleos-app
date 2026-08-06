@@ -177,12 +177,13 @@ describe('DocumentListComponent', () => {
     fixture.detectChanges();
 
     expect(documentStoreSpy.loadPage).toHaveBeenCalledWith({
-      officeId: mockOffice.id,
-      date,
       page: 1,
       sort: 'date',
       direction: 'desc',
+      officeId: mockOffice.id,
       size: PAGE_SIZE,
+      date,
+      types: undefined,
     });
   });
 
@@ -327,5 +328,42 @@ describe('DocumentListComponent', () => {
 
       expect(documentStoreSpy.downloadZip).not.toHaveBeenCalled();
     });
+  });
+
+  it('should emit add button', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.onAdd.subscribe(emitSpy);
+
+    fixture.detectChanges();
+
+    component.add();
+
+    expect(emitSpy).toHaveBeenCalled();
+  });
+
+  it('should emit edit button', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.onEdit.subscribe(emitSpy);
+
+    const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+
+    fixture.detectChanges();
+
+    component.edit(document);
+
+    expect(emitSpy).toHaveBeenCalledWith(document);
+  });
+
+  it('should emit delete button', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.onDelete.subscribe(emitSpy);
+
+    const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+
+    fixture.detectChanges();
+
+    component.delete(document);
+
+    expect(emitSpy).toHaveBeenCalledWith(document);
   });
 });

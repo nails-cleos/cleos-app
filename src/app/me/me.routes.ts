@@ -11,31 +11,11 @@ import { ReferralsComponent } from './referrals/referrals.component';
 import { ReservationListComponent } from './reservation/list/reservation-list.component';
 import { MeReservationCreatePageComponent } from './reservation/me/me-reservation-create-page.component';
 import { MeReservationDetailsPageComponent } from './reservation/me/me-reservation-details-page.component';
-import { AdditionalService } from '../services/additional.service';
-import { ColorService } from '../services/color.service';
-import { CurrencyService } from '../services/currency.service';
-import { DiscountService } from '../services/discount.service';
-import { PaymentService } from '../services/payment.service';
-import { ReservationService } from '../services/reservation.service';
-import { RoomService } from '../services/room.service';
-import { TrackingService } from '../services/tracking.service';
-import { TreatmentService } from '../services/treatment.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { EmptyComponent } from '../util/empty.component';
 
 const providers = [
   provideFeatureTranslations('me'),
-  ReservationService,
-  PaymentService,
-  TreatmentService,
-  RoomService,
-  UserService,
-  AdditionalService,
-  TrackingService,
-  DiscountService,
-  CurrencyService,
-  ColorService,
 ];
 
 const children: Routes = [

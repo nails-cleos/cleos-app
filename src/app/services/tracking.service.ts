@@ -5,7 +5,9 @@ import { ITracking } from '../reservation/reservation';
 import { toUrl } from '../util/helper';
 import { skipLoadingOverlay } from '../interfaces/pagination';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TrackingService {
 
   private url = 'tracking';

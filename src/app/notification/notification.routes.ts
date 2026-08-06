@@ -2,12 +2,10 @@ import { Routes } from '@angular/router';
 import { NotificationListComponent } from './list/notification-list.component';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
-import { NotificationService } from '../services/notification.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('notification'),
-  NotificationService,
 ];
 
 const children: Routes = [

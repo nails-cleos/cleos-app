@@ -1,9 +1,19 @@
 {
   "DOCUMENT": {
+    "TITLE": "Documentos",
+    "UPLOAD_SUCCESS": "Documento {{fileName}} subido exitosamente",
     "LIST": {
       "ERROR": {
         "NO_CONTENT": "No hay documentos"
       }
+    },
+    "DELETED": {
+      "TITLE": "Eliminar documento",
+      "CONTENT": "¿Está seguro de eliminar documento {{name}}?",
+      "MESSAGE": "Documento {{name}} eliminado"
+    },
+    "STATEMENT": {
+      "TITLE": "Agregar declaración"
     }
   }
 }

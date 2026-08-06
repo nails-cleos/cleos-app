@@ -6,6 +6,7 @@ import { MainService } from '../services/main.service';
 import { ISendMessage } from '../../main';
 
 export const MainStore = signalStore(
+  { providedIn: 'root' },
   withCrudStoreState(),
   withCrudStoreMethods(() => {
     const mainService = inject(MainService);

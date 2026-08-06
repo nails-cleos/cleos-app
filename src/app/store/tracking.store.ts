@@ -9,6 +9,7 @@ import { ITracking } from '../reservation/reservation';
 const initialState = createStoreInitialState<never, ITracking>();
 
 export const TrackingStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

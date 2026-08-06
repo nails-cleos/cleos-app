@@ -12,6 +12,7 @@ const initialState: AwsStoreState = {
 };
 
 export const AwsStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((store, awsLambdaService = inject(AwsLambdaService)) => {
     let processPdfSubscription: Subscription | undefined;

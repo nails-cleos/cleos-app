@@ -35,18 +35,20 @@
               <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
             }
           </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
-            <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
-            <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-            <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
-            </mat-datepicker>
-          </mat-form-field>
-          <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()"
-                  class="app-surface-filter-action app-detail-action-button">
-            <mat-icon>folder_zip</mat-icon>
-            <span>{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}</span>
-          </button>
+          @if (showDateFilter()) {
+            <mat-form-field appearance="outline">
+              <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
+              <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
+              <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
+              </mat-datepicker>
+            </mat-form-field>
+            <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()"
+                    class="app-surface-filter-action app-detail-action-button">
+              <mat-icon>folder_zip</mat-icon>
+              <span>{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}</span>
+            </button>
+          }
         </div>
       </form>
     </section>
@@ -92,8 +94,14 @@
             </ng-container>
 
             <ng-container matColumnDef="actions">
-              <th *matHeaderCellDef class="app-surface-hide-mobile"
-                  mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}
+              <th *matHeaderCellDef mat-header-cell>
+                <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+                @if (navigationButtons()) {
+                  <button (click)="add()" mat-icon-button id="add-button"
+                          matTooltip="{{ 'DOCUMENT.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                    <mat-icon color="primary">add</mat-icon>
+                  </button>
+                }
               </th>
               <td *matCellDef="let document" class="app-surface-hide-mobile" mat-cell>
                 <div>
@@ -101,6 +109,16 @@
                     <button (click)="download(document)" mat-icon-button
                             matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
                       <mat-icon color="primary">file_download</mat-icon>
+                    </button>
+                  }
+                  @if (navigationButtons() && !document.deleted) {
+                    <button (click)="edit(document)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                      <mat-icon color="primary">edit</mat-icon>
+                    </button>
+                    <button (click)="delete(document)" mat-icon-button
+                            matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                      <mat-icon color="warn">delete</mat-icon>
                     </button>
                   }
                 </div>
@@ -119,13 +137,29 @@
                         <div matListItemLine>{{ document.date | date:'MM-yyyy' }}</div>
                       </mat-list-item>
                     }
-                    @if (!document.deleted && googleDriveUploadFile) {
+
+                    @if (!document.deleted) {
                       <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-                      <mat-list-item role="list">
-                        <button (click)="download(document)" color="primary" mat-icon-button>
-                          <mat-icon matListItemIcon>file_download</mat-icon>
-                        </button>
-                      </mat-list-item>
+                      @if (googleDriveUploadFile) {
+                        <mat-list-item role="list">
+                          <button (click)="download(document)" color="primary" mat-icon-button>
+                            <mat-icon matListItemIcon>file_download</mat-icon>
+                          </button>
+                        </mat-list-item>
+                      }
+                      @if (navigationButtons()) {
+                        <mat-list-item role="list">
+                          <button (click)="edit(document)" color="primary" mat-icon-button>
+                            <mat-icon matListItemIcon>edit</mat-icon>
+                          </button>
+                        </mat-list-item>
+
+                        <mat-list-item role="list">
+                          <button (click)="delete(document)" color="primary" mat-icon-button>
+                            <mat-icon matListItemIcon>delete</mat-icon>
+                          </button>
+                        </mat-list-item>
+                      }
                     }
                   </mat-list>
                 </div>

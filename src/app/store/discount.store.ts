@@ -31,6 +31,7 @@ const initialState: DiscountStoreState = {
 };
 
 export const DiscountStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,
