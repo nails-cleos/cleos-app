@@ -492,7 +492,10 @@ export const createAddress = (
   return undefined;
 };
 
-export const toUrl = (...url: string[]): string => url.join('/');
+export const toUrl = (...url: (string | undefined | null)[]): string =>
+  url
+    .filter((part): part is string => !!part?.trim())
+    .join('/');
 
 export const getCurrencyFromRoom = (
   selectedRoom?: ISummaryRoom | 'All',

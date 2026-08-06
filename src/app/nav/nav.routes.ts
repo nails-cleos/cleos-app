@@ -27,7 +27,6 @@ import { CatalogueStore } from '../store/catalogue.store';
 import { ColorStore } from '../store/color.store';
 import { CurrencyStore } from '../store/currency.store';
 import { DocumentStore } from '../store/document.store';
-import { StatementStore } from '../store/statement.store';
 import { DiscountStore } from '../store/discount.store';
 import { AwsStore } from '../store/aws.store';
 import { AdditionalStore } from '../store/additional.store';
@@ -81,7 +80,6 @@ const providers = [
   ColorStore,
   CurrencyStore,
   DocumentStore,
-  StatementStore,
   DiscountStore,
   AwsStore,
   AdditionalStore,
@@ -103,7 +101,6 @@ const providers = [
   provideGlobalFeedbackSource(ColorStore),
   provideGlobalFeedbackSource(CurrencyStore),
   provideGlobalFeedbackSource(DocumentStore),
-  provideGlobalFeedbackSource(StatementStore),
   provideGlobalFeedbackSource(DiscountStore),
   provideGlobalFeedbackSource(AdditionalStore),
   provideGlobalFeedbackSource(OfficeStore),

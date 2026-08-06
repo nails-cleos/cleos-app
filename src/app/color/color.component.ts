@@ -60,6 +60,7 @@ export class ColorComponent {
       }
     });
   }
+
   get getConfig(): ICommon {
     return this.config();
   }

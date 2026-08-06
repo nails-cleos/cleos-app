@@ -193,8 +193,17 @@ export const ReservationStore = signalStore(
       date?: Date,
     ) => {
       const message = translateService.instant(key);
-      // TODO update selected state
-      patchState(store, { response: { message }, isLoading: false });
+      const currentSelected = store.selected();
+      patchState(store, {
+        response: { message },
+        isLoading: false,
+        ...(state && currentSelected && {
+          selected: {
+            ...currentSelected,
+            state,
+          },
+        }),
+      });
       if (paymentLink) {
         window.open(paymentLink, '_self');
         return;
@@ -479,7 +488,20 @@ export const ReservationStore = signalStore(
               const message = translateService.instant('COMMON.RESERVATION.UPDATED.MESSAGE',
                 { date: newDateTimestamp(timestamp, timeZone) });
               navigate(role, message, response.id, response.paymentLink || paymentLink);
-              // TODO: loadById ???
+              const currentSelected = store.selected();
+              if (currentSelected) {
+                patchState(store, {
+                  selected: {
+                    ...currentSelected,
+                    ...(currentSelected.note !== note && {
+                      note,
+                    }),
+                    ...(currentSelected.customerNote !== customerNote && {
+                      customerNote,
+                    }),
+                  },
+                });
+              }
             },
             error: patchError,
           });

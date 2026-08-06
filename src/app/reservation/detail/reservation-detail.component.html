@@ -279,7 +279,7 @@
 
           @if (paymentsLoading()) {
             <app-table-skeleton [columns]="paymentTableColumns"></app-table-skeleton>
-          } @else if (currentPaymentPaid) {
+          } @else if (currentPaymentPaid.length) {
             <mat-card appearance="outlined" class="app-surface-section">
               <mat-card-content>
                 <div class="section-header app-detail-section-header">

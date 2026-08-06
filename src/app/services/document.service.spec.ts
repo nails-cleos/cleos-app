@@ -3,8 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { DocumentService } from './document.service';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
-import { IDocument } from '../document/document';
-import { Pagination } from '../interfaces/pagination';
+import { DocumentTypeEnum, IDocument } from '../document/document';
+import { Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import { getNowTimeZone } from '../util/dates';
 
 describe('DocumentService', () => {
   let service: DocumentService;
@@ -25,6 +26,18 @@ describe('DocumentService', () => {
     expect(service).toBeTruthy();
   });
 
+  it('should get document', () => {
+    const id = '123';
+    const document: IDocument = { date: getNowTimeZone(), type: DocumentTypeEnum.statement, id, name: 'test.pdf' };
+    httpSpy.get.and.returnValue(of(document));
+
+    service.getDocument(id).subscribe(result => {
+      expect(result).toBe(document);
+    });
+
+    expect(httpSpy.get).toHaveBeenCalledWith(`v1/documents/${id}`, { ...skipLoadingOverlay() });
+  });
+
   it('should download document', () => {
     const blob = new Blob(['test'], { type: 'application/pdf' });
     httpSpy.get.and.returnValue(of(blob));
@@ -34,7 +47,7 @@ describe('DocumentService', () => {
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith(
-      'v1/documents/123',
+      'v1/documents/123/file',
       jasmine.objectContaining({ responseType: 'blob' }),
     );
 
@@ -54,7 +67,28 @@ describe('DocumentService', () => {
 
     httpSpy.get.and.returnValue(of(response));
 
-    service.getDocumentsPage('1', '2026-01', 0, 'date', 'asc', 10)
+    service.getDocumentsPage('1', 0, 'date', 'asc', 10, '2026-01')
+      .subscribe(result => {
+        expect(result).toEqual(response);
+      });
+
+    expect(httpSpy.get).toHaveBeenCalledWith(
+      'v1/documents/offices/1/pages',
+      jasmine.objectContaining({ params: jasmine.any(HttpParams) }),
+    );
+  });
+
+  it('should fetch paginated documents', () => {
+    const response: Pagination<IDocument> = {
+      number: 0,
+      totalPages: 0,
+      content: [],
+      totalElements: 0,
+    };
+
+    httpSpy.get.and.returnValue(of(response));
+
+    service.getDocumentsPage('1', 0, 'date', 'asc', 10, undefined, [DocumentTypeEnum.statement])
       .subscribe(result => {
         expect(result).toEqual(response);
       });
