@@ -23,6 +23,7 @@ export type AdditionalData =
 const initialState = createStoreInitialState<AdditionalData, IAdditionalAll>();
 
 export const AdditionalStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

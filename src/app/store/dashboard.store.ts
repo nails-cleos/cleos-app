@@ -58,6 +58,7 @@ const initialState: DashboardStoreState = {
 };
 
 export const DashboardStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

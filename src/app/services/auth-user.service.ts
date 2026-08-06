@@ -46,7 +46,9 @@ export const initialAuthUser: IAuthUser = {
   theme: undefined,
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthUserService {
   private cookieConsentService: NgcCookieConsentService = inject(NgcCookieConsentService);
   private _authUser = signal<IAuthUser>(initialAuthUser);

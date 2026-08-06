@@ -6,7 +6,12 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'STATEMENT.TITLE' | translate }}</span>
+        <span class="app-surface-eyebrow">
+          {{ getConfig.title | translate }}
+        </span>
+        @if (statement(); as statement) {
+          <h2 class="app-crud-title">{{ statement.name }}</h2>
+        }
       </div>
     </div>
 
@@ -44,7 +49,8 @@
     </div>
 
     @if (!form.invalid) {
-      <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"></app-file-drop>
+      <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"
+                     [currentFile]="file()"></app-file-drop>
     }
   </section>
 
@@ -54,8 +60,8 @@
       <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
     </button>
     <button [disabled]="form.invalid || !blob()" mat-stroked-button type="submit">
-      <mat-icon>upload_file</mat-icon>
-      <span>{{ 'COMMON.BUTTON.ADD' | translate }}</span>
+      <mat-icon>{{ getConfig.button.icon }}</mat-icon>
+      <span>{{ getConfig.button.label | translate }}</span>
     </button>
   </div>
 </form>

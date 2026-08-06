@@ -9,7 +9,9 @@ import { toUrl } from '../util/helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class AdditionalService {
 
   private url = 'additional';

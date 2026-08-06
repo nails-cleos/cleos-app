@@ -14,7 +14,9 @@ export type ReservationErrorStateOptions<TField extends string, TErrors extends 
   stepByField?: Partial<Record<TField, number>>;
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class ReservationFormErrorService {
   createErrorState<TField extends string, TErrors extends Record<string, unknown>>(
     subErrors: IError[],

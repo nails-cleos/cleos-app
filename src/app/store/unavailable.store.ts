@@ -19,6 +19,7 @@ import type { Subscription } from 'rxjs';
 const initialState = createStoreInitialState<Pagination<IUnavailableAll>, IUnavailableAll>();
 
 export const UnavailableStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

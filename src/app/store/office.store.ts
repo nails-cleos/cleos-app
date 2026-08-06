@@ -22,6 +22,7 @@ export type OfficeData =
 const initialState = createStoreInitialState<OfficeData, IOfficeAll>();
 
 export const OfficeStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

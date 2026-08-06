@@ -1,145 +1,46 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { combineLatestWith } from 'rxjs';
-import { getNowTimeZone, invoiceFormat } from '../../util/dates';
-import { map, startWith } from 'rxjs/operators';
-import { TranslatePipe } from '@ngx-translate/core';
-import { IOfficeAll } from '../../office/office';
-import { requireMatch } from '../../util/validators';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { DriveAccessService } from '../../services/drive-access.service';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { FileDropComponent, UploadFile } from '../../shared/file-drop/file-drop.component';
-import { StatementStore } from '../../store/statement.store';
-import { OfficeStore } from '../../store/office.store';
-import { MatOption } from '@angular/material/core';
-import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
-import { EnvService } from '../../services/env.service';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
-import { MatSuffix } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
-import { MatButton } from '@angular/material/button';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-
-type StatementForm = {
-  office: FormControl<IOfficeAll | undefined>;
-  date: FormControl<Date>;
-};
+import { Component, inject } from '@angular/core';
+import { DocumentListComponent } from '../../document/list/document-list.component';
+import { DocumentTypeEnum, IDocument } from '../../document/document';
+import { executeDialogNoWidth } from '../../util/helper';
+import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { TranslateService } from '@ngx-translate/core';
+import { MatDialog } from '@angular/material/dialog';
+import { DocumentStore } from '../../store/document.store';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'app-statement-list',
-  templateUrl: './statement-list.component.html',
-  styleUrls: ['./statement-list.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatOption,
-    MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError,
-    MatAutocompleteTrigger,
-    BackButtonDirective, BackButtonDirective, FileDropComponent],
-  providers: [...provideYearMonthDateAdapter()],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DocumentListComponent],
+  template: `
+    <app-document-list [showDateFilter]="false" [navigationButtons]="true" (onDelete)="delete($event)"
+                       (onEdit)="edit($event)" (onAdd)="add()" [types]="types"></app-document-list>`,
 })
 export class StatementListComponent {
-  private readonly env: EnvService = inject(EnvService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly officeStore = inject(OfficeStore);
-  private readonly statementStore = inject(StatementStore);
-  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
 
-  private allOfficesSignal = signal<IOfficeAll[] | undefined>(undefined);
+  private readonly translateService = inject(TranslateService);
+  private readonly dialog = inject(MatDialog);
+  private readonly documentStore = inject(DocumentStore);
+  private readonly navigationService = inject(NavigationService);
 
-  isLoading = this.officeStore.isLoading;
-  blob = signal<Blob | undefined>(undefined);
-  fileName = signal<string | undefined>(undefined);
+  readonly types = [DocumentTypeEnum.statement];
 
-  form: FormGroup<StatementForm> = this.formBuilder.group<StatementForm>({
-    office: this.formBuilder.control(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-    date: this.formBuilder.control(getNowTimeZone(), {
-      validators: [Validators.required],
-    }),
-  });
+  add = (): void => {
+    this.navigationService.navigate(['statements', 'add']);
+  };
 
-  filteredOfficeSignal = toSignal(
-    this.getForm.office.valueChanges.pipe(
-      startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.code),
-      combineLatestWith(toObservable(this.allOfficesSignal)),
-      map(([name, offices]) => {
-        if (name) {
-          return this.filterOffice(name, offices ?? []);
-        } else {
-          return offices ? offices.slice() : offices;
+  edit = (document: IDocument): void => {
+    this.navigationService.navigate(['statements', document.id]);
+  };
+
+  delete = (document: IDocument): void => {
+    const title = this.translateService.instant('DOCUMENT.DELETED.TITLE');
+    const content = this.translateService.instant('DOCUMENT.DELETED.CONTENT', { name: document.name });
+
+    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: document, variant: 'warning' },
+      result => {
+        if (result) {
+          this.documentStore.delete(result.id, result.name);
         }
-      }),
-    ));
-
-  private selectedOfficeSignal = toSignal(this.getForm.office.valueChanges);
-
-  constructor() {
-    this.statementStore.clean();
-    this.officeStore.loadMyOffices();
-
-    effect(() => {
-      const data = this.officeStore.data();
-      this.allOfficesSignal.set(data?.kind === 'list' ? data.value : undefined);
-    });
-
-    effect(() => {
-      const offices = this.allOfficesSignal();
-      if (offices?.length === 1) {
-        this.getForm.office.setValue(offices[0]);
-      }
-    });
-
-    effect(() => {
-      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
-    });
-  }
-
-  get getForm(): StatementForm {
-    return this.form.controls;
-  }
-
-  submit() {
-    const officeId = this.selectedOfficeSignal()?.id;
-    const blob = this.blob();
-    const fileName = this.fileName();
-    if (!blob || !officeId || !fileName) {
-      return;
-    }
-    this.statementStore.upload(officeId, blob, fileName);
-  }
-
-  keyDownHandler = (event: KeyboardEvent): void => {
-    if (event.code === 'Backspace') {
-      this.getForm.office.setValue(undefined);
-    }
+      });
   };
-
-  displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
-
-  setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
-    const ctrlValue = new Date(this.getForm.date.value);
-    ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
-    ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
-
-    this.getForm.date.setValue(ctrlValue);
-
-    datepicker.close();
-  };
-
-  onSelectedFile = (currentFile?: UploadFile): void => {
-    const file = currentFile?.raw;
-    if (file) {
-      this.fileName.set(`Statement_${ invoiceFormat(this.getForm.date.value) }.pdf`);
-      this.blob.set(new Blob([file], { type: file.type }));
-    } else {
-      this.fileName.set(undefined);
-      this.blob.set(undefined);
-    }
-  };
-
-  private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
 }

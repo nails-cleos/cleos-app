@@ -4,14 +4,10 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ProfileComponent } from './profile/profile.component';
-import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('auth'),
-  AuthService,
-  UserService,
 ];
 
 const children: Routes = [

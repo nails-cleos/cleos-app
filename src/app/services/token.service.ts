@@ -6,7 +6,9 @@ import { getNowTimeZone, newDate, plusMinutes } from '../util/dates';
 import { FirebaseService } from './firebase.service';
 import { AuthStore } from '../store/auth.store';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class TokenService {
   private readonly destroyRef = inject(DestroyRef);
   private readonly authStore = inject(AuthStore);

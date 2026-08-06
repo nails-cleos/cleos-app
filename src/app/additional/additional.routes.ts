@@ -3,16 +3,12 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { AdditionalListComponent } from './list/additional-list.component';
 import { AdditionalSortingComponent } from './sorting/additional-sorting.component';
-import { AdditionalService } from '../services/additional.service';
-import { TreatmentService } from '../services/treatment.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';
 
 const providers = [
   provideFeatureTranslations('additional'),
-  AdditionalService,
-  TreatmentService,
 ];
 
 const children: Routes = [

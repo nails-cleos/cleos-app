@@ -421,6 +421,7 @@ export class ReservationComponent {
   address?: string;
 
   customerAdditionalIds?: string[];
+  private customerAdditionalSelectionSeeded = false;
 
   private selectCustomerSignal = toSignal(this.getCustomerForm.customer.valueChanges);
   private selectOfficeSignal = toSignal(this.getOfficeForm.office.valueChanges);
@@ -765,10 +766,11 @@ export class ReservationComponent {
       if (additionalList?.length) {
         const additionalIndex = enableStep(this.steps, 'post_add');
         if (this.customerAdditionalIds?.length && !this.additionalSelected().length &&
-          this.currentStepIndex() === additionalIndex) {
+          this.currentStepIndex() === additionalIndex && !this.customerAdditionalSelectionSeeded) {
           const selected = additionalList.filter(ad => this.customerAdditionalIds?.includes(ad.id))
             .map(ad => Object.assign({}, ad, { id: ad.id }));
           this.additionalSelected.set(selected);
+          this.customerAdditionalSelectionSeeded = true;
           const currentPrice = untracked(() => this.price());
           this.setPrice(newAdditional(currentPrice, selected, reservation?.treatment?.discountCustomer));
         }
@@ -814,9 +816,13 @@ export class ReservationComponent {
       this.customerInfo.set(customerInfo);
       if (customerInfo) {
         this.customerAdditionalIds = customerInfo.additionalIds;
+        this.customerAdditionalSelectionSeeded = false;
         this.treatmentId.update(prev => prev || customerInfo.treatment.key);
         this.roomId.update(prev => prev || customerInfo.roomId);
         this.professionalId.update(prev => prev || customerInfo.professionalId);
+      } else {
+        this.customerAdditionalIds = undefined;
+        this.customerAdditionalSelectionSeeded = false;
       }
     });
 
@@ -985,9 +991,9 @@ export class ReservationComponent {
         const date = control.controls.date.value;
         const start = control.controls.start.value;
 
-        return date ? { date, start } : undefined;
+        return date && start ? { date, start } : undefined;
       })
-      .filter((value): value is { date: Date; start: string | undefined } => !!value);
+      .filter((value): value is { date: Date; start: string } => !!value);
   }
 
   get hasDiscountApplied(): boolean {
@@ -1075,8 +1081,10 @@ export class ReservationComponent {
   getFormDateTimeControls = (index: number): DateTimeForm => this.getFormDateTime(index).controls;
 
   create(): void {
-    const dates: string[] = this.events.value?.map(
-      (calendarEvent: any) => calendarEvent.event.start.toLocaleString(DEFAULT_LOCALE)) ?? [];
+    const dates: string[] = this.events.controls
+      .map(control => control.get('event')?.value?.start)
+      .filter((start): start is Date => start instanceof Date)
+      .map(start => start.toLocaleString(DEFAULT_LOCALE));
     if (dates.length) {
       const amount = this.getConfigurationForm.amount.value;
       const type = this.getConfigurationForm.option.value?.type;

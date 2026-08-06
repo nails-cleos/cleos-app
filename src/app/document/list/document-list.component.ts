@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, input, output, viewChild } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
@@ -12,7 +12,7 @@ import { requireMatch } from '../../util/validators';
 import { IOfficeAll } from '../../office/office';
 import { map, startWith } from 'rxjs/operators';
 import { combineLatestWith } from 'rxjs';
-import { IDocument } from '../document';
+import { DocumentTypeEnum, IDocument } from '../document';
 import { DocumentStore } from '../../store/document.store';
 import { OfficeStore } from '../../store/office.store';
 import { MatOption } from '@angular/material/core';
@@ -65,6 +65,14 @@ type DocumentsForm = {
   providers: [...provideYearMonthDateAdapter()],
 })
 export class DocumentListComponent {
+  types = input<DocumentTypeEnum[]>();
+  showDateFilter = input<boolean>(true);
+  navigationButtons = input<boolean>(false);
+
+  onAdd = output<void>();
+  onEdit = output<IDocument>();
+  onDelete = output<IDocument>();
+
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
   private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
@@ -118,9 +126,7 @@ export class DocumentListComponent {
     office: this.formBuilder.control(undefined, {
       validators: [Validators.required, requireMatch],
     }),
-    date: this.formBuilder.control(getNowTimeZone(), {
-      validators: [Validators.required],
-    }),
+    date: this.formBuilder.control(getNowTimeZone()),
   });
 
   filteredOfficeSignal = toSignal(
@@ -146,15 +152,40 @@ export class DocumentListComponent {
     this.officeStore.loadMyOffices();
 
     effect(() => {
+      const dateControl = this.getForm.date;
+
+      if (this.showDateFilter()) {
+        dateControl.setValidators(Validators.required);
+
+        if (!dateControl.value) {
+          dateControl.setValue(getNowTimeZone(), { emitEvent: false });
+        }
+      } else {
+        dateControl.clearValidators();
+        dateControl.setValue(undefined, { emitEvent: false });
+      }
+
+      dateControl.updateValueAndValidity({ emitEvent: false });
+    });
+
+    effect(() => {
       const officeId = this.selectedOffice()?.id;
-      const date = this.selectedDate();
-      if (!officeId || !date) {
+      const showDateFilter = this.showDateFilter();
+      const date = showDateFilter ? this.selectedDate() : undefined;
+
+      if (!officeId || (showDateFilter && !date)) {
         return;
       }
-      const request = this.tableState.baseRequest();
-      const size = this.pageSizeSignal();
-      this.documentStore.loadPage({ ...request, officeId, date, size });
+
+      this.documentStore.loadPage({
+        ...this.tableState.baseRequest(),
+        officeId,
+        size: this.pageSizeSignal(),
+        date,
+        types: this.types(),
+      });
     });
+
     this.tableState.resetOn(this.responseSignal, () => this.documentStore.clearResponse());
 
     effect(() => {
@@ -192,6 +223,18 @@ export class DocumentListComponent {
   };
 
   download = (document: IDocument): void => this.documentStore.download({ id: document.id, fileName: document.name });
+
+  add = (): void => {
+    this.onAdd.emit();
+  };
+
+  edit = (document: IDocument): void => {
+    this.onEdit.emit(document);
+  };
+
+  delete = (document: IDocument): void => {
+    this.onDelete.emit(document);
+  };
 
   downloadZip = (): void => {
     const office = this.selectedOffice();

@@ -12,6 +12,7 @@ type ColorData =
   | { kind: 'list'; value?: IColorAll[] };
 
 export const ColorStore = signalStore(
+  { providedIn: 'root' },
   withCrudStoreState<IColorAll, ColorData, IColorAll>(),
   withCrudStoreMethods<IColor, IApiResponse, IApiResponse, { id: string; name: string }>(() => {
     const colorService = inject(ColorService);

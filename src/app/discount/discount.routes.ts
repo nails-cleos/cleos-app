@@ -2,18 +2,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { DiscountListComponent } from './list/discount-list.component';
-import { CurrencyService } from '../services/currency.service';
-import { DiscountService } from '../services/discount.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountDetailsPageComponent } from './discount-details-page.component';
 
 const providers = [
   provideFeatureTranslations('discount'),
-  DiscountService,
-  UserService,
-  CurrencyService,
 ];
 
 const children: Routes = [

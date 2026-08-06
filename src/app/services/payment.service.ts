@@ -15,7 +15,9 @@ import { toUrl } from '../util/helper';
 import { IApiResponse } from '../interfaces/common';
 import { skipLoadingOverlay } from '../interfaces/pagination';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class PaymentService {
 
   private url = 'payments';

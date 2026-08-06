@@ -7,7 +7,9 @@ import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
 import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ExpenseService {
 
   private urlV1 = 'v1/rooms/{roomId}/expenses';

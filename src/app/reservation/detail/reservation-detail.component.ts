@@ -432,10 +432,13 @@ export class ReservationDetailComponent {
         const previousTransition =
           ReservationDetailComponent.createTransaction(
             previous,
-            () => this.navigationService.navigate([
-              'reservation',
-              allReservations[currentIndex - 1],
-            ]),
+            () => {
+              this.hasFetched.set(false);
+              this.navigationService.navigate([
+                'reservation',
+                allReservations[currentIndex - 1],
+              ]);
+            },
           );
 
         ReservationDetailComponent.addTransitionToAllStates(
@@ -458,10 +461,13 @@ export class ReservationDetailComponent {
         const nextTransition =
           ReservationDetailComponent.createTransaction(
             next,
-            () => this.navigationService.navigate([
-              'reservation',
-              allReservations[currentIndex + 1],
-            ]),
+            () => {
+              this.hasFetched.set(false);
+              this.navigationService.navigate([
+                'reservation',
+                allReservations[currentIndex + 1],
+              ]);
+            },
           );
 
         ReservationDetailComponent.addTransitionToAllStates(

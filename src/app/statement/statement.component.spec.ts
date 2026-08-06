@@ -2,32 +2,35 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslateModule } from '@ngx-translate/core';
-import { StatementListComponent } from './statement-list.component';
+import { StatementComponent } from './statement.component';
 import { ActivatedRoute } from '@angular/router';
-import { IOfficeAll } from '../../office/office';
-import { DriveAccessService } from '../../services/drive-access.service';
-import { StatementStore } from '../../store/statement.store';
+import { IOfficeAll } from '../office/office';
+import { DriveAccessService } from '../services/drive-access.service';
 import { signal } from '@angular/core';
-import { OfficeStore } from '../../store/office.store';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { OfficeStore } from '../store/office.store';
+import { NavigationService } from '../services/navigation.service';
+import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
+import { ICommon } from '../interfaces/common';
+import { DocumentTypeEnum, IDocument } from '../document/document';
+import { MatDatepicker } from '@angular/material/datepicker';
 
-describe('StatementListComponent', () => {
-  let component: StatementListComponent;
-  let fixture: ComponentFixture<StatementListComponent>;
+describe('StatementComponent', () => {
+  let component: StatementComponent;
+  let fixture: ComponentFixture<StatementComponent>;
   let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
 
   let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
   let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
   let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
-  let statementStoreSpy: {
-    clean: jasmine.Spy;
-    upload: jasmine.Spy;
-  };
   let officeStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     loadMyOffices: jasmine.Spy;
+  };
+
+  const config: ICommon = {
+    title: 'DOCUMENT.TITLE',
+    button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
   const mockOffice: IOfficeAll = {
@@ -58,10 +61,6 @@ describe('StatementListComponent', () => {
 
     breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
     driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
-    statementStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      upload: jasmine.createSpy('upload'),
-    };
     officeStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(undefined),
@@ -76,20 +75,20 @@ describe('StatementListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [StatementListComponent, TranslateModule.forRoot()],
+      imports: [StatementComponent, TranslateModule.forRoot()],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
-        { provide: StatementStore, useValue: statementStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(StatementListComponent);
+    fixture = TestBed.createComponent(StatementComponent);
     component = fixture.componentInstance;
 
+    fixture.componentRef.setInput('config', config);
     fixture.detectChanges();
   });
 
@@ -102,11 +101,29 @@ describe('StatementListComponent', () => {
   });
 
   it('should bootstrap statement page state on init', () => {
-    const freshFixture = TestBed.createComponent(StatementListComponent);
+    const name = 'test.pdf';
+    const document: IDocument = {
+      date: getNowTimeZone(),
+      type: DocumentTypeEnum.statement,
+      id: '123',
+      name,
+      office: mockOffice,
+    };
+
+    const freshFixture = TestBed.createComponent(StatementComponent);
+    const freshComponent = freshFixture.componentInstance;
+
+    freshFixture.componentRef.setInput('config', config);
+    freshFixture.detectChanges();
+    freshFixture.componentRef.setInput('statement', document);
     freshFixture.detectChanges();
 
-    expect(statementStoreSpy.clean).toHaveBeenCalled();
     expect(officeStoreSpy.loadMyOffices).toHaveBeenCalled();
+    expect(freshComponent.getForm.office.disabled).toBeTrue();
+    expect(freshComponent.getForm.date.disabled).toBeTrue();
+    expect(freshComponent.getForm.date.value).toEqual(document.date);
+    expect(freshComponent.getForm.office.value).toEqual(document.office);
+    expect(freshComponent.file()).toEqual({ name, progress: 100, size: 0 });
   });
 
   it('should display office name with displayFnOffice', () => {
@@ -169,6 +186,9 @@ describe('StatementListComponent', () => {
   });
 
   it('should submit statement when all required fields are set', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
+
     officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
     fixture.detectChanges();
     component.getForm.date.setValue(new Date(2026, 0, 1));
@@ -182,11 +202,39 @@ describe('StatementListComponent', () => {
     expect(component.form.valid).toBeTrue();
     expect(component.fileName()).toBe(fileName);
     expect(component.blob()).toEqual(blob);
-    expect(statementStoreSpy.upload).toHaveBeenCalledWith(mockOffice.id, blob, fileName);
+    expect(emitSpy).toHaveBeenCalledWith({
+      officeId: mockOffice.id, blob, fileName,
+    });
   });
 
   it('should not submit statement when required fields are missing', () => {
+    const emitSpy = jasmine.createSpy('emit');
+    component.submitData.subscribe(emitSpy);
     component.submit();
-    expect(statementStoreSpy.upload).not.toHaveBeenCalled();
+    expect(emitSpy).not.toHaveBeenCalled();
+  });
+
+  describe('setMonthAndYear method', () => {
+    it('should set month and year from normalized date', () => {
+      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const newDate = new Date(2024, 5, 1);
+      component.getForm.date.setValue(new Date(2024, 0, 1));
+
+      component.setMonthAndYear(newDate, mockDatepicker);
+
+      expect(component.getForm.date.value?.getMonth()).toBe(5);
+      expect(component.getForm.date.value?.getFullYear()).toBe(2024);
+      expect(mockDatepicker.close).toHaveBeenCalled();
+    });
+
+    it('should close datepicker after setting date', () => {
+      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const newDate = new Date(2024, 3, 1);
+      component.getForm.date.setValue(new Date());
+
+      component.setMonthAndYear(newDate, mockDatepicker);
+
+      expect(mockDatepicker.close).toHaveBeenCalled();
+    });
   });
 });

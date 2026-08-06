@@ -17,6 +17,7 @@ import type { Subscription } from 'rxjs';
 const initialState = createStoreInitialState<INote, INoteAll>();
 
 export const NoteStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,
