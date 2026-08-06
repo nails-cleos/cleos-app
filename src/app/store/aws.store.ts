@@ -1,7 +1,7 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { IAwsExtract } from '../interfaces/aws';
-import { AwsLambdaService } from '../services/aws-lambda.service';
+import AwsLambdaService from '../services/aws-lambda.service';
 import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
 import type { Subscription } from 'rxjs';
 

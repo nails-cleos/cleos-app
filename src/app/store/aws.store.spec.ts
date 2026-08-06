@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { AwsStore } from './aws.store';
-import { AwsLambdaService } from '../services/aws-lambda.service';
+import AwsLambdaService from '../services/aws-lambda.service';
 
 describe('AwsStore', () => {
   let store: InstanceType<typeof AwsStore>;

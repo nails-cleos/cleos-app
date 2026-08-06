@@ -1,5 +1,5 @@
 import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { AwsLambdaService } from './aws-lambda.service';
+import AwsLambdaService from './aws-lambda.service';
 import { firstValueFrom, of } from 'rxjs';
 import { IAwsExtract, IAwsLambda, IAwsNotification } from '../interfaces/aws';
 
