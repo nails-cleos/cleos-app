@@ -1,34 +1,6 @@
 import { Routes } from '@angular/router';
 import { NavComponent } from './nav.component';
-import { AuthService } from '../services/auth.service';
-import { NotificationService } from '../services/notification.service';
-import { UserService } from '../services/user.service';
-import { RoomService } from '../services/room.service';
-import { TreatmentService } from '../services/treatment.service';
-import { CatalogueService } from '../services/catalogue.service';
-import { DiscountService } from '../services/discount.service';
-import { UnavailableService } from '../services/unavailable.service';
-import { ReservationService } from '../services/reservation.service';
-import { PaymentService } from '../services/payment.service';
-import { AdditionalService } from '../services/additional.service';
-import { CurrencyService } from '../services/currency.service';
-import { OfficeService } from '../services/office.service';
-import { ColorService } from '../services/color.service';
-import { ExpenseService } from '../services/expense.service';
-import { NoteService } from '../services/note.service';
-import { AccountService } from '../services/account.service';
-import { TrackingService } from '../services/tracking.service';
-import { AwsLambdaService } from '../services/aws-lambda.service';
-import { DocumentService } from '../services/document.service';
-import { StatementService } from '../services/statement.service';
-import { InvoiceService } from '../services/invoice.service';
-import { DashboardService } from '../services/dashboard.service';
-import { CatalogueStore } from '../store/catalogue.store';
-import { ColorStore } from '../store/color.store';
-import { CurrencyStore } from '../store/currency.store';
-import { DocumentStore } from '../store/document.store';
 import { DiscountStore } from '../store/discount.store';
-import { AwsStore } from '../store/aws.store';
 import { AdditionalStore } from '../store/additional.store';
 import { OfficeStore } from '../store/office.store';
 import { AccountStore } from '../store/account.store';
@@ -39,63 +11,19 @@ import { UnavailableStore } from '../store/unavailable.store';
 import { TreatmentStore } from '../store/treatment.store';
 import { RoomStore } from '../store/room.store';
 import { UserStore } from '../store/user.store';
-import { DashboardStore } from '../store/dashboard.store';
-import { NotificationStore } from '../store/notification.store';
 import { provideGlobalFeedbackSource } from '../store/global-feedback-source';
 import { provideFeatureTranslations } from '../shared/feature-providers';
-import { MessagingService } from '../services/messaging.service';
 import { AuthStore } from '../store/auth.store';
 import { PaymentStore } from '../store/payment.store';
 import { TrackingStore } from '../store/tracking.store';
 import { ReservationStore } from '../store/reservation.store';
+import { CatalogueStore } from '../store/catalogue.store';
+import { ColorStore } from '../store/color.store';
+import { CurrencyStore } from '../store/currency.store';
+import { DocumentStore } from '../store/document.store';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
-  AuthService,
-  NotificationService,
-  UserService,
-  RoomService,
-  TreatmentService,
-  CatalogueService,
-  DiscountService,
-  UnavailableService,
-  ReservationService,
-  PaymentService,
-  AdditionalService,
-  CurrencyService,
-  OfficeService,
-  ColorService,
-  ExpenseService,
-  NoteService,
-  AccountService,
-  DashboardService,
-  MessagingService,
-  TrackingService,
-  AwsLambdaService,
-  DocumentService,
-  StatementService,
-  InvoiceService,
-  UserStore,
-  CatalogueStore,
-  ColorStore,
-  CurrencyStore,
-  DocumentStore,
-  DiscountStore,
-  AwsStore,
-  AdditionalStore,
-  OfficeStore,
-  AccountStore,
-  ExpenseStore,
-  NoteStore,
-  NotificationStore,
-  InvoiceStore,
-  UnavailableStore,
-  TreatmentStore,
-  RoomStore,
-  DashboardStore,
-  PaymentStore,
-  ReservationStore,
-  TrackingStore,
   provideGlobalFeedbackSource(UserStore),
   provideGlobalFeedbackSource(CatalogueStore),
   provideGlobalFeedbackSource(ColorStore),

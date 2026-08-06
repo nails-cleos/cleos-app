@@ -8,30 +8,10 @@ import { ReservationDetailComponent } from './detail/reservation-detail.componen
 import { ReservationCreatePageComponent } from './reservation-create-page.component';
 import { ReservationEditPageComponent } from './reservation-edit-page.component';
 import { SearchComponent } from './search/search.component';
-import { AdditionalService } from '../services/additional.service';
-import { ColorService } from '../services/color.service';
-import { CurrencyService } from '../services/currency.service';
-import { DiscountService } from '../services/discount.service';
-import { PaymentService } from '../services/payment.service';
-import { ReservationService } from '../services/reservation.service';
-import { RoomService } from '../services/room.service';
-import { TrackingService } from '../services/tracking.service';
-import { TreatmentService } from '../services/treatment.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('reservation'),
-  ReservationService,
-  PaymentService,
-  TreatmentService,
-  RoomService,
-  UserService,
-  AdditionalService,
-  TrackingService,
-  ColorService,
-  DiscountService,
-  CurrencyService,
 ];
 
 const children: Routes = [

@@ -6,7 +6,9 @@ import { PaymentStore } from '../../store/payment.store';
  * Centralised logic for handling Mollie redirect query parameters.
  * Used by PaymentRedirectGuard (and can be reused by any resolver/component).
  */
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class PaymentRedirectService {
   private readonly paymentStore = inject(PaymentStore);
 

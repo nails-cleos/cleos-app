@@ -59,8 +59,6 @@
       <mat-icon>arrow_back</mat-icon>
       <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
     </button>
-    {{!form.invalid}}
-    {{!blob()}}
     <button [disabled]="form.invalid || !blob()" mat-stroked-button type="submit">
       <mat-icon>{{ getConfig.button.icon }}</mat-icon>
       <span>{{ getConfig.button.label | translate }}</span>

@@ -38,6 +38,7 @@ export type DocumentZipRequest = {
 };
 
 export const DocumentStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

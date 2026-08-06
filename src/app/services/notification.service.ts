@@ -7,7 +7,9 @@ import { toUrl } from '../util/helper';
 import { paginated } from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class NotificationService {
 
   private url = 'notifications';

@@ -23,7 +23,9 @@ if (environment.useEmulators) {
   connectDatabaseEmulator(database, 'localhost', 9000);
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class FirebaseSdkService {
   auth = auth;
   messaging = messaging;

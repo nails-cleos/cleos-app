@@ -33,6 +33,7 @@ const initialState: TreatmentStoreState = {
 };
 
 export const TreatmentStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

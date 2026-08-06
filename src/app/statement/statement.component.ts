@@ -81,6 +81,7 @@ export class StatementComponent {
     ));
 
   private selectedOfficeSignal = toSignal(this.getForm.office.valueChanges);
+  private readonly selectedDateSignal = toSignal(this.getForm.date.valueChanges);
 
   constructor() {
     this.officeStore.loadMyOffices();
@@ -114,6 +115,15 @@ export class StatementComponent {
 
     effect(() => {
       this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
+    });
+
+    effect(() => {
+      const date = this.selectedDateSignal();
+      if (date && this.blob()) {
+        this.fileName.set(`Statement_${ invoiceFormat(newDate(date)) }.pdf`);
+      } else {
+        this.fileName.set(undefined);
+      }
     });
   }
 
@@ -160,10 +170,8 @@ export class StatementComponent {
   onSelectedFile = (currentFile?: UploadFile): void => {
     const file = currentFile?.raw;
     if (file) {
-      this.fileName.set(`Statement_${ invoiceFormat(newDate(this.getForm.date.value)) }.pdf`);
       this.blob.set(new Blob([file], { type: file.type }));
     } else {
-      this.fileName.set(undefined);
       this.blob.set(undefined);
       this.file.set(undefined);
     }

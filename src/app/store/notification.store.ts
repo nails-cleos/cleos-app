@@ -20,6 +20,7 @@ const initialState: NotificationStoreState = {
 };
 
 export const NotificationStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

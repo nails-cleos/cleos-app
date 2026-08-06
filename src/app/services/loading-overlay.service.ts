@@ -1,6 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class LoadingOverlayService {
   private readonly _loading = signal(false);
   private activeRequests = 0;

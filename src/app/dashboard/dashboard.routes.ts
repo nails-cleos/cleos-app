@@ -6,28 +6,10 @@ import { MonthSummaryComponent } from './month-summary/month-summary.component';
 import { YearSummaryComponent } from './year-summary/year-summary.component';
 import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.component';
 import { DashboardEventComponent } from './events/dashboard-event.component';
-import { DashboardService } from '../services/dashboard.service';
-import { ReservationService } from '../services/reservation.service';
-import { PaymentService } from '../services/payment.service';
-import { TreatmentService } from '../services/treatment.service';
-import { RoomService } from '../services/room.service';
-import { UserService } from '../services/user.service';
-import { AdditionalService } from '../services/additional.service';
-import { TrackingService } from '../services/tracking.service';
-import { ColorService } from '../services/color.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('dashboard'),
-  DashboardService,
-  ReservationService,
-  PaymentService,
-  TreatmentService,
-  RoomService,
-  UserService,
-  AdditionalService,
-  TrackingService,
-  ColorService,
 ];
 
 const children: Routes = [

@@ -102,6 +102,7 @@ type ChangeStateParams = {
 };
 
 export const ReservationStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

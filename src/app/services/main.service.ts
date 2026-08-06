@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ISendMessage } from '../../main';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class MainService {
 
   private url = 'contacts';

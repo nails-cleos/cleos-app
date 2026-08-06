@@ -1,7 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { AuthStore } from '../store/auth.store';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class DriveAccessService {
   private readonly authStore = inject(AuthStore);
 

@@ -10,7 +10,9 @@ import { Sha256 } from '@aws-crypto/sha256-browser';
 import { IAwsExtract, IAwsLambda } from '../interfaces/aws';
 import { EnvService } from './env.service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AwsLambdaService {
   private readonly env: EnvService = inject(EnvService);
 

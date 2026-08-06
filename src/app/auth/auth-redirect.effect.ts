@@ -6,7 +6,9 @@ import { getLocale, hasRoomAdmin } from '../util/helper';
 import { IAuthority } from '../user/user';
 import { Role } from '../interfaces/token';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class AuthRedirectEffect {
   private readonly authStore = inject(AuthStore);
   private readonly navigationService = inject(NavigationService);

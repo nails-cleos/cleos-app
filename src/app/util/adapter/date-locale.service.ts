@@ -2,7 +2,9 @@ import { DateAdapter } from '@angular/material/core';
 import { inject, Injectable } from '@angular/core';
 import { DEFAULT_LOCALE, LOCALE_MAP } from '../dates';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class DateLocaleService {
   private readonly dateAdapter = inject(DateAdapter<Date>);
 

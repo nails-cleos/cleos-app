@@ -10,20 +10,10 @@ import { RoomDetailsPageComponent } from './room-details-page.component';
 import { ExpenseCreatePageComponent } from './me/expense/expense-create-page.component';
 import { ExpenseDetailsPageComponent } from './me/expense/expense-details-page.component';
 import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
-import { AwsLambdaService } from '../services/aws-lambda.service';
-import { ExpenseService } from '../services/expense.service';
-import { RoomService } from '../services/room.service';
-import { TokenService } from '../services/token.service';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('room'),
-  RoomService,
-  UserService,
-  ExpenseService,
-  TokenService,
-  AwsLambdaService,
 ];
 
 const children: Routes = [

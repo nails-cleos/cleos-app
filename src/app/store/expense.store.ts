@@ -32,6 +32,7 @@ const initialState: ExpenseStoreState = {
 };
 
 export const ExpenseStore = signalStore(
+  { providedIn: 'root' },
   withState(initialState),
   withMethods((
     store,

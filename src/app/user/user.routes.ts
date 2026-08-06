@@ -5,12 +5,10 @@ import { OverviewComponent } from './overview/overview.component';
 import { UserListComponent } from './list/user-list.component';
 import { UserCreatePageComponent } from './user-create-page.component';
 import { UserDetailsPageComponent } from './user-details-page.component';
-import { UserService } from '../services/user.service';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
 const providers = [
   provideFeatureTranslations('user'),
-  UserService,
 ];
 
 const children: Routes = [
