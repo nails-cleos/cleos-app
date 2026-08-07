@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IPaymentOption } from '../../../interfaces/payment';
 import { IReservationAll } from '../../../reservation/reservation';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { NavigationService } from '../../../services/navigation.service';
 import { provideAppIcons } from '../../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../../util/dates';
@@ -109,7 +109,7 @@ describe('OptionComponent', () => {
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
     }).compileComponents();

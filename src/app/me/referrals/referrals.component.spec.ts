@@ -5,7 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ToastService } from '../../services/toast.service';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { DiscountStore } from '../../store/discount.store';
 
@@ -46,7 +46,7 @@ describe('ReferralsComponent', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
       ],
     }).compileComponents();
 

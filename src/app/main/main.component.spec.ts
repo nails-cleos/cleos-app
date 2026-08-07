@@ -3,7 +3,7 @@ import { MainComponent } from './main.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
@@ -85,7 +85,7 @@ describe('MainComponent', () => {
         { provide: MainContentService, useValue: mainContentServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideAppIcons(),
       ],

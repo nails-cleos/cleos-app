@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DragDropDirective } from './drag-drop.directive';
 
 @Component({
   imports: [DragDropDirective],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '<div appDragDrop (fileDropped)="onDropped($event)"></div>',
 })
 class TestHostComponent {

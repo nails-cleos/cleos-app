@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProfileComponent } from './profile.component';
 import { of } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../../services/geocode.service';
 import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
@@ -63,7 +63,7 @@ describe('ProfileComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],

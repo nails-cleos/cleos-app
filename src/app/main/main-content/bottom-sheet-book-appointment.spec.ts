@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideAppIcons } from '../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../util/dates';
 
@@ -21,7 +21,7 @@ describe('BottomSheetBookAppointmentComponent', () => {
       imports: [BottomSheetBookAppointmentComponent, TranslateModule.forRoot()],
       providers: [
         { provide: MatBottomSheetRef, useValue: bottomSheetRefSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
     }).compileComponents();

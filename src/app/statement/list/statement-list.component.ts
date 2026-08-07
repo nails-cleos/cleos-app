@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { DocumentListComponent } from '../../document/list/document-list.component';
 import { DocumentTypeEnum, IDocument } from '../../document/document';
 import { executeDialogNoWidth } from '../../util/helper';
@@ -11,6 +11,7 @@ import { NavigationService } from '../../services/navigation.service';
 @Component({
   selector: 'app-statement-list',
   imports: [DocumentListComponent],
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: `
     <app-document-list [showDateFilter]="false" [navigationButtons]="true" (onDelete)="delete($event)"
                        (onEdit)="edit($event)" (onAdd)="add()" [types]="types"></app-document-list>`,

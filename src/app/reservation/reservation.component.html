@@ -18,9 +18,9 @@
         @if (event?.meta?.isReservation) {
           <div class="calendar-tooltip-card">
             <div class="calendar-tooltip-card__time">
-              {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:language }}
+              {{ event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
               -
-              {{ event.end | date:'HH:mm':event.meta?.timeZone:language }}
+              {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
             </div>
             <div class="calendar-tooltip-card__row">
               <span>{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
@@ -61,10 +61,10 @@
               <span>{{ 'RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
               @if (hasDiscountApplied && !currentIsEditing) {
                 <small>
-                  {{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalWithoutDiscount | number:'1.2-2' }}
+                  {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalWithoutDiscount | number:'1.2-2' }}
                 </small>
               }
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
           }
         </div>
@@ -103,7 +103,7 @@
               <div class="booking-summary__slots">
                 @for (slot of summaryDateTimes; track $index) {
                   <span class="booking-summary__slot app-detail-chip">
-                    {{ slot.date | date:'EEE d MMM':currentRoom?.timeZone:language }}
+                    {{ slot.date | date:'EEE d MMM':$safeNavigationMigration(currentRoom?.timeZone):language }}
                     @if (slot.start) {
                       <span> · {{ slot.start }}</span>
                     }
@@ -140,46 +140,46 @@
 
             <div class="price-row">
               <span>{{ currentTreatment.name }}</span>
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
             </div>
 
             @for (additional of currentAdditionalSelected; track additional.id) {
               <div class="price-row">
                 <span>{{ additional.name }}</span>
-                <strong>{{ currentRoom?.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
               </div>
             }
 
             @if (hasDiscountApplied && price().discount) {
               <div class="price-row price-row--discount">
                 <span>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                <strong>- {{ currentRoom?.currency | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                <strong>- {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
               </div>
             }
 
             <div class="price-row price-row--total">
               <span>{{ 'RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
 
             @if (showConfigurationAmounts) {
               @if (effectivePaidWithConfiguredAmount > 0) {
                 <div class="price-row">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
                 </div>
               }
 
               @if (effectiveBalanceUsed > 0) {
                 <div class="price-row">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
-                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
                 </div>
               }
 
               <div class="price-row price-row--total">
                 <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
-                <strong>{{ currentRoom?.currency | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
               </div>
             }
           </div>
@@ -572,25 +572,25 @@
                   <strong class="app-surface-item__value">
                     @if (hasDiscountApplied) {
                       <span class="summary-price summary-price--old">
-                        {{ getOfficeForm.room.value?.currency | currencySymbol }}
+                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
                         {{ selectedTreatmentPrice | number:'1.2-2' }}
                       </span>
                     }
                     @if (hasDiscountApplied && effectiveDiscountAmount > 0) {
                       <span>
-                        {{ getOfficeForm.room.value?.currency | currencySymbol }}
+                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
                         {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}
                       </span>
                     } @else {
                       <span>
-                        {{ getOfficeForm.room.value?.currency | currencySymbol }}
+                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
                         {{ selectedTreatmentPrice | number:'1.2-2' }}
                       </span>
                     }
                   </strong>
                 } @else {
                   <strong class="app-surface-item__value">
-                    {{ getOfficeForm.room.value?.currency | currencySymbol }}
+                    {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
                     {{ selectedTreatmentPrice | number:'1.2-2' }}
                   </strong>
                 }
@@ -625,7 +625,7 @@
                 <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
                   <div matListItemTitle>{{ it.name }}</div>
                   <div matListItemLine>
-                    {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}
+                    {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ it.price | number:'1.2-2' }}
                     · &#9202; {{ it.duration | durationTime }}
                   </div>
                   @if (it.description) {
@@ -810,7 +810,7 @@
             <div class="support-card__header">
               <mat-icon>event</mat-icon>
               <div>
-                <h3>{{ dataEvent.key | date:'fullDate':getOfficeForm.room.value?.timeZone:language }}</h3>
+                <h3>{{ dataEvent.key | date:'fullDate':$safeNavigationMigration(getOfficeForm.room.value?.timeZone):language }}</h3>
                 <p>{{ 'RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</p>
               </div>
             </div>
@@ -869,7 +869,7 @@
             </div>
             <div class="booking-summary__price">
               <span>{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
-              <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
           </div>
 
@@ -892,7 +892,7 @@
                 <strong class="app-surface-item__value">
                   <a
                     class="app-detail-link"
-                    [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + getOfficeForm.room.value?.address?.name"
+                    [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + $safeNavigationMigration(getOfficeForm.room.value?.address?.name)"
                     rel="noreferrer" target="_blank">{{ getOfficeForm.room.value?.address?.name }}</a>
                 </strong>
                 @if (getOfficeForm.room.value?.address?.description) {
@@ -928,7 +928,7 @@
                 @for (eventGroup of events.value; track eventGroup.event?.id || $index) {
                   @if (eventGroup.event) {
                     <span class="booking-summary__slot app-detail-chip">
-                      {{ eventGroup.event.start | date:'EEE d MMM, HH:mm':getOfficeForm.room.value?.timeZone:language }}
+                      {{ eventGroup.event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(getOfficeForm.room.value?.timeZone):language }}
                       @if (showTimeZone) {
                         <button (click)="openDialog(eventGroup.event.start)" class="summary-slot-button" mat-icon-button
                                 type="button">
@@ -944,7 +944,7 @@
             <div class="info-item app-surface-item">
               <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
               <strong
-                class="app-surface-item__value">{{ totalDurationFormatted || (getTreatmentForm.treatment.value?.duration | durationTime) }}</strong>
+                class="app-surface-item__value">{{ totalDurationFormatted || ($safeNavigationMigration(getTreatmentForm.treatment.value?.duration) | durationTime) }}</strong>
             </div>
 
             @if (getConfigurationForm.note.value) {
@@ -979,20 +979,20 @@
             <div class="price-breakdown price-breakdown--expanded">
               <div class="price-row">
                 <span>{{ getTreatmentForm.treatment.value.name }}</span>
-                <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
               </div>
 
               @for (additional of summaryAdditionals; track additional.id) {
                 <div class="price-row">
                   <span>{{ additional.name }}</span>
-                  <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
                 </div>
               }
 
               @if (hasDiscountApplied && price().discount) {
                 <div class="price-row price-row--discount">
                   <span>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                  <strong>- {{ getOfficeForm.room.value?.currency | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                  <strong>- {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
                 </div>
               }
 
@@ -1000,26 +1000,26 @@
                 @if (effectivePaidWithConfiguredAmount > 0) {
                   <div class="price-row">
                     <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-                    <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
+                    <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
                   </div>
                 }
 
                 @if (effectiveBalanceUsed > 0) {
                   <div class="price-row">
                     <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
-                    <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
+                    <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
                   </div>
                 }
 
                 <div class="price-row price-row--total">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
-                  <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
                 </div>
               }
 
               <div class="price-row price-row--total">
                 <span>{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
-                <strong>{{ getOfficeForm.room.value?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
               </div>
             </div>
           </div>

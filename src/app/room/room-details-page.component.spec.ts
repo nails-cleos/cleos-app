@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { RoomComponent } from './room.component';
@@ -10,6 +10,7 @@ import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-room',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 class RoomComponentStub {

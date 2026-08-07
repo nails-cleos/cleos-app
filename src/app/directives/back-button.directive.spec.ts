@@ -1,5 +1,5 @@
 import { BackButtonDirective } from './back-button.directive';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavigationService } from '../services/navigation.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { DEFAULT_LOCALE } from '../util/dates';
       [form]="form"
       [date]="date"
       [step]="step"></button>`,
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [BackButtonDirective],
 })
 class HostComponent {

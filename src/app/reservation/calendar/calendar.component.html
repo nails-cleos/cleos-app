@@ -146,8 +146,8 @@
         @if (event.meta?.isReservation) {
           <span class="calendar-event-detail calendar-event-detail--reservation">
             <strong class="calendar-event-detail__time">
-              {{ event.start | date:'HH:mm':event.meta?.timeZone }}
-              - {{ event.end | date:'HH:mm':event.meta?.timeZone }}
+              {{ event.start | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone) }}
+              - {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone) }}
             </strong>
             @if (event.meta?.customer) {
               <span class="calendar-event-detail__line">{{ event.meta?.customer }}</span>
@@ -168,9 +168,9 @@
               @if (event?.meta?.isReservation) {
                 <div class="calendar-tooltip-card">
                   <div class="calendar-tooltip-card__time">
-                    {{ event.start | date:'EEE d MMM, HH:mm':event.meta?.timeZone:language }}
+                    {{ event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
                     -
-                    {{ event.end | date:'HH:mm':event.meta?.timeZone:language }}
+                    {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
                   </div>
                   <div class="calendar-tooltip-card__row">
                     <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</span>

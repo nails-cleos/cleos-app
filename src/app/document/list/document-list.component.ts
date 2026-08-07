@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output, viewChild } from '@angular/core';
+import { Component, computed, effect, inject, input, output, viewChild, ChangeDetectionStrategy } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
@@ -62,6 +62,7 @@ type DocumentsForm = {
     MatAutocompleteTrigger, TableSkeletonComponent, SkeletonComponent],
   templateUrl: './document-list.component.html',
   styleUrl: './document-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.Eager,
   providers: [...provideYearMonthDateAdapter()],
 })
 export class DocumentListComponent {

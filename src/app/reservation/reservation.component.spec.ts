@@ -17,7 +17,7 @@ import { DataEvent } from '../util/event';
 import { DEFAULT_LOCALE, Duration, getTime, newDateTimestamp } from '../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from './reservation';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
@@ -232,7 +232,7 @@ describe('ReservationComponent', () => {
         { provide: MatSnackBar, useValue: snackBarSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
       ],
     }).compileComponents();

@@ -34,14 +34,14 @@
           <ng-container matColumnDef="amount">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
+              <div>{{ transaction.amount | number:'1.2-2'| currency: $safeNavigationMigration(account?.currency?.code) }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amountGifted">
             <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</th>
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
+              <div>{{ transaction.amountGifted | number:'1.2-2'| currency: $safeNavigationMigration(account?.currency?.code) }}</div>
             </td>
           </ng-container>
 
@@ -64,7 +64,7 @@
             <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
               @if (!transaction.deleted) {
                 <button mat-icon-button
-                        [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
+                        [routerLink]="['/', language, 'accounts', $safeNavigationMigration(account?.id), 'transactions', transaction.id]"
                         matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
                   <mat-icon color="primary">receipt</mat-icon>
                 </button>
@@ -85,13 +85,13 @@
                   @if (transaction.amount) {
                     <div matListItemTitle>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
                     <mat-list-item>
-                      {{ transaction.amount | number:'1.2-2' | currency: account?.currency?.code }}
+                      {{ transaction.amount | number:'1.2-2' | currency: $safeNavigationMigration(account?.currency?.code) }}
                     </mat-list-item>
                   }
                   @if (transaction.amountGifted) {
                     <div matListItemTitle>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</div>
                     <mat-list-item>
-                      {{ transaction.amountGifted | number:'1.2-2' | currency: account?.currency?.code }}
+                      {{ transaction.amountGifted | number:'1.2-2' | currency: $safeNavigationMigration(account?.currency?.code) }}
                     </mat-list-item>
                   }
                   @if (transaction.payment?.status) {
@@ -109,7 +109,7 @@
                   @if (!transaction.deleted) {
                     <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
                     <mat-list-item role="list">
-                      <button [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
+                      <button [routerLink]="['/', language, 'accounts', $safeNavigationMigration(account?.id), 'transactions', transaction.id]"
                               color="primary" mat-icon-button>
                         <mat-icon matListItemIcon>receipt</mat-icon>
                       </button>

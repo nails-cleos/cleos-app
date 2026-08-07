@@ -65,7 +65,7 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
             <mat-icon matPrefix>{{ discount()?.currency?.icon }}</mat-icon>
-            <input [value]="discount()?.currency?.code" disabled matInput>
+            <input [value]="$safeNavigationMigration(discount()?.currency?.code)" disabled matInput>
           </mat-form-field>
         }
 

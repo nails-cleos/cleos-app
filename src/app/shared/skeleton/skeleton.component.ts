@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-skeleton',
@@ -36,6 +36,7 @@ import { Component, input } from '@angular/core';
       </section>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [`
     .app-skeleton-header {
       flex-direction: column;

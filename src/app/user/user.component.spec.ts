@@ -9,7 +9,7 @@ import { Role } from '../interfaces/token';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
 import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal, WritableSignal } from '@angular/core';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { ICommon } from '../interfaces/common';
@@ -61,7 +61,7 @@ describe('UserComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: GeocodeService, useValue: geocodeServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],

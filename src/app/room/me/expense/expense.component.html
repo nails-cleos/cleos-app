@@ -167,13 +167,13 @@
 
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.NET.FIELD' | translate }}</mat-label>
-                <input disabled [value]="totalMap.get(i)?.net" matInput appTwoDigits>
+                <input disabled [value]="$safeNavigationMigration(totalMap.get(i)?.net)" matInput appTwoDigits>
                 <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'EXPENSE.BTW.FIELD' | translate }}</mat-label>
-                <input disabled [value]="totalMap.get(i)?.btwValue" matInput appTwoDigits>
+                <input disabled [value]="$safeNavigationMigration(totalMap.get(i)?.btwValue)" matInput appTwoDigits>
                 <mat-icon matPrefix>{{ currentCurrencyIcon }}</mat-icon>
               </mat-form-field>
             </div>

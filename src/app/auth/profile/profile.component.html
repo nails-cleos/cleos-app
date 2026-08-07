@@ -125,10 +125,10 @@
 
           <div class="app-crud-form-grid__full app-crud-fields">
             <app-google-map [addressFormGroup]="googleMapForm"
-                            [latitudeMarker]="user.address?.location?.y"
-                            [longitudeMarker]="user.address?.location?.x"
+                            [latitudeMarker]="$safeNavigationMigration(user.address?.location?.y)"
+                            [longitudeMarker]="$safeNavigationMigration(user.address?.location?.x)"
                             (addressEmitter)="getAddress($event)"
-                            [markInfo]="'<b>' + user.address?.name + '</b>'">
+                            [markInfo]="'<b>' + $safeNavigationMigration(user.address?.name) + '</b>'">
             </app-google-map>
           </div>
 

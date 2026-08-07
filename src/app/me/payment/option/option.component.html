@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      <app-payment-preview [option]="form.get('option')?.value"
+      <app-payment-preview [option]="$safeNavigationMigration(form.get('option')?.value)"
                            [price]="currentPrice"
                            [currencyIcon]="currentReservation.room.currency.icon"
                            [toPaid]="currentPrice.toPaid">

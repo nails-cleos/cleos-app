@@ -1,10 +1,11 @@
 import { HideMissingDirective } from './hide-missing.directive';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 
 @Component({
   template: '<img appHideMissing src="test.jpg" />',
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [HideMissingDirective],
 })
 class HostComponent {}

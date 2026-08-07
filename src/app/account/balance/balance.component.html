@@ -5,7 +5,7 @@
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">{{ 'ACCOUNT.BALANCE' | translate }}</span>
-        <h2 class="balance-title">{{ userAccount.balance | currency: userAccount?.currency?.code: 'symbol': '1.2-2' }}</h2>
+        <h2 class="balance-title">{{ userAccount.balance | currency: $safeNavigationMigration(userAccount?.currency?.code): 'symbol': '1.2-2' }}</h2>
         <p class="balance-subtitle">{{ 'ACCOUNT.TITLE' | translate }} {{ userAccount.id }}</p>
       </div>
 
@@ -37,7 +37,7 @@
           <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage" [diameter]="200"/>
         </div>
         <div class="spinner-text-inside">
-          <h1>{{ userAccount.balance | currency: userAccount?.currency?.code: 'symbol': '1.2-2' }}</h1>
+          <h1>{{ userAccount.balance | currency: $safeNavigationMigration(userAccount?.currency?.code): 'symbol': '1.2-2' }}</h1>
         </div>
       </div>
     </div>

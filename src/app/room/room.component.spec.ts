@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
 import { RoomComponent } from './room.component';
 import { IAvailability, IRoomAll } from './room';
 import { GeocodeService } from '../services/geocode.service';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { IUserAll } from '../user/user';
 import { Role } from '../interfaces/token';
@@ -169,7 +169,7 @@ describe('RoomComponent', () => {
         { provide: GeocodeService, useValue: geocodeServiceSpy },
         { provide: PaymentService, useValue: paymentServiceSpy },
         { provide: AuthUserService, useValue: authUserService },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],

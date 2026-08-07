@@ -6,7 +6,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ToastService } from '../../services/toast.service';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../main';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
@@ -69,7 +69,7 @@ describe('MainContentComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
         { provide: ToastService, useValue: toastServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
         provideAppIcons(),
       ],

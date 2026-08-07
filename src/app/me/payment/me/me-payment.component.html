@@ -6,15 +6,15 @@
         <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title
-              [innerHTML]="'COMMON.PAYMENT.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
+              [innerHTML]="'COMMON.PAYMENT.TO_PAY' | translate: {amount: $safeNavigationMigration(payment?.amount) | number:'1.2-2', symbol: $safeNavigationMigration(payment?.reservation?.room?.currency) | currencySymbol}">
             </mat-card-title>
             <mat-card-subtitle>
               @if (payment?.reservation) {
-                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]"
+                <button mat-icon-button [routerLink]="['/', language, 'reservation', $safeNavigationMigration(payment?.reservation?.id)]"
                         type="button">
                   <mat-icon>visibility</mat-icon>
                 </button>&nbsp;
-                <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">
+                <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: $safeNavigationMigration(payment?.reservation?.id)}">
                 </span>
               }
             </mat-card-subtitle>

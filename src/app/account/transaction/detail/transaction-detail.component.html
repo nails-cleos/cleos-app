@@ -10,7 +10,7 @@
 
         <div class="app-detail-actions">
           <button mat-stroked-button type="button"
-                  [routerLink]="['/', language, 'accounts', transaction.account?.id, 'transactions', 'view']">
+                  [routerLink]="['/', language, 'accounts', $safeNavigationMigration(transaction.account?.id), 'transactions', 'view']">
             <mat-icon>account_balance</mat-icon>
             <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
           </button>

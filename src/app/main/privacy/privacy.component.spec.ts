@@ -1,4 +1,4 @@
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
@@ -56,7 +56,7 @@ describe('PrivacyComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: EnvService, useValue: envMock },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
       ],
     }).compileComponents();

@@ -64,7 +64,7 @@
 @if (file()?.image) {
   <div class="divider">
     <div class="container">
-      <img [alt]="file()?.name" [src]="file()?.image" mat-card-image>
+      <img [alt]="$safeNavigationMigration(file()?.name)" [src]="$safeNavigationMigration(file()?.image)" mat-card-image>
     </div>
   </div>
 }

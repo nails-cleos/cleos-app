@@ -18,19 +18,19 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.CURRENCY.FIELD' | translate }}</mat-label>
             <mat-icon matPrefix>{{ room?.currency?.icon }}</mat-icon>
-            <input [value]="room?.currency?.code" disabled matInput>
+            <input [value]="$safeNavigationMigration(room?.currency?.code)" disabled matInput>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'ROOM.OFFICE.FIELD' | translate }}</mat-label>
             <mat-icon matPrefix>store</mat-icon>
-            <input [value]="room?.office?.name" disabled matInput type="text">
+            <input [value]="$safeNavigationMigration(room?.office?.name)" disabled matInput type="text">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'ROOM.TIME_ZONE.FIELD' | translate }}</mat-label>
             <mat-icon matPrefix>public</mat-icon>
-            <input [value]="room?.timeZone" disabled matInput type="text">
+            <input [value]="$safeNavigationMigration(room?.timeZone)" disabled matInput type="text">
           </mat-form-field>
         } @else {
           @if (filteredCurrencySignal(); as filteredCurrency) {

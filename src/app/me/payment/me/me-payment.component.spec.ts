@@ -3,7 +3,7 @@ import { MePaymentComponent } from './me-payment.component';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { PaymentPercentage } from '../../../interfaces/payment';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideAppIcons } from '../../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../../util/dates';
 import { NavigationService } from '../../../services/navigation.service';
@@ -64,7 +64,7 @@ describe('MePaymentComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
     }).compileComponents();

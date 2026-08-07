@@ -26,7 +26,7 @@ import { MatPaginatorIntl } from '@angular/material/paginator';
 import localeEnGB from '@angular/common/locales/en-GB';
 import localeNl from '@angular/common/locales/nl';
 import localeEs from '@angular/common/locales/es';
-import { provideHttpClient, withInterceptors, withJsonpSupport } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withJsonpSupport, withXhr } from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
 import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app/app.routes';
@@ -77,7 +77,7 @@ export function initializePwaService(pwaService: PwaService) {
 }
 
 const providers = [
-  provideHttpClient(withInterceptors(httpInterceptorProviders), withJsonpSupport()),
+  provideHttpClient(withXhr(), withInterceptors(httpInterceptorProviders), withJsonpSupport()),
   provideRouter(
     routes,
     withRouterConfig({ onSameUrlNavigation: 'reload' }),

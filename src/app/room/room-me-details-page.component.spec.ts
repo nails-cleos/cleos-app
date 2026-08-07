@@ -1,10 +1,11 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RoomDetailsPageComponent } from './room-details-page.component';
 import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
 
 @Component({
   selector: 'app-room-details-page',
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 class RoomDetailsPageStubComponent {

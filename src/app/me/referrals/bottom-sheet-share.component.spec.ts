@@ -3,7 +3,7 @@ import { BottomSheetShareComponent, BottomSheetShareData } from './bottom-sheet-
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideAppIcons } from '../../util/app-icons.provider';
 import { DEFAULT_LOCALE } from '../../util/dates';
 
@@ -18,7 +18,7 @@ describe('BottomSheetShareComponent', () => {
       imports: [BottomSheetShareComponent, TranslateModule.forRoot()],
       providers: [
         { provide: MAT_BOTTOM_SHEET_DATA, useValue: mockData },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
     }).compileComponents();

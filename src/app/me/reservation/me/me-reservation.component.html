@@ -27,10 +27,10 @@
               <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
               @if (hasDiscountApplied && !isEditing) {
                 <small>
-                  {{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalWithoutDiscount | number:'1.2-2' }}
+                  {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalWithoutDiscount | number:'1.2-2' }}
                 </small>
               }
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
           }
         </div>
@@ -59,7 +59,7 @@
             <span
               class="summary-item__label app-surface-item__label">{{ 'ME.RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
             <strong
-              class="app-surface-item__value">{{ totalDurationFormatted || (currentTreatment?.duration | durationTime) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+              class="app-surface-item__value">{{ totalDurationFormatted || ($safeNavigationMigration(currentTreatment?.duration) | durationTime) || ('ME.RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
           </div>
 
           <div class="summary-item app-crud-form-grid__full app-surface-item">
@@ -68,9 +68,9 @@
             @if (appointmentStart) {
               <div class="booking-summary__slots">
                 <span class="booking-summary__slot app-detail-chip">
-                  {{ appointmentStart | date:'EEE d MMM, HH:mm':currentRoom?.timeZone:language }}
+                  {{ appointmentStart | date:'EEE d MMM, HH:mm':$safeNavigationMigration(currentRoom?.timeZone):language }}
                   @if (appointmentEnd) {
-                    <span> - {{ appointmentEnd | date:'HH:mm':currentRoom?.timeZone:language }}</span>
+                    <span> - {{ appointmentEnd | date:'HH:mm':$safeNavigationMigration(currentRoom?.timeZone):language }}</span>
                   }
                   @if (showTimeZone) {
                     <button (click)="openDialog(appointmentStart)" class="summary-slot-button" mat-icon-button
@@ -105,46 +105,46 @@
 
             <div class="price-row">
               <span>{{ currentTreatment.name }}</span>
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
             </div>
 
             @for (additional of currentAdditionalSelected; track additional.id) {
               <div class="price-row">
                 <span>{{ additional.name }}</span>
-                <strong>{{ currentRoom?.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
               </div>
             }
 
             @if (hasDiscountApplied && effectiveDiscountAmount > 0) {
               <div class="price-row price-row--discount">
                 <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                <strong>- {{ currentRoom?.currency | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                <strong>- {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
               </div>
             }
 
             <div class="price-row price-row--total">
               <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
-              <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
             </div>
 
             @if (showCoveredAmounts) {
               @if (effectivePaidTotal > 0) {
                 <div class="price-row">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ effectivePaidTotal | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectivePaidTotal | number:'1.2-2' }}</strong>
                 </div>
               }
 
               @if (accountBalanceUsed > 0) {
                 <div class="price-row">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
-                  <strong>{{ currentRoom?.currency | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</strong>
+                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</strong>
                 </div>
               }
 
               <div class="price-row price-row--total">
                 <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
-                <strong>{{ currentRoom?.currency | currencySymbol }} {{ paymentToPay | number:'1.2-2' }}</strong>
+                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ paymentToPay | number:'1.2-2' }}</strong>
               </div>
             }
           </div>
@@ -417,15 +417,15 @@
                 @if (hasDiscountApplied && !isEditing) {
                   <div class="summary-price app-surface-item__value">
                     <span class="summary-price--old">
-                      {{ room?.currency | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}
+                      {{ $safeNavigationMigration(room?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}
                     </span>
                     <strong>
-                      {{ room?.currency | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}
+                      {{ $safeNavigationMigration(room?.currency) | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}
                     </strong>
                   </div>
                 } @else {
                   <strong
-                    class="app-surface-item__value">{{ room?.currency | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}</strong>
+                    class="app-surface-item__value">{{ $safeNavigationMigration(room?.currency) | currencySymbol }} {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}</strong>
                 }
               </div>
 
@@ -457,7 +457,7 @@
                 <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
                   <div matListItemTitle>{{ it.name }}</div>
                   <div matListItemLine>
-                    {{ room?.currency | currencySymbol }} {{ it.price | number:'1.2-2' }} ·
+                    {{ $safeNavigationMigration(room?.currency) | currencySymbol }} {{ it.price | number:'1.2-2' }} ·
                     &#9202; {{ it.duration | durationTime }}
                   </div>
                   @if (it.description) {
@@ -523,7 +523,7 @@
             <mat-icon>event_busy</mat-icon>
             <div class="empty-state__title">
               <span [innerHTML]="'ME.RESERVATION.UPCOMING.CUSTOMER.NO_CONTENT' |
-                translate:{date: dateNoContent(available?.key)}"></span>
+                translate:{date: dateNoContent($safeNavigationMigration(available?.key))}"></span>
             </div>
           </div>
         </ng-template>
@@ -684,7 +684,7 @@
               @if (appointmentStart) {
                 <div class="booking-summary__slots">
                   <span class="booking-summary__slot app-detail-chip">
-                    {{ appointmentStart | date:'EEE d MMM, HH:mm':room?.timeZone:language }}
+                    {{ appointmentStart | date:'EEE d MMM, HH:mm':$safeNavigationMigration(room?.timeZone):language }}
                     @if (showTimeZone) {
                       <button (click)="openDialog(appointmentStart)" class="summary-slot-button" mat-icon-button
                               type="button">
@@ -776,8 +776,8 @@
 
             @if (paymentToPay > 0) {
               <app-payment-preview [option]="getTypeForm.option.value"
-                                   [currencyIcon]="room?.currency?.icon" [toPaid]="paymentToPay"
-                                   [penalty]="oldPrice?.penalty"
+                                   [currencyIcon]="$safeNavigationMigration(room?.currency?.icon)" [toPaid]="paymentToPay"
+                                   [penalty]="$safeNavigationMigration(oldPrice?.penalty)"
                                    [accountBalanceUsed]="accountBalanceUsed"
                                    [price]="price()" [isEditing]="isEditing" [updatedTotal]="price().total"
                                    [accountCredit]="paymentCredit"
@@ -785,10 +785,10 @@
                                    [discountId]="getTreatmentForm.discount.value"
                                    [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-payment-preview>
             } @else {
-              <app-payment-preview [accountCredit]="paymentCredit" [currencyIcon]="room?.currency?.icon"
+              <app-payment-preview [accountCredit]="paymentCredit" [currencyIcon]="$safeNavigationMigration(room?.currency?.icon)"
                                    [accountBalanceUsed]="accountBalanceUsed"
                                    [price]="price()" [isEditing]="isEditing" [updatedTotal]="price().total"
-                                   [penalty]="showPenalty ? oldPrice?.penalty : undefined"
+                                   [penalty]="showPenalty ? $safeNavigationMigration(oldPrice?.penalty) : undefined"
                                    [paidTotal]="oldPrice?.totalPaid ?? price().totalPaid"
                                    [discountId]="getTreatmentForm.discount.value"
                                    [discountKey]="'ME.RESERVATION.TREATMENT.DISCOUNT.ADD'"></app-payment-preview>

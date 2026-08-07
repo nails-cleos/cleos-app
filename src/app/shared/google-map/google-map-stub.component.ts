@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { GoogleMapForm } from './google-map.component';
 import PlaceResult = google.maps.places.PlaceResult;
@@ -11,6 +11,7 @@ export type GoogleMapFormStub = {
 @Component({
   selector: 'app-google-map',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.Eager,
   template: '',
 })
 export class GoogleMapStubComponent {

@@ -56,10 +56,10 @@
         @if (!form.invalid) {
           <mat-list>
             <mat-list-item>
-              <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: getUser?.displayName}"></div>
+              <div matListItemLine [innerHTML]="'USER.MERGE.NAME' | translate: {name: $safeNavigationMigration(getUser?.displayName)}"></div>
             </mat-list-item>
             <mat-list-item>
-              <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: getUser?.email}"></div>
+              <div matListItemLine [innerHTML]="'USER.MERGE.EMAIL' | translate: {email: $safeNavigationMigration(getUser?.email)}"></div>
             </mat-list-item>
           </mat-list>
         }

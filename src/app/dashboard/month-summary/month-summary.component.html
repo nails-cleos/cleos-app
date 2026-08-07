@@ -45,33 +45,33 @@
       <div class="app-surface-item">
         <span class="app-surface-item__label">{{ 'SUMMARY.INCOME' | translate }}</span>
         <div class="monthly-summary-kpi__value">
-          {{ getTotal(reservationMonth, 'gross') | currency: currentCurrency?.code:'symbol':'1.2-2' }}
+          {{ getTotal(reservationMonth, 'gross') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}
         </div>
         <div class="monthly-summary-kpi__meta">
-          <span>Net {{ getTotal(reservationMonth, 'net') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
-          <span>BTW {{ getTotal(reservationMonth, 'btw') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
+          <span>Net {{ getTotal(reservationMonth, 'net') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
+          <span>BTW {{ getTotal(reservationMonth, 'btw') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
         </div>
       </div>
 
       <div class="app-surface-item">
         <span class="app-surface-item__label">{{ 'SUMMARY.EXPENSES' | translate }}</span>
         <div class="monthly-summary-kpi__value">
-          {{ getTotal(expenseMonth, 'gross') | currency: currentCurrency?.code:'symbol':'1.2-2' }}
+          {{ getTotal(expenseMonth, 'gross') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}
         </div>
         <div class="monthly-summary-kpi__meta">
-          <span>Net {{ getTotal(expenseMonth, 'net') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
-          <span>BTW {{ getTotal(expenseMonth, 'btw') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
+          <span>Net {{ getTotal(expenseMonth, 'net') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
+          <span>BTW {{ getTotal(expenseMonth, 'btw') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
         </div>
       </div>
 
       <div class="app-surface-item">
         <span class="app-surface-item__label">{{ 'SUMMARY.TOTAL' | translate }}</span>
         <div class="monthly-summary-kpi__value">
-          {{ (getTotal(reservationMonth, 'gross') - getTotal(expenseMonth, 'gross')) | currency: currentCurrency?.code:'symbol':'1.2-2' }}
+          {{ (getTotal(reservationMonth, 'gross') - getTotal(expenseMonth, 'gross')) | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}
         </div>
         <div class="monthly-summary-kpi__meta">
-          <span>Net {{ (getTotal(reservationMonth, 'net') - getTotal(expenseMonth, 'net')) | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
-          <span>BTW {{ (getTotal(reservationMonth, 'btw') - getTotal(expenseMonth, 'btw')) | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
+          <span>Net {{ (getTotal(reservationMonth, 'net') - getTotal(expenseMonth, 'net')) | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
+          <span>BTW {{ (getTotal(reservationMonth, 'btw') - getTotal(expenseMonth, 'btw')) | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
         </div>
       </div>
 
@@ -79,11 +79,11 @@
         <div class="app-surface-item">
           <span class="app-surface-item__label">{{ 'SUMMARY.CASH' | translate }}</span>
           <div class="monthly-summary-kpi__value">
-            {{ getTotal(cashMonth, 'gross') | currency: currentCurrency?.code:'symbol':'1.2-2' }}
+            {{ getTotal(cashMonth, 'gross') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}
           </div>
           <div class="monthly-summary-kpi__meta">
-            <span>Net {{ getTotal(cashMonth, 'net') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
-            <span>BTW {{ getTotal(cashMonth, 'btw') | currency: currentCurrency?.code:'symbol':'1.2-2' }}</span>
+            <span>Net {{ getTotal(cashMonth, 'net') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
+            <span>BTW {{ getTotal(cashMonth, 'btw') | currency: $safeNavigationMigration(currentCurrency?.code):'symbol':'1.2-2' }}</span>
           </div>
         </div>
       }

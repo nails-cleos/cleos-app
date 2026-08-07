@@ -7,16 +7,16 @@
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.GROSS' | translate"
   [value]="calculateAmount('gross')"
-  [currencyCode]="currentCurrency?.code">
+  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)">
 </app-total-summary-item>
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.BTW' | translate"
   [value]="calculateAmount('btw')"
-  [currencyCode]="currentCurrency?.code"
+  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)"
   [isResult]="true">
 </app-total-summary-item>
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.NET' | translate"
   [value]="calculateAmount('net')"
-  [currencyCode]="currentCurrency?.code">
+  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)">
 </app-total-summary-item>
