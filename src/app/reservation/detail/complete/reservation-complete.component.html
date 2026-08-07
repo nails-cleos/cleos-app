@@ -179,7 +179,7 @@
         }
 
         <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
-                              (onChange)="onExtrasChanges($event)" (isValid)="isValid = $event"
+                              (changeOutput)="onExtrasChanges($event)" (isValid)="isValid = $event"
                               [allPaymentOptions]="options()">
         </app-form-field-adder>
 
@@ -197,7 +197,7 @@
               <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
                                     [toPaid]="currentPrice.toPaid" (isValid)="isValidSplit.set($event)"
                                     [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'" [allPaymentOptions]="options()"
-                                    (onChange)="onSplitChanges($event)"></app-form-field-adder>
+                                    (changeOutput)="onSplitChanges($event)"></app-form-field-adder>
             } @else {
               <div class="app-surface-grid app-surface-grid--auto">
                 <app-payment-option-select [control]="getForm.type" [options]="options()" [valueMode]="'type'"

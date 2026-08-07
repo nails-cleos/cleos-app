@@ -6,7 +6,7 @@ import { IUserAll } from '@app/user/user';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { signal, WritableSignal } from '@angular/core';
 import { UserStore } from '@app/store/user.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;

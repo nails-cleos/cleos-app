@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { IPaymentOption } from '@app/interfaces/payment';
 import { MatIconRegistry } from '@angular/material/icon';
 import { matIconRegistryStub } from '@app/util/app-material-registry-stub';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('PaymentPreviewComponent', () => {
   let component: PaymentPreviewComponent;

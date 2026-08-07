@@ -11,7 +11,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { UserStore } from '@app/store/user.store';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;

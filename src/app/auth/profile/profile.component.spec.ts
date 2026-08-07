@@ -13,7 +13,7 @@ import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
 import { UserStore } from '@app/store/user.store';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;

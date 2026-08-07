@@ -62,7 +62,7 @@ type DocumentsForm = {
     MatAutocompleteTrigger, TableSkeletonComponent, SkeletonComponent],
   templateUrl: './document-list.component.html',
   styleUrl: './document-list.component.scss',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [...provideYearMonthDateAdapter()],
 })
 export class DocumentListComponent {
@@ -70,9 +70,9 @@ export class DocumentListComponent {
   showDateFilter = input<boolean>(true);
   navigationButtons = input<boolean>(false);
 
-  onAdd = output<void>();
-  onEdit = output<IDocument>();
-  onDelete = output<IDocument>();
+  addOutput = output<void>();
+  editOutput = output<IDocument>();
+  deleteOutput = output<IDocument>();
 
   private readonly env: EnvService = inject(EnvService);
   private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
@@ -226,15 +226,15 @@ export class DocumentListComponent {
   download = (document: IDocument): void => this.documentStore.download({ id: document.id, fileName: document.name });
 
   add = (): void => {
-    this.onAdd.emit();
+    this.addOutput.emit();
   };
 
   edit = (document: IDocument): void => {
-    this.onEdit.emit(document);
+    this.editOutput.emit(document);
   };
 
   delete = (document: IDocument): void => {
-    this.onDelete.emit(document);
+    this.deleteOutput.emit(document);
   };
 
   downloadZip = (): void => {

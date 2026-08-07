@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { PaymentOptionSelectComponent } from './payment-option-select.component';
 import { IPaymentOption } from '@app/interfaces/payment';
 import { provideAppIcons } from '@app/util/app-icons.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('PaymentOptionSelectComponent', () => {
   let component: PaymentOptionSelectComponent;

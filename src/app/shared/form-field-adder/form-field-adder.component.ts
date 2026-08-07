@@ -65,7 +65,7 @@ export class FormFieldAdderComponent {
   split = input<boolean>(false);
   toPaid = input<number>(0);
 
-  onChange = output<IExtras[]>();
+  changeOutput = output<IExtras[]>();
   isValid = output<boolean>();
 
   form: FormGroup<FormFieldsForm> = this.formBuilder.group<FormFieldsForm>({
@@ -112,7 +112,7 @@ export class FormFieldAdderComponent {
 
       const valid = this.form.valid;
       if (valid) {
-        this.onChange.emit(extras);
+        this.changeOutput.emit(extras);
       }
       this.isValid.emit(this.split() ? valid && this.total() === this.toPaid() : valid);
     });

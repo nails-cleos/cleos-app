@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 
 @Component({
   template: '<input appTwoDigits [allowNegatives]="allowNegatives" />',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TwoDigitsDirective],
 })
 class HostComponent {

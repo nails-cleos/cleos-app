@@ -4,7 +4,7 @@ import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { IColorAll } from '@app/color/color';
 import { signal } from '@angular/core';
 import { ColorStore } from '@app/store/color.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;

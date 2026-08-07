@@ -7,7 +7,7 @@ import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { CatalogueStore } from '../store/catalogue.store';
 import { TreatmentStore } from '../store/treatment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;

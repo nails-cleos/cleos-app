@@ -1,5 +1,5 @@
 import { CalendarEvent, CalendarEventTitleFormatter } from 'angular-calendar';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import {
   dateToTimestamp,
@@ -7,7 +7,7 @@ import {
   formatDateHourMinute,
   getTimeZone,
   isSameTimeZone,
-  newDateTimestamp
+  newDateTimestamp,
 } from '../util/dates';
 import { IMeta } from '../util/event';
 import { ReservationIconKey, ReservationIconName } from '../util/icon';
@@ -15,7 +15,8 @@ import { snakeToCamel } from '../util/helper';
 
 @Injectable()
 export class CustomEventTitleFormatter extends CalendarEventTitleFormatter {
-  constructor(private translate: TranslateService) {
+  private translate: TranslateService = inject(TranslateService);
+  constructor() {
     super();
   }
 

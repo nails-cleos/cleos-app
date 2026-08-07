@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DragDropSortingComponent, ISorting, Sorted } from './drag-drop-sorting.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DragDropSortingComponent', () => {
   let component: DragDropSortingComponent;

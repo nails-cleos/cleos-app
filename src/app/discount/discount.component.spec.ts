@@ -8,7 +8,7 @@ import { signal } from '@angular/core';
 import { DiscountStore } from '../store/discount.store';
 import { ICommon } from '../interfaces/common';
 import { DEFAULT_LOCALE } from '../util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;

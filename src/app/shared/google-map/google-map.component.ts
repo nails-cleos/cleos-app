@@ -41,6 +41,7 @@ export class GoogleMapComponent {
 
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly env: EnvService = inject(EnvService);
+  private readonly geocodeService: GeocodeService = inject(GeocodeService);
 
   private authUserSignal = this.authUserService.authUser;
 
@@ -58,7 +59,7 @@ export class GoogleMapComponent {
   public zoom: number;
   public options: any = {};
 
-  constructor(private geocodeService: GeocodeService) {
+  constructor() {
     this.latitude = 51.926517;
     this.longitude = 4.462456;
     this.isDraggable = false;

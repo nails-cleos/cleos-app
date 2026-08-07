@@ -4,7 +4,7 @@ import { UserDetailsPageComponent } from './user-details-page.component';
 import { UserStore } from '../store/user.store';
 import { IUserAll } from './user';
 import { UserComponent } from './user.component';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UserDetailsPageComponent', () => {
   let component: UserDetailsPageComponent;

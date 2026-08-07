@@ -6,7 +6,7 @@ import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.compo
 import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentSortingComponent } from './treatment-sorting.component';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;

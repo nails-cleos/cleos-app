@@ -21,7 +21,7 @@ import { signal } from '@angular/core';
 import { OfficeStore } from '@app/store/office.store';
 import { InvoiceStore } from '@app/store/invoice.store';
 import { PaymentStore } from '@app/store/payment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;

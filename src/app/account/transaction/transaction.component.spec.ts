@@ -11,7 +11,7 @@ import { provideAppIcons } from '@app/util/app-icons.provider';
 import { AccountStore } from '@app/store/account.store';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { PaymentStore } from '@app/store/payment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;

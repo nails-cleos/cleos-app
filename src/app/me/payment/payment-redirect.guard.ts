@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, Router, ActivatedRouteSnapshot, UrlTree } from '@angular/router';
+import { inject, Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, UrlTree } from '@angular/router';
 import { PaymentRedirectService } from './payment-redirect.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
@@ -7,10 +7,9 @@ import { DEFAULT_LOCALE } from '@app/util/dates';
   providedIn: 'root',
 })
 export class PaymentRedirectGuard implements CanActivate {
-  constructor(
-    private router: Router,
-    private paymentRedirect: PaymentRedirectService,
-  ) {}
+
+  private router: Router = inject(Router);
+  private paymentRedirect: PaymentRedirectService = inject(PaymentRedirectService);
 
   canActivate(route: ActivatedRouteSnapshot): UrlTree {
     const lang = route.paramMap.get('lang') ?? DEFAULT_LOCALE;

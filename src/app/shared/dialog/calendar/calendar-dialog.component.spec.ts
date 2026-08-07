@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CalendarDialogComponent } from './calendar-dialog.component';
 import { MatDialogRef } from '@angular/material/dialog';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CalendarDialogComponent', () => {
   let component: CalendarDialogComponent;

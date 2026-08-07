@@ -1,6 +1,6 @@
 import '../support/commands';
 import { devices } from '../support/utils';
-import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height }) => {
   describe(`Me reservation flow  with ${ name }`, () => {
@@ -58,8 +58,9 @@ devices.forEach(({ name, width, height }) => {
       cy.get('[data-cy="date-picker"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
 
-      cy.wait(50);
-      cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
+      cy.get(`button[aria-label="${formattedDate}"]`)
+        .should('be.visible')
+        .click({ force: true });
 
       cy.get('[data-cy="group-input"]').click({ force: true });
       cy.contains('mat-option', 'Biab Treatment').click({ force: true });

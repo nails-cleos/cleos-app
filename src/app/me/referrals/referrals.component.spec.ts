@@ -7,7 +7,7 @@ import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { DiscountStore } from '@app/store/discount.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ReferralsComponent', () => {
   let component: ReferralsComponent;

@@ -10,7 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DiscountStore } from '@app/store/discount.store';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;

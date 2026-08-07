@@ -3,7 +3,7 @@ import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { provideAppIcons } from '@app/util/app-icons.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('BankComponent', () => {
   let component: BankComponent;

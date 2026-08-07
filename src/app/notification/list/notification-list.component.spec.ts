@@ -7,7 +7,7 @@ import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
 import { signal } from '@angular/core';
 import { Pagination } from '@app/interfaces/pagination';
 import { NotificationStore } from '@app/store/notification.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('NotificationListComponent', () => {
   let component: NotificationListComponent;

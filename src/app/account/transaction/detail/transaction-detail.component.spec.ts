@@ -8,7 +8,7 @@ import { AccountStore } from '@app/store/account.store';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { PaymentStore } from '@app/store/payment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;

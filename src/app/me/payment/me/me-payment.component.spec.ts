@@ -8,7 +8,7 @@ import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
 import { PaymentStore } from '@app/store/payment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;

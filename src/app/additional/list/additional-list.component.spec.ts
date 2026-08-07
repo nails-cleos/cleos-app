@@ -11,7 +11,7 @@ import { AdditionalStore } from '@app/store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;

@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices, zeroPad } from '../support/utils';
-import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Additional with ${name}`, () => {
@@ -90,8 +90,16 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.get('[data-cy="description-textarea"]').should('have.value', additional.description);
           cy.get('[data-cy="duration-input"]').should('have.value', additional.duration.slice(0, 5));
 
-          additional.groups.forEach((groups: any) => {
-            cy.get('mat-chip-row').contains(groups.name).scrollIntoView().should('be.visible');
+          additional.groups.forEach((group: any) => {
+            cy.get('mat-chip-row')
+              .contains(group.name)
+              .then(($chip) => {
+                cy.wrap($chip)
+                  .scrollIntoView();
+
+                cy.wrap($chip)
+                  .should('be.visible');
+              });
           });
 
           cy.formControlType('name', additionalName);

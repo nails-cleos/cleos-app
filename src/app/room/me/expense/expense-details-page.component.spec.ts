@@ -10,7 +10,7 @@ import { DriveAccessService } from '@app/services/drive-access.service';
 import { NavigationService } from '@app/services/navigation.service';
 import { TokenService } from '@app/services/token.service';
 import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ExpenseDetailsPageComponent', () => {
   let component: ExpenseDetailsPageComponent;

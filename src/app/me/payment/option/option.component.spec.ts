@@ -12,7 +12,7 @@ import { DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
 import { PaymentStore } from '@app/store/payment.store';
 import { ReservationStore } from '@app/store/reservation.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;

@@ -3,7 +3,7 @@ import { DEFAULT_LOCALE } from '../dates';
 
 export abstract class CustomDateAdapter extends NativeDateAdapter {
 
-  protected constructor(matDateLocale: string) {
+  protected constructor() {
     super();
   }
 

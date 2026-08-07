@@ -5,7 +5,7 @@ import { ITreatmentAll } from '../treatment';
 import { ServiceType } from '@app/room/room';
 import { convertDuration, DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentTableComponent', () => {
   let component: TreatmentTableComponent;

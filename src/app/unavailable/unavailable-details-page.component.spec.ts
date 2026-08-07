@@ -7,7 +7,7 @@ import { IUnavailableAll } from './unavailable';
 import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';
 import { UserStore } from '../store/user.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UnavailableDetailsPageComponent', () => {
   let component: UnavailableDetailsPageComponent;

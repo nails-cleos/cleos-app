@@ -8,7 +8,7 @@ import { RoomStore } from '@app/store/room.store';
 import { signal } from '@angular/core';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;

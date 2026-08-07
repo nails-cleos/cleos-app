@@ -11,7 +11,7 @@ export type GoogleMapFormStub = {
 @Component({
   selector: 'app-google-map',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 export class GoogleMapStubComponent {

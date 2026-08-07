@@ -5,7 +5,7 @@ import { PriceComponent } from './price.component';
 import { ICurrency } from '@app/currency/currency';
 import { Price } from '@app/treatment/treatment';
 import { BankForm } from '../bank/bank.component';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('PriceComponent', () => {
   let component: PriceComponent;
@@ -25,7 +25,7 @@ describe('PriceComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PriceComponent],
-      providers: [provideTranslateService()]
+      providers: [provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PriceComponent);

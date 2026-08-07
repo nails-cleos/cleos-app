@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
 import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UpdateTrackingDialogComponent', () => {
   let component: UpdateTrackingDialogComponent;

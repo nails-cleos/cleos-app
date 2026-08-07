@@ -4,17 +4,21 @@
     "types": [
       "cypress",
       "node"
-    ]
+    ],
+    "rootDir": "..",
+    "baseUrl": "..",
+    "paths": {
+      "@app/*": [
+        "src/app/*"
+      ]
+    },
+    "noEmit": true
   },
   "include": [
-    "**/*.ts"
+    "./**/*.ts",
+    "../src/**/*.ts"
   ],
-  "angularCompilerOptions": {
-    "extendedDiagnostics": {
-      "checks": {
-        "nullishCoalescingNotNullable": "suppress",
-        "optionalChainNotNullable": "suppress"
-      }
-    }
-  }
+  "exclude": [
+    "../node_modules"
+  ]
 }

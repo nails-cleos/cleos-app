@@ -29,7 +29,7 @@ export type ClockTimepickerDialogData = {
   selector: 'app-clock-timepicker-dialog',
   imports: [MatButtonModule],
   templateUrl: './clock-timepicker-dialog.component.html',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./clock-timepicker-dialog.component.scss'],
 })
 export class ClockTimepickerDialogComponent {

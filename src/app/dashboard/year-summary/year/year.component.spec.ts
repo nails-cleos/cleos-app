@@ -4,7 +4,7 @@ import { YearComponent } from './year.component';
 import { IQuarterSummary } from '../../dashboard';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('YearComponent', () => {
   let component: YearComponent;

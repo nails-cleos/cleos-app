@@ -6,7 +6,7 @@ import { IColorAll } from './color';
 import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ColorComponent', () => {
   let component: ColorComponent;

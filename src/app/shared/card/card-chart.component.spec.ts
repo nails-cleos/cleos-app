@@ -6,7 +6,7 @@ import { CardChartComponent } from './card-chart.component';
 import { Chart, registerables } from 'chart.js';
 import { signal } from '@angular/core';
 import { AuthUserService, initialAuthUser } from '@app/services/auth-user.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 Chart.register(...registerables);
 describe('CardChartComponent', () => {

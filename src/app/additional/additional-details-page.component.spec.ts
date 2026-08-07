@@ -8,7 +8,7 @@ import { TreatmentStore } from '../store/treatment.store';
 import { DateAdapter } from '@angular/material/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;

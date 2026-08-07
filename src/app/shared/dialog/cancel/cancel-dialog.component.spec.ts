@@ -4,7 +4,7 @@ import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CancelOption } from '@app/reservation/reservation';
 import { provideAppIcons } from '@app/util/app-icons.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CancelDialogComponent', () => {
   let component: CancelDialogComponent;

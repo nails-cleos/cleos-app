@@ -11,7 +11,7 @@ import { VERIFICATION_EMAIL } from '../util/helper';
 import { AuthStore } from '../store/auth.store';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AuthComponent', () => {
   let component: AuthComponent;

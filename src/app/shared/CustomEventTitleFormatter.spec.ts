@@ -1,21 +1,10 @@
-import { TranslateService } from '@ngx-translate/core';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
-import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('CustomEventTitleFormatter', () => {
   let formatter: CustomEventTitleFormatter;
-  let translateService: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
-    translateService = jasmine.createSpyObj('TranslateService', [
-      'instant',
-      'getCurrentLang',
-    ]);
-
-    translateService.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
-    translateService.instant.and.callFake((key: string) => key);
-
-    formatter = new CustomEventTitleFormatter(translateService);
+    formatter = new CustomEventTitleFormatter();
   });
 
   it('should return ALL_DAY label in month view when no end time', () => {

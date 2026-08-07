@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToDays, devices, zeroPad } from '../support/utils';
-import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
@@ -60,8 +60,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('[data-cy="date-picker"]').click({ force: true });
       cy.get('.mat-calendar-next-button').click({ force: true });
 
-      cy.wait(50);
-      cy.get(`button[aria-label="${ formattedDate }"]`).click({ force: true });
+      cy.get(`button[aria-label="${ formattedDate }"]`)
+        .should('be.visible')
+        .click({ force: true });
 
       cy.get('[data-cy="start-picker"]').click({ force: true });
       cy.setTime(hourFormat, minuteFormat);

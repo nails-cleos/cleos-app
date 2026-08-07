@@ -6,7 +6,7 @@ import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from './util/dates';
 import { NavigationService } from './services/navigation.service';
 import { BehaviorSubject } from 'rxjs';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;

@@ -5,7 +5,7 @@ import { SelectUserDialogComponent } from './select-user-dialog.component';
 import { Role } from '@app/interfaces/token';
 import { signal, WritableSignal } from '@angular/core';
 import { UserStore } from '@app/store/user.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('SelectUserDialogComponent', () => {
   let component: SelectUserDialogComponent;

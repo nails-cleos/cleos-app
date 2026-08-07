@@ -12,7 +12,7 @@ import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { ICommon } from '../interfaces/common';
 import { DocumentTypeEnum, IDocument } from '../document/document';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('StatementComponent', () => {
   let component: StatementComponent;

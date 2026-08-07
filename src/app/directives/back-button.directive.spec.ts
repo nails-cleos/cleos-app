@@ -15,7 +15,7 @@ import { DEFAULT_LOCALE } from '../util/dates';
       [form]="form"
       [date]="date"
       [step]="step"></button>`,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BackButtonDirective],
 })
 class HostComponent {

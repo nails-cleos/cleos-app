@@ -526,14 +526,14 @@ export class ReservationComponent {
           switch (value.order) {
             case 0:
               value.enable = false;
-              return value;
+              break;
+
             case 1:
-              const enable = this.isAdmin();
-              value.enable = enable;
-              return value;
-            default:
-              return value;
+              value.enable = this.isAdmin();
+              break;
           }
+
+          return value;
         });
       }
     });

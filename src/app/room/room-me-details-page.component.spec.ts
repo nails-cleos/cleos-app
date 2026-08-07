@@ -5,7 +5,7 @@ import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
 
 @Component({
   selector: 'app-room-details-page',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 class RoomDetailsPageStubComponent {

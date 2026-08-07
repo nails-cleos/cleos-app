@@ -36,7 +36,7 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
       </section>
     </div>
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [`
     .app-skeleton-header {
       flex-direction: column;

@@ -9,7 +9,7 @@ import { AdditionalStore } from '../store/additional.store';
 import { AdditionalComponent } from './additional.component';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { TreatmentStore } from '../store/treatment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;

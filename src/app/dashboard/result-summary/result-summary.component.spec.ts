@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ResultSummaryComponent } from './result-summary.component';
 import { ICurrencyAll } from '@app/currency/currency';
 import { ISummaryTotals } from '../dashboard';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ResultSummaryComponent', () => {
   let component: ResultSummaryComponent;
@@ -27,7 +27,7 @@ describe('ResultSummaryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ResultSummaryComponent],
-      providers: [provideTranslateService()]
+      providers: [provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ResultSummaryComponent);

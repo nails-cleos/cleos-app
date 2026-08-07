@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 declare namespace Cypress {
   interface Chainable {

@@ -12,7 +12,7 @@ import { getDateQuarter, getNowTimeZone, monthViewTitle } from '@app/util/dates'
 import { MatDatepicker } from '@angular/material/datepicker';
 import { DocumentStore } from '@app/store/document.store';
 import { OfficeStore } from '@app/store/office.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DocumentListComponent', () => {
   let component: DocumentListComponent;
@@ -333,7 +333,7 @@ describe('DocumentListComponent', () => {
 
   it('should emit add button', () => {
     const emitSpy = jasmine.createSpy('emit');
-    component.onAdd.subscribe(emitSpy);
+    component.addOutput.subscribe(emitSpy);
 
     fixture.detectChanges();
 
@@ -344,7 +344,7 @@ describe('DocumentListComponent', () => {
 
   it('should emit edit button', () => {
     const emitSpy = jasmine.createSpy('emit');
-    component.onEdit.subscribe(emitSpy);
+    component.editOutput.subscribe(emitSpy);
 
     const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
 
@@ -357,7 +357,7 @@ describe('DocumentListComponent', () => {
 
   it('should emit delete button', () => {
     const emitSpy = jasmine.createSpy('emit');
-    component.onDelete.subscribe(emitSpy);
+    component.deleteOutput.subscribe(emitSpy);
 
     const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
 

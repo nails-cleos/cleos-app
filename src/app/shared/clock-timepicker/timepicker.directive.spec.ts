@@ -22,7 +22,7 @@ import { TimepickerDirective } from './timepicker.directive';
       [minutesGap]="minutesGap"
       (timeSet)="lastTimeSet = $event"></app-timepicker>
   `,
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [ReactiveFormsModule, TimepickerDirective, TimepickerComponent],
 })
 class HostComponent {

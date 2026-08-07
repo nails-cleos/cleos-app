@@ -3,7 +3,7 @@ import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { signal } from '@angular/core';
 import { DiscountStore } from '@app/store/discount.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;

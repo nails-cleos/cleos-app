@@ -8,7 +8,7 @@ import { AccountStore } from '@app/store/account.store';
 import { signal } from '@angular/core';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AccountComponent', () => {
   let component: AccountComponent;

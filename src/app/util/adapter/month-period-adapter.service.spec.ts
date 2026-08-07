@@ -22,7 +22,7 @@ describe('MonthPeriodAdapter', () => {
     ]);
     dateAdapterMock.createDate.and.callFake((year: number, month: number, day: number) => new Date(year, month, day));
 
-    adapter = new MonthPeriodAdapter<Date>(dateAdapterMock);
+    adapter = new MonthPeriodAdapter<Date>();
   });
 
   it('should create full month range from a selected date', () => {

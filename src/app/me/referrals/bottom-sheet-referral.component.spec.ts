@@ -1,7 +1,7 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { BottomSheetReferralComponent, BottomSheetReferralData } from './bottom-sheet-referral.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('BottomSheetReferralComponent', () => {
   let component: BottomSheetReferralComponent;

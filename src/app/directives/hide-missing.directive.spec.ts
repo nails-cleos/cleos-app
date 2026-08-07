@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 
 @Component({
   template: '<img appHideMissing src="test.jpg" />',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [HideMissingDirective],
 })
 class HostComponent {}

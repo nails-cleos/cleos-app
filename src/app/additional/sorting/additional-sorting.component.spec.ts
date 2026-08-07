@@ -7,7 +7,7 @@ import { NavigationService } from '@app/services/navigation.service';
 import { AdditionalStore } from '@app/store/additional.store';
 import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
 import { AdditionalSortingComponent } from './additional-sorting.component';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalSortingComponent', () => {
   let component: AdditionalSortingComponent;

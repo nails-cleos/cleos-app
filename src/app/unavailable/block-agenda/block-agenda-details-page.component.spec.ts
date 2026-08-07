@@ -7,7 +7,7 @@ import { IUnavailableAll } from '../unavailable';
 import { BlockAgendaComponent } from './block-agenda.component';
 import { AuthUserService } from '@app/services/auth-user.service';
 import { UserStore } from '@app/store/user.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('BlockAgendaDetailsPageComponent', () => {
   let component: BlockAgendaDetailsPageComponent;

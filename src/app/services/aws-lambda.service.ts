@@ -164,4 +164,4 @@ class AwsLambdaService {
   }
 }
 
-export default AwsLambdaService
+export default AwsLambdaService;

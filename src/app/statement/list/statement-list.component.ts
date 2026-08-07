@@ -11,10 +11,10 @@ import { NavigationService } from '@app/services/navigation.service';
 @Component({
   selector: 'app-statement-list',
   imports: [DocumentListComponent],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <app-document-list [showDateFilter]="false" [navigationButtons]="true" (onDelete)="delete($event)"
-                       (onEdit)="edit($event)" (onAdd)="add()" [types]="types"></app-document-list>`,
+    <app-document-list [showDateFilter]="false" [navigationButtons]="true" (deleteOutput)="delete($event)"
+                       (editOutput)="edit($event)" (addOutput)="add()" [types]="types"></app-document-list>`,
 })
 export class StatementListComponent {
 

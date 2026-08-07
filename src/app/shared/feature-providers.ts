@@ -1,9 +1,9 @@
-import { effect, inject, makeEnvironmentProviders, provideEnvironmentInitializer, } from '@angular/core';
+import { effect, inject, makeEnvironmentProviders, provideEnvironmentInitializer } from '@angular/core';
 import {
   provideChildTranslateService,
   provideMissingTranslationHandler,
   provideTranslateLoader,
-  TranslateService
+  TranslateService,
 } from '@ngx-translate/core';
 import { MissingTranslateHandler, TranslateLoaderFactory } from './translate-loader.factory';
 import { NavigationService } from '../services/navigation.service';

@@ -1,12 +1,11 @@
-import { Inject, Injectable } from '@angular/core';
-import { MAT_DATE_LOCALE } from '@angular/material/core';
+import { Injectable } from '@angular/core';
 import { CustomDateAdapter } from './custom-date-adapter';
 
 @Injectable()
 export class YearAdapter extends CustomDateAdapter {
 
-  constructor(@Inject(MAT_DATE_LOCALE) locale: string) {
-    super(locale);
+  constructor() {
+    super();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

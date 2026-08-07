@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
-import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 const mapRole = new Map([
   ['Customer', { url: 'customers', displayName: 'Customer 1', otherButtons: [] }],

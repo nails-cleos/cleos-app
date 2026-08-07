@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { RoomStore } from '@app/store/room.store';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;

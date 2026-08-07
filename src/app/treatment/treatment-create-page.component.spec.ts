@@ -4,7 +4,7 @@ import { NavigationService } from '../services/navigation.service';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentCreatePageComponent } from './treatment-create-page.component';
 import { ColorStore } from '../store/color.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentCreatePageComponent', () => {
   let component: TreatmentCreatePageComponent;

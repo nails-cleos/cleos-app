@@ -1,15 +1,15 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import angular from '@angular-eslint/eslint-plugin';
-import angularTemplate from '@angular-eslint/eslint-plugin-template';
+import { configs, templateParser, templatePlugin, tsPlugin, } from 'angular-eslint';
+import cypress from 'eslint-plugin-cypress';
 
 export default tseslint.config(
   {
     ignores: [
       'projects/**',
-      'dist/',
-      'node_modules/',
-      'coverage/',
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
       'cypress/results/**',
       'cypress/screenshots/**',
       'cypress/videos/**',
@@ -18,12 +18,13 @@ export default tseslint.config(
 
   js.configs.recommended,
 
+  ...tseslint.configs.recommended,
+
+  ...configs.tsRecommended,
+
   {
     files: ['**/*.ts'],
-    ...tseslint.configs.recommended,
-    plugins: {
-      '@angular-eslint': angular,
-    },
+
     languageOptions: {
       parserOptions: {
         project: [
@@ -32,42 +33,63 @@ export default tseslint.config(
         ],
       },
     },
+
+    plugins: {
+      '@angular-eslint': tsPlugin,
+    },
+
     rules: {
       quotes: [
         'error',
         'single',
       ],
+
       semi: [
         'error',
         'always',
       ],
+
       'no-console': [
         'error',
         {
           allow: ['warn', 'error'],
         },
       ],
+
       eqeqeq: 'error',
+
       curly: [
         'error',
         'all',
       ],
-      'no-unused-vars': 'error',
-      'no-undef': 'error',
+
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': 'error',
+      'no-useless-escape': 'off',
+      'no-undef': 'off',
+
       camelcase: 'error',
+
       'prefer-const': 'error',
+
       'consistent-return': 'error',
+
       'no-debugger': 'error',
+
       'no-alert': 'error',
-      'no-shadow': 'error',
+
+      'no-shadow': 'off',
+
       'comma-dangle': [
         'error',
         'always-multiline',
       ],
+
       'object-curly-spacing': [
         'error',
         'always',
       ],
+
       'array-bracket-spacing': [
         'error',
         'never',
@@ -93,14 +115,6 @@ export default tseslint.config(
         },
       ],
 
-      indent: [
-        'error',
-        2,
-        {
-          SwitchCase: 1,
-        },
-      ],
-
       'max-len': [
         'error',
         {
@@ -114,9 +128,35 @@ export default tseslint.config(
       ],
     },
   },
-
+  {
+    files: ['cypress/**/*.ts'],
+    plugins: {
+      cypress,
+    },
+    languageOptions: {
+      globals: {
+        cy: 'readonly',
+        Cypress: 'readonly',
+        expect: 'readonly',
+        assert: 'readonly',
+        chai: 'readonly',
+      },
+    },
+    rules: {
+      ...cypress.configs.recommended.rules,
+    },
+  },
   {
     files: ['**/*.html'],
-    ...angularTemplate.configs.recommended,
+    languageOptions: {
+      parser: templateParser,
+    },
+    plugins: {
+      '@angular-eslint/template': templatePlugin,
+    },
+    rules: {
+      ...configs.templateRecommended.rules,
+      'no-shadow': 'off',
+    },
   },
 );

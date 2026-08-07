@@ -6,7 +6,7 @@ import { ICurrencyAll } from './currency';
 import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;

@@ -592,7 +592,7 @@ export class ReservationDetailComponent {
   ): void => {
     for (const state in ReservationDetailComponent.stateMachineDefinition) {
       if (state !== 'initialState') {
-        if (ReservationDetailComponent.stateMachineDefinition.hasOwnProperty(state)) {
+        if (Object.hasOwn(ReservationDetailComponent.stateMachineDefinition, state)) {
           const stateDefinition = ReservationDetailComponent.stateMachineDefinition[state];
           if (!stateDefinition.transitions) {
             stateDefinition.transitions = {};

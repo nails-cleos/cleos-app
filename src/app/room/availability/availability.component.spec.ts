@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AvailabilityComponent } from './availability.component';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AvailabilityComponent', () => {
   let component: AvailabilityComponent;
@@ -10,7 +10,7 @@ describe('AvailabilityComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AvailabilityComponent],
-      providers:[provideTranslateService()]
+      providers:[provideTranslateService()],
     }).compileComponents();
   });
 

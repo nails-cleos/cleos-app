@@ -8,7 +8,7 @@ import { IChart } from '@app/dashboard/dashboard';
 import { ICurrency } from '@app/currency/currency';
 import { createChart } from '@app/util/chart';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ChartComponent', () => {
   let component: ChartComponent;

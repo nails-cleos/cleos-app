@@ -6,7 +6,7 @@ import { getCurrentTimeZone, getNowTimeZone } from '@app/util/dates';
 import { MAX_RESERVATION_MONTH } from '../reservation';
 import { IRoomAll } from '@app/room/room';
 import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ReservationCloneDialogComponent', () => {
   let component: ReservationCloneDialogComponent;

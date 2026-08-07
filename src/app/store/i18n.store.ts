@@ -2,7 +2,7 @@ import { effect, inject } from '@angular/core';
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { createStoreInitialState, StoreState } from './crud-signal-store';
-import { DEFAULT_LOCALE } from "../util/dates";
+import { DEFAULT_LOCALE } from '../util/dates';
 
 type I18NStoreState = StoreState & {
   language: string;

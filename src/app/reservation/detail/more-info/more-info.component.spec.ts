@@ -16,7 +16,7 @@ import { PaymentStore } from '@app/store/payment.store';
 import { signal } from '@angular/core';
 import { TrackingStore } from '@app/store/tracking.store';
 import { ReservationStore } from '@app/store/reservation.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;

@@ -1,6 +1,6 @@
 import '../support/commands';
-import { Role } from '@app/src/app/interfaces/token';
-import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '@app/src/app/util/dates';
+import { Role } from '@app/interfaces/token';
+import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '@app/util/dates';
 import { devices } from '../support/utils';
 
 const displayName = 'Customer 1';
@@ -88,14 +88,17 @@ devices.forEach(({ name, width, height }) => {
               cy.get('.app-surface-eyebrow').contains('No upcoming reservations');
               cy.get('tr').contains('No reservations');
               break;
+
             case Role.admin:
               cy.get('h3').contains(monthViewTitle(today, DEFAULT_LOCALE));
               break;
-            case Role.roomAdmin:
+
+            case Role.roomAdmin: {
               const date = dayViewTitle(today, DEFAULT_LOCALE);
               cy.get('h2').contains(date);
               cy.get('h2').contains(`Room is not open ${date}`);
               break;
+            }
           }
         });
       });

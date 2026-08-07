@@ -3,7 +3,7 @@ import type { TimepickerDirective } from './timepicker.directive';
 
 @Component({
   selector: 'app-timepicker',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 export class TimepickerComponent {

@@ -4,7 +4,7 @@ import { DragDropDirective } from './drag-drop.directive';
 
 @Component({
   imports: [DragDropDirective],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<div appDragDrop (fileDropped)="onDropped($event)"></div>',
 })
 class TestHostComponent {

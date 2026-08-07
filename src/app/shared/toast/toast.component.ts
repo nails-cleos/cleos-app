@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, InjectionToken } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';
 import { ToastData } from './toast.model';
-import { TranslatePipe } from "@ngx-translate/core";
+import { TranslatePipe } from '@ngx-translate/core';
+
+export const TOAST_DATA = new InjectionToken<ToastData>('TOAST_DATA');
+export const TOAST_DISMISS = new InjectionToken<Subject<void>>('TOAST_DISMISS');
+export const TOAST_ACTION = new InjectionToken<Subject<void>>('TOAST_ACTION');
 
 @Component({
   selector: 'app-toast',
@@ -14,12 +18,9 @@ import { TranslatePipe } from "@ngx-translate/core";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ToastComponent {
-  constructor(
-    @Inject('TOAST_DATA') public data: ToastData,
-    @Inject('TOAST_DISMISS') public dismiss$: Subject<void>,
-    @Inject('TOAST_ACTION') public action$: Subject<void>,
-  ) {
-  }
+  public data = inject<ToastData>(TOAST_DATA);
+  public dismiss$ = inject<Subject<void>>(TOAST_DISMISS);
+  public action$ = inject<Subject<void>>(TOAST_ACTION);
 
   getIcon(): string {
     switch (this.data.type) {

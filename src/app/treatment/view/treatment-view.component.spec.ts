@@ -4,7 +4,7 @@ import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentViewComponent } from './treatment-view.component';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentViewComponent', () => {
   let component: TreatmentViewComponent;

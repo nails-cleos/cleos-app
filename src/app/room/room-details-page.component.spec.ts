@@ -9,7 +9,7 @@ import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-room',
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 class RoomComponentStub {

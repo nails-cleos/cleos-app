@@ -10,7 +10,7 @@ import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;

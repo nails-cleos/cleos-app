@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
 import { signal } from '@angular/core';
 import { CatalogueStore } from '@app/store/catalogue.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;

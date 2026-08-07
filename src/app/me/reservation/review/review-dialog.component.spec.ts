@@ -8,7 +8,7 @@ import { ICurrencyAll } from '@app/currency/currency';
 import { ITreatmentAll } from '@app/treatment/treatment';
 import { DEFAULT_LOCALE, getCurrentTimeZone } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;

@@ -4,7 +4,7 @@ import { MiniCardComponent } from './mini-card.component';
 import { IError } from '@app/interfaces/common';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('MiniCardComponent', () => {
   let component: MiniCardComponent;

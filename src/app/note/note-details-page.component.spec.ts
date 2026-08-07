@@ -9,7 +9,7 @@ import { FrequencyEnum } from '../util/helper';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '../store/user.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('NoteDetailsPageComponent', () => {
   let component: NoteDetailsPageComponent;

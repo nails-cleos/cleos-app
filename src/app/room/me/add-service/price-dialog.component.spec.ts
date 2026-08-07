@@ -3,7 +3,7 @@ import { PriceDialogComponent } from './price-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ServiceType } from '../../room';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('PriceDialogComponent', () => {
   let component: PriceDialogComponent;

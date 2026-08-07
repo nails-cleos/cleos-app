@@ -20,7 +20,7 @@ import { RoomStore } from '../store/room.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { NavigationService } from '../services/navigation.service';
 import { PaymentStore } from '../store/payment.store';
-import { provideTranslateService } from "@ngx-translate/core";
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('RoomComponent', () => {
   let component: RoomComponent;

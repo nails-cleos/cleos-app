@@ -45,7 +45,7 @@ import { AuthStore } from '../store/auth.store';
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatIcon, MatListItem, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
     MatTooltip, MatListItemIcon, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
     MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatProgressSpinner, MatDrawerContainer,
