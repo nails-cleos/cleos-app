@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GoogleMapComponent } from './google-map.component';
 import { provideHttpClient, withJsonpSupport, withXhr } from '@angular/common/http';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { signal } from '@angular/core';
 
 describe('GoogleMapComponent', () => {

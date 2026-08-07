@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DragDropSortingComponent, ISorting, Sorted } from './drag-drop-sorting.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { NavigationService } from '../../services/navigation.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DragDropSortingComponent', () => {
   let component: DragDropSortingComponent;
@@ -20,8 +20,9 @@ describe('DragDropSortingComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
-      imports: [DragDropSortingComponent, TranslateModule.forRoot()],
+      imports: [DragDropSortingComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

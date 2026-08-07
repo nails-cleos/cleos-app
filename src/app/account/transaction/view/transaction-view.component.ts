@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ITransaction } from '../../account';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
-import { newDateTimestamp } from '../../../util/dates';
-import { AuthUserService } from '../../../services/auth-user.service';
+import { newDateTimestamp } from '@app/util/dates';
+import { AuthUserService } from '@app/services/auth-user.service';
 import { BalanceComponent } from '../../balance/balance.component';
-import { AccountStore } from '../../../store/account.store';
+import { AccountStore } from '@app/store/account.store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   MatCell,
@@ -33,8 +33,8 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListItemTitle } from '@angular/material/list';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-transaction-view',

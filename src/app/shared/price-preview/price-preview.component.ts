@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IPrice } from '../../treatment/treatment';
-import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { IPrice } from '@app/treatment/treatment';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';

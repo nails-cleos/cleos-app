@@ -1,13 +1,13 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { IAdditionalAll } from '../additional';
-import { ServiceType } from '../../room/room';
-import { NavigationService } from '../../services/navigation.service';
-import { AdditionalStore } from '../../store/additional.store';
-import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { ServiceType } from '@app/room/room';
+import { NavigationService } from '@app/services/navigation.service';
+import { AdditionalStore } from '@app/store/additional.store';
+import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
 import { AdditionalSortingComponent } from './additional-sorting.component';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AdditionalSortingComponent', () => {
   let component: AdditionalSortingComponent;
@@ -58,8 +58,9 @@ describe('AdditionalSortingComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalSortingComponent, TranslateModule.forRoot()],
+      imports: [AdditionalSortingComponent],
       providers: [
+        provideTranslateService(),
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: NavigationService, useValue: jasmine.createSpyObj('NavigationService', ['back']) },
       ],

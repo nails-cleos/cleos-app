@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IReservation } from '../../../reservation/reservation';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { IReservation } from '@app/reservation/reservation';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { ReservationTableComponent } from './reservation-table.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { IUser } from '../../../user/user';
-import { IRoom } from '../../../room/room';
-import { ITreatment } from '../../../treatment/treatment';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { IUser } from '@app/user/user';
+import { IRoom } from '@app/room/room';
+import { ITreatment } from '@app/treatment/treatment';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
-import { ReservationStore } from '../../../store/reservation.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
@@ -94,8 +94,9 @@ describe('ReservationTableComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ReservationTableComponent, TranslateModule.forRoot()],
+      imports: [ReservationTableComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

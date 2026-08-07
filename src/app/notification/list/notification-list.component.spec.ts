@@ -1,13 +1,13 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { NotificationListComponent } from './notification-list.component';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 import { INotification, INotificationDTO } from '../notification';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { Pagination } from '../../interfaces/pagination';
-import { NotificationStore } from '../../store/notification.store';
+import { Pagination } from '@app/interfaces/pagination';
+import { NotificationStore } from '@app/store/notification.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('NotificationListComponent', () => {
   let component: NotificationListComponent;
@@ -66,8 +66,9 @@ describe('NotificationListComponent', () => {
     );
 
     TestBed.configureTestingModule({
-      imports: [NotificationListComponent, TranslateModule.forRoot()],
+      imports: [NotificationListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NotificationStore, useValue: notificationStoreSpy },
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },

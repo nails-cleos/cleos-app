@@ -2,21 +2,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MoreInfoComponent } from './more-info.component';
 import { of } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
 import { IReservationAll, ITracking } from '../../reservation';
-import { DEFAULT_LOCALE, getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
-import { IRoomAll } from '../../../room/room';
-import { ICurrencyAll } from '../../../currency/currency';
-import { IReview } from '../../../me/reservation/list/review';
+import { DEFAULT_LOCALE, getCurrentTimeZone, getNowTimeZone } from '@app/util/dates';
+import { IRoomAll } from '@app/room/room';
+import { ICurrencyAll } from '@app/currency/currency';
+import { IReview } from '@app/me/reservation/list/review';
 import { addHours } from 'date-fns';
-import { IPaymentAll } from '../../../interfaces/payment';
+import { IPaymentAll } from '@app/interfaces/payment';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { ToastService } from '../../../services/toast.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
+import { ToastService } from '@app/services/toast.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 import { signal } from '@angular/core';
-import { TrackingStore } from '../../../store/tracking.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { TrackingStore } from '@app/store/tracking.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
@@ -92,8 +92,9 @@ describe('MoreInfoComponent', () => {
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
     await TestBed.configureTestingModule({
-      imports: [MoreInfoComponent, TranslateModule.forRoot()],
+      imports: [MoreInfoComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TrackingStore, useValue: trackingStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },

@@ -1,6 +1,6 @@
 import '../support/commands';
 import { devices } from '../support/utils';
-import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
 
 devices.forEach(({ name, width, height }) => {
   describe(`Me reservation flow  with ${ name }`, () => {

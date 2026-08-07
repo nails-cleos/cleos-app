@@ -6,7 +6,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { IChartUtil } from '../../util/chart';
+import { IChartUtil } from '@app/util/chart';
 import { ChartComponent } from '../chart/chart.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatButton } from '@angular/material/button';

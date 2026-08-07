@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '../../util/MainTreatment';
+import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '@app/util/MainTreatment';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
-import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
+import { TranslateLoaderFactory } from '@app/shared/translate-loader.factory';
 import { MatDivider, MatList } from '@angular/material/list';
-import { MainContentService } from '../../services/main-content.service';
-import { NavigationService } from '../../services/navigation.service';
+import { MainContentService } from '@app/services/main-content.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-main-treatment',

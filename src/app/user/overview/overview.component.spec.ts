@@ -2,16 +2,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OverviewComponent } from './overview.component';
 import { BehaviorSubject } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IOverview } from '../user';
-import { IReservationOverview } from '../../reservation/reservation';
-import { IChart } from '../../dashboard/dashboard';
+import { IReservationOverview } from '@app/reservation/reservation';
+import { IChart } from '@app/dashboard/dashboard';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
@@ -58,8 +58,9 @@ describe('OverviewComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [OverviewComponent, TranslateModule.forRoot()],
+      imports: [OverviewComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

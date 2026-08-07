@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ErrorComponent } from './error.component';
-import { NavigationService } from '../../services/navigation.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ErrorComponent', () => {
   let component: ErrorComponent;
@@ -18,8 +18,9 @@ describe('ErrorComponent', () => {
     navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
 
     await TestBed.configureTestingModule({
-      imports: [ErrorComponent, TranslateModule.forRoot()],
+      imports: [ErrorComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

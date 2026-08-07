@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { CancelOption, IReservationAll, States } from '../reservation';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
-import { IUserAll } from '../../user/user';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../currency/currency';
-import { ServiceType } from '../../room/room';
+import { IUserAll } from '@app/user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { ServiceType } from '@app/room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { NavigationService } from '../../services/navigation.service';
-import { UserStore } from '../../store/user.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { UserStore } from '@app/store/user.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
@@ -144,8 +144,9 @@ describe('SearchComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [SearchComponent, TranslateModule.forRoot()],
+      imports: [SearchComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },

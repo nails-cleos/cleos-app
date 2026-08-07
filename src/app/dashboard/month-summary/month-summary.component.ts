@@ -10,7 +10,7 @@ import {
   getWeeksInMonth,
   monthViewTitle,
   newDateTimestamp,
-} from '../../util/dates';
+} from '@app/util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   AmountFormat,
@@ -32,17 +32,17 @@ import {
   getCurrencyFromRoom,
   getTimeZoneFromRoom,
   titleCase,
-} from '../../util/helper';
+} from '@app/util/helper';
 import { RouterLink } from '@angular/router';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService } from '@app/services/auth-user.service';
 import fs from 'file-saver';
-import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '../../util/report';
-import { FilterByPipe } from '../../pipes/filterBy.pipe';
-import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
-import { TwoDigitsDirective } from '../../directives/two-digits.directive';
+import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '@app/util/report';
+import { FilterByPipe } from '@app/pipes/filterBy.pipe';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { TwoDigitsDirective } from '@app/directives/two-digits.directive';
 import { MatOption } from '@angular/material/core';
-import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
-import { EnvService } from '../../services/env.service';
+import { provideYearMonthDateAdapter } from '@app/util/adapter/app-date.provider';
+import { EnvService } from '@app/services/env.service';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
@@ -66,8 +66,8 @@ import {
   NgTemplateOutlet,
   SlicePipe,
 } from '@angular/common';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;

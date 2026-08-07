@@ -18,16 +18,16 @@ import {
   MatTable,
   MatTableDataSource,
 } from '@angular/material/table';
-import { createMatTableState } from 'src/app/util/mat-table-state';
+import { createMatTableState } from '@app/util/mat-table-state';
 import { ITreatmentAll } from '../treatment';
-import { convertDuration } from '../../util/dates';
+import { convertDuration } from '@app/util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
-import { PAGE_SIZE } from '../../interfaces/pagination';
+import { PAGE_SIZE } from '@app/interfaces/pagination';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { TableSkeletonColumn } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { TableSkeletonColumn } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-treatment-table',

@@ -13,7 +13,7 @@ import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { DiscountStore } from '../../store/discount.store';
+import { DiscountStore } from '@app/store/discount.store';
 
 type DiscountForm = {
   discount: FormControl<string>;

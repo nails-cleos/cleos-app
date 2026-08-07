@@ -2,7 +2,6 @@ import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/
 import { AuthComponent } from './auth.component';
 import { of, Subject } from 'rxjs';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { FirebaseService } from '../services/firebase.service';
 import { signal } from '@angular/core';
 import { Validators } from '@angular/forms';
@@ -12,6 +11,7 @@ import { VERIFICATION_EMAIL } from '../util/helper';
 import { AuthStore } from '../store/auth.store';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AuthComponent', () => {
   let component: AuthComponent;
@@ -79,8 +79,9 @@ describe('AuthComponent', () => {
     (firebaseServiceSpy as any).user = signal(null);
 
     await TestBed.configureTestingModule({
-      imports: [AuthComponent, TranslateModule.forRoot()],
+      imports: [AuthComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

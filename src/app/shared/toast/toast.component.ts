@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { ToastData } from './toast.model';
+import { TranslatePipe } from "@ngx-translate/core";
 
 @Component({
   selector: 'app-toast',
-  imports: [CommonModule, MatIconModule, MatButtonModule, TranslateModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

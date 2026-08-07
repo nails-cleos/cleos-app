@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { CatalogueStore } from '../../store/catalogue.store';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
@@ -22,8 +22,9 @@ describe('CatalogComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [CatalogComponent, TranslateModule.forRoot()],
+      imports: [CatalogComponent],
       providers: [
+        provideTranslateService(),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
       ],
     }).compileComponents();

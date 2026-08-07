@@ -2,25 +2,25 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, input, si
 import { RouterLink } from '@angular/router';
 import { combineLatestWith } from 'rxjs';
 import { BalanceForm, IAccountAll, Transaction } from '../account';
-import { ICurrency, ICurrencyAll } from '../../currency/currency';
+import { ICurrency, ICurrencyAll } from '@app/currency/currency';
 import { map, startWith } from 'rxjs/operators';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch } from '../../util/validators';
-import { AuthUserService } from '../../services/auth-user.service';
-import { getLocale } from '../../util/helper';
+import { requireMatch } from '@app/util/validators';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { getLocale } from '@app/util/helper';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { IError } from '../../interfaces/common';
-import { AccountStore } from '../../store/account.store';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { IError } from '@app/interfaces/common';
+import { AccountStore } from '@app/store/account.store';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatOption } from '@angular/material/core';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-account',

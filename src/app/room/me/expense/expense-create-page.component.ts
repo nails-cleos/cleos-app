@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ExpenseComponent } from './expense.component';
-import { ExpenseStore } from '../../../store/expense.store';
+import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
-import { ICommon } from '../../../interfaces/common';
+import { ICommon } from '@app/interfaces/common';
 
 @Component({
   selector: 'app-expense-create-page',

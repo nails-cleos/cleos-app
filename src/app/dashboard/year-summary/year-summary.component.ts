@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { dateMonthYear, getNowTimeZone } from '../../util/dates';
+import { dateMonthYear, getNowTimeZone } from '@app/util/dates';
 import {
   IMonthlyExport,
   IQuarterSummary,
@@ -14,22 +14,22 @@ import {
   SummaryTotals,
   Total,
 } from '../dashboard';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService } from '@app/services/auth-user.service';
 import {
   allElementsHaveSameKeyFilterValue,
   currencySymbol,
   getCurrencyFromRoom,
   getTimeZoneFromRoom,
-} from '../../util/helper';
-import { createYearlyWorkbook } from '../../util/report';
+} from '@app/util/helper';
+import { createYearlyWorkbook } from '@app/util/report';
 import fs from 'file-saver';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { YearComponent } from './year/year.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatOption } from '@angular/material/core';
-import { provideYearDateAdapter } from '../../util/adapter/app-date.provider';
-import { EnvService } from '../../services/env.service';
+import { provideYearDateAdapter } from '@app/util/adapter/app-date.provider';
+import { EnvService } from '@app/services/env.service';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
@@ -37,8 +37,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type YearSummaryForm = {
   date: FormControl<Date>;

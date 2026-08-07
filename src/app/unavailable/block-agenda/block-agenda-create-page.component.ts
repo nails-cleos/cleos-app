@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ICommon } from '../../interfaces/common';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ICommon } from '@app/interfaces/common';
 import { IUnavailable } from '../unavailable';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { getTimeNumber } from '../../util/dates';
-import { closest } from '../../util/numbers';
+import { getTimeNumber } from '@app/util/dates';
+import { closest } from '@app/util/numbers';
 
 @Component({
   selector: 'app-block-agenda-create-page',

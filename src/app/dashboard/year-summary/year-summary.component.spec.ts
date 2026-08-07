@@ -2,8 +2,7 @@
 import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
 import { BehaviorSubject } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard';
 import fs from 'file-saver';
@@ -11,9 +10,10 @@ import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { By } from '@angular/platform-browser';
 import { YearComponent } from './year/year.component';
-import { DashboardStore } from '../../store/dashboard.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
@@ -68,8 +68,9 @@ describe('YearSummaryComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [YearSummaryComponent, TranslateModule.forRoot()],
+      imports: [YearSummaryComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

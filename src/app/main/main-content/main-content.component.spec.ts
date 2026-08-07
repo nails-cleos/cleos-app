@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainContentComponent } from './main-content.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@app/services/toast.service';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../main';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
+import { GoogleMapStubComponent } from '@app/shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
-import { provideAppIcons } from '../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { MainStore } from '../../store/main.store';
-import { NavigationService } from '../../services/navigation.service';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { MainStore } from '@app/store/main.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
@@ -61,8 +61,9 @@ describe('MainContentComponent', () => {
     bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
 
     await TestBed.configureTestingModule({
-      imports: [MainContentComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [MainContentComponent, GoogleMapStubComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MainStore, useValue: mainStoreSpy },
         { provide: CatalogueStore, useValue: catalogueStoreSpy },

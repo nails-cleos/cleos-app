@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormFieldAdderComponent } from './form-field-adder.component';
-import { IPaymentOption } from '../../interfaces/payment';
-import { TranslateModule } from '@ngx-translate/core';
+import { IPaymentOption } from '@app/interfaces/payment';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('FormFieldAdderComponent', () => {
   let component: FormFieldAdderComponent;
@@ -33,7 +33,8 @@ describe('FormFieldAdderComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FormFieldAdderComponent, TranslateModule.forRoot()],
+      imports: [FormFieldAdderComponent],
+      providers: [provideTranslateService()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(FormFieldAdderComponent);

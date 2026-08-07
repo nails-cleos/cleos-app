@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
-import { IColorAll } from '../../color/color';
+import { IColorAll } from '@app/color/color';
 import { signal } from '@angular/core';
-import { ColorStore } from '../../store/color.store';
+import { ColorStore } from '@app/store/color.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ChangeColorDialogComponent', () => {
   let component: ChangeColorDialogComponent;
@@ -35,8 +35,9 @@ describe('ChangeColorDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [ChangeColorDialogComponent, TranslateModule.forRoot()],
+      imports: [ChangeColorDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => (mockChangeColor),

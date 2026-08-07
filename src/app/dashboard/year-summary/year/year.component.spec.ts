@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YearComponent } from './year.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { IQuarterSummary } from '../../dashboard';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('YearComponent', () => {
   let component: YearComponent;
@@ -17,8 +17,9 @@ describe('YearComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      imports: [YearComponent, TranslateModule.forRoot()],
+      imports: [YearComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

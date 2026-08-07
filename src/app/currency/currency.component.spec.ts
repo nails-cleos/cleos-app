@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { CurrencyComponent } from './currency.component';
@@ -7,6 +6,7 @@ import { ICurrencyAll } from './currency';
 import { ICommon } from '../interfaces/common';
 import { CurrencyStore } from '../store/currency.store';
 import { NavigationService } from '../services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CurrencyComponent', () => {
   let component: CurrencyComponent;
@@ -38,8 +38,9 @@ describe('CurrencyComponent', () => {
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
-      imports: [CurrencyComponent, TranslateModule.forRoot()],
+      imports: [CurrencyComponent],
       providers: [
+        provideTranslateService(),
         { provide: CurrencyStore, useValue: currencyStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],

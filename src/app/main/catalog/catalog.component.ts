@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { ICatalogueAll } from '../../catalogue/catalogue';
-import { getImage } from '../../util/file';
+import { ICatalogueAll } from '@app/catalogue/catalogue';
+import { getImage } from '@app/util/file';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import {
@@ -11,8 +11,8 @@ import {
   MatCardSubtitle,
   MatCardTitle,
 } from '@angular/material/card';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { MainContentService } from '../../services/main-content.service';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { MainContentService } from '@app/services/main-content.service';
 
 @Component({
   selector: 'app-catalog',

@@ -1,6 +1,6 @@
 import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { MainComponent } from './main.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient, withXhr } from '@angular/common/http';
@@ -75,8 +75,9 @@ describe('MainComponent', () => {
 
     paramMapSpy.get.and.returnValue(DEFAULT_LOCALE);
     await TestBed.configureTestingModule({
-      imports: [MainComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [MainComponent, GoogleMapStubComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },

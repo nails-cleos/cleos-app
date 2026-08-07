@@ -1,9 +1,9 @@
-import { ICurrencyAll } from '../../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
 import { IRoomAll } from '../../room';
-import { IDocument } from '../../../document/document';
-import { fieldChange } from '../../../util/validators';
+import { IDocument } from '@app/document/document';
+import { fieldChange } from '@app/util/validators';
 import { FormArray, FormControl } from '@angular/forms';
-import { DEFAULT_LOCALE, createNewDateZonedTime } from '../../../util/dates';
+import { DEFAULT_LOCALE, createNewDateZonedTime } from '@app/util/dates';
 
 export type ExpenseForm = {
   invoice: FormControl<string>;

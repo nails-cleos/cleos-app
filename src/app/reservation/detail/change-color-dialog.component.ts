@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IColorAll } from '../../color/color';
+import { IColorAll } from '@app/color/color';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -18,7 +18,7 @@ import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { ColorStore } from '../../store/color.store';
+import { ColorStore } from '@app/store/color.store';
 
 type ChangeColorForm = {
   color: FormControl<IColorAll | undefined>,

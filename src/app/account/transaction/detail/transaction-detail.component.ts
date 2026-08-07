@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { newDateTimestamp } from '../../../util/dates';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { AccountStore } from '../../../store/account.store';
+import { newDateTimestamp } from '@app/util/dates';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { AccountStore } from '@app/store/account.store';
 import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 
 @Component({
   selector: 'app-transaction-detail',

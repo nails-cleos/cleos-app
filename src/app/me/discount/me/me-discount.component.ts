@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { DiscountType, IUserDiscount } from '../../../discount/discount';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { DiscountType, IUserDiscount } from '@app/discount/discount';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { currencySymbol } from '../../../util/helper';
+import { currencySymbol } from '@app/util/helper';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FirebaseService } from '../../../services/firebase.service';
+import { FirebaseService } from '@app/services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
 import { DecimalPipe, NgClass } from '@angular/common';
@@ -30,9 +30,9 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatSuffix } from '@angular/material/input';
-import { DiscountStore } from '../../../store/discount.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
+import { DiscountStore } from '@app/store/discount.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-me-discount',

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { TransactionComponent } from './transaction.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { IAccountAll, ITransaction } from '../account';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { signal } from '@angular/core';
-import { NavigationService } from '../../services/navigation.service';
-import { provideAppIcons } from '../../util/app-icons.provider';
-import { AccountStore } from '../../store/account.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { PaymentStore } from '../../store/payment.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { AccountStore } from '@app/store/account.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { PaymentStore } from '@app/store/payment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TransactionComponent', () => {
   let component: TransactionComponent;
@@ -99,8 +99,9 @@ describe('TransactionComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [TransactionComponent, TranslateModule.forRoot()],
+      imports: [TransactionComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },

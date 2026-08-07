@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCompleteComponent } from './reservation-complete.component';
 import { of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { IExtras } from '../../reservation';
 import { MatListOption } from '@angular/material/list';
-import { ServiceType } from '../../../room/room';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { ServiceType } from '@app/room/room';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { TreatmentStore } from '../../../store/treatment.store';
-import { AdditionalStore } from '../../../store/additional.store';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { AdditionalStore } from '@app/store/additional.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
@@ -162,8 +162,9 @@ describe('ReservationCompleteComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [ReservationCompleteComponent, TranslateModule.forRoot()],
+      imports: [ReservationCompleteComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },

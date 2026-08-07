@@ -3,11 +3,11 @@ import {
   DragDropSortingComponent,
   ISorted,
   ItemSorting,
-} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+} from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
 import { IAdditionalAll } from '../additional';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AdditionalStore } from '../../store/additional.store';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+import { AdditionalStore } from '@app/store/additional.store';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-sorting',

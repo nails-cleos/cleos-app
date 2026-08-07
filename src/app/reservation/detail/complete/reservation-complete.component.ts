@@ -10,10 +10,10 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { IExtras } from '../../reservation';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '@app/treatment/treatment';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch, valueChange } from '../../../util/validators';
-import { IPaymentOption } from '../../../interfaces/payment';
+import { requireMatch, valueChange } from '@app/util/validators';
+import { IPaymentOption } from '@app/interfaces/payment';
 import {
   addPayment,
   createTreatmentGroupService,
@@ -22,7 +22,7 @@ import {
   newAdditional,
   newExtra,
   newPrice,
-} from '../../../util/helper';
+} from '@app/util/helper';
 import {
   DEFAULT_LOCALE,
   getDiffTime,
@@ -30,22 +30,22 @@ import {
   getTime,
   getTimeNumber,
   newDateTimestamp,
-} from '../../../util/dates';
+} from '@app/util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { map, startWith } from 'rxjs/operators';
-import { IAdditionalAll } from '../../../additional/additional';
+import { IAdditionalAll } from '@app/additional/additional';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
-import { IService } from '../../../room/room';
-import { IColorAll } from '../../../color/color';
-import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
+import { IService } from '@app/room/room';
+import { IColorAll } from '@app/color/color';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
-import { FormFieldAdderComponent } from '../../../shared/form-field-adder/form-field-adder.component';
-import { PaymentOptionSelectComponent } from '../../../shared/payment-option-select/payment-option-select.component';
-import { PricePreviewComponent } from '../../../shared/price-preview/price-preview.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { FormFieldAdderComponent } from '@app/shared/form-field-adder/form-field-adder.component';
+import { PaymentOptionSelectComponent } from '@app/shared/payment-option-select/payment-option-select.component';
+import { PricePreviewComponent } from '@app/shared/price-preview/price-preview.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
@@ -54,15 +54,15 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
-import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { ReservationDetailSkeletonComponent } from '../reservation-detail-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
-import { TreatmentStore } from '../../../store/treatment.store';
-import { AdditionalStore } from '../../../store/additional.store';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { AdditionalStore } from '@app/store/additional.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 type ReservationCompleteForm = {
   group: FormControl<IGroupService | undefined>;

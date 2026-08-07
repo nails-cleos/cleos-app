@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountComponent } from './discount.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
 import { DiscountType, IDiscountAll } from './discount';
 import { ICurrency } from '../currency/currency';
@@ -9,6 +8,7 @@ import { signal } from '@angular/core';
 import { DiscountStore } from '../store/discount.store';
 import { ICommon } from '../interfaces/common';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
@@ -51,8 +51,9 @@ describe('DiscountComponent', () => {
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
 
     await TestBed.configureTestingModule({
-      imports: [DiscountComponent, TranslateModule.forRoot()],
+      imports: [DiscountComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { NOT_INSTALL_PWA } from '../../services/pwa.service';
+import { NOT_INSTALL_PWA } from '@app/services/pwa.service';
 import { CookieService } from 'ngx-cookie-service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';

@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterComponent } from './quarter.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
@@ -15,8 +15,9 @@ describe('QuarterComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      imports: [QuarterComponent, TranslateModule.forRoot()],
+      imports: [QuarterComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

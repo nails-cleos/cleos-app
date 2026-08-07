@@ -2,22 +2,22 @@
 import { of } from 'rxjs';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MeReservationComponent } from './me-reservation.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { signal } from '@angular/core';
-import { FirebaseService } from '../../../services/firebase.service';
-import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
-import { Role } from '../../../interfaces/token';
-import { IGroupService, ITreatmentAll, Price } from '../../../treatment/treatment';
-import { IRoomAll, ServiceType } from '../../../room/room';
-import { DiscountType, IUserDiscount } from '../../../discount/discount';
-import { ToastService } from '../../../services/toast.service';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
-import { AdditionalStore } from '../../../store/additional.store';
-import { TreatmentStore } from '../../../store/treatment.store';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { FirebaseService } from '@app/services/firebase.service';
+import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
+import { Role } from '@app/interfaces/token';
+import { IGroupService, ITreatmentAll, Price } from '@app/treatment/treatment';
+import { IRoomAll, ServiceType } from '@app/room/room';
+import { DiscountType, IUserDiscount } from '@app/discount/discount';
+import { ToastService } from '@app/services/toast.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { AdditionalStore } from '@app/store/additional.store';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('MeReservationComponent', () => {
   let component: MeReservationComponent;
@@ -218,8 +218,9 @@ describe('MeReservationComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [MeReservationComponent, TranslateModule.forRoot()],
+      imports: [MeReservationComponent],
       providers: [
+        provideTranslateService(),
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },

@@ -8,8 +8,8 @@ import { IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { UserStore } from '../store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('NoteDetailsPageComponent', () => {
   let component: NoteDetailsPageComponent;
@@ -67,8 +67,9 @@ describe('NoteDetailsPageComponent', () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
-      imports: [NoteDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [NoteDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NoteStore, useValue: noteStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },

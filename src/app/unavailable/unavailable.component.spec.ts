@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
@@ -109,8 +109,9 @@ describe('UnavailableComponent', () => {
     authUserSignal.set(initialAuthUser);
 
     await TestBed.configureTestingModule({
-      imports: [UnavailableComponent, TranslateModule.forRoot()],
+      imports: [UnavailableComponent],
       providers: [
+        provideTranslateService(),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: authUserSignal.asReadonly() } },

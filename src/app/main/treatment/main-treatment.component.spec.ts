@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MainTreatmentComponent } from './main-treatment.component';
-import { IBiabTreatmentTranslations, IMainTreatmentContent } from '../../util/MainTreatment';
-import { TranslateLoaderFactory } from '../../shared/translate-loader.factory';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { IBiabTreatmentTranslations, IMainTreatmentContent } from '@app/util/MainTreatment';
+import { TranslateLoaderFactory } from '@app/shared/translate-loader.factory';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
 
 describe('MainTreatmentComponent', () => {

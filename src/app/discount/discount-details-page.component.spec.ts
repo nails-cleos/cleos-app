@@ -4,7 +4,6 @@ import { DiscountDetailsPageComponent } from './discount-details-page.component'
 import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
 
@@ -42,7 +41,7 @@ describe('DiscountDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [DiscountDetailsPageComponent],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },

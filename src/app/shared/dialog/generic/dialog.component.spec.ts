@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DialogComponent } from './dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DialogComponent', () => {
   let component: DialogComponent;
@@ -20,8 +20,9 @@ describe('DialogComponent', () => {
     mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [DialogComponent, TranslateModule.forRoot()],
+      imports: [DialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } }, // Create fresh copy each time
       ],

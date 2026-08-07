@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChartComponent } from './chart.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { NavigationService } from '../../services/navigation.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { IChart } from '../../dashboard/dashboard';
-import { ICurrency } from '../../currency/currency';
-import { createChart } from '../../util/chart';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
+import { createChart } from '@app/util/chart';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ChartComponent', () => {
   let component: ChartComponent;
@@ -27,8 +27,9 @@ describe('ChartComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ChartComponent, TranslateModule.forRoot()],
+      imports: [ChartComponent],
       providers: [
+        provideTranslateService(),
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],

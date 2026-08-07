@@ -1,9 +1,9 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BlockAgendaCreatePageComponent } from './block-agenda-create-page.component';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { IUnavailableAll } from '../unavailable';
-import { AuthUserService } from '../../services/auth-user.service';
+import { AuthUserService } from '@app/services/auth-user.service';
 
 describe('BlockAgendaCreatePageComponent', () => {
   let component: BlockAgendaCreatePageComponent;

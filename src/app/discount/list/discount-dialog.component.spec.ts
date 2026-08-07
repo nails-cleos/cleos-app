@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDialogComponent } from './discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DiscountType, IDiscountAll } from '../discount';
-import { IUserAll } from '../../user/user';
-import { TranslateModule } from '@ngx-translate/core';
+import { IUserAll } from '@app/user/user';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;
@@ -47,8 +47,9 @@ describe('DiscountDialogComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountDialogComponent, TranslateModule.forRoot()],
+      imports: [DiscountDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => ({ discount: mockDiscount }),

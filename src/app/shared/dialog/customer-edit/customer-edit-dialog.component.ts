@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IPrice } from '../../../treatment/treatment';
-import { ICurrencyAll } from '../../../currency/currency';
+import { IPrice } from '@app/treatment/treatment';
+import { ICurrencyAll } from '@app/currency/currency';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -8,7 +8,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { PENALTY } from '../../../interfaces/payment';
+import { PENALTY } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';

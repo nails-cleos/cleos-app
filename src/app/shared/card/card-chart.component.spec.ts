@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { IChartUtil } from '../../util/chart';
+import { IChartUtil } from '@app/util/chart';
 import { By } from '@angular/platform-browser';
 import { CardChartComponent } from './card-chart.component';
 import { Chart, registerables } from 'chart.js';
 import { signal } from '@angular/core';
-import { AuthUserService, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule } from '@ngx-translate/core';
+import { AuthUserService, initialAuthUser } from '@app/services/auth-user.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 Chart.register(...registerables);
 describe('CardChartComponent', () => {
@@ -30,8 +30,9 @@ describe('CardChartComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [CardChartComponent, TranslateModule.forRoot()],
+      imports: [CardChartComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useValue: { chart: fakeChart, title: 'Test Chart' },

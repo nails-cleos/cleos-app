@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
 import { IUserAll } from '../user/user';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('SelectProfessionalDialogComponent', () => {
   let component: SelectProfessionalDialogComponent;
@@ -24,8 +24,9 @@ describe('SelectProfessionalDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [SelectProfessionalDialogComponent, TranslateModule.forRoot()],
+      imports: [SelectProfessionalDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => (mockProfessionalDialogData),

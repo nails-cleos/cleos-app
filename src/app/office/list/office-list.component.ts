@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { IOffice } from '../office';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -30,9 +30,9 @@ import {
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { RouterLink } from '@angular/router';
-import { OfficeStore } from '../../store/office.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { OfficeStore } from '@app/store/office.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-office-list',

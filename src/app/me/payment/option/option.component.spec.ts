@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IPaymentOption } from '../../../interfaces/payment';
-import { IReservationAll } from '../../../reservation/reservation';
+import { IPaymentOption } from '@app/interfaces/payment';
+import { IReservationAll } from '@app/reservation/reservation';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { NavigationService } from '../../../services/navigation.service';
-import { provideAppIcons } from '../../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
@@ -102,8 +102,9 @@ describe('OptionComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [OptionComponent, TranslateModule.forRoot()],
+      imports: [OptionComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },

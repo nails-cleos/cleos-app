@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { IDiscount, IDiscountAll } from '../discount';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { executeDialog } from '../../util/helper';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { executeDialog } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { DiscountDialogComponent, DiscountDialogData } from './discount-dialog.component';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -34,9 +34,9 @@ import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/mat
 import { MatPrefix, MatSuffix } from '@angular/material/input';
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { discountIcon, DiscountStore } from '../../store/discount.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { discountIcon, DiscountStore } from '@app/store/discount.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-discount-list',

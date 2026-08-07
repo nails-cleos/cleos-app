@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UnavailableDetailsPageComponent } from './unavailable-details-page.component';
 import { UnavailableStore } from '../store/unavailable.store';
@@ -8,6 +7,7 @@ import { IUnavailableAll } from './unavailable';
 import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';
 import { UserStore } from '../store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('UnavailableDetailsPageComponent', () => {
   let component: UnavailableDetailsPageComponent;
@@ -55,8 +55,9 @@ describe('UnavailableDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [UnavailableDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [UnavailableDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },

@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ShortcutComponent } from './shortcut.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { NavigationService } from '../services/navigation.service';
 import { signal } from '@angular/core';
@@ -24,8 +24,9 @@ describe('ShortcutComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ShortcutComponent, TranslateModule.forRoot()],
+      imports: [ShortcutComponent],
       providers: [
+        provideTranslateService(),
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],

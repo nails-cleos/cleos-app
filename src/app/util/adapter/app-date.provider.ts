@@ -12,8 +12,8 @@ import {
   provideCalendar,
 } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { CustomDateFormatter } from '../../shared/CustomDateFormatter';
-import { CustomEventTitleFormatter } from '../../shared/CustomEventTitleFormatter';
+import { CustomDateFormatter } from '@app/shared/CustomDateFormatter';
+import { CustomEventTitleFormatter } from '@app/shared/CustomEventTitleFormatter';
 
 const YEAR_MONTH_FORMATS = {
   parse: {

@@ -21,9 +21,9 @@ import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { IRoomCustomer } from '../../room';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -31,9 +31,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
 import { MatIconButton } from '@angular/material/button';
 import { MatTooltip } from '@angular/material/tooltip';
-import { RoomStore } from '../../../store/room.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-customers',

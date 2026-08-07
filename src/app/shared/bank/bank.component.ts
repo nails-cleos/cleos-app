@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';

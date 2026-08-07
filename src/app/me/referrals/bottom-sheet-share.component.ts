@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ShareButtonsComponent } from './share-buttons/share-buttons.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { TranslateService } from '@ngx-translate/core';
-import { EnvService } from '../../services/env.service';
+import { EnvService } from '@app/services/env.service';
 
 export type BottomSheetShareData = {
   code: string;

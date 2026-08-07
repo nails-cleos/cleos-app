@@ -1,14 +1,14 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { ToastService } from '../../services/toast.service';
-import { FirebaseService } from '../../services/firebase.service';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { ToastService } from '@app/services/toast.service';
+import { FirebaseService } from '@app/services/firebase.service';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { AuthStore } from '../../store/auth.store';
-import { NavigationService } from '../../services/navigation.service';
+import { AuthStore } from '@app/store/auth.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type ForgotPasswordForm = {
   email: FormControl<string>;

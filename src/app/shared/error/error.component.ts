@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IError } from '../../interfaces/common';
+import { IError } from '@app/interfaces/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardContent } from '@angular/material/card';

@@ -4,7 +4,7 @@ import { UserDetailsPageComponent } from './user-details-page.component';
 import { UserStore } from '../store/user.store';
 import { IUserAll } from './user';
 import { UserComponent } from './user.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('UserDetailsPageComponent', () => {
   let component: UserDetailsPageComponent;
@@ -37,8 +37,9 @@ describe('UserDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [UserDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [UserDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: UserStore, useValue: userStoreSpy },
       ],
     }).overrideTemplate(UserComponent, '')

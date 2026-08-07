@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { IDiscount } from '../discount';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountListComponent } from './discount-list.component';
 import { MatDialog } from '@angular/material/dialog';
-import { DiscountStore } from '../../store/discount.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DiscountStore } from '@app/store/discount.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
@@ -77,8 +77,9 @@ describe('DiscountListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [DiscountListComponent, TranslateModule.forRoot()],
+      imports: [DiscountListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

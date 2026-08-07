@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DashboardEventComponent } from './dashboard-event.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { DayViewSchedulerCalendarUtils, Professional } from './day-view-scheduler.component';
 import { IProfessionalEvent, IRoomEvents } from '../dashboard';
 import { addDays, addHours } from 'date-fns';
-import { States } from '../../reservation/reservation';
-import { FrequencyEnum } from '../../util/helper';
-import { daysOfWeek, DEFAULT_LOCALE } from '../../util/dates';
+import { States } from '@app/reservation/reservation';
+import { FrequencyEnum } from '@app/util/helper';
+import { daysOfWeek, DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
-import { ReservationStore } from '../../store/reservation.store';
+import { provideAppCalendar, provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('DashboardEventComponent', () => {
   let fixture: ComponentFixture<DashboardEventComponent>;
@@ -55,8 +55,9 @@ describe('DashboardEventComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [DashboardEventComponent, TranslateModule.forRoot()],
+      imports: [DashboardEventComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },

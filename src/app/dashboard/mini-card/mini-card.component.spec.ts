@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MiniCardComponent } from './mini-card.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { IError } from '../../interfaces/common';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { IError } from '@app/interfaces/common';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('MiniCardComponent', () => {
   let component: MiniCardComponent;
@@ -16,8 +16,9 @@ describe('MiniCardComponent', () => {
       { language: DEFAULT_LOCALE },
     );
     await TestBed.configureTestingModule({
-      imports: [MiniCardComponent, TranslateModule.forRoot()],
+      imports: [MiniCardComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

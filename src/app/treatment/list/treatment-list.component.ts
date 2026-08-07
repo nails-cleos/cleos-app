@@ -28,13 +28,13 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { TreatmentStore } from '../../store/treatment.store';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-treatment-list',

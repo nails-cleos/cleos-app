@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '@app/util/dates';
 import { IUnavailable, IUnavailableAll } from '../unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { createDialog, executeDialogNoWidth } from '../../util/helper';
-import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
+import { createDialog, executeDialogNoWidth } from '@app/util/helper';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
@@ -35,10 +35,10 @@ import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } f
 import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { DurationTimePipe } from '../../pipes/durationTime.pipe';
-import { UnavailableStore } from '../../store/unavailable.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { UnavailableStore } from '@app/store/unavailable.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-unavailable-list',

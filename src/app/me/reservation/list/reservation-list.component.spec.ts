@@ -2,16 +2,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { ReservationListComponent } from './reservation-list.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
-import { Price } from '../../../treatment/treatment';
-import { DiscountStore } from '../../../store/discount.store';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { Price } from '@app/treatment/treatment';
+import { DiscountStore } from '@app/store/discount.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { ReservationStore } from '../../../store/reservation.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
@@ -65,8 +65,9 @@ describe('ReservationListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoints$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ReservationListComponent, TranslateModule.forRoot()],
+      imports: [ReservationListComponent],
       providers: [
+        provideTranslateService(),
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

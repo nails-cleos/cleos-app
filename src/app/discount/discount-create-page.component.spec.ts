@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
-import { TranslateModule } from '@ngx-translate/core';
 import { CurrencyStore } from '../store/currency.store';
 
 describe('DiscountCreatePageComponent', () => {
@@ -33,7 +32,7 @@ describe('DiscountCreatePageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountCreatePageComponent, TranslateModule.forRoot()],
+      imports: [DiscountCreatePageComponent],
       providers: [
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: CurrencyStore, useValue: currencyStoreSpy },

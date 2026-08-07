@@ -1,26 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CalendarComponent } from './calendar.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { CalendarEvent } from 'angular-calendar';
 import { addDays, addMonths } from 'date-fns';
-import { Role } from '../../interfaces/token';
-import { IOfficeAll } from '../../office/office';
-import { IRoomAll } from '../../room/room';
-import { ICurrencyAll } from '../../currency/currency';
-import { IUserAll } from '../../user/user';
+import { Role } from '@app/interfaces/token';
+import { IOfficeAll } from '@app/office/office';
+import { IRoomAll } from '@app/room/room';
+import { ICurrencyAll } from '@app/currency/currency';
+import { IUserAll } from '@app/user/user';
 import { States } from '../reservation';
-import { createNewDate, DEFAULT_LOCALE } from '../../util/dates';
+import { createNewDate, DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { provideAppCalendar, provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { NavigationService } from '../../services/navigation.service';
-import { RoomStore } from '../../store/room.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { provideAppCalendar, provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { NavigationService } from '@app/services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { ReservationStore } from '@app/store/reservation.store';
 import anything = jasmine.anything;
 
 describe('CalendarComponent', () => {
@@ -171,8 +171,9 @@ describe('CalendarComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [CalendarComponent, TranslateModule.forRoot()],
+      imports: [CalendarComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: RoomStore, useValue: roomStoreSpy },

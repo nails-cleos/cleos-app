@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { TransactionDetailComponent } from './transaction-detail.component';
 import { ITransaction } from '../../account';
-import { NavigationService } from '../../../services/navigation.service';
-import { AccountStore } from '../../../store/account.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { AccountStore } from '@app/store/account.store';
 import { signal } from '@angular/core';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { PaymentStore } from '../../../store/payment.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { PaymentStore } from '@app/store/payment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent;
@@ -56,8 +56,9 @@ describe('TransactionDetailComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [TransactionDetailComponent, TranslateModule.forRoot()],
+      imports: [TransactionDetailComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },

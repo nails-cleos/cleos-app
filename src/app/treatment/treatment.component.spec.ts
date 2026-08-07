@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentComponent } from './treatment.component';
 import { IColorAll } from '../color/color';
 import { ITreatmentGroupAll } from './treatment';
@@ -53,7 +52,7 @@ describe('TreatmentComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentComponent, TranslateModule.forRoot()],
+      imports: [TreatmentComponent],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },

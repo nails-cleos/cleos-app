@@ -1,27 +1,27 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { IReservationAll, States } from '../../../reservation/reservation';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { IReservationAll, States } from '@app/reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { executeDialogNoWidth, openDialog } from '../../../util/helper';
+import { isSameTimeZone, newDateTimestamp } from '@app/util/dates';
+import { executeDialogNoWidth, openDialog } from '@app/util/helper';
 import { IReview, Review } from './review';
 import { ReviewDialogComponent } from '../review/review-dialog.component';
 import { isToday } from 'date-fns';
 import { RouterLink } from '@angular/router';
-import { IPayment } from '../../../interfaces/payment';
+import { IPayment } from '@app/interfaces/payment';
 import { UpcomingComponent } from '../upcoming/upcoming.component';
-import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
-import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
-import { ErrorComponent } from '../../../shared/error/error.component';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { ReservationIconPipe } from '@app/pipes/reservation-icon.pipe';
+import { ErrorComponent } from '@app/shared/error/error.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { FirebaseService } from '../../../services/firebase.service';
-import { DiscountStore } from '../../../store/discount.store';
+import { FirebaseService } from '@app/services/firebase.service';
+import { DiscountStore } from '@app/store/discount.store';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
@@ -44,9 +44,9 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
-import { UpcomingSkeletonComponent } from '../../../shared/skeleton/upcoming-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
-import { ReservationStore } from '../../../store/reservation.store';
+import { UpcomingSkeletonComponent } from '@app/shared/skeleton/upcoming-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-reservation-list',

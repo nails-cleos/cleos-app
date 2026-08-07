@@ -3,13 +3,13 @@ import { AddServiceComponent } from './add-service.component';
 import { of } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { IService, ServicePrice, ServiceType } from '../../room';
-import { TranslateModule } from '@ngx-translate/core';
-import { ITreatmentAll } from '../../../treatment/treatment';
+import { ITreatmentAll } from '@app/treatment/treatment';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { RoomStore } from '../../../store/room.store';
-import { NavigationService } from '../../../services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;
@@ -34,8 +34,9 @@ describe('AddServiceComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AddServiceComponent, TranslateModule.forRoot()],
+      imports: [AddServiceComponent],
       providers: [
+        provideTranslateService(),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },

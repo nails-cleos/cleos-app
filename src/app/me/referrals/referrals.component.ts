@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, effect, inject, signal, WritableSig
 import { Clipboard } from '@angular/cdk/clipboard';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ToastService } from '../../services/toast.service';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ToastService } from '@app/services/toast.service';
 import { BottomSheetShareComponent } from './bottom-sheet-share.component';
 import { BottomSheetReferralComponent } from './bottom-sheet-referral.component';
-import { FirebaseService } from '../../services/firebase.service';
+import { FirebaseService } from '@app/services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { DiscountStore } from '../../store/discount.store';
+import { DiscountStore } from '@app/store/discount.store';
 
 @Component({
   selector: 'app-referrals',

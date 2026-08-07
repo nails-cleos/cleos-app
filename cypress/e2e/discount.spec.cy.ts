@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
-import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Discount with ${name}`, () => {

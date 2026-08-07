@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavComponent } from './nav.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { TokenService } from '../services/token.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { MessagingService } from '../services/messaging.service';
@@ -172,8 +172,9 @@ describe('NavComponent', () => {
     paramMapSpy.get.and.returnValue(null);
 
     await TestBed.configureTestingModule({
-      imports: [NavComponent, TranslateModule.forRoot()],
+      imports: [NavComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: MessagingService, useValue: messagingServiceSpy },

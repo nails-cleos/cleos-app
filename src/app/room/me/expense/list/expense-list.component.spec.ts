@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { ExpenseListComponent } from './expense-list.component';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { IExpenseAll } from '../expense';
 import {
   dateToTimestamp,
@@ -13,15 +13,15 @@ import {
   getCurrentTimeZone,
   getDateFormat,
   getNowTimeZone,
-} from '../../../../util/dates';
+} from '@app/util/dates';
 import { IRoomAll } from '../../../room';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { signal } from '@angular/core';
-import { DriveAccessService } from '../../../../services/drive-access.service';
-import { DocumentStore } from '../../../../store/document.store';
-import { DocumentTypeEnum } from '../../../../document/document';
-import { ExpenseStore } from '../../../../store/expense.store';
-import { NavigationService } from '../../../../services/navigation.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { DocumentStore } from '@app/store/document.store';
+import { DocumentTypeEnum } from '@app/document/document';
+import { ExpenseStore } from '@app/store/expense.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('ExpenseListComponent', () => {
   let component: ExpenseListComponent;
@@ -163,8 +163,9 @@ describe('ExpenseListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ExpenseListComponent, TranslateModule.forRoot()],
+      imports: [ExpenseListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },

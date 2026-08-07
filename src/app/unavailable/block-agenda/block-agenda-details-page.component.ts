@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ICommon } from '../../interfaces/common';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ICommon } from '@app/interfaces/common';
 import { IUnavailable } from '../unavailable';
-import { UnavailableStore } from '../../store/unavailable.store';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { UnavailableStore } from '@app/store/unavailable.store';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { executeDialogNoWidth } from '../../util/helper';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { executeDialogNoWidth } from '@app/util/helper';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 

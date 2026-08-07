@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, viewChild } from '@angular/core';
 import { ControlContainer, FormControl, FormGroup, NgForm, ReactiveFormsModule } from '@angular/forms';
-import { GeocodeService, MapStatus } from '../../services/geocode.service';
+import { GeocodeService, MapStatus } from '@app/services/geocode.service';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
-import { AuthUserService } from '../../services/auth-user.service';
-import { EnvService } from '../../services/env.service';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { EnvService } from '@app/services/env.service';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { TranslatePipe } from '@ngx-translate/core';
 import PlaceResult = google.maps.places.PlaceResult;

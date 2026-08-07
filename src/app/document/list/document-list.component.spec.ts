@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DocumentListComponent } from './document-list.component';
-import { DriveAccessService } from '../../services/drive-access.service';
-import { IOfficeAll } from '../../office/office';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { IOfficeAll } from '@app/office/office';
 import { DocumentTypeEnum, IDocument } from '../document';
-import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { getDateQuarter, getNowTimeZone, monthViewTitle } from '@app/util/dates';
 import { MatDatepicker } from '@angular/material/datepicker';
-import { DocumentStore } from '../../store/document.store';
-import { OfficeStore } from '../../store/office.store';
+import { DocumentStore } from '@app/store/document.store';
+import { OfficeStore } from '@app/store/office.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('DocumentListComponent', () => {
   let component: DocumentListComponent;
@@ -90,8 +90,9 @@ describe('DocumentListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [DocumentListComponent, TranslateModule.forRoot()],
+      imports: [DocumentListComponent],
       providers: [
+        provideTranslateService(),
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

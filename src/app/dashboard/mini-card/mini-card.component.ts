@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
-import { ErrorComponent } from '../../shared/error/error.component';
-import { IError } from '../../interfaces/common';
+import { ErrorComponent } from '@app/shared/error/error.component';
+import { IError } from '@app/interfaces/common';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatSuffix } from '@angular/material/input';
 import { NgClass, PercentPipe } from '@angular/common';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-mini-card',

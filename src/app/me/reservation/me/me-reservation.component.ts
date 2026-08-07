@@ -13,9 +13,9 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch } from '../../../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
-import { IRoom, IRoomAll, IService } from '../../../room/room';
+import { requireMatch } from '@app/util/validators';
+import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '@app/treatment/treatment';
+import { IRoom, IRoomAll, IService } from '@app/room/room';
 import {
   IAvailableDTO,
   IReservation,
@@ -23,7 +23,7 @@ import {
   IUpcomingAll,
   MAX_RESERVATION_CUSTOMER_MONTH,
   Reservation,
-} from '../../../reservation/reservation';
+} from '@app/reservation/reservation';
 import {
   createNewDate,
   Duration,
@@ -41,7 +41,7 @@ import {
   newDateTimestamp,
   plusMonthDate,
   totalDuration,
-} from '../../../util/dates';
+} from '@app/util/dates';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, startWith } from 'rxjs/operators';
@@ -59,33 +59,33 @@ import {
   removeDiscount,
   roomDetail,
   round,
-} from '../../../util/helper';
-import { DiscountType, IDiscount, IUserDiscount } from '../../../discount/discount';
+} from '@app/util/helper';
+import { DiscountType, IDiscount, IUserDiscount } from '@app/discount/discount';
 import { isEqual } from 'date-fns';
-import { IAdditionalAll } from '../../../additional/additional';
+import { IAdditionalAll } from '@app/additional/additional';
 import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { IOffice, IOfficeAll } from '../../../office/office';
+import { IOffice, IOfficeAll } from '@app/office/office';
 import { MatDialog } from '@angular/material/dialog';
-import { Role } from '../../../interfaces/token';
-import { IUser, IUserAll } from '../../../user/user';
-import { IPaymentOption, PaymentPercentage, PENALTY } from '../../../interfaces/payment';
-import { AuthUserService } from '../../../services/auth-user.service';
-import { enableStep, getBackIndex, getIndex, IStep, Step } from '../../../util/step';
-import { RoomNamePipe } from '../../../pipes/room-name.pipe';
-import { SortByPipe } from '../../../pipes/sort-by.pipe';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
-import { PriceComponent } from '../../../shared/price/price.component';
-import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
-import { GoogleMapComponent } from '../../../shared/google-map/google-map.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { Role } from '@app/interfaces/token';
+import { IUser, IUserAll } from '@app/user/user';
+import { IPaymentOption, PaymentPercentage, PENALTY } from '@app/interfaces/payment';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { enableStep, getBackIndex, getIndex, IStep, Step } from '@app/util/step';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
+import { SortByPipe } from '@app/pipes/sort-by.pipe';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { PriceComponent } from '@app/shared/price/price.component';
+import { PaymentPreviewComponent } from '@app/shared/payment-preview/payment-preview.component';
+import { GoogleMapComponent } from '@app/shared/google-map/google-map.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ToastService } from '../../../services/toast.service';
-import { IError } from '../../../interfaces/common';
-import { BankForm } from '../../../shared/bank/bank.component';
-import { FirebaseService } from '../../../services/firebase.service';
+import { ToastService } from '@app/services/toast.service';
+import { IError } from '@app/interfaces/common';
+import { BankForm } from '@app/shared/bank/bank.component';
+import { FirebaseService } from '@app/services/firebase.service';
 import {
   createMeReservationErrors,
   MeReservationAcceptForm,
@@ -95,8 +95,8 @@ import {
   MeReservationForms,
   MeReservationTreatmentForm,
   OfficeForm,
-} from '../../../reservation/reservation-form.types';
-import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
+} from '@app/reservation/reservation-form.types';
+import { ReservationFormErrorService } from '@app/reservation/reservation-form-error.service';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
@@ -108,12 +108,12 @@ import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autoc
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { NavigationService } from '../../../services/navigation.service';
-import { TreatmentStore } from '../../../store/treatment.store';
-import { AdditionalStore } from '../../../store/additional.store';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
-import { MeReservationParams } from '../../../util/models/reservation.models';
+import { NavigationService } from '@app/services/navigation.service';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { AdditionalStore } from '@app/store/additional.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { MeReservationParams } from '@app/util/models/reservation.models';
 
 const MAX_UPCOMING_RESERVATION = 10;
 

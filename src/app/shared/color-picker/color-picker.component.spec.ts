@@ -1,9 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatIconRegistry } from '@angular/material/icon';
-import { matIconRegistryStub } from '../../util/app-material-registry-stub';
+import { matIconRegistryStub } from '@app/util/app-material-registry-stub';
 import { ColorPickerComponent } from './color-picker.component';
 
 describe('ColorPickerComponent', () => {
@@ -15,7 +14,7 @@ describe('ColorPickerComponent', () => {
     control = new FormControl('#123456', { nonNullable: true });
 
     await TestBed.configureTestingModule({
-      imports: [ColorPickerComponent, TranslateModule.forRoot()],
+      imports: [ColorPickerComponent],
       providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
     }).compileComponents();
 

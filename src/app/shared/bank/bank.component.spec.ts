@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BankComponent, BankForm } from './bank.component';
 import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
-import { IPaymentOption, PaymentPercentage } from '../../interfaces/payment';
-import { TranslateModule } from '@ngx-translate/core';
-import { provideAppIcons } from '../../util/app-icons.provider';
+import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('BankComponent', () => {
   let component: BankComponent;
@@ -38,8 +38,8 @@ describe('BankComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BankComponent, TranslateModule.forRoot()],
-      providers: [provideAppIcons()],
+      imports: [BankComponent],
+      providers: [provideAppIcons(), provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(BankComponent);

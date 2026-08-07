@@ -1,6 +1,5 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { RoomComponent } from './room.component';
 import { RoomDetailsPageComponent } from './room-details-page.component';
 import { IRoomAll } from './room';
@@ -60,7 +59,7 @@ describe('RoomDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [RoomDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [RoomDetailsPageComponent],
       providers: [
         { provide: RoomStore, useValue: roomStoreSpy },
       ],

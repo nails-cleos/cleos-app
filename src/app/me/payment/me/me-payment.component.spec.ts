@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MePaymentComponent } from './me-payment.component';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
-import { PaymentPercentage } from '../../../interfaces/payment';
+import { PaymentPercentage } from '@app/interfaces/payment';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideAppIcons } from '../../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { PaymentStore } from '../../../store/payment.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
@@ -59,8 +59,9 @@ describe('MePaymentComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [MePaymentComponent, TranslateModule.forRoot()],
+      imports: [MePaymentComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },

@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { INotification } from '../notification';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { NavigationService } from '../../services/navigation.service';
-import { zoneDateToDate } from '../../util/dates';
-import { PAGE_SIZE } from '../../interfaces/pagination';
+import { NavigationService } from '@app/services/navigation.service';
+import { zoneDateToDate } from '@app/util/dates';
+import { PAGE_SIZE } from '@app/interfaces/pagination';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
-import { NotificationStore } from '../../store/notification.store';
+import { NotificationStore } from '@app/store/notification.store';
 
 const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
 

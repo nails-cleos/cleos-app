@@ -3,7 +3,7 @@ import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } fr
 import { IUser, IUserAll, User } from './user';
 import { flags, IFlag } from '../util/flags';
 import { randomColor } from '../util/color';
-import { createDateFromString } from '../util/dates';
+import { createDateFromString, DEFAULT_LOCALE } from '../util/dates';
 import { validColorValidator } from '../util/validators';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
@@ -168,7 +168,7 @@ export class UserComponent {
     const user = User.fromForm(
       this.getForm,
       this.user(),
-      this.translate.getCurrentLang(),
+      this.translate.getCurrentLang() || DEFAULT_LOCALE,
       this.isProfessionalOrManager,
       this.formattedAddress,
       this.geometry?.location,

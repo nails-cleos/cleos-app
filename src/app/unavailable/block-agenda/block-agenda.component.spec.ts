@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { NavigationService } from '../../services/navigation.service';
-import { ICommon } from '../../interfaces/common';
-import { FrequencyEnum } from '../../util/helper';
-import { IAvailability, IRoomAll } from '../../room/room';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { ICommon } from '@app/interfaces/common';
+import { FrequencyEnum } from '@app/util/helper';
+import { IAvailability, IRoomAll } from '@app/room/room';
 import { IUnavailableAll } from '../unavailable';
-import { IUserAll } from '../../user/user';
-import { DEFAULT_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '../../util/dates';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { IUserAll } from '@app/user/user';
+import { DEFAULT_LOCALE, createNewDate, formatDuration, getTime, zoneDateToDate } from '@app/util/dates';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
 
 describe('BlockAgendaComponent', () => {
   let component: BlockAgendaComponent;
@@ -109,8 +109,9 @@ describe('BlockAgendaComponent', () => {
     authUserSignal.set(initialAuthUser);
 
     await TestBed.configureTestingModule({
-      imports: [BlockAgendaComponent, TranslateModule.forRoot()],
+      imports: [BlockAgendaComponent],
       providers: [
+        provideTranslateService(),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: authUserSignal.asReadonly() } },

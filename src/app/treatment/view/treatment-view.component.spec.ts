@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
-import { TreatmentStore } from '../../store/treatment.store';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentViewComponent } from './treatment-view.component';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TreatmentViewComponent', () => {
   let component: TreatmentViewComponent;
@@ -34,8 +34,9 @@ describe('TreatmentViewComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentViewComponent, TranslateModule.forRoot()],
+      imports: [TreatmentViewComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
       ],

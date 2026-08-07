@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { IMonthSummary, IQuarterSummary } from '../../dashboard';
-import { ICurrencyAll } from '../../../currency/currency';
-import { dateMonthYear, monthTitle } from '../../../util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { dateMonthYear, monthTitle } from '@app/util/dates';
 import { MonthComponent } from '../../month-summary/month/month.component';
-import { NavigationService } from '../../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 type YearMonthRow = {
   month: number;

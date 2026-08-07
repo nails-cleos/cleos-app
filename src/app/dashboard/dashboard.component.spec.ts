@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardComponent } from './dashboard.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { signal } from '@angular/core';
 import { IDashboard } from './dashboard';
@@ -98,8 +98,9 @@ describe('DashboardComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent, TranslateModule.forRoot()],
+      imports: [DashboardComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },

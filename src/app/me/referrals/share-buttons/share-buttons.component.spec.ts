@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ShareButtonsComponent } from './share-buttons.component';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideAppIcons } from '../../../util/app-icons.provider';
+import { provideAppIcons } from '@app/util/app-icons.provider';
 
 describe('ShareButtonsComponent', () => {
   let component: ShareButtonsComponent;

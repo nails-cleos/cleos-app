@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
-import { ServiceType } from '../../room/room';
+import { ServiceType } from '@app/room/room';
 import { ITreatmentAll, ITreatmentGroupAll } from '../treatment';
-import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { TreatmentStore } from '../../store/treatment.store';
+import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentSortingComponent } from './treatment-sorting.component';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TreatmentSortingComponent', () => {
   let component: TreatmentSortingComponent;
@@ -64,8 +64,9 @@ describe('TreatmentSortingComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentSortingComponent, TranslateModule.forRoot()],
+      imports: [TreatmentSortingComponent],
       providers: [
+        provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
       ],

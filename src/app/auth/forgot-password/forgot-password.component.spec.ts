@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ForgotPasswordComponent } from './forgot-password.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ToastService } from '../../services/toast.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { ToastService } from '@app/services/toast.service';
 import { of, Subject } from 'rxjs';
-import { FirebaseService } from '../../services/firebase.service';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { FirebaseService } from '@app/services/firebase.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { AuthStore } from '../../store/auth.store';
+import { AuthStore } from '@app/store/auth.store';
 
 describe('ForgotPasswordComponent', () => {
   let component: ForgotPasswordComponent;
@@ -46,8 +46,9 @@ describe('ForgotPasswordComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ForgotPasswordComponent, TranslateModule.forRoot()],
+      imports: [ForgotPasswordComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },

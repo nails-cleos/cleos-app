@@ -7,17 +7,17 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '../../util/dates';
+import { filterDateRoom, getAvailability, getNowTimeZone, getStartEndDay, getTime } from '@app/util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from '../reservation';
 import { TranslatePipe } from '@ngx-translate/core';
-import { IRoomAll } from '../../room/room';
+import { IRoomAll } from '@app/room/room';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
-import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
 
 type CloneForm = {
   date: FormControl<Date | undefined>,

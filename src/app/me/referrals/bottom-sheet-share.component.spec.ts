@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BottomSheetShareComponent, BottomSheetShareData } from './bottom-sheet-share.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideAppIcons } from '../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 describe('BottomSheetShareComponent', () => {
   let component: BottomSheetShareComponent;
@@ -15,8 +15,9 @@ describe('BottomSheetShareComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BottomSheetShareComponent, TranslateModule.forRoot()],
+      imports: [BottomSheetShareComponent],
       providers: [
+        provideTranslateService(),
         { provide: MAT_BOTTOM_SHEET_DATA, useValue: mockData },
         provideHttpClient(withXhr()),
         provideAppIcons(),

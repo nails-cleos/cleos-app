@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MonthComponent } from './month.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { IMonthSummary, ISummaryTotal } from '../../dashboard';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('MonthComponent', () => {
   let component: MonthComponent;
@@ -31,8 +31,9 @@ describe('MonthComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      imports: [MonthComponent, TranslateModule.forRoot()],
+      imports: [MonthComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

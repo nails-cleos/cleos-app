@@ -1,10 +1,10 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 
 import { FileDropComponent } from './file-drop.component';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@app/services/toast.service';
 import { BehaviorSubject, of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 describe('FileDropComponent', () => {
   let component: FileDropComponent;
@@ -24,8 +24,9 @@ describe('FileDropComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [FileDropComponent, TranslateModule.forRoot()],
+      imports: [FileDropComponent],
       providers: [
+        provideTranslateService(),
         { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();

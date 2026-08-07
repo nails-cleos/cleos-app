@@ -4,7 +4,6 @@ import { OfficeDetailsPageComponent } from './office-details-page.component';
 import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
 
@@ -41,7 +40,7 @@ describe('OfficeDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [OfficeDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [OfficeDetailsPageComponent],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },

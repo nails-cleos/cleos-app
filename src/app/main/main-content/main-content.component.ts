@@ -8,31 +8,31 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ITreatmentGroupAll } from '../../treatment/treatment';
+import { ITreatmentGroupAll } from '@app/treatment/treatment';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../main';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { goTo, observeElementSignal } from '../../util/animation';
-import { isMobile } from '../../util/helper';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { goTo, observeElementSignal } from '@app/util/animation';
+import { isMobile } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@app/services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
-import { EnvService } from '../../services/env.service';
-import { ICatalogueAll } from '../../catalogue/catalogue';
-import { getImage } from '../../util/file';
+import { EnvService } from '@app/services/env.service';
+import { ICatalogueAll } from '@app/catalogue/catalogue';
+import { getImage } from '@app/util/file';
 import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
 import { NgClass, NgStyle } from '@angular/common';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { MainStore } from '../../store/main.store';
-import { MainContentService } from '../../services/main-content.service';
-import { NavigationService } from '../../services/navigation.service';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { MainStore } from '@app/store/main.store';
+import { MainContentService } from '@app/services/main-content.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 type MainForm = {
   name: FormControl<string>;

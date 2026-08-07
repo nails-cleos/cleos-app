@@ -8,16 +8,16 @@ import {
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
 import { ICatalogueAll } from '../catalogue';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { executeDialogNoWidth } from '../../util/helper';
+import { executeDialogNoWidth } from '@app/util/helper';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-catalogue-list',

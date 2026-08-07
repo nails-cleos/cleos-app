@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
+import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { IReservationPayment } from '../../../reservation/reservation';
-import { FirebaseService } from '../../../services/firebase.service';
+import { BankComponent, BankForm } from '@app/shared/bank/bank.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { IReservationPayment } from '@app/reservation/reservation';
+import { FirebaseService } from '@app/services/firebase.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DecimalPipe } from '@angular/common';
@@ -19,8 +19,8 @@ import {
   MatCardSubtitle,
   MatCardTitle,
 } from '@angular/material/card';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 
 @Component({
   selector: 'app-me-payment',

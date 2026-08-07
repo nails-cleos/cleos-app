@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TotalSummaryItemComponent } from './total-summary-item.component';
-import { ICurrencyAll } from '../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
 
 describe('TotalSummaryItemComponent', () => {
   let component: TotalSummaryItemComponent;

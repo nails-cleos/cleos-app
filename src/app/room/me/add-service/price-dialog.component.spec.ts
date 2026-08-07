@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PriceDialogComponent } from './price-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { ServiceType } from '../../room';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('PriceDialogComponent', () => {
   let component: PriceDialogComponent;
@@ -16,8 +16,9 @@ describe('PriceDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, TranslateModule.forRoot()],
+      imports: [ReactiveFormsModule],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: mockData },
       ],
@@ -54,8 +55,9 @@ describe('PriceDialogComponent', () => {
   it('should default price to zero when currentPrice is missing', async () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, TranslateModule.forRoot(), PriceDialogComponent],
+      imports: [ReactiveFormsModule, PriceDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: { name: 'Test', type: ServiceType.additional } },
       ],

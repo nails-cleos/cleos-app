@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { UnavailableListComponent } from './unavailable-list.component';
 import { IUnavailableAll } from '../unavailable';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { IUserAll } from '../../user/user';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { FrequencyEnum } from '../../util/helper';
+import { IUserAll } from '@app/user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { FrequencyEnum } from '@app/util/helper';
 import { MatDialog } from '@angular/material/dialog';
-import { UnavailableStore } from '../../store/unavailable.store';
-import { NavigationService } from '../../services/navigation.service';
+import { UnavailableStore } from '@app/store/unavailable.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('UnavailableListComponent', () => {
   let component: UnavailableListComponent;
@@ -106,8 +106,9 @@ describe('UnavailableListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [UnavailableListComponent, TranslateModule.forRoot()],
+      imports: [UnavailableListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

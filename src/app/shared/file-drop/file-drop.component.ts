@@ -13,9 +13,9 @@ import {
 import { finalize, interval, takeWhile } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { formatBytes, resizeImage } from '../../util/file';
-import { DragDropDirective } from '../../directives/drag-drop.directive';
-import { ToastService } from '../../services/toast.service';
+import { formatBytes, resizeImage } from '@app/util/file';
+import { DragDropDirective } from '@app/directives/drag-drop.directive';
+import { ToastService } from '@app/services/toast.service';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';

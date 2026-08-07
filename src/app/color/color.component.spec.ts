@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { ColorComponent } from './color.component';
@@ -7,6 +6,7 @@ import { IColorAll } from './color';
 import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ColorComponent', () => {
   let component: ColorComponent;
@@ -36,8 +36,9 @@ describe('ColorComponent', () => {
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
-      imports: [ColorComponent, TranslateModule.forRoot()],
+      imports: [ColorComponent],
       providers: [
+        provideTranslateService(),
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],

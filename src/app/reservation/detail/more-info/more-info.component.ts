@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { IPaymentAll } from '../../../interfaces/payment';
+import { IPaymentAll } from '@app/interfaces/payment';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { getDiffTime, newDateTimestamp } from '../../../util/dates';
+import { getDiffTime, newDateTimestamp } from '@app/util/dates';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { executeDialog } from '../../../util/helper';
+import { executeDialog } from '@app/util/helper';
 import { MatDialog } from '@angular/material/dialog';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
-import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
-import { RatingComponent } from '../../../shared/rating/rating.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { ToastService } from '../../../services/toast.service';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { RatingComponent } from '@app/shared/rating/rating.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { ToastService } from '@app/services/toast.service';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
@@ -30,11 +30,11 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
-import { TrackingStore } from '../../../store/tracking.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
+import { TrackingStore } from '@app/store/tracking.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-more-info',

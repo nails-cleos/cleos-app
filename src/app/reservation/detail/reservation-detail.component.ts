@@ -16,9 +16,9 @@ import {
   newDate,
   newDateTimestamp,
   reservationDuration,
-} from '../../util/dates';
+} from '@app/util/dates';
 import { MatPaginator } from '@angular/material/paginator';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
@@ -31,28 +31,28 @@ import {
   openDialog,
   snakeToCamel,
   totalPaid,
-} from '../../util/helper';
-import { IPrice, Price } from '../../treatment/treatment';
+} from '@app/util/helper';
+import { IPrice, Price } from '@app/treatment/treatment';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, PENALTY } from '../../interfaces/payment';
+import { IPayment, IPaymentAll, IPaymentOption, IPaymentRequest, PENALTY } from '@app/interfaces/payment';
 import { isToday, isTomorrow } from 'date-fns';
-import { ReservationIconName } from '../../util/icon';
+import { ReservationIconName } from '@app/util/icon';
 import { FormArray, FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { startWith } from 'rxjs/operators';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
-import { AuthUserService } from '../../services/auth-user.service';
-import { Role } from '../../interfaces/token';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { Role } from '@app/interfaces/token';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
-import { RoomNamePipe } from '../../pipes/room-name.pipe';
-import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
-import { PriceExtrasComponent } from '../../shared/price-extras/price-extras.component';
-import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
-import { TwoDigitsDirective } from '../../directives/two-digits.directive';
-import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
+import { ReservationIconPipe } from '@app/pipes/reservation-icon.pipe';
+import { PriceExtrasComponent } from '@app/shared/price-extras/price-extras.component';
+import { PaymentOptionSelectComponent } from '@app/shared/payment-option-select/payment-option-select.component';
+import { TwoDigitsDirective } from '@app/directives/two-digits.directive';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { FabMenuComponent } from './fab-menu/fab-menu.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
@@ -72,8 +72,8 @@ import {
   MatTable,
   MatTableDataSource,
 } from '@angular/material/table';
-import { findStateColor } from '../../util/theme';
-import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { findStateColor } from '@app/util/theme';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
 import { MatFormField, MatInput, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import {
@@ -88,11 +88,11 @@ import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
 import { MatSort } from '@angular/material/sort';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
 import { ReservationDetailSkeletonComponent } from './reservation-detail-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 type PaymentForm = {
   amount: FormControl<string>;

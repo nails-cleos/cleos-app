@@ -1,27 +1,27 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { getDisplayNameInitials, getUserImage } from '../../util/helper';
-import { IReservationOverview } from '../../reservation/reservation';
+import { getDisplayNameInitials, getUserImage } from '@app/util/helper';
+import { IReservationOverview } from '@app/reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { IChart } from '../../dashboard/dashboard';
-import { formatDateTime, newDateTimestamp } from '../../util/dates';
-import { IAccountAll } from '../../account/account';
+import { IChart } from '@app/dashboard/dashboard';
+import { formatDateTime, newDateTimestamp } from '@app/util/dates';
+import { IAccountAll } from '@app/account/account';
 import { IUserAll } from '../user';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ErrorComponent } from '../../shared/error/error.component';
-import { CardComponent } from '../../shared/card/card.component';
-import { ChartComponent } from '../../shared/chart/chart.component';
-import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ErrorComponent } from '@app/shared/error/error.component';
+import { CardComponent } from '@app/shared/card/card.component';
+import { ChartComponent } from '@app/shared/chart/chart.component';
+import { GoogleMapComponent } from '@app/shared/google-map/google-map.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatMiniFabButton } from '@angular/material/button';
 import { CurrencyPipe } from '@angular/common';
 import { MatCard, MatCardContent } from '@angular/material/card';
-import { AvatarComponent } from '../../shared/avatar/avatar.component';
+import { AvatarComponent } from '@app/shared/avatar/avatar.component';
 import { MatGridList, MatGridTile } from '@angular/material/grid-list';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-overview',

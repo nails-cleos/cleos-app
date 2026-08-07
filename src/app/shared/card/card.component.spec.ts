@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CardComponent } from './card.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { IChart } from '../../dashboard/dashboard';
-import { ICurrency } from '../../currency/currency';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 
 describe('CardComponent', () => {

@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ITreatmentAll } from '../treatment';
-import { TreatmentStore } from '../../store/treatment.store';
+import { TreatmentStore } from '@app/store/treatment.store';
 import {
   DragDropSortingComponent,
   ISorted,
   ItemSorting,
-} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+} from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-treatment-sorting',

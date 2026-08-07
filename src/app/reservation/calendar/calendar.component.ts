@@ -20,8 +20,8 @@ import {
   reservationDuration,
   searchDates,
   subPeriod,
-} from '../../util/dates';
-import { IRoom, IRoomAll } from '../../room/room';
+} from '@app/util/dates';
+import { IRoom, IRoomAll } from '@app/room/room';
 import {
   allDayEvent,
   calendarEvent,
@@ -32,25 +32,25 @@ import {
   Meta,
   OUT_OF_WORK,
   OUT_OF_WORK_ALL_DAY,
-} from '../../util/event';
+} from '@app/util/event';
 import { RouterLink } from '@angular/router';
 import { CalendarEvent, CalendarEventTimesChangedEvent, CalendarWeekViewComponent } from 'angular-calendar';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IUser, IUserAll } from '../../user/user';
-import { IUnavailableAll } from '../../unavailable/unavailable';
-import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getList } from '../../util/helper';
+import { IUser, IUserAll } from '@app/user/user';
+import { IUnavailableAll } from '@app/unavailable/unavailable';
+import { createRoomOffice, executeDialogNoWidth, FrequencyEnum, getList } from '@app/util/helper';
 import { addDays, addMonths, isEqual } from 'date-fns';
-import { findStateColor } from '../../util/theme';
+import { findStateColor } from '@app/util/theme';
 import { map, startWith } from 'rxjs/operators';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IOffice, IOfficeAll } from '../../office/office';
-import { requireMatch } from '../../util/validators';
-import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { INoteAll } from '../../note/note';
-import { AuthUserService } from '../../services/auth-user.service';
-import { Role } from '../../interfaces/token';
-import { RoomNamePipe } from '../../pipes/room-name.pipe';
+import { IOffice, IOfficeAll } from '@app/office/office';
+import { requireMatch } from '@app/util/validators';
+import { CalendarDialogComponent } from '@app/shared/dialog/calendar/calendar-dialog.component';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { INoteAll } from '@app/note/note';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { Role } from '@app/interfaces/token';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -59,9 +59,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, NgClass } from '@angular/common';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { NavigationService } from '../../services/navigation.service';
-import { RoomStore } from '../../store/room.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 const CALENDAR_RESPONSIVE = {
   xsmall: {

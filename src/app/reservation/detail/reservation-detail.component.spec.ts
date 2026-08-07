@@ -1,21 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ReservationDetailComponent } from './reservation-detail.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { CancelOption, IReservationAll, States } from '../reservation';
-import { IPaymentAll } from '../../interfaces/payment';
-import { ServiceType } from '../../room/room';
-import { IUserAll } from '../../user/user';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../currency/currency';
-import { IAdditionalAll } from '../../additional/additional';
+import { IPaymentAll } from '@app/interfaces/payment';
+import { ServiceType } from '@app/room/room';
+import { IUserAll } from '@app/user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { IAdditionalAll } from '@app/additional/additional';
 import { signal } from '@angular/core';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('ReservationDetailComponent', () => {
   let component: ReservationDetailComponent;
@@ -202,8 +202,9 @@ describe('ReservationDetailComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ReservationDetailComponent, TranslateModule.forRoot()],
+      imports: [ReservationDetailComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },

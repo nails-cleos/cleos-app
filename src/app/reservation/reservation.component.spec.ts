@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationComponent } from './reservation.component';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
@@ -218,8 +218,9 @@ describe('ReservationComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ReservationComponent, GoogleMapStubComponent, TranslateModule.forRoot()],
+      imports: [ReservationComponent, GoogleMapStubComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },

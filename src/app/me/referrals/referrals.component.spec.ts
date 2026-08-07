@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReferralsComponent } from './referrals.component';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ToastService } from '../../services/toast.service';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { ToastService } from '@app/services/toast.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal } from '@angular/core';
-import { DiscountStore } from '../../store/discount.store';
+import { DiscountStore } from '@app/store/discount.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ReferralsComponent', () => {
   let component: ReferralsComponent;
@@ -39,8 +39,9 @@ describe('ReferralsComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ReferralsComponent, TranslateModule.forRoot()],
+      imports: [ReferralsComponent],
       providers: [
+        provideTranslateService(),
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },

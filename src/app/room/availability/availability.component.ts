@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../room';
-import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
+import { createDate, getCurrentTimeZone, getTime } from '@app/util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
-import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { AvailabilityForm } from '../room-form.types';
 

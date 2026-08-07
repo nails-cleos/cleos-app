@@ -7,7 +7,7 @@ import {
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { PaymentStatus } from '../../interfaces/payment';
-import { PaymentStore } from '../../store/payment.store';
+import { PaymentStatus } from '@app/interfaces/payment';
+import { PaymentStore } from '@app/store/payment.store';
 
 /**
  * Centralised logic for handling Mollie redirect query parameters.

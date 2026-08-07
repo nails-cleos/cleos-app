@@ -3,13 +3,13 @@ import { MatButton } from '@angular/material/button';
 import { MatChip, MatChipListbox } from '@angular/material/chips';
 import { MatIcon } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { DurationTimePipe } from '../../pipes/durationTime.pipe';
-import { TreatmentStore } from '../../store/treatment.store';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
 import { TreatmentTableComponent } from '../table/treatment-table.component';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-treatment-view',

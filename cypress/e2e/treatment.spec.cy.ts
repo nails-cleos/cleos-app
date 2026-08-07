@@ -1,6 +1,6 @@
 import '../support/commands';
 import { breakpointToButtons, convertSecondsToTime, devices, zeroPad } from '../support/utils';
-import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/src/app/util/dates';
 
 const getAddTreatmentInput = () =>
   cy.get('#add-treatment').scrollIntoView().should('exist').and('not.be.disabled');

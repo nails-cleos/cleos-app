@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { of } from 'rxjs';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../services/geocode.service';
 import { UserComponent } from './user.component';
@@ -55,8 +55,9 @@ describe('UserComponent', () => {
     );
 
     await TestBed.configureTestingModule({
-      imports: [UserComponent, TranslateModule.forRoot()],
+      imports: [UserComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

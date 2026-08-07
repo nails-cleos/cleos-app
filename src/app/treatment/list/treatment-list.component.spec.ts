@@ -3,14 +3,14 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ITreatmentGroupAll } from '../treatment';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { TreatmentStore } from '../../store/treatment.store';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '@app/interfaces/pagination';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;
@@ -65,8 +65,9 @@ describe('TreatmentListComponent', () => {
     }));
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentListComponent, TranslateModule.forRoot()],
+      imports: [TreatmentListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

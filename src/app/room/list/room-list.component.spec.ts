@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { IAddress, IRoomAll } from '../room';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { RoomListComponent } from './room-list.component';
-import { ICurrencyAll } from '../../currency/currency';
-import { DEFAULT_LOCALE, getCurrentTimeZone } from '../../util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from '@app/util/dates';
 import { MatDialog } from '@angular/material/dialog';
-import { RoomStore } from '../../store/room.store';
-import { NavigationService } from '../../services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('RoomListComponent', () => {
   let component: RoomListComponent;
@@ -107,8 +107,9 @@ describe('RoomListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [RoomListComponent, TranslateModule.forRoot()],
+      imports: [RoomListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

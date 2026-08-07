@@ -1,21 +1,21 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { getPrice, newPercentage } from '../../../util/helper';
-import { IPaymentOption, PaymentPercentage } from '../../../interfaces/payment';
-import { IPrice, Price } from '../../../treatment/treatment';
-import { IReservationAll, IReservationPayment } from '../../../reservation/reservation';
+import { getPrice, newPercentage } from '@app/util/helper';
+import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
+import { IPrice, Price } from '@app/treatment/treatment';
+import { IReservationAll, IReservationPayment } from '@app/reservation/reservation';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BankComponent, BankForm } from '../../../shared/bank/bank.component';
-import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
+import { BankComponent, BankForm } from '@app/shared/bank/bank.component';
+import { PaymentPreviewComponent } from '@app/shared/payment-preview/payment-preview.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DecimalPipe, NgTemplateOutlet } from '@angular/common';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-option',

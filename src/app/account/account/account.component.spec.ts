@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { AccountComponent } from './account.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import { IAccountAll, ITransaction } from '../account';
-import { AccountStore } from '../../store/account.store';
+import { AccountStore } from '@app/store/account.store';
 import { signal } from '@angular/core';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AccountComponent', () => {
   let component: AccountComponent;
@@ -64,8 +64,9 @@ describe('AccountComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [AccountComponent, TranslateModule.forRoot()],
+      imports: [AccountComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

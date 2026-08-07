@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { RoomComponent } from './room.component';
@@ -21,6 +20,7 @@ import { RoomStore } from '../store/room.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { NavigationService } from '../services/navigation.service';
 import { PaymentStore } from '../store/payment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('RoomComponent', () => {
   let component: RoomComponent;
@@ -161,8 +161,9 @@ describe('RoomComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [RoomComponent, TranslateModule.forRoot()],
+      imports: [RoomComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },

@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CustomerEditDialogComponent } from './customer-edit-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { Price } from '../../../treatment/treatment';
+import { Price } from '@app/treatment/treatment';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CustomerEditReservationDialogComponent', () => {
   let component: CustomerEditDialogComponent;
@@ -19,8 +19,9 @@ describe('CustomerEditReservationDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [CustomerEditDialogComponent, TranslateModule.forRoot()],
+      imports: [CustomerEditDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: mockData },
       ],

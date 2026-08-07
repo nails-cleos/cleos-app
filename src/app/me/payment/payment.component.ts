@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { IPayment, IPaymentAll } from '../../interfaces/payment';
+import { IPayment, IPaymentAll } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
@@ -22,10 +22,10 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 
 @Component({
   selector: 'app-payment',

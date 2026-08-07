@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentPreviewComponent } from './payment-preview.component';
 import { By } from '@angular/platform-browser';
-import { IPaymentOption } from '../../interfaces/payment';
-import { TranslateModule } from '@ngx-translate/core';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { MatIconRegistry } from '@angular/material/icon';
-import { matIconRegistryStub } from '../../util/app-material-registry-stub';
+import { matIconRegistryStub } from '@app/util/app-material-registry-stub';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('PaymentPreviewComponent', () => {
   let component: PaymentPreviewComponent;
@@ -24,8 +24,11 @@ describe('PaymentPreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaymentPreviewComponent, TranslateModule.forRoot()],
-      providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
+      imports: [PaymentPreviewComponent],
+      providers: [
+        provideTranslateService(),
+        { provide: MatIconRegistry, useValue: matIconRegistryStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentPreviewComponent);

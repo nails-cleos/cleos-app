@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IAdditionalAll } from '../../additional/additional';
-import { IExtras } from '../../reservation/reservation';
-import { ICurrencyAll } from '../../currency/currency';
-import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { IAdditionalAll } from '@app/additional/additional';
+import { IExtras } from '@app/reservation/reservation';
+import { ICurrencyAll } from '@app/currency/currency';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatDivider, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
-import { DurationTimePipe } from '../../pipes/durationTime.pipe';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
 
 @Component({
   selector: 'app-price-extras',

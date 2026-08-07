@@ -1,6 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueComponent } from './catalogue.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 import { ICatalogueAll } from './catalogue';
 import { ICommon } from '../interfaces/common';
@@ -8,6 +7,7 @@ import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { CatalogueStore } from '../store/catalogue.store';
 import { TreatmentStore } from '../store/treatment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
@@ -52,8 +52,9 @@ describe('CatalogueComponent', () => {
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
-      imports: [CatalogueComponent, TranslateModule.forRoot()],
+      imports: [CatalogueComponent],
       providers: [
+        provideTranslateService(),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },

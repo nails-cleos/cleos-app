@@ -1,16 +1,16 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { ExpenseDetailsPageComponent } from './expense-details-page.component';
-import { ExpenseStore } from '../../../store/expense.store';
+import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
 import { ExpenseComponent } from './expense.component';
-import { AwsStore } from '../../../store/aws.store';
-import { AuthUserService } from '../../../services/auth-user.service';
-import { DriveAccessService } from '../../../services/drive-access.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { TokenService } from '../../../services/token.service';
-import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
+import { AwsStore } from '@app/store/aws.store';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { TokenService } from '@app/services/token.service';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ExpenseDetailsPageComponent', () => {
   let component: ExpenseDetailsPageComponent;
@@ -53,8 +53,9 @@ describe('ExpenseDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [ExpenseDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [ExpenseDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         {
           provide: AwsStore,

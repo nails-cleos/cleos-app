@@ -12,7 +12,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { combineLatestWith } from 'rxjs';
-import { IUserAll } from '../../user/user';
+import { IUserAll } from '@app/user/user';
 import { DiscountType, IDiscountAll } from '../discount';
 import {
   MAT_DIALOG_DATA,
@@ -22,14 +22,14 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { map, startWith } from 'rxjs/operators';
-import { currencySymbol } from '../../util/helper';
+import { currencySymbol } from '@app/util/helper';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatChipGrid, MatChipInput, MatChipRow } from '@angular/material/chips';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
 
 export type DiscountDialogData = {
   discount: IDiscountAll;

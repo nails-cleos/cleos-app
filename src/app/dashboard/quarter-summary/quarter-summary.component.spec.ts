@@ -2,18 +2,18 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { QuarterSummaryComponent } from './quarter-summary.component';
 import { of } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDatepicker } from '@angular/material/datepicker';
 import { IMonthSummary, ISummaryRoom, ISummaryTotal, MonthSummary, SummaryTotals, Total } from '../dashboard';
-import { ICurrencyAll } from '../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
@@ -130,8 +130,9 @@ describe('QuarterSummaryComponent', () => {
     paramMapSpy.get.and.returnValue('test');
 
     await TestBed.configureTestingModule({
-      imports: [QuarterSummaryComponent, TranslateModule.forRoot()],
+      imports: [QuarterSummaryComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

@@ -1,6 +1,6 @@
 import '../support/commands';
-import { Role } from '../../src/app/interfaces/token';
-import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '../../src/app/util/dates';
+import { Role } from '@app/src/app/interfaces/token';
+import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '@app/src/app/util/dates';
 import { devices } from '../support/utils';
 
 const displayName = 'Customer 1';

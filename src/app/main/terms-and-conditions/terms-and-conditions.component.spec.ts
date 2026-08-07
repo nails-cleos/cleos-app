@@ -2,10 +2,10 @@ import { provideHttpClient, withXhr } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { EnvService } from '../../services/env.service';
+import { EnvService } from '@app/services/env.service';
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('TermsAndConditionsComponent', () => {
   let component: TermsAndConditionsComponent;

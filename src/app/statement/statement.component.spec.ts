@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { StatementComponent } from './statement.component';
 import { ActivatedRoute } from '@angular/router';
 import { IOfficeAll } from '../office/office';
@@ -13,6 +12,7 @@ import { DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
 import { ICommon } from '../interfaces/common';
 import { DocumentTypeEnum, IDocument } from '../document/document';
 import { MatDatepicker } from '@angular/material/datepicker';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('StatementComponent', () => {
   let component: StatementComponent;
@@ -75,8 +75,9 @@ describe('StatementComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [StatementComponent, TranslateModule.forRoot()],
+      imports: [StatementComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

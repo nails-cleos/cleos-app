@@ -2,13 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { DateAdapter as MaterialDateAdapter } from '@angular/material/core';
 import { DateAdapter as CalendarDateAdapter } from 'angular-calendar';
 import { provideAppCalendar, provideAppDateAdapter } from './app-date.provider';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('app-date.provider', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot()],
       providers: [
+        provideTranslateService(),
         provideAppDateAdapter(),
         provideAppCalendar(),
       ],

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
-import { IUserAll } from '../../user/user';
+import { IUserAll } from '@app/user/user';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;
@@ -35,8 +35,9 @@ describe('ChangeCustomerDialogComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ChangeCustomerDialogComponent, TranslateModule.forRoot()],
+      imports: [ChangeCustomerDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => (mockChangeCustomer),

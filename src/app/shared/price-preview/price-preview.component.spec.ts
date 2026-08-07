@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PricePreviewComponent } from './price-preview.component';
-import { Price } from '../../treatment/treatment';
-import { TranslateModule } from '@ngx-translate/core';
+import { Price } from '@app/treatment/treatment';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('PricePreviewComponent', () => {
   let component: PricePreviewComponent;
@@ -10,7 +10,8 @@ describe('PricePreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PricePreviewComponent, TranslateModule.forRoot()],
+      imports: [PricePreviewComponent],
+      providers: [provideTranslateService()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PricePreviewComponent);

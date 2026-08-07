@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MonthSummaryComponent } from './month-summary.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
 import {
   ExpenseType,
   IMonthlySummary,
@@ -15,9 +15,9 @@ import {
 import { MatDatepicker } from '@angular/material/datepicker';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
@@ -91,8 +91,9 @@ describe('MonthSummaryComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [MonthSummaryComponent, TranslateModule.forRoot()],
+      imports: [MonthSummaryComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

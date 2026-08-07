@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 import { signal } from '@angular/core';
 
 describe('PaymentComponent', () => {
@@ -39,8 +39,9 @@ describe('PaymentComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [PaymentComponent, TranslateModule.forRoot()],
+      imports: [PaymentComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },

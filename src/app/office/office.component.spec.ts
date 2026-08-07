@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 
 import { IOfficeAll } from './office';
 import { Role } from '../interfaces/token';
@@ -46,8 +46,9 @@ describe('OfficeComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [OfficeComponent, TranslateModule.forRoot()],
+      imports: [OfficeComponent],
       providers: [
+        provideTranslateService(),
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],

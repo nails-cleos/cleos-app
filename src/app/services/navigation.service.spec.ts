@@ -1,6 +1,6 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 
 import { NavigationService } from './navigation.service';
@@ -63,8 +63,8 @@ describe('NavigationService', () => {
     });
 
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot()],
       providers: [
+        provideTranslateService(),
         NavigationService,
         { provide: I18NStore, useValue: i18nStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },

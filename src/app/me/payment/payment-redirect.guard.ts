@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, UrlTree } from '@angular/router';
 import { PaymentRedirectService } from './payment-redirect.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 @Injectable({
   providedIn: 'root',

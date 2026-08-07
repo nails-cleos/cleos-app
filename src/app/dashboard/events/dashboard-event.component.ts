@@ -18,7 +18,7 @@ import {
   newDateTimestamp,
   startOfPeriod,
   subPeriod,
-} from '../../util/dates';
+} from '@app/util/dates';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ICalendarNote, ICalendarReservations, IProfessionalEvent } from '../dashboard';
 import {
@@ -28,23 +28,23 @@ import {
   Professional,
 } from './day-view-scheduler.component';
 import { EventColor } from 'calendar-utils';
-import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '../../reservation/reservation';
+import { Day, IReservation, MAX_RESERVATION_MONTH, States } from '@app/reservation/reservation';
 import { addMonths, isSameDay, isToday } from 'date-fns';
 import { MatDialog } from '@angular/material/dialog';
-import { createEventColor, getProfessionalColor } from '../../util/color';
-import { CalendarDialogComponent } from '../../shared/dialog/calendar/calendar-dialog.component';
-import { currencySymbol, executeDialogNoWidth, FrequencyEnum } from '../../util/helper';
-import { AuthUserService } from '../../services/auth-user.service';
-import { CounterComponent } from '../../util/counter/counter.component';
-import { findStateColor } from '../../util/theme';
-import { DataEvent, IDataEvent } from '../../util/event';
+import { createEventColor, getProfessionalColor } from '@app/util/color';
+import { CalendarDialogComponent } from '@app/shared/dialog/calendar/calendar-dialog.component';
+import { currencySymbol, executeDialogNoWidth, FrequencyEnum } from '@app/util/helper';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { CounterComponent } from '@app/util/counter/counter.component';
+import { findStateColor } from '@app/util/theme';
+import { DataEvent, IDataEvent } from '@app/util/event';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatInput } from '@angular/material/input';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
-import { ReservationStore } from '../../store/reservation.store';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-dashboard',

@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
 import { ExpenseComponent } from './expense.component';
-import { ExpenseStore } from '../../../store/expense.store';
+import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
-import { ICommon } from '../../../interfaces/common';
-import { SkeletonComponent } from '../../../shared/skeleton/skeleton.component';
+import { ICommon } from '@app/interfaces/common';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
 
 @Component({
   selector: 'app-expense-details-page',

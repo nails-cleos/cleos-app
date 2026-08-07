@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 import { AuthUserService } from './auth-user.service';
@@ -72,8 +72,8 @@ describe('AuthUserService', () => {
     });
 
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot()],
       providers: [
+        provideTranslateService(),
         AuthUserService,
         { provide: NgcCookieConsentService, useValue: cookieSpy },
       ],

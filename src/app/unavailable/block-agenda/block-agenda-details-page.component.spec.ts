@@ -1,13 +1,13 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BlockAgendaDetailsPageComponent } from './block-agenda-details-page.component';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { IUnavailableAll } from '../unavailable';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { AuthUserService } from '../../services/auth-user.service';
-import { UserStore } from '../../store/user.store';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('BlockAgendaDetailsPageComponent', () => {
   let component: BlockAgendaDetailsPageComponent;
@@ -54,8 +54,9 @@ describe('BlockAgendaDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [BlockAgendaDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [BlockAgendaDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },

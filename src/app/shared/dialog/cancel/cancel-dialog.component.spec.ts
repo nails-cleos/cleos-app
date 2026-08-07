@@ -2,9 +2,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { CancelOption } from '../../../reservation/reservation';
-import { provideAppIcons } from '../../../util/app-icons.provider';
+import { CancelOption } from '@app/reservation/reservation';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CancelDialogComponent', () => {
   let component: CancelDialogComponent;
@@ -14,8 +14,9 @@ describe('CancelDialogComponent', () => {
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: { options: [] } },
         provideAppIcons(),
@@ -59,10 +60,11 @@ describe('CancelDialogComponent', () => {
 
   it('should preselect the only cancellation option', async () => {
     const singleDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    await TestBed.resetTestingModule();
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: singleDialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: { options: ['REFUND'], currency: { code: 'EUR', icon: 'EUR' } } },
       ],
@@ -77,10 +79,11 @@ describe('CancelDialogComponent', () => {
 
   it('should hide percentage for provided payment options', async () => {
     const dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    await TestBed.resetTestingModule();
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRef },
         {
           provide: MAT_DIALOG_DATA,

@@ -2,18 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProfileComponent } from './profile.component';
 import { of } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { GeocodeService, MapStatus } from '../../services/geocode.service';
-import { GoogleMapComponent } from '../../shared/google-map/google-map.component';
-import { GoogleMapStubComponent } from '../../shared/google-map/google-map-stub.component';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { GeocodeService, MapStatus } from '@app/services/geocode.service';
+import { GoogleMapComponent } from '@app/shared/google-map/google-map.component';
+import { GoogleMapStubComponent } from '@app/shared/google-map/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal, WritableSignal } from '@angular/core';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -57,8 +57,9 @@ describe('ProfileComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ProfileComponent, TranslateModule.forRoot()],
+      imports: [ProfileComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

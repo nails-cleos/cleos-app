@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';
 import { AdditionalStore } from '../store/additional.store';
 import { IAdditionalAll } from './additional';
@@ -9,6 +8,7 @@ import { TreatmentStore } from '../store/treatment.store';
 import { DateAdapter } from '@angular/material/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;
@@ -54,8 +54,9 @@ describe('AdditionalDetailsPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [AdditionalDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },

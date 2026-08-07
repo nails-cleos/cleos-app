@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { ExpenseComponent } from './expense.component';
 import { IExpenseAll, ISupplyStore } from './expense';
-import { ICommon } from '../../../interfaces/common';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../../util/dates';
+import { ICommon } from '@app/interfaces/common';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
 import { computed, signal } from '@angular/core';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { DriveAccessService } from '../../../services/drive-access.service';
-import { EnvService } from '../../../services/env.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { TokenService } from '../../../services/token.service';
-import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
-import { AwsStore } from '../../../store/aws.store';
-import { ExpenseStore } from '../../../store/expense.store';
+import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { EnvService } from '@app/services/env.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { TokenService } from '@app/services/token.service';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { AwsStore } from '@app/store/aws.store';
+import { ExpenseStore } from '@app/store/expense.store';
 
 describe('ExpenseComponent', () => {
   let component: ExpenseComponent;
@@ -119,8 +119,9 @@ describe('ExpenseComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [ExpenseComponent, TranslateModule.forRoot()],
+      imports: [ExpenseComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },

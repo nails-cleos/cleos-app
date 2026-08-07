@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
-import { getPrice } from '../../../util/helper';
+import { createNewDate, newDateTimestamp, reservationDuration } from '@app/util/dates';
+import { getPrice } from '@app/util/helper';
 import { IReview } from '../list/review';
-import { IReservationAll } from '../../../reservation/reservation';
-import { IPrice } from '../../../treatment/treatment';
+import { IReservationAll } from '@app/reservation/reservation';
+import { IPrice } from '@app/treatment/treatment';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -13,15 +13,15 @@ import {
 } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RoomNamePipe } from '../../../pipes/room-name.pipe';
-import { RatingComponent } from '../../../shared/rating/rating.component';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
+import { RatingComponent } from '@app/shared/rating/rating.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { FirebaseService } from '../../../services/firebase.service';
+import { FirebaseService } from '@app/services/firebase.service';
 import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/list';
-import { NavigationService } from '../../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-review-dialog',

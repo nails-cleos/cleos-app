@@ -1,27 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { InvoiceListComponent } from './invoice-list.component';
 import { IInvoice, IRoomInvoice } from '../invoice';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
-import { IOfficeAll } from '../../office/office';
-import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { IUserAll } from '../../user/user';
+import { IOfficeAll } from '@app/office/office';
+import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { IUserAll } from '@app/user/user';
 import { addDays } from 'date-fns';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { DriveAccessService } from '../../services/drive-access.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PaymentService } from '../../services/payment.service';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { NavigationService } from '../../services/navigation.service';
+import { PaymentService } from '@app/services/payment.service';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { OfficeStore } from '../../store/office.store';
-import { InvoiceStore } from '../../store/invoice.store';
-import { PaymentStore } from '../../store/payment.store';
+import { OfficeStore } from '@app/store/office.store';
+import { InvoiceStore } from '@app/store/invoice.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
@@ -212,8 +212,9 @@ describe('InvoiceListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [InvoiceListComponent, TranslateModule.forRoot()],
+      imports: [InvoiceListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },

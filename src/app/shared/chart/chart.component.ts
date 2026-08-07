@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { createChart, IChartUtil } from '../../util/chart';
-import { IChart } from '../../dashboard/dashboard';
-import { ICurrency } from '../../currency/currency';
-import { AuthUserService } from '../../services/auth-user.service';
+import { createChart, IChartUtil } from '@app/util/chart';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
+import { AuthUserService } from '@app/services/auth-user.service';
 import { ErrorComponent } from '../error/error.component';
 import { BaseChartDirective } from 'ng2-charts';
-import { IError } from '../../interfaces/common';
+import { IError } from '@app/interfaces/common';
 
 @Component({
   selector: 'app-chart',

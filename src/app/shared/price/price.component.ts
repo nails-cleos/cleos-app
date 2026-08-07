@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { IPrice } from '../../treatment/treatment';
-import { ICurrency } from '../../currency/currency';
+import { IPrice } from '@app/treatment/treatment';
+import { ICurrency } from '@app/currency/currency';
 import { FormGroup } from '@angular/forms';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { BankComponent, BankForm } from '../bank/bank.component';
 import { MatDivider } from '@angular/material/divider';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';

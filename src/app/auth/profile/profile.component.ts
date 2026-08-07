@@ -8,22 +8,22 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { User } from '../../user/user';
+import { User } from '@app/user/user';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { validColorValidator, valueChange } from '../../util/validators';
-import { flags, IFlag } from '../../util/flags';
-import { getDisplayNameInitials, getLocale, getUserImage } from '../../util/helper';
-import { createDateFromString } from '../../util/dates';
-import { Role } from '../../interfaces/token';
+import { validColorValidator, valueChange } from '@app/util/validators';
+import { flags, IFlag } from '@app/util/flags';
+import { getDisplayNameInitials, getLocale, getUserImage } from '@app/util/helper';
+import { createDateFromString } from '@app/util/dates';
+import { Role } from '@app/interfaces/token';
 import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { resizeImage } from '../../util/file';
-import { GoogleMapComponent, GoogleMapForm } from '../../shared/google-map/google-map.component';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { resizeImage } from '@app/util/file';
+import { GoogleMapComponent, GoogleMapForm } from '@app/shared/google-map/google-map.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { NgIcon } from '@ng-icons/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { IError } from '../../interfaces/common';
-import { ColorPickerComponent } from '../../shared/color-picker/color-picker.component';
+import { IError } from '@app/interfaces/common';
+import { ColorPickerComponent } from '@app/shared/color-picker/color-picker.component';
 import { MatIcon } from '@angular/material/icon';
 import { NgClass, UpperCasePipe } from '@angular/common';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
@@ -34,9 +34,9 @@ import { MatButton, MatIconButton } from '@angular/material/button';
 import PlaceGeometry = google.maps.places.PlaceGeometry;
 import PlaceResult = google.maps.places.PlaceResult;
 import { MatCheckbox } from '@angular/material/checkbox';
-import { ProfileForm } from '../../user/user-form.types';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
+import { ProfileForm } from '@app/user/user-form.types';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-profile',

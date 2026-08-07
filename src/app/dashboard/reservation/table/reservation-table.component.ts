@@ -1,19 +1,19 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { IReservation, IReservationAll } from '../../../reservation/reservation';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
-import { DialogComponent } from '../../../shared/dialog/generic/dialog.component';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { IReservation, IReservationAll } from '@app/reservation/reservation';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { executeDialogNoWidth, openDialog } from '../../../util/helper';
-import { isSameTimeZone, newDateTimestamp } from '../../../util/dates';
-import { AuthUserService } from '../../../services/auth-user.service';
-import { TimeDetailPipe } from '../../../pipes/time-detail.pipe';
-import { ReservationIconPipe } from '../../../pipes/reservation-icon.pipe';
-import { ErrorComponent } from '../../../shared/error/error.component';
+import { executeDialogNoWidth, openDialog } from '@app/util/helper';
+import { isSameTimeZone, newDateTimestamp } from '@app/util/dates';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { ReservationIconPipe } from '@app/pipes/reservation-icon.pipe';
+import { ErrorComponent } from '@app/shared/error/error.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatPrefix } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
@@ -39,9 +39,9 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../../services/navigation.service';
-import { ReservationStore } from '../../../store/reservation.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-reservation-table',

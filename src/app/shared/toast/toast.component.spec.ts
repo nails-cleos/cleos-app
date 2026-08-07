@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { ToastComponent } from './toast.component';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ToastComponent', () => {
   let component: ToastComponent;
@@ -16,8 +16,9 @@ describe('ToastComponent', () => {
     const mockToastData = { type: 'success', message: 'Test toast', duration: 5000, actionType: 'none' };
 
     TestBed.configureTestingModule({
-      imports: [ToastComponent, TranslateModule.forRoot()],
+      imports: [ToastComponent],
       providers: [
+        provideTranslateService(),
         { provide: 'TOAST_DATA', useValue: mockToastData },
         { provide: 'TOAST_DISMISS', useValue: dismiss$ },
         { provide: 'TOAST_ACTION', useValue: action$ },

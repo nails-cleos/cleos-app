@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { DiscountStore } from '../../store/discount.store';
+import { DiscountStore } from '@app/store/discount.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;
@@ -28,11 +28,9 @@ describe('AddDiscountDialogComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        AddDiscountDialogComponent,
-        TranslateModule.forRoot(),
-      ],
+      imports: [AddDiscountDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: DiscountStore, useValue: discountStoreSpy },
         {
           provide: MAT_DIALOG_DATA,

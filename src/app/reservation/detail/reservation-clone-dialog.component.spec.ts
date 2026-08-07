@@ -2,11 +2,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { addMonths } from 'date-fns';
-import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
+import { getCurrentTimeZone, getNowTimeZone } from '@app/util/dates';
 import { MAX_RESERVATION_MONTH } from '../reservation';
-import { IRoomAll } from '../../room/room';
-import { TranslateModule } from '@ngx-translate/core';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { IRoomAll } from '@app/room/room';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('ReservationCloneDialogComponent', () => {
   let component: ReservationCloneDialogComponent;
@@ -43,8 +43,9 @@ describe('ReservationCloneDialogComponent', () => {
     dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     await TestBed.configureTestingModule({
-      imports: [ReservationCloneDialogComponent, TranslateModule.forRoot()],
+      imports: [ReservationCloneDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MAT_DIALOG_DATA, useValue: dialogData },
         { provide: MatDialogRef, useValue: dialogRef },
         provideAppDateAdapter(),

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentEditPageComponent } from './treatment-edit-page.component';
 import { ColorStore } from '../store/color.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('TreatmentEditPageComponent', () => {
   let component: TreatmentEditPageComponent;
@@ -35,8 +35,9 @@ describe('TreatmentEditPageComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentEditPageComponent, TranslateModule.forRoot()],
+      imports: [TreatmentEditPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },

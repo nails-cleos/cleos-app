@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { IUpcomingAll } from '../../../reservation/reservation';
-import { customerEditDialog, getPrice, openDialog } from '../../../util/helper';
+import { IUpcomingAll } from '@app/reservation/reservation';
+import { customerEditDialog, getPrice, openDialog } from '@app/util/helper';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '../../../util/dates';
+import { createNewDate, isSameTimeZone, newDateTimestamp, reservationDuration } from '@app/util/dates';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { PaymentPreviewComponent } from '@app/shared/payment-preview/payment-preview.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { NavigationService } from '../../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-upcoming',

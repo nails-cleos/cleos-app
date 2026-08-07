@@ -3,7 +3,7 @@ import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Va
 import { TranslatePipe } from '@ngx-translate/core';
 import { IUser, IUserAll } from '../user';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -20,7 +20,7 @@ import { MatList, MatListItem } from '@angular/material/list';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
 
 type SelectUserForm = {
   user: FormControl<IUserAll | undefined>;

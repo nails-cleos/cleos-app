@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../user/user';
-import { IRoomAll } from '../../room/room';
+import { IUser, IUserAll } from '@app/user/user';
+import { IRoomAll } from '@app/room/room';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   BlockAgendaForm,
   IUnavailable,
@@ -25,21 +25,21 @@ import {
   getTimeNumber,
   newDate,
   zoneDateToDate,
-} from '../../util/dates';
+} from '@app/util/dates';
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { ICommon, IError } from '../../interfaces/common';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { ICommon, IError } from '@app/interfaces/common';
 import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
-import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
-import { UnavailableStore } from '../../store/unavailable.store';
-import { UserStore } from '../../store/user.store';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
+import { UnavailableStore } from '@app/store/unavailable.store';
+import { UserStore } from '@app/store/user.store';
 
 @Component({
   selector: 'app-block-agenda',

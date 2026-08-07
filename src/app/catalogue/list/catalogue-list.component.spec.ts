@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ICatalogueAll } from '../catalogue';
 import { CatalogueListComponent } from './catalogue-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('CatalogueListComponent', () => {
   let component: CatalogueListComponent;
@@ -76,8 +76,9 @@ describe('CatalogueListComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [CatalogueListComponent, TranslateModule.forRoot()],
+      imports: [CatalogueListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { provideAppIcons } from '../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 describe('BottomSheetBookAppointmentComponent', () => {
   let component: BottomSheetBookAppointmentComponent;
@@ -18,8 +18,9 @@ describe('BottomSheetBookAppointmentComponent', () => {
     windowOpenSpy = spyOn(window, 'open');
 
     await TestBed.configureTestingModule({
-      imports: [BottomSheetBookAppointmentComponent, TranslateModule.forRoot()],
+      imports: [BottomSheetBookAppointmentComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatBottomSheetRef, useValue: bottomSheetRefSpy },
         provideHttpClient(withXhr()),
         provideAppIcons(),

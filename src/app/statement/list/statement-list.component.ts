@@ -1,12 +1,12 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
-import { DocumentListComponent } from '../../document/list/document-list.component';
-import { DocumentTypeEnum, IDocument } from '../../document/document';
-import { executeDialogNoWidth } from '../../util/helper';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { DocumentListComponent } from '@app/document/list/document-list.component';
+import { DocumentTypeEnum, IDocument } from '@app/document/document';
+import { executeDialogNoWidth } from '@app/util/helper';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DocumentStore } from '../../store/document.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DocumentStore } from '@app/store/document.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-statement-list',

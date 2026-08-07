@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
 import { UpdateTrackingDialogComponent } from './update-tracking-dialog.component';
-import { provideAppDateAdapter } from '../../../util/adapter/app-date.provider';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('UpdateTrackingDialogComponent', () => {
   let component: UpdateTrackingDialogComponent;
@@ -20,8 +20,9 @@ describe('UpdateTrackingDialogComponent', () => {
     dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
 
     TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, UpdateTrackingDialogComponent, TranslateModule.forRoot()],
+      imports: [ReactiveFormsModule, UpdateTrackingDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: mockTimestamps },
         provideAppDateAdapter(),

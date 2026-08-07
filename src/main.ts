@@ -21,7 +21,7 @@ import { NavigationService } from './app/services/navigation.service';
 import { TokenService } from './app/services/token.service';
 import { PermissionsService } from './app/services/auth-guard.service';
 import { PaginatorI18n } from './app/util/paginator';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateLoader, provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import localeEnGB from '@angular/common/locales/en-GB';
 import localeNl from '@angular/common/locales/nl';
@@ -86,21 +86,18 @@ const providers = [
   ),
   importProvidersFrom(
     BrowserModule,
-    TranslateModule.forRoot({
-      fallbackLang: 'en',
-      loader: {
-        provide: TranslateLoader,
-        useClass: TranslateLoaderFactory.forModule('common'),
-      },
-      isolate: false,
-      extend: true,
-    }),
     NgcCookieConsentModule.forRoot(cookieConfig),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: environment.production,
       registrationStrategy: 'registerWhenStable:30000',
     }),
   ),
+  provideTranslateService({
+    fallbackLang: 'en',
+    loader: provideTranslateLoader(
+      TranslateLoaderFactory.forModule('common'),
+    ),
+  }),
   {
     provide: MatPaginatorIntl, deps: [TranslateService],
     useFactory: () => new PaginatorI18n().getPaginatorIntl(),

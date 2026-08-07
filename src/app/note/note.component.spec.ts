@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { NoteComponent } from './note.component';
 import { IUser, IUserAll } from '../user/user';
 import { INoteAll } from './note';
@@ -74,8 +74,9 @@ describe('NoteComponent', () => {
     const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
 
     await TestBed.configureTestingModule({
-      imports: [NoteComponent, TranslateModule.forRoot()],
+      imports: [NoteComponent],
       providers: [
+        provideTranslateService(),
         { provide: NoteStore, useValue: noteStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },

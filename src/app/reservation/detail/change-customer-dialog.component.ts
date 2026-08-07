@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../user/user';
+import { IUser, IUserAll } from '@app/user/user';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -18,7 +18,7 @@ import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
 
 type ChangeCustomerForm = {
   customer: FormControl<IUserAll | undefined>,

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ActivatedRoute } from '@angular/router';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { UserListComponent } from './user-list.component';
 import { IUser, IUserAll, User } from '../user';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '@app/interfaces/pagination';
 import { signal, WritableSignal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { UserStore } from '../../store/user.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { UserStore } from '@app/store/user.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('UserListComponent', () => {
   let component: UserListComponent;
@@ -83,8 +83,9 @@ describe('UserListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [UserListComponent, TranslateModule.forRoot()],
+      imports: [UserListComponent],
       providers: [
+        provideTranslateService(),
         { provide: UserStore, useValue: userStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

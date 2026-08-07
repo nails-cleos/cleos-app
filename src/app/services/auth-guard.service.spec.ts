@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { PermissionsService } from './auth-guard.service';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { ToastService } from './toast.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { DEFAULT_LOCALE } from '../util/dates';
@@ -39,8 +39,8 @@ describe('authGuard', () => {
     });
 
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot()],
       providers: [
+        provideTranslateService(),
         PermissionsService,
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthStore, useValue: authStoreSpy },

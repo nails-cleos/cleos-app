@@ -1,6 +1,5 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { IAdditionalAll } from './additional';
 import { ICommon } from '../interfaces/common';
@@ -10,6 +9,7 @@ import { AdditionalStore } from '../store/additional.store';
 import { AdditionalComponent } from './additional.component';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { TreatmentStore } from '../store/treatment.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
@@ -60,8 +60,9 @@ describe('AdditionalComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalComponent, TranslateModule.forRoot()],
+      imports: [AdditionalComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },

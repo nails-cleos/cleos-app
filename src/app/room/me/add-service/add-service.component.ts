@@ -3,16 +3,16 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem }
 import { MatDialog } from '@angular/material/dialog';
 
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../room';
-import { IGroupService } from '../../../treatment/treatment';
-import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { IGroupService } from '@app/treatment/treatment';
+import { createTreatmentGroupService, executeDialogNoWidth } from '@app/util/helper';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { KeyValuePipe } from '@angular/common';
-import { RoomStore } from '../../../store/room.store';
+import { RoomStore } from '@app/store/room.store';
 
 @Component({
   selector: 'app-add-service',

@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CustomersComponent } from './customers.component';
 import { Subject } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IRoomCustomer } from '../../room';
 import { ActivatedRoute } from '@angular/router';
-import { RoomStore } from '../../../store/room.store';
+import { RoomStore } from '@app/store/room.store';
 import { signal } from '@angular/core';
-import { NavigationService } from '../../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;
@@ -40,8 +40,9 @@ describe('CustomersComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpointObserver$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [CustomersComponent, TranslateModule.forRoot()],
+      imports: [CustomersComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },

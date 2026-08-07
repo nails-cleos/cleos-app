@@ -7,14 +7,14 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { DEFAULT_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '../../../util/dates';
+import { DEFAULT_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '@app/util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { TimepickerComponent } from '../../../shared/clock-timepicker/timepicker.component';
-import { TimepickerDirective } from '../../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
 
 type TrackingForm = {
   startedDate: FormControl<Date | undefined>;

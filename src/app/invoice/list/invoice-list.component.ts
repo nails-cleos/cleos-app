@@ -10,9 +10,9 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
-import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '../../util/dates';
+import { backendFormatDate, datesInSameWeek, invoiceFormat, newDateTimestamp } from '@app/util/dates';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { map, startWith } from 'rxjs/operators';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -20,12 +20,12 @@ import { SelectionModel } from '@angular/cdk/collections';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { IInvoice } from '../invoice';
-import { IOfficeAll } from '../../office/office';
-import { pdf } from '../../util/invoice';
-import { requireMatch } from '../../util/validators';
-import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
+import { IOfficeAll } from '@app/office/office';
+import { pdf } from '@app/util/invoice';
+import { requireMatch } from '@app/util/validators';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import {
   MatDatepickerToggle,
   MatDateRangeInput,
@@ -33,10 +33,10 @@ import {
   MatEndDate,
   MatStartDate,
 } from '@angular/material/datepicker';
-import { provideMonthPeriodAdapter } from '../../util/adapter/app-date.provider';
-import { DriveAccessService } from '../../services/drive-access.service';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { EnvService } from '../../services/env.service';
+import { provideMonthPeriodAdapter } from '@app/util/adapter/app-date.provider';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { EnvService } from '@app/services/env.service';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -63,12 +63,12 @@ import { MatTooltip } from '@angular/material/tooltip';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
 import { MatSuffix } from '@angular/material/form-field';
-import { OfficeStore } from '../../store/office.store';
-import { InvoiceStore } from '../../store/invoice.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
+import { OfficeStore } from '@app/store/office.store';
+import { InvoiceStore } from '@app/store/invoice.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 
 // Set up VFS fonts for pdfMake (provides fallback Roboto fonts)
 (pdfMake as any).vfs = (pdfFonts as any).pdfMake?.vfs || pdfFonts;

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExpenseCreatePageComponent } from './expense-create-page.component';
-import { ExpenseStore } from '../../../store/expense.store';
+import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
 
 describe('ExpenseCreatePageComponent', () => {

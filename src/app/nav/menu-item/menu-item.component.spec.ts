@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MenuItemComponent } from './menu-item.component';
 import { BreakpointObserver, Breakpoints, BreakpointState } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('MenuItemComponent', () => {
   let component: MenuItemComponent;
@@ -26,8 +26,9 @@ describe('MenuItemComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [MenuItemComponent, TranslateModule.forRoot()],
+      imports: [MenuItemComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],

@@ -1,15 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DiscountType, IUserDiscount } from '../../../discount/discount';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { DiscountType, IUserDiscount } from '@app/discount/discount';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MeDiscountComponent } from './me-discount.component';
-import { DiscountStore } from '../../../store/discount.store';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DiscountStore } from '@app/store/discount.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('MeDiscountComponent', () => {
   let component: MeDiscountComponent;
@@ -92,8 +92,9 @@ describe('MeDiscountComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [MeDiscountComponent, TranslateModule.forRoot()],
+      imports: [MeDiscountComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

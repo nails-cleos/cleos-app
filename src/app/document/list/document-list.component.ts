@@ -3,23 +3,23 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { createMatTableState } from 'src/app/util/mat-table-state';
+import { createMatTableState } from '@app/util/mat-table-state';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { DriveAccessService } from '../../services/drive-access.service';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { DriveAccessService } from '@app/services/drive-access.service';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch } from '../../util/validators';
-import { IOfficeAll } from '../../office/office';
+import { requireMatch } from '@app/util/validators';
+import { IOfficeAll } from '@app/office/office';
 import { map, startWith } from 'rxjs/operators';
 import { combineLatestWith } from 'rxjs';
 import { DocumentTypeEnum, IDocument } from '../document';
-import { DocumentStore } from '../../store/document.store';
-import { OfficeStore } from '../../store/office.store';
+import { DocumentStore } from '@app/store/document.store';
+import { OfficeStore } from '@app/store/office.store';
 import { MatOption } from '@angular/material/core';
-import { provideYearMonthDateAdapter } from '../../util/adapter/app-date.provider';
-import { getDateQuarter, getNowTimeZone, monthViewTitle } from '../../util/dates';
+import { provideYearMonthDateAdapter } from '@app/util/adapter/app-date.provider';
+import { getDateQuarter, getNowTimeZone, monthViewTitle } from '@app/util/dates';
 import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { EnvService } from '../../services/env.service';
+import { EnvService } from '@app/services/env.service';
 import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
@@ -44,8 +44,8 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
 
 type DocumentsForm = {
   office: FormControl<IOfficeAll | undefined>;

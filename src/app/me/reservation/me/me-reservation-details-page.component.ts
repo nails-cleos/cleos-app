@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { MeReservationComponent } from './me-reservation.component';
-import { IReservation } from '../../../reservation/reservation';
-import { Role } from '../../../interfaces/token';
-import { ReservationStore } from '../../../store/reservation.store';
+import { IReservation } from '@app/reservation/reservation';
+import { Role } from '@app/interfaces/token';
+import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-me-reservation-details-page',

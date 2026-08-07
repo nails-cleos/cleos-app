@@ -2,10 +2,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, FormGroup } from '@angular/forms';
 
 import { PriceComponent } from './price.component';
-import { ICurrency } from '../../currency/currency';
-import { Price } from '../../treatment/treatment';
-import { TranslateModule } from '@ngx-translate/core';
+import { ICurrency } from '@app/currency/currency';
+import { Price } from '@app/treatment/treatment';
 import { BankForm } from '../bank/bank.component';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('PriceComponent', () => {
   let component: PriceComponent;
@@ -24,7 +24,8 @@ describe('PriceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PriceComponent, TranslateModule.forRoot()],
+      imports: [PriceComponent],
+      providers: [provideTranslateService()]
     }).compileComponents();
 
     fixture = TestBed.createComponent(PriceComponent);

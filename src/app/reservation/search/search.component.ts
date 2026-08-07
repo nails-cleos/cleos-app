@@ -9,26 +9,26 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { CancelOption, IReservation, IReservationAll, States } from '../reservation';
 import { combineLatestWith } from 'rxjs';
-import { createMatTableState } from 'src/app/util/mat-table-state';
+import { createMatTableState } from '@app/util/mat-table-state';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
-import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '../../util/dates';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { getNowTimeZone, isSameTimeZone, newDateTimestamp } from '@app/util/dates';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { map, startWith } from 'rxjs/operators';
-import { IUser, IUserAll } from '../../user/user';
+import { IUser, IUserAll } from '@app/user/user';
 import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { openCancel, openDialog } from '../../util/helper';
+import { openCancel, openDialog } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TimeDetailPipe } from '../../pipes/time-detail.pipe';
-import { ReservationIconPipe } from '../../pipes/reservation-icon.pipe';
+import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
+import { ReservationIconPipe } from '@app/pipes/reservation-icon.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
@@ -54,10 +54,10 @@ import {
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
 import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { NavigationService } from '../../services/navigation.service';
-import { UserStore } from '../../store/user.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { NavigationService } from '@app/services/navigation.service';
+import { UserStore } from '@app/store/user.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 type SearchForm = {
   customer: FormControl<IUserAll | undefined>;

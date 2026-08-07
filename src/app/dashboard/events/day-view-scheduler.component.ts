@@ -20,8 +20,8 @@ import {
   WeekViewTimeEvent,
 } from 'calendar-utils';
 import { DragEndEvent, DraggableDirective, DragMoveEvent, DroppableDirective } from 'angular-draggable-droppable';
-import { Day } from '../../reservation/reservation';
-import { ConvertHMPipe } from '../../pipes/convert-hm.pipe';
+import { Day } from '@app/reservation/reservation';
+import { ConvertHMPipe } from '@app/pipes/convert-hm.pipe';
 import { DatePipe, NgClass, TitleCasePipe } from '@angular/common';
 import { ResizableDirective, ResizeHandleDirective } from 'angular-resizable-element';
 import { MatIcon } from '@angular/material/icon';

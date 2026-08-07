@@ -3,14 +3,14 @@ import { IUser, IUserAll, User } from '../user';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Role } from '../../interfaces/token';
-import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
+import { Role } from '@app/interfaces/token';
+import { executeDialogNoWidth, snakeToCamel } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { RoleIconKey, RoleIconName } from '../../util/icon';
+import { RoleIconKey, RoleIconName } from '@app/util/icon';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
@@ -44,9 +44,9 @@ import {
 } from '@angular/material/list';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { LowerCasePipe, NgClass } from '@angular/common';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
+import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;

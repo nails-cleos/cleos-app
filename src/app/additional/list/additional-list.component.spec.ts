@@ -3,15 +3,15 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { IAdditional, IAdditionalAll } from '../additional';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { AdditionalStore } from '../../store/additional.store';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { AdditionalStore } from '@app/store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
@@ -76,8 +76,9 @@ describe('AdditionalListComponent', () => {
     breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalListComponent, TranslateModule.forRoot()],
+      imports: [AdditionalListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },

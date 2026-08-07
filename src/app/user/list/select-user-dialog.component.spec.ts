@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IUserAll } from '../user';
-import { TranslateModule } from '@ngx-translate/core';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
-import { Role } from '../../interfaces/token';
+import { Role } from '@app/interfaces/token';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from "@ngx-translate/core";
 
 describe('SelectUserDialogComponent', () => {
   let component: SelectUserDialogComponent;
@@ -44,8 +44,9 @@ describe('SelectUserDialogComponent', () => {
     });
 
     await TestBed.configureTestingModule({
-      imports: [SelectUserDialogComponent, TranslateModule.forRoot()],
+      imports: [SelectUserDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => ({ newUser: mockUser }),
