@@ -13,7 +13,7 @@ export type DiscountForm = {
 
 export enum DiscountType {
   money = 'MONEY',
-  percentage = 'PERCENTAGE'
+  percentage = 'PERCENTAGE',
 }
 
 export interface IDiscount {
@@ -59,7 +59,10 @@ export class Discount {
   ): IDiscount {
     return {
       name: fieldChange(discountForm.name, currentDiscount?.name),
-      description: fieldChange(discountForm.description, currentDiscount?.description),
+      description: fieldChange(
+        discountForm.description,
+        currentDiscount?.description,
+      ),
       type: fieldChange(discountForm.type, currentDiscount?.type),
       amount: fieldChange(discountForm.amount, currentDiscount?.amount),
       currencyId: discountForm.currency.value?.id,

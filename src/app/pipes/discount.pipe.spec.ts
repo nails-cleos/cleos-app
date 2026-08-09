@@ -1,5 +1,6 @@
 import { DiscountPipe } from './discount.pipe';
 import { DiscountType } from '../discount/discount';
+import { describe, expect, it } from 'vitest';
 
 describe('DiscountPipe', () => {
   const pipe = new DiscountPipe();

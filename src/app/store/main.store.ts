@@ -13,7 +13,8 @@ export const MainStore = signalStore(
     const translateService = inject(TranslateService);
 
     return {
-      create: (sendMessage: ISendMessage) => mainService.sendMessage(sendMessage),
+      create: (sendMessage: ISendMessage) =>
+        mainService.sendMessage(sendMessage),
       createResponse: () => ({
         message: translateService.instant('MAIN.CONTACT.SEND.MESSAGE'),
       }),

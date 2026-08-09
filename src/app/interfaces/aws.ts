@@ -17,7 +17,9 @@ export interface IAwsLambda {
   body: IAwsNotification | IAwsExtract;
 }
 
-export const awsExtractToNumberFormat = (value: string | undefined): number | undefined => {
+export const awsExtractToNumberFormat = (
+  value: string | undefined,
+): number | undefined => {
   if (!value) {
     return undefined;
   }

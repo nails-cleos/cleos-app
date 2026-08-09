@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  viewChild,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from '@app/util/mat-table-state';
@@ -30,60 +38,114 @@ import {
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatList, MatListItem, MatListItemIcon, MatListItemTitle } from '@angular/material/list';
+import {
+  MatList,
+  MatListItem,
+  MatListItemIcon,
+  MatListItemTitle,
+} from '@angular/material/list';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-transaction-view',
   templateUrl: './transaction-view.component.html',
   styleUrls: ['./transaction-view.component.scss'],
-  imports: [MatIcon, MatList, MatListItem, MatIconButton, TranslatePipe, CurrencyPipe, DecimalPipe,
-    RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
-    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, BalanceComponent, MatListItemTitle,
-    TableSkeletonComponent],
+  imports: [
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatIconButton,
+    TranslatePipe,
+    CurrencyPipe,
+    DecimalPipe,
+    RouterLink,
+    DatePipe,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatListItemIcon,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    BalanceComponent,
+    MatListItemTitle,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionViewComponent {
   id = input<string>();
 
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly accountStore = inject(AccountStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
-
-  private authUserSignal = this.authUserService.authUser;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
-      },
-    },
+  private tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'timestamp',
+    'desc',
   );
 
-  private transactionsSignal = computed(() => this.accountStore.data()?.transactions);
+  private authUserSignal = this.authUserService.authUser;
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+      },
+    },
+  });
+
+  private transactionsSignal = computed(
+    () => this.accountStore.data()?.transactions,
+  );
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = this.accountStore.isLoading;
-  dataSourceSignal = computed(() => this.transactionsSignal()?.content?.map((it: ITransaction) =>
-    Object.assign({}, it, { date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp) }),
-  ));
-  resultsLengthSignal = computed(() => this.transactionsSignal()?.totalElements || 0);
+  dataSourceSignal = computed(() =>
+    this.transactionsSignal()?.content?.map((it: ITransaction) =>
+      Object.assign({}, it, {
+        date: newDateTimestamp(it.timestamp ?? it.payment?.timestamp),
+      }),
+    ),
+  );
+  resultsLengthSignal = computed(
+    () => this.transactionsSignal()?.totalElements || 0,
+  );
   accountSignal = computed(() => this.accountStore.data()?.account);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
   hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
 
   tableColumns: TableSkeletonColumn[] = [

@@ -1,10 +1,22 @@
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type MockedObject,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { BehaviorSubject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 
 import { TransactionViewComponent } from './transaction-view.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { IAccountAll, IAccountTransaction, ITransaction } from '../../account';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { signal } from '@angular/core';
@@ -16,15 +28,22 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('TransactionViewComponent', () => {
   let component: TransactionViewComponent;
   let fixture: ComponentFixture<TransactionViewComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let accountTransactionSignal: ReturnType<typeof signal<IAccountTransaction | undefined>>;
+  let accountTransactionSignal: ReturnType<
+    typeof signal<IAccountTransaction | undefined>
+  >;
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let accountStoreSpy: jasmine.SpyObj<any>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let accountStoreSpy: MockedObject<any>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
 
   const mockAccount: IAccountAll = {
     id: 'account-123',
@@ -71,10 +90,13 @@ describe('TransactionViewComponent', () => {
   ];
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    accountTransactionSignal = signal<IAccountTransaction | undefined>(
+      undefined,
     );
-    accountTransactionSignal = signal<IAccountTransaction | undefined>(undefined);
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -82,25 +104,36 @@ describe('TransactionViewComponent', () => {
         [Breakpoints.Small]: false,
       },
     });
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false, customerId: 'user-1' }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      hasAdminRole: false,
+      customerId: 'user-1',
+    }));
 
-    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadTransactions'], {
+    accountStoreSpy = {
+      clean: vi.fn().mockName('AccountStore.clean'),
+      loadTransactions: vi.fn().mockName('AccountStore.loadTransactions'),
       data: accountTransactionSignal.asReadonly(),
       isLoading: signal(false).asReadonly(),
-    });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [TransactionViewComponent],
       providers: [
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: AccountStore, useValue: accountStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -117,11 +150,17 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(component.hasAdminRole()).toBeFalse();
+    expect(component.hasAdminRole()).toBe(false);
     expect(component.pageSizeSignal()).toBe(PAGE_SIZE);
     expect(component.language).toBe(DEFAULT_LOCALE);
     expect(component.displayedColumns).toEqual([
-      'position', 'timestamp', 'amount', 'amountGifted', 'payment.status', 'payment.type', 'actions',
+      'position',
+      'timestamp',
+      'amount',
+      'amountGifted',
+      'payment.status',
+      'payment.type',
+      'actions',
     ]);
   });
 
@@ -152,15 +191,23 @@ describe('TransactionViewComponent', () => {
   });
 
   it('should update hasAdminRole signal based on auth user', () => {
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true, customerId: 'user-1' }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      hasAdminRole: true,
+      customerId: 'user-1',
+    }));
     fixture.detectChanges();
 
-    expect(component.hasAdminRole()).toBeTrue();
+    expect(component.hasAdminRole()).toBe(true);
 
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: false, customerId: 'user-2' }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      hasAdminRole: false,
+      customerId: 'user-2',
+    }));
     fixture.detectChanges();
 
-    expect(component.hasAdminRole()).toBeFalse();
+    expect(component.hasAdminRole()).toBe(false);
   });
 
   it('should load transactions when accountId changes', () => {
@@ -168,12 +215,15 @@ describe('TransactionViewComponent', () => {
     fixture.detectChanges();
 
     expect(accountStoreSpy.clean).toHaveBeenCalled();
-    expect(accountStoreSpy.loadTransactions).toHaveBeenCalledWith('account-123', {
-      page: 0,
-      sort: 'timestamp',
-      direction: 'desc',
-      size: PAGE_SIZE,
-    });
+    expect(accountStoreSpy.loadTransactions).toHaveBeenCalledWith(
+      'account-123',
+      {
+        page: 0,
+        sort: 'timestamp',
+        direction: 'desc',
+        size: PAGE_SIZE,
+      },
+    );
   });
 
   it('should update account and transactions from accountTransactionSignal', () => {

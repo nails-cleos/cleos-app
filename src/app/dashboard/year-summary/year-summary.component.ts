@@ -1,7 +1,23 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { dateMonthYear, getNowTimeZone } from '@app/util/dates';
 import {
   IMonthlyExport,
@@ -43,31 +59,54 @@ import { NavigationService } from '@app/services/navigation.service';
 type YearSummaryForm = {
   date: FormControl<Date>;
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
-}
+};
 
 @Component({
   selector: 'app-year-summary',
   templateUrl: './year-summary.component.html',
   styleUrls: ['./year-summary.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
-    MatOption, MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, KeyValuePipe,
-    RouterLink, YearComponent, TotalSummaryComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatButton,
+    MatSuffix,
+    ReactiveFormsModule,
+    TranslatePipe,
+    KeyValuePipe,
+    RouterLink,
+    YearComponent,
+    TotalSummaryComponent,
+  ],
   providers: [...provideYearDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YearSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly dashboardStore = inject(DashboardStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
 
   private authUserSignal = this.authUserService.authUser;
 
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
-  private quarterSummariesSignal = signal<IQuarterSummary[] | undefined>(undefined);
+  private quarterSummariesSignal = signal<IQuarterSummary[] | undefined>(
+    undefined,
+  );
   private sheetDataSignal = signal<IMonthlyExport[]>([]);
   private readonly exportSignal = signal<boolean>(false);
 
@@ -81,7 +120,9 @@ export class YearSummaryComponent {
   private dateSignal = toSignal(this.getForm.date.valueChanges);
   private selectedRoomSignal = toSignal(this.getForm.selectedRoom.valueChanges);
 
-  private timeZone = computed(() => getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
+  private timeZone = computed(() =>
+    getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()),
+  );
 
   yearSummaryMapSignal = this.dashboardStore.yearSummaryMap;
   yearExportSignal = this.dashboardStore.yearExport;
@@ -105,35 +146,50 @@ export class YearSummaryComponent {
 
   showCash = computed(() => this.authUserSignal()?.showCash || false);
   isHandset = computed(() => this.breakpointsSignal().matches);
-  currencySignal = computed(() => getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
+  currencySignal = computed(() =>
+    getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()),
+  );
   yearSummaryTotalsSignal = computed(() => {
     const quarterSummaries = this.quarterSummariesSignal();
     const yearSummaryTotals: ISummaryTotals = new SummaryTotals();
 
-    quarterSummaries?.forEach(q => {
-      q.monthSummaries.forEach(value => {
-        value.total.forEach(t => {
+    quarterSummaries?.forEach((q) => {
+      q.monthSummaries.forEach((value) => {
+        value.total.forEach((t) => {
           switch (t.type) {
             case 'INCOME':
-              yearSummaryTotals.income = new Total(yearSummaryTotals.income.gross + t.gross,
-                yearSummaryTotals.income.btw + t.btw, yearSummaryTotals.income.net + t.net);
+              yearSummaryTotals.income = new Total(
+                yearSummaryTotals.income.gross + t.gross,
+                yearSummaryTotals.income.btw + t.btw,
+                yearSummaryTotals.income.net + t.net,
+              );
               break;
             case 'EXPENSE':
-              yearSummaryTotals.expense = new Total(yearSummaryTotals.expense.gross + t.gross,
-                yearSummaryTotals.expense.btw + t.btw, yearSummaryTotals.expense.net + t.net);
+              yearSummaryTotals.expense = new Total(
+                yearSummaryTotals.expense.gross + t.gross,
+                yearSummaryTotals.expense.btw + t.btw,
+                yearSummaryTotals.expense.net + t.net,
+              );
               break;
             case 'CASH':
-              yearSummaryTotals.cash = new Total(yearSummaryTotals.cash.gross + t.gross,
-                yearSummaryTotals.cash.btw + t.btw, yearSummaryTotals.cash.net + t.net);
+              yearSummaryTotals.cash = new Total(
+                yearSummaryTotals.cash.gross + t.gross,
+                yearSummaryTotals.cash.btw + t.btw,
+                yearSummaryTotals.cash.net + t.net,
+              );
               break;
           }
         });
-        yearSummaryTotals.totals = new Total(yearSummaryTotals.totals.gross + value.totalGross,
-          yearSummaryTotals.totals.btw + value.totalBTW, yearSummaryTotals.totals.net + value.totalNet);
-        yearSummaryTotals.totalsWithoutCash =
-          new Total(yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
-            yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
-            yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet);
+        yearSummaryTotals.totals = new Total(
+          yearSummaryTotals.totals.gross + value.totalGross,
+          yearSummaryTotals.totals.btw + value.totalBTW,
+          yearSummaryTotals.totals.net + value.totalNet,
+        );
+        yearSummaryTotals.totalsWithoutCash = new Total(
+          yearSummaryTotals.totalsWithoutCash.gross + value.totalWithoutGross,
+          yearSummaryTotals.totalsWithoutCash.btw + value.totalWithoutBTW,
+          yearSummaryTotals.totalsWithoutCash.net + value.totalWithoutNet,
+        );
       });
     });
 
@@ -149,7 +205,12 @@ export class YearSummaryComponent {
       const navigationState = history.state;
       if (navigationState) {
         const now = getNowTimeZone(this.timeZone());
-        this.getForm.date.setValue(dateMonthYear(now.getMonth(), navigationState['year'] || now.getFullYear()));
+        this.getForm.date.setValue(
+          dateMonthYear(
+            now.getMonth(),
+            navigationState['year'] || now.getFullYear(),
+          ),
+        );
       }
     });
 
@@ -174,8 +235,13 @@ export class YearSummaryComponent {
               this.getForm.selectedRoom.setValue(key);
             }
           });
-          if (yearSummaryMapValue.size > 1 &&
-            allElementsHaveSameKeyFilterValue(yearSummaryMapValue, ['currency', 'id'])) {
+          if (
+            yearSummaryMapValue.size > 1 &&
+            allElementsHaveSameKeyFilterValue(yearSummaryMapValue, [
+              'currency',
+              'id',
+            ])
+          ) {
             const selectedRoomValue = this.getForm.selectedRoom.value;
             if (selectedRoomValue && typeof selectedRoomValue !== 'string') {
               this.primaryRoomSignal.set(selectedRoomValue);
@@ -203,7 +269,9 @@ export class YearSummaryComponent {
           });
           this.quarterSummariesSignal.set(result);
         } else if (room !== 'All') {
-          this.quarterSummariesSignal.set(yearSummaryMapValue.get(room)?.quarterSummaries);
+          this.quarterSummariesSignal.set(
+            yearSummaryMapValue.get(room)?.quarterSummaries,
+          );
         }
       }
     });
@@ -231,7 +299,8 @@ export class YearSummaryComponent {
     return this.quarterSummariesSignal();
   }
 
-  get yearSummaryMap(): Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | undefined {
+  get yearSummaryMap():
+    Map<ISummaryRoom, { quarterSummaries: IQuarterSummary[] }> | undefined {
     return this.yearSummaryMapSignal();
   }
 
@@ -243,7 +312,8 @@ export class YearSummaryComponent {
     return this.exportSignal();
   }
 
-  get yearExport(): Map<ISummaryRoom, { monthlyExport: IMonthlyExport[] }> | undefined {
+  get yearExport():
+    Map<ISummaryRoom, { monthlyExport: IMonthlyExport[] }> | undefined {
     return this.yearExportSignal();
   }
 
@@ -258,7 +328,10 @@ export class YearSummaryComponent {
     return;
   }
 
-  setYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
+  setYear = (
+    normalizedMonthAndYear: Date,
+    datepicker: Pick<MatDatepicker<Date>, 'close'>,
+  ): void => {
     const ctrlValue = new Date(this.getForm.date.value);
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
 
@@ -270,42 +343,57 @@ export class YearSummaryComponent {
   private getAllQuarterSummaries = (
     quarterSummaries: IQuarterSummary[],
     result: IQuarterSummary[],
-  ): IQuarterSummary[] => result.map(q => {
-    const quarter = quarterSummaries.find(it => it.quarter === q.quarter);
-    return new QuarterSummary(q.quarter, q.monthSummaries.map(m => {
-      const month = quarter?.monthSummaries?.find(it => it.month === m.month);
-      return new MonthSummary(m.month, m.total.map(t => {
-        const total = month?.total?.find(it => it.type === t.type);
-        const type = t.type;
-        const net = t.net + (total?.net || 0);
-        const btw = t.btw + (total?.btw || 0);
-        const gross = t.gross + (total?.gross || 0);
-        return { type, net, btw, gross } as ISummaryTotal;
-      }));
-    }));
-  });
+  ): IQuarterSummary[] =>
+    result.map((q) => {
+      const quarter = quarterSummaries.find((it) => it.quarter === q.quarter);
+      return new QuarterSummary(
+        q.quarter,
+        q.monthSummaries.map((m) => {
+          const month = quarter?.monthSummaries?.find(
+            (it) => it.month === m.month,
+          );
+          return new MonthSummary(
+            m.month,
+            m.total.map((t) => {
+              const total = month?.total?.find((it) => it.type === t.type);
+              const type = t.type;
+              const net = t.net + (total?.net || 0);
+              const btw = t.btw + (total?.btw || 0);
+              const gross = t.gross + (total?.gross || 0);
+              return { type, net, btw, gross } as ISummaryTotal;
+            }),
+          );
+        }),
+      );
+    });
 
-  private createExportData = (yearExport: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[] }>): void => {
+  private createExportData = (
+    yearExport: Map<ISummaryRoom, { monthlyExport: IMonthlyExport[] }>,
+  ): void => {
     const sheetData: IMonthlyExport[] = [];
     const room = this.selectedRoomSignal();
     if (room) {
       if (room === 'All') {
         yearExport?.forEach(({ monthlyExport }) => {
-          monthlyExport.forEach(({ month, saleSummary, expenseSummary, cashSummary }) => {
-            const existingIndex = sheetData.findIndex(item => item.month === month);
-            if (existingIndex !== -1) {
-              sheetData[existingIndex].saleSummary.push(...saleSummary);
-              sheetData[existingIndex].expenseSummary.push(...expenseSummary);
-              sheetData[existingIndex].cashSummary.push(...cashSummary);
-            } else {
-              sheetData.push({
-                month,
-                saleSummary: [...saleSummary],
-                expenseSummary: [...expenseSummary],
-                cashSummary: [...cashSummary],
-              });
-            }
-          });
+          monthlyExport.forEach(
+            ({ month, saleSummary, expenseSummary, cashSummary }) => {
+              const existingIndex = sheetData.findIndex(
+                (item) => item.month === month,
+              );
+              if (existingIndex !== -1) {
+                sheetData[existingIndex].saleSummary.push(...saleSummary);
+                sheetData[existingIndex].expenseSummary.push(...expenseSummary);
+                sheetData[existingIndex].cashSummary.push(...cashSummary);
+              } else {
+                sheetData.push({
+                  month,
+                  saleSummary: [...saleSummary],
+                  expenseSummary: [...expenseSummary],
+                  cashSummary: [...cashSummary],
+                });
+              }
+            },
+          );
         });
         this.sheetDataSignal.set(sheetData.sort((a, b) => a.month - b.month));
       } else {
@@ -320,15 +408,27 @@ export class YearSummaryComponent {
   };
 
   private exportToExcel = (): void => {
-    const sortedSheetData = this.sheetData.map(monthly => ({
+    const sortedSheetData = this.sheetData.map((monthly) => ({
       ...monthly,
-      saleSummary: [...monthly.saleSummary].sort((a, b) => a.timestamp - b.timestamp),
-      expenseSummary: [...monthly.expenseSummary].sort((a, b) => a.timestamp - b.timestamp),
-      cashSaleSummary: [...monthly.cashSummary].sort((a, b) => a.timestamp - b.timestamp),
+      saleSummary: [...monthly.saleSummary].sort(
+        (a, b) => a.timestamp - b.timestamp,
+      ),
+      expenseSummary: [...monthly.expenseSummary].sort(
+        (a, b) => a.timestamp - b.timestamp,
+      ),
+      cashSaleSummary: [...monthly.cashSummary].sort(
+        (a, b) => a.timestamp - b.timestamp,
+      ),
     }));
     if (sortedSheetData.length) {
-      const workbook = createYearlyWorkbook(sortedSheetData, this.getForm.date.value || getNowTimeZone(this.timeZone()),
-        currencySymbol(this.currencySignal()), this.timeZone(), this.translateService, this.env);
+      const workbook = createYearlyWorkbook(
+        sortedSheetData,
+        this.getForm.date.value || getNowTimeZone(this.timeZone()),
+        currencySymbol(this.currencySignal()),
+        this.timeZone(),
+        this.translateService,
+        this.env,
+      );
 
       workbook.creator = this.userName() || '';
       workbook.created = getNowTimeZone(this.timeZone());
@@ -338,7 +438,10 @@ export class YearSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `Report_${ this.getForm.date.value?.getFullYear() }.xlsx`);
+        fs.saveAs(
+          blob,
+          `Report_${this.getForm.date.value?.getFullYear()}.xlsx`,
+        );
       });
     }
   };

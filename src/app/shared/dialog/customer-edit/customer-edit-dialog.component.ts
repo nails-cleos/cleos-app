@@ -23,13 +23,20 @@ type CustomerEditData = {
   selector: 'app-customer-edit-reservation-dialog',
   templateUrl: './customer-edit-dialog.component.html',
   styleUrls: ['./customer-edit-dialog.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, MatDialogTitle, MatDialogContent, MatDialogActions],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomerEditDialogComponent {
   private readonly data = inject<CustomerEditData>(MAT_DIALOG_DATA);
-  private readonly dialogRef: MatDialogRef<CustomerEditDialogComponent> = inject(
-    MatDialogRef<CustomerEditDialogComponent>);
+  private readonly dialogRef: MatDialogRef<CustomerEditDialogComponent> =
+    inject(MatDialogRef<CustomerEditDialogComponent>);
 
   price: IPrice = this.data.price;
   currency: ICurrencyAll = this.data.currency;

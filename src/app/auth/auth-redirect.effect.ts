@@ -28,7 +28,11 @@ export class AuthRedirectEffect {
 
       const result = this.resolveRedirect(queryParams, lang, user.authorities);
 
-      this.navigationService.reload(result.url, result.data, result.queryParams);
+      this.navigationService.reload(
+        result.url,
+        result.data,
+        result.queryParams,
+      );
     });
   }
 
@@ -89,11 +93,14 @@ export class AuthRedirectEffect {
   }
 
   private hasRoomOrAdmin(authorities?: IAuthority[]): boolean {
-    return !!authorities && authorities.some(
-      u =>
-        u.authority === Role.professional ||
-        u.authority === Role.manager ||
-        u.authority === Role.admin,
+    return (
+      !!authorities &&
+      authorities.some(
+        (u) =>
+          u.authority === Role.professional ||
+          u.authority === Role.manager ||
+          u.authority === Role.admin,
+      )
     );
   }
 }

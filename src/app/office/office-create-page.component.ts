@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { OfficeComponent } from './office.component';
 import { OfficeStore } from '../store/office.store';
 import { IOffice } from './office';
@@ -7,7 +12,8 @@ import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-office-create-page',
-  template: '<app-office [config]="config" [managers]="managers()" (submitData)="submit($event)"/>',
+  template:
+    '<app-office [config]="config" [managers]="managers()" (submitData)="submit($event)"/>',
   imports: [OfficeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

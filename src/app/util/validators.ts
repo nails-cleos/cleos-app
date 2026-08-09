@@ -1,10 +1,23 @@
-import { AbstractControl, FormArray, FormControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import {
+  AbstractControl,
+  FormArray,
+  FormControl,
+  ValidationErrors,
+  ValidatorFn,
+} from '@angular/forms';
 
-export const fieldChange = (formControl: FormControl, value?: any): any | undefined =>
-  formControl && formControl.dirty && value !== formControl.value ? formControl.value : null;
+export const fieldChange = (
+  formControl: FormControl,
+  value?: any,
+): any | undefined =>
+  formControl && formControl.dirty && value !== formControl.value
+    ? formControl.value
+    : null;
 
-export const valueChange = (newValue: any, oldValue: any | undefined): any | undefined => oldValue !== newValue ?
-  newValue : null;
+export const valueChange = (
+  newValue: any,
+  oldValue: any | undefined,
+): any | undefined => (oldValue !== newValue ? newValue : null);
 
 export const requireMatch = (control: AbstractControl): any => {
   const selection: any = control.value;
@@ -14,7 +27,9 @@ export const requireMatch = (control: AbstractControl): any => {
   return null;
 };
 
-export const noDuplicateDatesValidator = (key: string = 'date'): ValidatorFn => {
+export const noDuplicateDatesValidator = (
+  key: string = 'date',
+): ValidatorFn => {
   return (formArray: AbstractControl): { [key: string]: any } | null => {
     if (!(formArray instanceof FormArray)) {
       throw new Error('Validator must be applied to a FormArray');

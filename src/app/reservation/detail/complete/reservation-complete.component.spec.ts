@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCompleteComponent } from './reservation-complete.component';
 import { of } from 'rxjs';
@@ -16,29 +17,31 @@ import { ReservationStore } from '@app/store/reservation.store';
 describe('ReservationCompleteComponent', () => {
   let component: ReservationCompleteComponent;
   let fixture: ComponentFixture<ReservationCompleteComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let reservationStoreSpy: {
     selected: ReturnType<typeof signal>;
-    loadById: jasmine.Spy;
-    complete: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadById: Mock;
+    complete: Mock;
+    clean: Mock;
   };
 
   let treatmentStoreSpy: {
     treatmentDiscount: ReturnType<typeof signal>;
-    getAllTreatments: jasmine.Spy;
+    getAllTreatments: Mock;
   };
 
   let additionalStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllByGroupId: jasmine.Spy;
+    loadAllByGroupId: Mock;
   };
   let paymentStoreSpy: {
     data: ReturnType<typeof signal>;
     options: ReturnType<typeof signal>;
-    getOptions: jasmine.Spy;
-    getPaymentByResourceId: jasmine.Spy;
+    getOptions: Mock;
+    getPaymentByResourceId: Mock;
   };
 
   const mockReservation = {
@@ -72,9 +75,7 @@ describe('ReservationCompleteComponent', () => {
       paymentTypes: ['CASH', 'TRANSFER'],
       currency: { code: 'EUR' },
     },
-    additional: [
-      { key: 'additional-1', name: 'Additional 1', price: 20 },
-    ],
+    additional: [{ key: 'additional-1', name: 'Additional 1', price: 20 }],
     balance: 50,
   };
 
@@ -109,9 +110,7 @@ describe('ReservationCompleteComponent', () => {
     },
   ];
 
-  const mockPayments = [
-    { id: 'payment-1', amount: 50, type: 'CASH' },
-  ];
+  const mockPayments = [{ id: 'payment-1', amount: 50, type: 'CASH' }];
 
   const mockPaymentOptions = [
     {
@@ -137,28 +136,29 @@ describe('ReservationCompleteComponent', () => {
   ];
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       selected: signal(undefined),
-      loadById: jasmine.createSpy('loadById'),
-      complete: jasmine.createSpy('complete'),
-      clean: jasmine.createSpy('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      complete: vi.fn().mockName('complete'),
+      clean: vi.fn().mockName('clean'),
     };
     treatmentStoreSpy = {
       treatmentDiscount: signal<any>(mockTreatmentDiscount),
-      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+      getAllTreatments: vi.fn().mockName('getAllTreatments'),
     };
     additionalStoreSpy = {
       data: signal<any>({ kind: 'list', value: mockAdditionalList }),
-      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+      loadAllByGroupId: vi.fn().mockName('loadAllByGroupId'),
     };
     paymentStoreSpy = {
       data: signal(mockPayments),
       options: signal(mockPaymentOptions),
-      getOptions: jasmine.createSpy('getOptions'),
-      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
+      getOptions: vi.fn().mockName('getOptions'),
+      getPaymentByResourceId: vi.fn().mockName('getPaymentByResourceId'),
     };
 
     await TestBed.configureTestingModule({
@@ -228,8 +228,10 @@ describe('ReservationCompleteComponent', () => {
       reservationStoreSpy.selected.set(mockReservation);
       fixture.detectChanges();
 
-      expect(component.options().map(type => type.type)).toContain('CASH');
-      expect(component.options().map(type => type.type)).toContain('TRANSFER');
+      expect(component.options().map((type) => type.type)).toContain('CASH');
+      expect(component.options().map((type) => type.type)).toContain(
+        'TRANSFER',
+      );
     });
   });
 
@@ -241,7 +243,10 @@ describe('ReservationCompleteComponent', () => {
     });
 
     it('should return 0 when reservation has no balance', () => {
-      reservationStoreSpy.selected.set({ ...mockReservation, balance: undefined });
+      reservationStoreSpy.selected.set({
+        ...mockReservation,
+        balance: undefined,
+      });
       fixture.detectChanges();
       expect(component.balance).toBe(0);
     });
@@ -314,7 +319,9 @@ describe('ReservationCompleteComponent', () => {
       component.onChange(options);
 
       expect(component['additionalSelected']().length).toBe(2);
-      expect(component['additionalSelected']()[0]).toEqual(mockAdditionalList[0]);
+      expect(component['additionalSelected']()[0]).toEqual(
+        mockAdditionalList[0],
+      );
     });
 
     it('should check if additional is selected', () => {
@@ -417,8 +424,10 @@ describe('ReservationCompleteComponent', () => {
       const mockDialogRef = {
         afterClosed: () => of(true),
       };
-      const dialogSpyInstance = spyOn(component['dialog'], 'open');
-      dialogSpyInstance.and.returnValue(mockDialogRef as any);
+      const dialogSpyInstance = vi
+        .spyOn(component['dialog'], 'open')
+        .mockReturnValue(undefined as any);
+      dialogSpyInstance.mockReturnValue(mockDialogRef as any);
 
       component.complete();
 
@@ -430,8 +439,10 @@ describe('ReservationCompleteComponent', () => {
       const mockDialogRef = {
         afterClosed: () => of(true),
       };
-      const dialogSpyInstance = spyOn(component['dialog'], 'open');
-      dialogSpyInstance.and.returnValue(mockDialogRef as any);
+      const dialogSpyInstance = vi
+        .spyOn(component['dialog'], 'open')
+        .mockReturnValue(undefined as any);
+      dialogSpyInstance.mockReturnValue(mockDialogRef as any);
 
       component.complete();
 
@@ -443,12 +454,17 @@ describe('ReservationCompleteComponent', () => {
       const mockDialogRef = {
         afterClosed: () => of(false),
       };
-      const dialogSpyInstance = spyOn(component['dialog'], 'open');
-      dialogSpyInstance.and.returnValue(mockDialogRef as any);
+      const dialogSpyInstance = vi
+        .spyOn(component['dialog'], 'open')
+        .mockReturnValue(undefined as any);
+      dialogSpyInstance.mockReturnValue(mockDialogRef as any);
 
       component.complete();
 
-      setTimeout(() => expect(reservationStoreSpy.complete).not.toHaveBeenCalled(), 100);
+      setTimeout(
+        () => expect(reservationStoreSpy.complete).not.toHaveBeenCalled(),
+        100,
+      );
     });
 
     it('should complete reservation directly when isValid is true', () => {
@@ -467,14 +483,19 @@ describe('ReservationCompleteComponent', () => {
       fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('new-reservation-id', 'reservation');
+      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(
+        'new-reservation-id',
+        'reservation',
+      );
     });
 
     it('should dispatch getReservation when reservationId changes', () => {
       fixture.componentRef.setInput('id', 'new-reservation-id');
       fixture.detectChanges();
 
-      expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('new-reservation-id');
+      expect(reservationStoreSpy.loadById).toHaveBeenCalledWith(
+        'new-reservation-id',
+      );
     });
 
     it('should dispatch getAllTreatments when roomId changes', () => {
@@ -482,7 +503,10 @@ describe('ReservationCompleteComponent', () => {
       fixture.componentRef.setInput('customerId', 'customer-1');
       fixture.detectChanges();
 
-      expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith('new-room-id', 'customer-1');
+      expect(treatmentStoreSpy.getAllTreatments).toHaveBeenCalledWith(
+        'new-room-id',
+        'customer-1',
+      );
     });
 
     it('should dispatch getAllAdditionalByGroupId when group is selected', () => {
@@ -499,7 +523,10 @@ describe('ReservationCompleteComponent', () => {
       component.getForm.group.setValue(group as any);
       fixture.detectChanges();
 
-      expect(additionalStoreSpy.loadAllByGroupId).toHaveBeenCalledWith('room-1', 'group-1');
+      expect(additionalStoreSpy.loadAllByGroupId).toHaveBeenCalledWith(
+        'room-1',
+        'group-1',
+      );
     });
   });
 
@@ -522,7 +549,10 @@ describe('ReservationCompleteComponent', () => {
         { id: 'treatment-2', name: 'Deep Tissue Massage' },
       ];
 
-      const filtered = component['filterTreatment']('swedish', treatments as any);
+      const filtered = component['filterTreatment'](
+        'swedish',
+        treatments as any,
+      );
 
       expect(filtered?.length).toBe(1);
       expect(filtered?.[0].name).toBe('Swedish Massage');
@@ -609,14 +639,14 @@ describe('ReservationCompleteComponent', () => {
   it('should set the valid time', () => {
     component.totalTime.set('');
     fixture.detectChanges();
-    expect(component.isValidTime()).toBeFalse();
+    expect(component.isValidTime()).toBe(false);
 
     component.totalTime.set('01:00');
     fixture.detectChanges();
-    expect(component.isValidTime()).toBeTrue();
+    expect(component.isValidTime()).toBe(true);
 
     component.totalTime.set('-01:00');
     fixture.detectChanges();
-    expect(component.isValidTime()).toBeFalse();
+    expect(component.isValidTime()).toBe(false);
   });
 });

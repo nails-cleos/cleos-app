@@ -14,25 +14,35 @@ type CurrencyData =
 export const CurrencyStore = signalStore(
   { providedIn: 'root' },
   withCrudStoreState<ICurrencyAll, CurrencyData, ICurrencyAll>(),
-  withCrudStoreMethods<ICurrency, IApiResponse, IApiResponse, { id: string; code: string }>(() => {
+  withCrudStoreMethods<
+    ICurrency,
+    IApiResponse,
+    IApiResponse,
+    { id: string; code: string }
+  >(() => {
     const currencyService = inject(CurrencyService);
     const translateService = inject(TranslateService);
 
     return {
-      loadPage: ({ page, sort, direction, size }) => currencyService.getCurrenciesPage(page, sort, direction, size),
+      loadPage: ({ page, sort, direction, size }) =>
+        currencyService.getCurrenciesPage(page, sort, direction, size),
       loadById: (id) => currencyService.getCurrency(id),
       loadAll: () => currencyService.getAllCurrency(),
       create: (currency) => currencyService.createCurrency(currency),
       update: (id, currency) => currencyService.updateCurrency(id, currency),
       delete: ({ id }) => currencyService.deleteCurrency(id),
       createResponse: (response) => ({
-        message: translateService.instant('CURRENCY.CREATED', { code: response.name }),
-        path: `currency/${ response.id }`,
+        message: translateService.instant('CURRENCY.CREATED', {
+          code: response.name,
+        }),
+        path: `currency/${response.id}`,
         redirect: 'currency',
       }),
       updateResponse: (response) => ({
-        message: translateService.instant('CURRENCY.UPDATED.MESSAGE', { code: response.name }),
-        path: `currency/${ response.id }`,
+        message: translateService.instant('CURRENCY.UPDATED.MESSAGE', {
+          code: response.name,
+        }),
+        path: `currency/${response.id}`,
         redirect: 'currency',
       }),
       deleteResponse: ({ code }) => ({

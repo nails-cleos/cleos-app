@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { AuthUserService } from '../services/auth-user.service';
 import { ICommon } from '../interfaces/common';
 import { IUnavailable } from './unavailable';
@@ -21,7 +28,7 @@ import { DialogComponent } from '../shared/dialog/generic/dialog.component';
         (deleteData)="delete()"
       />
     } @else {
-      <app-skeleton [buttons]="3"/>
+      <app-skeleton [buttons]="3" />
     }
   `,
   imports: [UnavailableComponent, SkeletonComponent],
@@ -32,12 +39,17 @@ export class UnavailableDetailsPageComponent {
 
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly authUserService = inject(AuthUserService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   config: ICommon = {
     title: 'UNAVAILABLE.DETAIL',
-    button: { icon: 'published_with_changes', label: 'COMMON.BUTTON.UPDATE', showDelete: true },
+    button: {
+      icon: 'published_with_changes',
+      label: 'COMMON.BUTTON.UPDATE',
+      showDelete: true,
+    },
   };
 
   unavailable = computed(() => this.unavailableStore.selected());
@@ -53,7 +65,9 @@ export class UnavailableDetailsPageComponent {
     this.unavailableStore.update(
       this.id(),
       unavailable,
-      this.authUserService.authUser()?.isRoomAdmin ? 'dashboard/events' : 'unavailable',
+      this.authUserService.authUser()?.isRoomAdmin
+        ? 'dashboard/events'
+        : 'unavailable',
     );
   }
 
@@ -64,13 +78,24 @@ export class UnavailableDetailsPageComponent {
     }
     const title = this.translateService.instant('UNAVAILABLE.DELETED.TITLE');
     const date = unavailable.start;
-    const content = this.translateService.instant('UNAVAILABLE.DELETED.CONTENT', { date });
+    const content = this.translateService.instant(
+      'UNAVAILABLE.DELETED.CONTENT',
+      { date },
+    );
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
-      result => {
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: unavailable, variant: 'warning' },
+      (result) => {
         if (result) {
-          this.unavailableStore.delete(result.id, result.timestamp, result.timeZone);
+          this.unavailableStore.delete(
+            result.id,
+            result.timestamp,
+            result.timeZone,
+          );
         }
-      });
+      },
+    );
   }
 }

@@ -1,7 +1,12 @@
 @let currentIsEditing = isEditing();
 @let currentIsAdmin = isAdmin();
 @if (screenConfig(); as screenConfig) {
-  <ng-template #stepHeading let-step="step" let-title="title" let-description="description">
+  <ng-template
+    #stepHeading
+    let-step="step"
+    let-title="title"
+    let-description="description"
+  >
     <div class="step-heading app-surface-hero app-detail-panel">
       <div class="step-heading__index">{{ step }}</div>
       <div class="step-heading__copy">
@@ -11,27 +16,49 @@
     </div>
   </ng-template>
 
-  <ng-template #calendarTooltip let-event="event" let-placement="placement" let-contents="contents">
+  <ng-template
+    #calendarTooltip
+    let-event="event"
+    let-placement="placement"
+    let-contents="contents"
+  >
     <div class="cal-tooltip" [ngClass]="'cal-tooltip-' + placement">
       <div class="cal-tooltip-arrow"></div>
       <div class="cal-tooltip-inner reservation-tooltip-inner">
         @if (event?.meta?.isReservation) {
           <div class="calendar-tooltip-card">
             <div class="calendar-tooltip-card__time">
-              {{ event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
+              {{
+                event.start
+                  | date
+                    : 'EEE d MMM, HH:mm'
+                    : $safeNavigationMigration(event.meta?.timeZone)
+                    : language
+              }}
               -
-              {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
+              {{
+                event.end
+                  | date
+                    : 'HH:mm'
+                    : $safeNavigationMigration(event.meta?.timeZone)
+                    : language
+              }}
             </div>
             <div class="calendar-tooltip-card__row">
               <span>{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-              <strong>{{ event.meta?.treatmentName || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+              <strong>{{
+                event.meta?.treatmentName ||
+                  ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+              }}</strong>
             </div>
             <div class="calendar-tooltip-card__row">
               <span>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
               @if (event.meta?.additionalNames?.length) {
                 <strong>{{ event.meta.additionalNames.join(', ') }}</strong>
               } @else {
-                <strong>{{ 'RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+                <strong>{{
+                  'RESERVATION.FLOW.SUMMARY.NONE' | translate
+                }}</strong>
               }
             </div>
           </div>
@@ -49,8 +76,11 @@
     @let currentProfessional = summaryProfessional;
     @let currentAdditionalSelected = summaryAdditionals;
 
-    <mat-card appearance="outlined" class="booking-summary app-surface-section"
-              [class.booking-summary--compact]="compact">
+    <mat-card
+      appearance="outlined"
+      class="booking-summary app-surface-section"
+      [class.booking-summary--compact]="compact"
+    >
       <mat-card-content>
         <div class="booking-summary__header">
           <div>
@@ -61,54 +91,90 @@
               <span>{{ 'RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
               @if (hasDiscountApplied && !currentIsEditing) {
                 <small>
-                  {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalWithoutDiscount | number:'1.2-2' }}
+                  {{
+                    $safeNavigationMigration(currentRoom?.currency)
+                      | currencySymbol
+                  }}
+                  {{ effectiveTotalWithoutDiscount | number: '1.2-2' }}
                 </small>
               }
-              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong
+                >{{
+                  $safeNavigationMigration(currentRoom?.currency)
+                    | currencySymbol
+                }}
+                {{ effectiveTotalPrice | number: '1.2-2' }}</strong
+              >
             </div>
           }
         </div>
 
         <div class="booking-summary__grid">
           <div class="summary-item app-surface-item">
-            <span
-              class="summary-item__label app-surface-item__label">{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</span>
-            <strong
-              class="app-surface-item__value">{{ currentCustomer?.displayName || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+            <span class="summary-item__label app-surface-item__label">{{
+              'RESERVATION.CUSTOMER.FIELD' | translate
+            }}</span>
+            <strong class="app-surface-item__value">{{
+              currentCustomer?.displayName ||
+                ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+            }}</strong>
           </div>
 
           <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-            <strong
-              class="app-surface-item__value">{{ (currentRoom | roomName) || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+            <span class="summary-item__label app-surface-item__label">{{
+              'COMMON.ROOM.FIELD' | translate
+            }}</span>
+            <strong class="app-surface-item__value">{{
+              (currentRoom | roomName) ||
+                ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+            }}</strong>
           </div>
 
           <div class="summary-item app-surface-item">
-            <span
-              class="summary-item__label app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-            <strong
-              class="app-surface-item__value">{{ currentProfessional?.displayName || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+            <span class="summary-item__label app-surface-item__label">{{
+              'COMMON.PROFESSIONAL.FIELD' | translate
+            }}</span>
+            <strong class="app-surface-item__value">{{
+              currentProfessional?.displayName ||
+                ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+            }}</strong>
           </div>
 
           <div class="summary-item app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-            <strong
-              class="app-surface-item__value">{{ currentTreatment?.name || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+            <span class="summary-item__label app-surface-item__label">{{
+              'COMMON.TREATMENT.FIELD' | translate
+            }}</span>
+            <strong class="app-surface-item__value">{{
+              currentTreatment?.name ||
+                ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+            }}</strong>
           </div>
 
           <div class="summary-item app-crud-form-grid__full app-surface-item">
-            <span
-              class="summary-item__label app-surface-item__label">{{ 'RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</span>
+            <span class="summary-item__label app-surface-item__label">{{
+              'RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate
+            }}</span>
             @if (summaryDateTimes.length) {
               <div class="booking-summary__slots">
                 @for (slot of summaryDateTimes; track $index) {
                   <span class="booking-summary__slot app-detail-chip">
-                    {{ slot.date | date:'EEE d MMM':$safeNavigationMigration(currentRoom?.timeZone):language }}
+                    {{
+                      slot.date
+                        | date
+                          : 'EEE d MMM'
+                          : $safeNavigationMigration(currentRoom?.timeZone)
+                          : language
+                    }}
                     @if (slot.start) {
                       <span> · {{ slot.start }}</span>
                     }
                     @if (showTimeZone) {
-                      <button (click)="openDialog(slot.date)" class="summary-slot-button" mat-icon-button type="button">
+                      <button
+                        (click)="openDialog(slot.date)"
+                        class="summary-slot-button"
+                        mat-icon-button
+                        type="button"
+                      >
                         <mat-icon>info_outline</mat-icon>
                       </button>
                     }
@@ -116,70 +182,135 @@
                 }
               </div>
             } @else {
-              <strong class="app-surface-item__value">{{ 'RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
+              <strong class="app-surface-item__value">{{
+                'RESERVATION.FLOW.SUMMARY.EMPTY' | translate
+              }}</strong>
             }
           </div>
 
           <div class="summary-item app-crud-form-grid__full app-surface-item">
-            <span class="summary-item__label app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
+            <span class="summary-item__label app-surface-item__label">{{
+              'COMMON.ADDITIONAL.FIELD' | translate
+            }}</span>
             @if (currentAdditionalSelected.length) {
               <div class="booking-summary__slots">
-                @for (additional of currentAdditionalSelected; track additional.id) {
-                  <span class="booking-summary__slot app-detail-chip">{{ additional.name }}</span>
+                @for (
+                  additional of currentAdditionalSelected;
+                  track additional.id
+                ) {
+                  <span class="booking-summary__slot app-detail-chip">{{
+                    additional.name
+                  }}</span>
                 }
               </div>
             } @else {
-              <strong class="app-surface-item__value">{{ 'RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+              <strong class="app-surface-item__value">{{
+                'RESERVATION.FLOW.SUMMARY.NONE' | translate
+              }}</strong>
             }
           </div>
         </div>
 
         @if (currentTreatment) {
           <div class="price-breakdown">
-            <div class="price-breakdown__title">{{ 'RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</div>
+            <div class="price-breakdown__title">
+              {{ 'RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}
+            </div>
 
             <div class="price-row">
               <span>{{ currentTreatment.name }}</span>
-              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+              <strong
+                >{{
+                  $safeNavigationMigration(currentRoom?.currency)
+                    | currencySymbol
+                }}
+                {{ selectedTreatmentPrice | number: '1.2-2' }}</strong
+              >
             </div>
 
-            @for (additional of currentAdditionalSelected; track additional.id) {
+            @for (
+              additional of currentAdditionalSelected;
+              track additional.id
+            ) {
               <div class="price-row">
                 <span>{{ additional.name }}</span>
-                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                <strong
+                  >{{
+                    $safeNavigationMigration(currentRoom?.currency)
+                      | currencySymbol
+                  }}
+                  {{ additional.price | number: '1.2-2' }}</strong
+                >
               </div>
             }
 
             @if (hasDiscountApplied && price().discount) {
               <div class="price-row price-row--discount">
-                <span>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                <strong>- {{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                <span>{{
+                  'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate
+                }}</span>
+                <strong
+                  >-
+                  {{
+                    $safeNavigationMigration(currentRoom?.currency)
+                      | currencySymbol
+                  }}
+                  {{ effectiveDiscountAmount | number: '1.2-2' }}</strong
+                >
               </div>
             }
 
             <div class="price-row price-row--total">
               <span>{{ 'RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
-              <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong
+                >{{
+                  $safeNavigationMigration(currentRoom?.currency)
+                    | currencySymbol
+                }}
+                {{ effectiveTotalPrice | number: '1.2-2' }}</strong
+              >
             </div>
 
             @if (showConfigurationAmounts) {
               @if (effectivePaidWithConfiguredAmount > 0) {
                 <div class="price-row">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
+                  <strong
+                    >{{
+                      $safeNavigationMigration(currentRoom?.currency)
+                        | currencySymbol
+                    }}
+                    {{
+                      effectivePaidWithConfiguredAmount | number: '1.2-2'
+                    }}</strong
+                  >
                 </div>
               }
 
               @if (effectiveBalanceUsed > 0) {
                 <div class="price-row">
-                  <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
-                  <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
+                  <span>{{
+                    'COMMON.PAYMENT.OPTIONS.BALANCE' | translate
+                  }}</span>
+                  <strong
+                    >{{
+                      $safeNavigationMigration(currentRoom?.currency)
+                        | currencySymbol
+                    }}
+                    {{ effectiveBalanceUsed | number: '1.2-2' }}</strong
+                  >
                 </div>
               }
 
               <div class="price-row price-row--total">
                 <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
-                <strong>{{ $safeNavigationMigration(currentRoom?.currency) | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
+                <strong
+                  >{{
+                    $safeNavigationMigration(currentRoom?.currency)
+                      | currencySymbol
+                  }}
+                  {{ configuredPaymentToPay | number: '1.2-2' }}</strong
+                >
               </div>
             }
           </div>
@@ -189,36 +320,71 @@
   </ng-template>
 
   <ng-template #stepOne>
-    <form class="app-surface-stack" [formGroup]="customerForm" (keydown.enter)="$event.preventDefault()">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 1,
-        title: 'RESERVATION.CUSTOMER.FIELD',
-        description: 'RESERVATION.FLOW.STEPS.CUSTOMER'
-      }"></ng-container>
+    <form
+      class="app-surface-stack"
+      [formGroup]="customerForm"
+      (keydown.enter)="$event.preventDefault()"
+    >
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 1,
+            title: 'RESERVATION.CUSTOMER.FIELD',
+            description: 'RESERVATION.FLOW.STEPS.CUSTOMER',
+          }
+        "
+      ></ng-container>
 
       @if (customersSignal() || (currentIsEditing && summaryCustomer)) {
         <div class="app-surface-section app-inline-field-action">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
-            <input (keydown)="keyDownHandler($event, getCustomerForm.customer)" [formControl]="getCustomerForm.customer"
-                   [matAutocomplete]="autoCustomer" name="customer" autocomplete="off" matInput required type="text">
-            <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
-              @for (customer of filteredCustomerSignal() || []; track customer.id) {
-                <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+            <mat-label>{{
+              'RESERVATION.CUSTOMER.FIELD' | translate
+            }}</mat-label>
+            <input
+              (keydown)="keyDownHandler($event, getCustomerForm.customer)"
+              [formControl]="getCustomerForm.customer"
+              [matAutocomplete]="autoCustomer"
+              name="customer"
+              autocomplete="off"
+              matInput
+              required
+              type="text"
+            />
+            <mat-autocomplete
+              #autoCustomer="matAutocomplete"
+              [displayWith]="displayFnUser"
+            >
+              @for (
+                customer of filteredCustomerSignal() || [];
+                track customer.id
+              ) {
+                <mat-option [value]="customer">{{
+                  customer.displayName
+                }}</mat-option>
               }
             </mat-autocomplete>
             @if (getCustomerForm.customer.hasError('required')) {
-              <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"
+              ></mat-error>
             } @else if (getCustomerForm.customer.hasError('requireMatch')) {
-              <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"
+              ></mat-error>
             } @else if (errors()['customer']) {
               <mat-error>{{ errors()['customer'] }}</mat-error>
             }
           </mat-form-field>
 
           @if (currentIsAdmin) {
-            <button type="button" (click)="addCustomer" mat-stroked-button
-                    class="app-surface-filter-action app-detail-action-button">
+            <button
+              type="button"
+              (click)="(addCustomer)"
+              mat-stroked-button
+              class="app-surface-filter-action app-detail-action-button"
+            >
               <mat-icon>person_add</mat-icon>
               {{ 'RESERVATION.CUSTOMER.ADD_BUTTON' | translate }}
             </button>
@@ -226,7 +392,7 @@
         </div>
 
         @if (isLoading()) {
-          <app-skeleton [lines]="2" [buttons]="0"/>
+          <app-skeleton [lines]="2" [buttons]="0" />
         } @else if (customerInfo(); as customerInfo) {
           <div class="support-card app-surface-section">
             <div class="support-card__header">
@@ -240,25 +406,38 @@
               <div class="info-item app-surface-item">
                 <span class="app-surface-item__label">Last visit</span>
                 <strong class="app-surface-item__value">
-                  {{ 'RESERVATION.CUSTOMER.INFO.DAYS' | translate: { days: customerInfo.days } }}
+                  {{
+                    'RESERVATION.CUSTOMER.INFO.DAYS'
+                      | translate: { days: customerInfo.days }
+                  }}
                 </strong>
               </div>
 
               <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value">{{ customerInfo.professionalName }}</strong>
+                <span class="app-surface-item__label">{{
+                  'COMMON.PROFESSIONAL.FIELD' | translate
+                }}</span>
+                <strong class="app-surface-item__value">{{
+                  customerInfo.professionalName
+                }}</strong>
               </div>
 
               <div class="info-item app-crud-form-grid__full app-surface-item">
-                <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
-                <strong class="app-surface-item__value">{{ treatmentDetail }}</strong>
+                <span class="app-surface-item__label">{{
+                  'COMMON.TREATMENT.FIELD' | translate
+                }}</span>
+                <strong class="app-surface-item__value">{{
+                  treatmentDetail
+                }}</strong>
               </div>
             </div>
           </div>
         } @else if (getCustomerForm.customer.value) {
           <div class="empty-state">
             <mat-icon>person_search</mat-icon>
-            <div class="empty-state__title">{{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate }}</div>
+            <div class="empty-state__title">
+              {{ 'RESERVATION.CUSTOMER.INFO.NONE' | translate }}
+            </div>
           </div>
         }
       } @else {
@@ -270,41 +449,77 @@
   </ng-template>
 
   <ng-template #stepTwo>
-    <form class="app-surface-stack" [formGroup]="officeForm" (keydown.enter)="$event.preventDefault()">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 2,
-        title: 'COMMON.ROOM.FIELD',
-        description: 'RESERVATION.FLOW.STEPS.ROOM'
-      }"></ng-container>
+    <form
+      class="app-surface-stack"
+      [formGroup]="officeForm"
+      (keydown.enter)="$event.preventDefault()"
+    >
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 2,
+            title: 'COMMON.ROOM.FIELD',
+            description: 'RESERVATION.FLOW.STEPS.ROOM',
+          }
+        "
+      ></ng-container>
 
       @if (isLoading()) {
-        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0" />
         <div class="field-grid field-grid--triple">
-          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
-          <app-skeleton [showTitle]="false" [lines]="0" [boxes]="1" [buttons]="0"/>
+          <app-skeleton
+            [showTitle]="false"
+            [lines]="0"
+            [boxes]="1"
+            [buttons]="0"
+          />
+          <app-skeleton
+            [showTitle]="false"
+            [lines]="0"
+            [boxes]="1"
+            [buttons]="0"
+          />
         </div>
       } @else if (!offices().length) {
         <div class="empty-state">
           <mat-icon>storefront</mat-icon>
-          <div class="empty-state__title">{{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}</div>
+          <div class="empty-state__title">
+            {{ 'RESERVATION.ROOM.NO_CONTENT' | translate }}
+          </div>
         </div>
       } @else {
         <div class="app-surface-section">
           <div class="field-grid field-grid--triple">
             @if (offices()) {
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownOffice($event)" [formControl]="getOfficeForm.office"
-                       [matAutocomplete]="autoOffice" matInput required type="text">
-                <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+                <mat-label>{{
+                  'COMMON.ROOM.OFFICE.FIELD' | translate
+                }}</mat-label>
+                <input
+                  (keydown)="keyDownOffice($event)"
+                  [formControl]="getOfficeForm.office"
+                  [matAutocomplete]="autoOffice"
+                  matInput
+                  required
+                  type="text"
+                />
+                <mat-autocomplete
+                  #autoOffice="matAutocomplete"
+                  [displayWith]="displayFnOffice"
+                >
                   @for (office of filteredOfficeSignal(); track office.id) {
                     <mat-option [value]="office">{{ office.name }}</mat-option>
                   }
                 </mat-autocomplete>
                 @if (getOfficeForm.office.hasError('required')) {
-                  <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"
+                  ></mat-error>
                 } @else if (getOfficeForm.office.hasError('requireMatch')) {
-                  <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"
+                  ></mat-error>
                 } @else if (errors()['office']) {
                   <mat-error>{{ errors()['office'] }}</mat-error>
                 }
@@ -316,17 +531,32 @@
             @if (roomList()) {
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownRoom($event)" [formControl]="getOfficeForm.room" [matAutocomplete]="autoRoom"
-                       matInput required type="text">
-                <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+                <input
+                  (keydown)="keyDownRoom($event)"
+                  [formControl]="getOfficeForm.room"
+                  [matAutocomplete]="autoRoom"
+                  matInput
+                  required
+                  type="text"
+                />
+                <mat-autocomplete
+                  #autoRoom="matAutocomplete"
+                  [displayWith]="displayFnRoom"
+                >
                   @for (room of filteredRoomSignal(); track room.id) {
-                    <mat-option [value]="room">{{ room | roomName }}</mat-option>
+                    <mat-option [value]="room">{{
+                      room | roomName
+                    }}</mat-option>
                   }
                 </mat-autocomplete>
                 @if (getOfficeForm.room.hasError('required')) {
-                  <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"
+                  ></mat-error>
                 } @else if (getOfficeForm.room.hasError('requireMatch')) {
-                  <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.ROOM.INVALID' | translate"
+                  ></mat-error>
                 } @else if (errors()['room']) {
                   <mat-error>{{ errors()['room'] }}</mat-error>
                 }
@@ -337,19 +567,40 @@
 
             @if (professionalList()) {
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownHandler($event, getOfficeForm.professional)"
-                       [formControl]="getOfficeForm.professional" [matAutocomplete]="autoProfessional" matInput
-                       type="text" required>
-                <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-                  @for (professional of filteredProfessionalSignal(); track professional.id) {
-                    <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+                <mat-label>{{
+                  'COMMON.PROFESSIONAL.FIELD' | translate
+                }}</mat-label>
+                <input
+                  (keydown)="keyDownHandler($event, getOfficeForm.professional)"
+                  [formControl]="getOfficeForm.professional"
+                  [matAutocomplete]="autoProfessional"
+                  matInput
+                  type="text"
+                  required
+                />
+                <mat-autocomplete
+                  #autoProfessional="matAutocomplete"
+                  [displayWith]="displayFnProfessional"
+                >
+                  @for (
+                    professional of filteredProfessionalSignal();
+                    track professional.id
+                  ) {
+                    <mat-option [value]="professional">{{
+                      professional.displayName
+                    }}</mat-option>
                   }
                 </mat-autocomplete>
                 @if (getOfficeForm.professional.hasError('required')) {
-                  <mat-error [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"></mat-error>
-                } @else if (getOfficeForm.professional.hasError('requireMatch')) {
-                  <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"
+                  ></mat-error>
+                } @else if (
+                  getOfficeForm.professional.hasError('requireMatch')
+                ) {
+                  <mat-error
+                    [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"
+                  ></mat-error>
                 } @else if (errors()['professional']) {
                   <mat-error>{{ errors()['professional'] }}</mat-error>
                 }
@@ -373,27 +624,46 @@
 
               <div class="info-grid">
                 <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-                  <strong class="app-surface-item__value">{{ getOfficeForm.room.value | roomName }}</strong>
+                  <span class="app-surface-item__label">{{
+                    'COMMON.ROOM.FIELD' | translate
+                  }}</span>
+                  <strong class="app-surface-item__value">{{
+                    getOfficeForm.room.value | roomName
+                  }}</strong>
                 </div>
                 <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-                  <strong
-                    class="app-surface-item__value">{{ getOfficeForm.professional.value?.displayName || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+                  <span class="app-surface-item__label">{{
+                    'COMMON.PROFESSIONAL.FIELD' | translate
+                  }}</span>
+                  <strong class="app-surface-item__value">{{
+                    getOfficeForm.professional.value?.displayName ||
+                      ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+                  }}</strong>
                 </div>
                 @if (getOfficeForm.room.value.address) {
-                  <div class="info-item app-crud-form-grid__full app-surface-item">
-                    <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
-                    <strong class="app-surface-item__value">{{ getOfficeForm.room.value.address.name }}</strong>
+                  <div
+                    class="info-item app-crud-form-grid__full app-surface-item"
+                  >
+                    <span class="app-surface-item__label">{{
+                      'COMMON.ADDRESS.FIELD' | translate
+                    }}</span>
+                    <strong class="app-surface-item__value">{{
+                      getOfficeForm.room.value.address.name
+                    }}</strong>
                     @if (getOfficeForm.room.value.address.description) {
-                      <p class="app-surface-item__muted">{{ getOfficeForm.room.value.address.description }}</p>
+                      <p class="app-surface-item__muted">
+                        {{ getOfficeForm.room.value.address.description }}
+                      </p>
                     }
                   </div>
                 }
               </div>
             </div>
 
-            @if (getOfficeForm.room.value.address && getOfficeForm.room.value.address.location) {
+            @if (
+              getOfficeForm.room.value.address &&
+              getOfficeForm.room.value.address.location
+            ) {
               <div class="support-card support-card--map app-surface-section">
                 <div class="support-card__header">
                   <mat-icon>map</mat-icon>
@@ -403,9 +673,15 @@
                   </div>
                 </div>
                 <div class="map-frame">
-                  <app-google-map (addressEmitter)="getAddress($event)"
-                                  [latitudeMarker]="getOfficeForm.room.value.address.location.y"
-                                  [longitudeMarker]="getOfficeForm.room.value.address.location.x"></app-google-map>
+                  <app-google-map
+                    (addressEmitter)="getAddress($event)"
+                    [latitudeMarker]="
+                      getOfficeForm.room.value.address.location.y
+                    "
+                    [longitudeMarker]="
+                      getOfficeForm.room.value.address.location.x
+                    "
+                  ></app-google-map>
                 </div>
               </div>
             }
@@ -416,38 +692,73 @@
   </ng-template>
 
   <ng-template #stepThree>
-    <form class="app-surface-stack" [formGroup]="treatmentForm" (keydown.enter)="$event.preventDefault()">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 3,
-        title: 'COMMON.TREATMENT.FIELD',
-        description: 'RESERVATION.FLOW.STEPS.TREATMENT'
-      }"></ng-container>
+    <form
+      class="app-surface-stack"
+      [formGroup]="treatmentForm"
+      (keydown.enter)="$event.preventDefault()"
+    >
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 3,
+            title: 'COMMON.TREATMENT.FIELD',
+            description: 'RESERVATION.FLOW.STEPS.TREATMENT',
+          }
+        "
+      ></ng-container>
 
       @if (isLoading()) {
-        <app-skeleton [showTitle]="false" [lines]="0" [buttons]="0" [boxes]="1"/>
-        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0"/>
+        <app-skeleton
+          [showTitle]="false"
+          [lines]="0"
+          [buttons]="0"
+          [boxes]="1"
+        />
+        <app-skeleton [showTitle]="false" [lines]="1" [buttons]="0" />
       } @else if (!groups()?.length) {
         <div class="empty-state">
           <mat-icon>spa</mat-icon>
-          <div class="empty-state__title">{{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}</div>
+          <div class="empty-state__title">
+            {{ 'RESERVATION.TREATMENT.NO_CONTENT' | translate }}
+          </div>
         </div>
       } @else {
         <div class="app-surface-section">
           <div formArrayName="dateTimeList" class="array-form">
-            @for (dateGroup of dateTimeList.controls; track $index; let i = $index) {
+            @for (
+              dateGroup of dateTimeList.controls;
+              track $index;
+              let i = $index
+            ) {
               @let dateGroupForm = dateGroup.controls;
               <div [formGroupName]="i" class="array-group">
                 <div class="array-group__index">{{ i + 1 }}</div>
                 <div class="date-time-fields">
                   <mat-form-field appearance="outline" class="date-field">
-                    <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-                    <input (focus)="picker.open()" [formControl]="dateGroupForm.date" [matDatepickerFilter]="myFilter"
-                           [matDatepicker]="picker" [max]="maxCalendarDate" matInput required name="date"
-                           data-cy="date-picker">
-                    <mat-datepicker-toggle [for]="picker" matSuffix></mat-datepicker-toggle>
+                    <mat-label>{{
+                      'RESERVATION.DATE.FIELD' | translate
+                    }}</mat-label>
+                    <input
+                      (focus)="picker.open()"
+                      [formControl]="dateGroupForm.date"
+                      [matDatepickerFilter]="myFilter"
+                      [matDatepicker]="picker"
+                      [max]="maxCalendarDate"
+                      matInput
+                      required
+                      name="date"
+                      data-cy="date-picker"
+                    />
+                    <mat-datepicker-toggle
+                      [for]="picker"
+                      matSuffix
+                    ></mat-datepicker-toggle>
                     <mat-datepicker #picker touchUi></mat-datepicker>
                     @if (dateGroupForm.date.hasError('invalid')) {
-                      <mat-error [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"></mat-error>
+                      <mat-error
+                        [innerHTML]="'RESERVATION.DATE.REQUIRED' | translate"
+                      ></mat-error>
                     }
                     @if (dateGroupForm.date.hasError('duplicateDate')) {
                       <mat-error>Duplicate dates are not allowed.</mat-error>
@@ -455,25 +766,56 @@
                   </mat-form-field>
 
                   <mat-form-field appearance="outline" class="time-field">
-                    <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-                    <input [formControl]="dateGroupForm.start" [format]="24" [max]="maxDate" [min]="minDate"
-                           [timepicker]="tStart" matInput name="start" readonly data-cy="start-picker">
-                    <span matPrefix><mat-icon (click)="tStart.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-                    <app-timepicker #tStart (timeSet)="timeChange($event, i)"
-                                    [minutesGap]="15"></app-timepicker>
+                    <mat-label>{{
+                      'RESERVATION.START.FIELD' | translate
+                    }}</mat-label>
+                    <input
+                      [formControl]="dateGroupForm.start"
+                      [format]="24"
+                      [max]="maxDate"
+                      [min]="minDate"
+                      [timepicker]="tStart"
+                      matInput
+                      name="start"
+                      readonly
+                      data-cy="start-picker"
+                    />
+                    <span matPrefix
+                      ><mat-icon (click)="tStart.open()" matPrefix
+                        >schedule</mat-icon
+                      >
+                      &nbsp;</span
+                    >
+                    <app-timepicker
+                      #tStart
+                      (timeSet)="timeChange($event, i)"
+                      [minutesGap]="15"
+                    ></app-timepicker>
                   </mat-form-field>
                 </div>
 
-                <button class="remove-button" [disabled]="dateTimeList.controls.length === 1" (click)="removeDate(i)"
-                        mat-fab color="warn" type="button">
+                <button
+                  class="remove-button"
+                  [disabled]="dateTimeList.controls.length === 1"
+                  (click)="removeDate(i)"
+                  mat-fab
+                  color="warn"
+                  type="button"
+                >
                   <mat-icon matIconPrefix>delete</mat-icon>
                 </button>
               </div>
             }
 
             <div class="add-button-container">
-              <button (click)="addDate()" [disabled]="isAddButtonDisabled || currentIsEditing" mat-fab color="primary"
-                      class="add-button" type="button">
+              <button
+                (click)="addDate()"
+                [disabled]="isAddButtonDisabled || currentIsEditing"
+                mat-fab
+                color="primary"
+                class="add-button"
+                type="button"
+              >
                 <mat-icon matIconPrefix>calendar_add_on</mat-icon>
               </button>
             </div>
@@ -484,18 +826,37 @@
           <div class="field-grid field-grid--double">
             @if (groups()) {
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownGroup($event)" [formControl]="getTreatmentForm.group"
-                       [matAutocomplete]="autoGroup" matInput required type="text" data-cy="group-input">
-                <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
-                  @for (group of filteredGroupSignal() | sortBy: 'asc':'order'; track group.id) {
+                <mat-label>{{
+                  'COMMON.TREATMENT.GROUP.FIELD' | translate
+                }}</mat-label>
+                <input
+                  (keydown)="keyDownGroup($event)"
+                  [formControl]="getTreatmentForm.group"
+                  [matAutocomplete]="autoGroup"
+                  matInput
+                  required
+                  type="text"
+                  data-cy="group-input"
+                />
+                <mat-autocomplete
+                  #autoGroup="matAutocomplete"
+                  [displayWith]="displayFnGroup"
+                >
+                  @for (
+                    group of filteredGroupSignal() | sortBy: 'asc' : 'order';
+                    track group.id
+                  ) {
                     <mat-option [value]="group">{{ group.name }}</mat-option>
                   }
                 </mat-autocomplete>
                 @if (getTreatmentForm.group.hasError('required')) {
-                  <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"
+                  ></mat-error>
                 } @else if (getTreatmentForm.group.hasError('requireMatch')) {
-                  <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"
+                  ></mat-error>
                 } @else if (errors()['group']) {
                   <mat-error>{{ errors()['group'] }}</mat-error>
                 }
@@ -506,19 +867,42 @@
 
             @if (treatmentList()) {
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-                <input (keydown)="keyDownHandler($event, getTreatmentForm.treatment)"
-                       [formControl]="getTreatmentForm.treatment" [matAutocomplete]="autoTreatment" matInput required
-                       type="text" data-cy="treatment-input">
-                <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
-                  @for (treatment of filteredTreatmentSignal() | sortBy: 'asc':'order'; track treatment.id) {
-                    <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
+                <mat-label>{{
+                  'COMMON.TREATMENT.FIELD' | translate
+                }}</mat-label>
+                <input
+                  (keydown)="keyDownHandler($event, getTreatmentForm.treatment)"
+                  [formControl]="getTreatmentForm.treatment"
+                  [matAutocomplete]="autoTreatment"
+                  matInput
+                  required
+                  type="text"
+                  data-cy="treatment-input"
+                />
+                <mat-autocomplete
+                  #autoTreatment="matAutocomplete"
+                  [displayWith]="displayFnTreatment"
+                >
+                  @for (
+                    treatment of filteredTreatmentSignal()
+                      | sortBy: 'asc' : 'order';
+                    track treatment.id
+                  ) {
+                    <mat-option [value]="treatment">{{
+                      treatment.name
+                    }}</mat-option>
                   }
                 </mat-autocomplete>
                 @if (getTreatmentForm.treatment.hasError('required')) {
-                  <mat-error [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"></mat-error>
-                } @else if (getTreatmentForm.treatment.hasError('requireMatch')) {
-                  <mat-error [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"
+                  ></mat-error>
+                } @else if (
+                  getTreatmentForm.treatment.hasError('requireMatch')
+                ) {
+                  <mat-error
+                    [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"
+                  ></mat-error>
                 } @else if (errors()['treatment']) {
                   <mat-error>{{ errors()['treatment'] }}</mat-error>
                 }
@@ -528,16 +912,34 @@
             }
           </div>
 
-          @if (getTreatmentForm.treatment.value && !currentIsEditing && discounts()?.length) {
-            <button (click)="showDiscount = !showDiscount" class="secondary-action" mat-stroked-button type="button">
-              {{ 'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW') | translate }}
+          @if (
+            getTreatmentForm.treatment.value &&
+            !currentIsEditing &&
+            discounts()?.length
+          ) {
+            <button
+              (click)="showDiscount = !showDiscount"
+              class="secondary-action"
+              mat-stroked-button
+              type="button"
+            >
+              {{
+                'COMMON.BUTTON.DISCOUNT.' + (showDiscount ? 'HIDE' : 'SHOW')
+                  | translate
+              }}
               <mat-icon>redeem</mat-icon>
             </button>
           }
 
-          @if (showDiscount && !currentIsEditing && getTreatmentForm.treatment.value) {
+          @if (
+            showDiscount &&
+            !currentIsEditing &&
+            getTreatmentForm.treatment.value
+          ) {
             <mat-form-field appearance="outline">
-              <mat-label>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</mat-label>
+              <mat-label>{{
+                'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate
+              }}</mat-label>
               <mat-select [formControl]="getTreatmentForm.discount">
                 <mat-option>--</mat-option>
                 @for (d of discounts(); track d.id) {
@@ -560,46 +962,73 @@
 
             <div class="info-grid">
               @if (getTreatmentForm.treatment.value.description) {
-                <div class="info-item app-crud-form-grid__full app-surface-item">
-                  <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DETAIL' | translate }}</span>
-                  <p class="app-surface-item__muted">{{ getTreatmentForm.treatment.value.description }}</p>
+                <div
+                  class="info-item app-crud-form-grid__full app-surface-item"
+                >
+                  <span class="app-surface-item__label">{{
+                    'RESERVATION.TREATMENT.DETAIL' | translate
+                  }}</span>
+                  <p class="app-surface-item__muted">
+                    {{ getTreatmentForm.treatment.value.description }}
+                  </p>
                 </div>
               }
 
               <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</span>
+                <span class="app-surface-item__label">{{
+                  'RESERVATION.TREATMENT.PRICE.FIELD' | translate
+                }}</span>
                 @if (!currentIsEditing) {
                   <strong class="app-surface-item__value">
                     @if (hasDiscountApplied) {
                       <span class="summary-price summary-price--old">
-                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
-                        {{ selectedTreatmentPrice | number:'1.2-2' }}
+                        {{
+                          $safeNavigationMigration(
+                            getOfficeForm.room.value?.currency
+                          ) | currencySymbol
+                        }}
+                        {{ selectedTreatmentPrice | number: '1.2-2' }}
                       </span>
                     }
                     @if (hasDiscountApplied && effectiveDiscountAmount > 0) {
                       <span>
-                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
-                        {{ effectiveTreatmentDisplayPrice | number:'1.2-2' }}
+                        {{
+                          $safeNavigationMigration(
+                            getOfficeForm.room.value?.currency
+                          ) | currencySymbol
+                        }}
+                        {{ effectiveTreatmentDisplayPrice | number: '1.2-2' }}
                       </span>
                     } @else {
                       <span>
-                        {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
-                        {{ selectedTreatmentPrice | number:'1.2-2' }}
+                        {{
+                          $safeNavigationMigration(
+                            getOfficeForm.room.value?.currency
+                          ) | currencySymbol
+                        }}
+                        {{ selectedTreatmentPrice | number: '1.2-2' }}
                       </span>
                     }
                   </strong>
                 } @else {
                   <strong class="app-surface-item__value">
-                    {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }}
-                    {{ selectedTreatmentPrice | number:'1.2-2' }}
+                    {{
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.currency
+                      ) | currencySymbol
+                    }}
+                    {{ selectedTreatmentPrice | number: '1.2-2' }}
                   </strong>
                 }
               </div>
 
               <div class="info-item app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-                <strong
-                  class="app-surface-item__value">{{ getTreatmentForm.treatment.value.duration | durationTime }}</strong>
+                <span class="app-surface-item__label">{{
+                  'RESERVATION.TREATMENT.DURATION.FIELD' | translate
+                }}</span>
+                <strong class="app-surface-item__value">{{
+                  getTreatmentForm.treatment.value.duration | durationTime
+                }}</strong>
               </div>
             </div>
           </div>
@@ -610,26 +1039,47 @@
 
   <ng-template #stepFour>
     <div class="app-surface-stack">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 4,
-        title: 'COMMON.ADDITIONAL.FIELD',
-        description: 'RESERVATION.FLOW.STEPS.ADDITIONALS'
-      }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 4,
+            title: 'COMMON.ADDITIONAL.FIELD',
+            description: 'RESERVATION.FLOW.STEPS.ADDITIONALS',
+          }
+        "
+      ></ng-container>
 
       @if (additionalListSignal(); as additionalList) {
         @if (additionalList.length) {
           <div class="app-surface-section">
-            <mat-selection-list #additional [compareWith]="compareAdditional" (selectionChange)="onChange(additional)"
-                                class="app-class additional-list">
+            <mat-selection-list
+              #additional
+              [compareWith]="compareAdditional"
+              (selectionChange)="onChange(additional)"
+              class="app-class additional-list"
+            >
               @for (it of additionalList; track it.id) {
-                <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before" lines="3">
+                <mat-list-option
+                  [selected]="isSelected(it)"
+                  [value]="it"
+                  togglePosition="before"
+                  lines="3"
+                >
                   <div matListItemTitle>{{ it.name }}</div>
                   <div matListItemLine>
-                    {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ it.price | number:'1.2-2' }}
-                    · &#9202; {{ it.duration | durationTime }}
+                    {{
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.currency
+                      ) | currencySymbol
+                    }}
+                    {{ it.price | number: '1.2-2' }} · &#9202;
+                    {{ it.duration | durationTime }}
                   </div>
                   @if (it.description) {
-                    <span class="description" matListItemLine>{{ it.description }}</span>
+                    <span class="description" matListItemLine>{{
+                      it.description
+                    }}</span>
                   }
                 </mat-list-option>
                 <mat-divider></mat-divider>
@@ -639,36 +1089,63 @@
         } @else {
           <div class="empty-state">
             <mat-icon>add_circle</mat-icon>
-            <div class="empty-state__title">{{ 'RESERVATION.TREATMENT.EXTRAS.NO_CONTENT' | translate }}</div>
+            <div class="empty-state__title">
+              {{ 'RESERVATION.TREATMENT.EXTRAS.NO_CONTENT' | translate }}
+            </div>
           </div>
         }
       } @else {
-        <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [descriptionLines]="1"
-                                [showMedia]="false"></app-card-list-skeleton>
+        <app-card-list-skeleton
+          [badgeCount]="0"
+          [actionCount]="0"
+          [descriptionLines]="1"
+          [showMedia]="false"
+        ></app-card-list-skeleton>
       }
     </div>
   </ng-template>
 
   <ng-template #stepFive>
-    <form class="app-surface-stack" [formGroup]="configurationForm" (keydown.enter)="$event.preventDefault()">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 5,
-        title: 'RESERVATION.CONFIGURATION.TITLE',
-        description: 'RESERVATION.FLOW.STEPS.CONFIGURATION'
-      }"></ng-container>
+    <form
+      class="app-surface-stack"
+      [formGroup]="configurationForm"
+      (keydown.enter)="$event.preventDefault()"
+    >
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 5,
+            title: 'RESERVATION.CONFIGURATION.TITLE',
+            description: 'RESERVATION.FLOW.STEPS.CONFIGURATION',
+          }
+        "
+      ></ng-container>
 
       <div class="app-surface-section">
-        <mat-checkbox [formControl]="getConfigurationForm.customerChange" color="primary">
+        <mat-checkbox
+          [formControl]="getConfigurationForm.customerChange"
+          color="primary"
+        >
           {{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}
         </mat-checkbox>
 
         <div class="field-grid field-grid--double">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate }}</mat-label>
-            <input [formControl]="getConfigurationForm.reference" [required]="getConfigurationForm.customerChange.value"
-                   matInput>
+            <mat-label>{{
+              'RESERVATION.CONFIGURATION.REFERENCE.FIELD' | translate
+            }}</mat-label>
+            <input
+              [formControl]="getConfigurationForm.reference"
+              [required]="getConfigurationForm.customerChange.value"
+              matInput
+            />
             @if (getConfigurationForm.reference.hasError('required')) {
-              <mat-error [innerHTML]="'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="
+                  'RESERVATION.CONFIGURATION.REFERENCE.REQUIRED' | translate
+                "
+              ></mat-error>
             } @else if (errors()['reference']) {
               <mat-error>{{ errors()['reference'] }}</mat-error>
             }
@@ -676,7 +1153,10 @@
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
-            <textarea [formControl]="getConfigurationForm.note" matInput></textarea>
+            <textarea
+              [formControl]="getConfigurationForm.note"
+              matInput
+            ></textarea>
             @if (errors()['note']) {
               <mat-error>{{ errors()['note'] }}</mat-error>
             }
@@ -697,10 +1177,13 @@
 
             <div class="price-breakdown price-breakdown--expanded">
               <div class="price-row">
-                <span>{{ getTreatmentForm.treatment.value?.name || ('COMMON.TREATMENT.FIELD' | translate) }}</span>
+                <span>{{
+                  getTreatmentForm.treatment.value?.name ||
+                    ('COMMON.TREATMENT.FIELD' | translate)
+                }}</span>
                 <strong>
                   {{ getOfficeForm.room.value.currency | currencySymbol }}
-                  {{ selectedTreatmentPrice | number:'1.2-2' }}
+                  {{ selectedTreatmentPrice | number: '1.2-2' }}
                 </strong>
               </div>
 
@@ -709,17 +1192,19 @@
                   <span>{{ it.name }}</span>
                   <strong>
                     {{ getOfficeForm.room.value.currency | currencySymbol }}
-                    {{ it.price | number:'1.2-2' }}
+                    {{ it.price | number: '1.2-2' }}
                   </strong>
                 </div>
               }
 
               @if (hasDiscountApplied && effectiveDiscountAmount > 0) {
                 <div class="price-row price-row--discount">
-                  <span>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
+                  <span>{{
+                    'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate
+                  }}</span>
                   <strong>
                     - {{ getOfficeForm.room.value.currency | currencySymbol }}
-                    {{ effectiveDiscountAmount | number:'1.2-2' }}
+                    {{ effectiveDiscountAmount | number: '1.2-2' }}
                   </strong>
                 </div>
               }
@@ -728,7 +1213,7 @@
                 <span>{{ 'RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
                 <strong>
                   {{ getOfficeForm.room.value.currency | currencySymbol }}
-                  {{ effectiveTotalPrice | number:'1.2-2' }}
+                  {{ effectiveTotalPrice | number: '1.2-2' }}
                 </strong>
               </div>
 
@@ -738,17 +1223,19 @@
                     <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
                     <strong>
                       {{ getOfficeForm.room.value.currency | currencySymbol }}
-                      {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}
+                      {{ effectivePaidWithConfiguredAmount | number: '1.2-2' }}
                     </strong>
                   </div>
                 }
 
                 @if (effectiveBalanceUsed > 0) {
                   <div class="price-row">
-                    <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
+                    <span>{{
+                      'COMMON.PAYMENT.OPTIONS.BALANCE' | translate
+                    }}</span>
                     <strong>
                       {{ getOfficeForm.room.value.currency | currencySymbol }}
-                      {{ effectiveBalanceUsed | number:'1.2-2' }}
+                      {{ effectiveBalanceUsed | number: '1.2-2' }}
                     </strong>
                   </div>
                 }
@@ -757,7 +1244,7 @@
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
                   <strong>
                     {{ getOfficeForm.room.value.currency | currencySymbol }}
-                    {{ configuredPaymentToPay | number:'1.2-2' }}
+                    {{ configuredPaymentToPay | number: '1.2-2' }}
                   </strong>
                 </div>
               }
@@ -766,27 +1253,52 @@
 
           <div class="field-grid field-grid--triple">
             <mat-form-field appearance="outline">
-              <mat-label>{{ 'RESERVATION.AMOUNT.FIELD' | translate }}</mat-label>
-              <mat-icon matPrefix>{{ getOfficeForm.room.value.currency.icon }}</mat-icon>
-              <input [formControl]="getConfigurationForm.amount" matInput matNativeControl [type]="'number'" [step]="1"
-                     [min]="1">
+              <mat-label>{{
+                'RESERVATION.AMOUNT.FIELD' | translate
+              }}</mat-label>
+              <mat-icon matPrefix>{{
+                getOfficeForm.room.value.currency.icon
+              }}</mat-icon>
+              <input
+                [formControl]="getConfigurationForm.amount"
+                matInput
+                matNativeControl
+                [type]="'number'"
+                [step]="1"
+                [min]="1"
+              />
               @if (getConfigurationForm.amount.hasError('min')) {
                 <mat-error
-                  [innerHTML]="'RESERVATION.AMOUNT.MIN' |
-                    translate:{ min: 1, currency: getOfficeForm.room.value.currency.icon }">
+                  [innerHTML]="
+                    'RESERVATION.AMOUNT.MIN'
+                      | translate
+                        : {
+                            min: 1,
+                            currency: getOfficeForm.room.value.currency.icon,
+                          }
+                  "
+                >
                 </mat-error>
               }
             </mat-form-field>
 
             @if (getConfigurationForm.amount.value) {
-              <app-payment-option-select [control]="getConfigurationForm.option" [options]="options()"
-                                         [required]="true">
+              <app-payment-option-select
+                [control]="getConfigurationForm.option"
+                [options]="options()"
+                [required]="true"
+              >
               </app-payment-option-select>
 
               @if (getConfigurationForm.option.value?.type === 'TRANSFER') {
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getConfigurationForm.transfer" matInput>
+                  <mat-label>{{
+                    'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate
+                  }}</mat-label>
+                  <input
+                    [formControl]="getConfigurationForm.transfer"
+                    matInput
+                  />
                 </mat-form-field>
               }
             }
@@ -798,27 +1310,50 @@
 
   <ng-template #stepSix>
     <div class="app-surface-stack">
-      <ng-container *ngTemplateOutlet="stepHeading; context: {
-        step: 6,
-        title: 'RESERVATION.SCHEDULE.FIELD',
-        description: 'RESERVATION.FLOW.STEPS.SCHEDULE'
-      }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="
+          stepHeading;
+          context: {
+            step: 6,
+            title: 'RESERVATION.SCHEDULE.FIELD',
+            description: 'RESERVATION.FLOW.STEPS.SCHEDULE',
+          }
+        "
+      ></ng-container>
 
       <div class="app-crud-form">
-        @for (dataEvent of dataEvents | keyvalue; track dataEvent.key; let last = $last) {
+        @for (
+          dataEvent of dataEvents | keyvalue;
+          track dataEvent.key;
+          let last = $last
+        ) {
           <div class="support-card schedule-card app-surface-section">
             <div class="support-card__header">
               <mat-icon>event</mat-icon>
               <div>
-                <h3>{{ dataEvent.key | date:'fullDate':$safeNavigationMigration(getOfficeForm.room.value?.timeZone):language }}</h3>
+                <h3>
+                  {{
+                    dataEvent.key
+                      | date
+                        : 'fullDate'
+                        : $safeNavigationMigration(
+                            getOfficeForm.room.value?.timeZone
+                          )
+                        : language
+                  }}
+                </h3>
                 <p>{{ 'RESERVATION.FLOW.SUMMARY.DATE_TIME' | translate }}</p>
               </div>
             </div>
 
             <mwl-calendar-week-view
-              (beforeViewRender)="beforeMonthViewRender($event, dataEvent.value)"
+              (beforeViewRender)="
+                beforeMonthViewRender($event, dataEvent.value)
+              "
               (eventTimesChanged)="eventTimesChanged($event, dataEvent.value)"
-              (hourSegmentClicked)="segmentClick($event.date, 'CREATED', dataEvent.key)"
+              (hourSegmentClicked)="
+                segmentClick($event.date, 'CREATED', dataEvent.key)
+              "
               [dayEndHour]="day.dayEndHour"
               [dayEndMinute]="day.dayEndMinute"
               [dayStartHour]="day.dayStartHour"
@@ -830,16 +1365,26 @@
               [refresh]="refresh"
               [tooltipTemplate]="calendarTooltip"
               [viewDate]="dataEvent.value.viewDate"
-              [weekendDays]="weekendDays"></mwl-calendar-week-view>
+              [weekendDays]="weekendDays"
+            ></mwl-calendar-week-view>
 
             @if (errors()['schedule'][dataEvent.value.index]) {
-              <mat-error [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate" class="divider"></mat-error>
+              <mat-error
+                [innerHTML]="'RESERVATION.SCHEDULE.REQUIRED' | translate"
+                class="divider"
+              ></mat-error>
             }
             @if (errors()['overlapping']) {
-              <mat-error [innerHTML]="errors()['overlapping']" class="divider"></mat-error>
+              <mat-error
+                [innerHTML]="errors()['overlapping']"
+                class="divider"
+              ></mat-error>
             }
             @if (errors()['professional']) {
-              <mat-error [innerHTML]="errors()['professional']" class="divider"></mat-error>
+              <mat-error
+                [innerHTML]="errors()['professional']"
+                class="divider"
+              ></mat-error>
             }
           </div>
 
@@ -854,11 +1399,16 @@
   <ng-template #stepSeven>
     @if (isPreview) {
       <div class="app-surface-stack">
-        <ng-container *ngTemplateOutlet="stepHeading; context: {
-          step: 7,
-          title: 'RESERVATION.FLOW.SUMMARY.TITLE',
-          description: 'RESERVATION.FLOW.STEPS.PREVIEW'
-        }"></ng-container>
+        <ng-container
+          *ngTemplateOutlet="
+            stepHeading;
+            context: {
+              step: 7,
+              title: 'RESERVATION.FLOW.SUMMARY.TITLE',
+              description: 'RESERVATION.FLOW.STEPS.PREVIEW',
+            }
+          "
+        ></ng-container>
 
         <div class="support-card app-surface-section">
           <div class="support-card__header support-card__header--with-total">
@@ -869,69 +1419,129 @@
             </div>
             <div class="booking-summary__price">
               <span>{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
-              <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+              <strong
+                >{{
+                  $safeNavigationMigration(getOfficeForm.room.value?.currency)
+                    | currencySymbol
+                }}
+                {{ effectiveTotalPrice | number: '1.2-2' }}</strong
+              >
             </div>
           </div>
 
           <div class="info-grid">
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</span>
-              <strong class="app-surface-item__value">{{ getCustomerForm.customer.value?.displayName }}</strong>
+              <span class="app-surface-item__label">{{
+                'RESERVATION.CUSTOMER.FIELD' | translate
+              }}</span>
+              <strong class="app-surface-item__value">{{
+                getCustomerForm.customer.value?.displayName
+              }}</strong>
             </div>
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.ROOM.FIELD' | translate }}</span>
-              <strong class="app-surface-item__value">{{ getOfficeForm.room.value | roomName }}</strong>
+              <span class="app-surface-item__label">{{
+                'COMMON.ROOM.FIELD' | translate
+              }}</span>
+              <strong class="app-surface-item__value">{{
+                getOfficeForm.room.value | roomName
+              }}</strong>
             </div>
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</span>
-              <strong class="app-surface-item__value">{{ getOfficeForm.professional.value?.displayName }}</strong>
+              <span class="app-surface-item__label">{{
+                'COMMON.PROFESSIONAL.FIELD' | translate
+              }}</span>
+              <strong class="app-surface-item__value">{{
+                getOfficeForm.professional.value?.displayName
+              }}</strong>
             </div>
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.ADDRESS.FIELD' | translate }}</span>
+              <span class="app-surface-item__label">{{
+                'COMMON.ADDRESS.FIELD' | translate
+              }}</span>
               @if (getOfficeForm.room.value?.address?.name) {
                 <strong class="app-surface-item__value">
                   <a
                     class="app-detail-link"
-                    [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + $safeNavigationMigration(getOfficeForm.room.value?.address?.name)"
-                    rel="noreferrer" target="_blank">{{ getOfficeForm.room.value?.address?.name }}</a>
+                    [href]="
+                      'https://www.google.com/maps/dir/?api=1&z=15&destination=' +
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.address?.name
+                      )
+                    "
+                    rel="noreferrer"
+                    target="_blank"
+                    >{{ getOfficeForm.room.value?.address?.name }}</a
+                  >
                 </strong>
                 @if (getOfficeForm.room.value?.address?.description) {
-                  <p class="app-surface-item__muted">{{ getOfficeForm.room.value?.address?.description }}</p>
+                  <p class="app-surface-item__muted">
+                    {{ getOfficeForm.room.value?.address?.description }}
+                  </p>
                 }
               } @else {
-                <strong class="app-surface-item__value">{{ 'RESERVATION.FLOW.SUMMARY.EMPTY' | translate }}</strong>
+                <strong class="app-surface-item__value">{{
+                  'RESERVATION.FLOW.SUMMARY.EMPTY' | translate
+                }}</strong>
               }
             </div>
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              <span class="app-surface-item__label">{{
+                'COMMON.TREATMENT.FIELD' | translate
+              }}</span>
               <strong class="app-surface-item__value">
-                {{ getTreatmentForm.treatment.value?.name || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}
+                {{
+                  getTreatmentForm.treatment.value?.name ||
+                    ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+                }}
               </strong>
             </div>
 
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
+              <span class="app-surface-item__label">{{
+                'COMMON.ADDITIONAL.FIELD' | translate
+              }}</span>
               @if (summaryAdditionals.length) {
                 <div class="booking-summary__slots">
                   @for (additional of summaryAdditionals; track additional.id) {
-                    <span class="booking-summary__slot app-detail-chip">{{ additional.name }}</span>
+                    <span class="booking-summary__slot app-detail-chip">{{
+                      additional.name
+                    }}</span>
                   }
                 </div>
               } @else {
-                <strong class="app-surface-item__value">{{ 'RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+                <strong class="app-surface-item__value">{{
+                  'RESERVATION.FLOW.SUMMARY.NONE' | translate
+                }}</strong>
               }
             </div>
 
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'RESERVATION.APPOINTMENT' | translate }}</span>
+              <span class="app-surface-item__label">{{
+                'RESERVATION.APPOINTMENT' | translate
+              }}</span>
               <div class="booking-summary__slots">
-                @for (eventGroup of events.value; track eventGroup.event?.id || $index) {
+                @for (
+                  eventGroup of events.value;
+                  track eventGroup.event?.id || $index
+                ) {
                   @if (eventGroup.event) {
                     <span class="booking-summary__slot app-detail-chip">
-                      {{ eventGroup.event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(getOfficeForm.room.value?.timeZone):language }}
+                      {{
+                        eventGroup.event.start
+                          | date
+                            : 'EEE d MMM, HH:mm'
+                            : $safeNavigationMigration(
+                                getOfficeForm.room.value?.timeZone
+                              )
+                            : language
+                      }}
                       @if (showTimeZone) {
-                        <button (click)="openDialog(eventGroup.event.start)" class="summary-slot-button" mat-icon-button
-                                type="button">
+                        <button
+                          (click)="openDialog(eventGroup.event.start)"
+                          class="summary-slot-button"
+                          mat-icon-button
+                          type="button"
+                        >
                           <mat-icon>info_outline</mat-icon>
                         </button>
                       }
@@ -942,34 +1552,48 @@
             </div>
 
             <div class="info-item app-surface-item">
-              <span class="app-surface-item__label">{{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}</span>
-              <strong
-                class="app-surface-item__value">{{ totalDurationFormatted || ($safeNavigationMigration(getTreatmentForm.treatment.value?.duration) | durationTime) }}</strong>
+              <span class="app-surface-item__label">{{
+                'RESERVATION.TREATMENT.DURATION.FIELD' | translate
+              }}</span>
+              <strong class="app-surface-item__value">{{
+                totalDurationFormatted ||
+                  ($safeNavigationMigration(
+                    getTreatmentForm.treatment.value?.duration
+                  ) | durationTime)
+              }}</strong>
             </div>
 
             @if (getConfigurationForm.note.value) {
               <div class="info-item app-crud-form-grid__full app-surface-item">
-                <span class="app-surface-item__label">{{ 'RESERVATION.NOTE.FIELD' | translate }}</span>
-                <p class="app-surface-item__muted">{{ getConfigurationForm.note.value }}</p>
+                <span class="app-surface-item__label">{{
+                  'RESERVATION.NOTE.FIELD' | translate
+                }}</span>
+                <p class="app-surface-item__muted">
+                  {{ getConfigurationForm.note.value }}
+                </p>
               </div>
             }
 
             @if (getConfigurationForm.customerChange.value) {
               <div class="info-item app-crud-form-grid__full app-surface-item">
-                <span
-                  class="app-surface-item__label">{{ 'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate }}</span>
-                <strong
-                  class="app-surface-item__value">{{ getConfigurationForm.reference.value || ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate) }}</strong>
+                <span class="app-surface-item__label">{{
+                  'RESERVATION.CONFIGURATION.CUSTOMER_CHANGE.FIELD' | translate
+                }}</span>
+                <strong class="app-surface-item__value">{{
+                  getConfigurationForm.reference.value ||
+                    ('RESERVATION.FLOW.SUMMARY.EMPTY' | translate)
+                }}</strong>
               </div>
             }
-
           </div>
         </div>
 
         @if (getTreatmentForm.treatment.value) {
           <div class="support-card support-card--price app-surface-section">
             <div class="support-card__header">
-              <mat-icon>{{ getOfficeForm.room.value?.currency?.icon }}</mat-icon>
+              <mat-icon>{{
+                getOfficeForm.room.value?.currency?.icon
+              }}</mat-icon>
               <div>
                 <h3>{{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</h3>
                 <p>{{ 'RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</p>
@@ -979,20 +1603,43 @@
             <div class="price-breakdown price-breakdown--expanded">
               <div class="price-row">
                 <span>{{ getTreatmentForm.treatment.value.name }}</span>
-                <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ selectedTreatmentPrice | number:'1.2-2' }}</strong>
+                <strong
+                  >{{
+                    $safeNavigationMigration(getOfficeForm.room.value?.currency)
+                      | currencySymbol
+                  }}
+                  {{ selectedTreatmentPrice | number: '1.2-2' }}</strong
+                >
               </div>
 
               @for (additional of summaryAdditionals; track additional.id) {
                 <div class="price-row">
                   <span>{{ additional.name }}</span>
-                  <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+                  <strong
+                    >{{
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.currency
+                      ) | currencySymbol
+                    }}
+                    {{ additional.price | number: '1.2-2' }}</strong
+                  >
                 </div>
               }
 
               @if (hasDiscountApplied && price().discount) {
                 <div class="price-row price-row--discount">
-                  <span>{{ 'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-                  <strong>- {{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveDiscountAmount | number:'1.2-2' }}</strong>
+                  <span>{{
+                    'RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate
+                  }}</span>
+                  <strong
+                    >-
+                    {{
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.currency
+                      ) | currencySymbol
+                    }}
+                    {{ effectiveDiscountAmount | number: '1.2-2' }}</strong
+                  >
                 </div>
               }
 
@@ -1000,26 +1647,57 @@
                 @if (effectivePaidWithConfiguredAmount > 0) {
                   <div class="price-row">
                     <span>{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-                    <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectivePaidWithConfiguredAmount | number:'1.2-2' }}</strong>
+                    <strong
+                      >{{
+                        $safeNavigationMigration(
+                          getOfficeForm.room.value?.currency
+                        ) | currencySymbol
+                      }}
+                      {{
+                        effectivePaidWithConfiguredAmount | number: '1.2-2'
+                      }}</strong
+                    >
                   </div>
                 }
 
                 @if (effectiveBalanceUsed > 0) {
                   <div class="price-row">
-                    <span>{{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}</span>
-                    <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveBalanceUsed | number:'1.2-2' }}</strong>
+                    <span>{{
+                      'COMMON.PAYMENT.OPTIONS.BALANCE' | translate
+                    }}</span>
+                    <strong
+                      >{{
+                        $safeNavigationMigration(
+                          getOfficeForm.room.value?.currency
+                        ) | currencySymbol
+                      }}
+                      {{ effectiveBalanceUsed | number: '1.2-2' }}</strong
+                    >
                   </div>
                 }
 
                 <div class="price-row price-row--total">
                   <span>{{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}</span>
-                  <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ configuredPaymentToPay | number:'1.2-2' }}</strong>
+                  <strong
+                    >{{
+                      $safeNavigationMigration(
+                        getOfficeForm.room.value?.currency
+                      ) | currencySymbol
+                    }}
+                    {{ configuredPaymentToPay | number: '1.2-2' }}</strong
+                  >
                 </div>
               }
 
               <div class="price-row price-row--total">
                 <span>{{ 'COMMON.LABEL.TOTAL' | translate }}</span>
-                <strong>{{ $safeNavigationMigration(getOfficeForm.room.value?.currency) | currencySymbol }} {{ effectiveTotalPrice | number:'1.2-2' }}</strong>
+                <strong
+                  >{{
+                    $safeNavigationMigration(getOfficeForm.room.value?.currency)
+                      | currencySymbol
+                  }}
+                  {{ effectiveTotalPrice | number: '1.2-2' }}</strong
+                >
               </div>
             </div>
           </div>
@@ -1028,22 +1706,36 @@
     }
   </ng-template>
 
-  <div class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell">
+  <div
+    class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell"
+  >
     @if (screenConfig.isSmall) {
       @switch (currentStepIndex()) {
         @case (0) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepOne"></ng-container>
           </div>
           @if (!currentIsEditing) {
             <div class="app-detail-actions app-detail-actions--mobile">
-              <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
+              <button
+                type="button"
+                [form]="customerForm"
+                appBackButton
+                mat-stroked-button
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
-              <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" mat-stroked-button
-                      name="toStepTwo">
+              <button
+                type="button"
+                (click)="callStepTwo(true)"
+                [disabled]="customerForm.invalid"
+                mat-stroked-button
+                name="toStepTwo"
+              >
                 <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
                 <mat-icon>arrow_forward</mat-icon>
               </button>
@@ -1052,7 +1744,9 @@
         }
         @case (1) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepTwo"></ng-container>
           </div>
           <div class="app-detail-actions app-detail-actions--mobile">
@@ -1062,13 +1756,23 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             } @else {
-              <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
+              <button
+                type="button"
+                [form]="officeForm"
+                appBackButton
+                mat-stroked-button
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
-                    name="toStepThree">
+            <button
+              type="button"
+              (click)="callStepThree(true)"
+              [disabled]="officeForm.invalid"
+              mat-stroked-button
+              name="toStepThree"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1076,7 +1780,9 @@
         }
         @case (2) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepThree"></ng-container>
           </div>
           <div class="app-detail-actions app-detail-actions--mobile">
@@ -1086,13 +1792,23 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             } @else {
-              <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
+              <button
+                type="button"
+                [form]="treatmentForm"
+                appBackButton
+                mat-stroked-button
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                    mat-stroked-button name="toStepFour">
+            <button
+              type="button"
+              (click)="callStepFour(true)"
+              [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+              mat-stroked-button
+              name="toStepFour"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1100,7 +1816,9 @@
         }
         @case (3) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepFour"></ng-container>
           </div>
           <div class="app-detail-actions app-detail-actions--mobile">
@@ -1108,7 +1826,12 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
+            <button
+              type="button"
+              (click)="callStepFive(true)"
+              mat-stroked-button
+              name="toStepFive"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1116,7 +1839,9 @@
         }
         @case (4) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepFive"></ng-container>
           </div>
           <div class="app-detail-actions app-detail-actions--mobile">
@@ -1124,8 +1849,13 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
-                    name="toStepSix">
+            <button
+              type="button"
+              (click)="callStepSix(true)"
+              [disabled]="configurationForm.invalid"
+              mat-stroked-button
+              name="toStepSix"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1133,7 +1863,9 @@
         }
         @case (5) {
           <div class="step-layout step-layout--mobile">
-            <ng-container *ngTemplateOutlet="bookingSummary; context: { compact: true }"></ng-container>
+            <ng-container
+              *ngTemplateOutlet="bookingSummary; context: { compact: true }"
+            ></ng-container>
             <ng-container *ngTemplateOutlet="stepSix"></ng-container>
           </div>
           <div class="app-detail-actions app-detail-actions--mobile">
@@ -1141,8 +1873,13 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
-                    name="toStepSeven">
+            <button
+              type="button"
+              (click)="callStepSeven(true)"
+              [disabled]="eventGroup.invalid"
+              mat-stroked-button
+              name="toStepSeven"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1157,7 +1894,12 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="create()" mat-stroked-button name="create">
+            <button
+              type="button"
+              (click)="create()"
+              mat-stroked-button
+              name="create"
+            >
               <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
               <mat-icon>add_task</mat-icon>
             </button>
@@ -1176,12 +1918,22 @@
             </aside>
           </div>
           <div class="app-detail-actions">
-            <button type="button" [form]="customerForm" appBackButton mat-stroked-button>
+            <button
+              type="button"
+              [form]="customerForm"
+              appBackButton
+              mat-stroked-button
+            >
               <mat-icon>keyboard_return</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepTwo(true)" [disabled]="customerForm.invalid" mat-stroked-button
-                    name="toStepTwo">
+            <button
+              type="button"
+              (click)="callStepTwo(true)"
+              [disabled]="customerForm.invalid"
+              mat-stroked-button
+              name="toStepTwo"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1203,13 +1955,23 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             } @else {
-              <button type="button" [form]="officeForm" appBackButton mat-stroked-button>
+              <button
+                type="button"
+                [form]="officeForm"
+                appBackButton
+                mat-stroked-button
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button type="button" (click)="callStepThree(true)" [disabled]="officeForm.invalid" mat-stroked-button
-                    name="toStepThree">
+            <button
+              type="button"
+              (click)="callStepThree(true)"
+              [disabled]="officeForm.invalid"
+              mat-stroked-button
+              name="toStepThree"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1231,13 +1993,23 @@
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             } @else {
-              <button type="button" [form]="treatmentForm" appBackButton mat-stroked-button>
+              <button
+                type="button"
+                [form]="treatmentForm"
+                appBackButton
+                mat-stroked-button
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
             }
-            <button type="button" (click)="callStepFour(true)" [disabled]="treatmentForm.invalid || isAddButtonDisabled"
-                    mat-stroked-button name="toStepFour">
+            <button
+              type="button"
+              (click)="callStepFour(true)"
+              [disabled]="treatmentForm.invalid || isAddButtonDisabled"
+              mat-stroked-button
+              name="toStepFour"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1257,7 +2029,12 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepFive(true)" mat-stroked-button name="toStepFive">
+            <button
+              type="button"
+              (click)="callStepFive(true)"
+              mat-stroked-button
+              name="toStepFive"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1277,8 +2054,13 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepSix(true)" [disabled]="configurationForm.invalid" mat-stroked-button
-                    name="toStepSix">
+            <button
+              type="button"
+              (click)="callStepSix(true)"
+              [disabled]="configurationForm.invalid"
+              mat-stroked-button
+              name="toStepSix"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1298,8 +2080,13 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button type="button" (click)="callStepSeven(true)" [disabled]="eventGroup.invalid" mat-stroked-button
-                    name="toStepSeven">
+            <button
+              type="button"
+              (click)="callStepSeven(true)"
+              [disabled]="eventGroup.invalid"
+              mat-stroked-button
+              name="toStepSeven"
+            >
               <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
               <mat-icon>arrow_forward</mat-icon>
             </button>
@@ -1316,7 +2103,12 @@
               <mat-icon>arrow_back</mat-icon>
               <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
             </button>
-            <button (click)="create()" mat-stroked-button type="button" name="create">
+            <button
+              (click)="create()"
+              mat-stroked-button
+              type="button"
+              name="create"
+            >
               <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
               <mat-icon>add_task</mat-icon>
             </button>

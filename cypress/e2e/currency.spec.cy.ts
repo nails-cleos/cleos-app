@@ -3,7 +3,7 @@ import { breakpointToButtons, devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
-  describe(`Currency with ${ name }`, () => {
+  describe(`Currency with ${name}`, () => {
     beforeEach(() => cy.viewport(width, height));
 
     beforeEach(() => {
@@ -30,7 +30,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/currency').as('saveCurrency');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
-      cy.contains('.no-content', 'No currency', { timeout: 15000 }).should('be.visible');
+      cy.contains('.no-content', 'No currency', { timeout: 15000 }).should(
+        'be.visible',
+      );
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/currency/add');
       cy.get('.app-surface-eyebrow').contains('Add currency');
@@ -41,7 +43,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('button[type="submit"]').click({ force: true });
 
-      cy.wait('@saveCurrency').then(currencyData => {
+      cy.wait('@saveCurrency').then((currencyData) => {
         const body = currencyData.request.body;
         expect(body.name).to.eq(name);
         expect(body.code).to.eq(code);
@@ -52,7 +54,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     });
 
     it('should edit a currency', () => {
-      cy.mockCurrencyList(true, undefined, 'e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358');
+      cy.mockCurrencyList(
+        true,
+        undefined,
+        'e5fa4fd7-74bb-4a02-bf11-fc30ad9fb358',
+      );
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
       cy.get('.app-table-shell').should('be.visible');
@@ -64,14 +70,22 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         const icon = 'attach_money';
 
         cy.mockCurrency(currency.id, currency);
-        cy.mockApi('PATCH', `**/api/v1/currency/${ currency.id }`, {
+        cy.mockApi('PATCH', `**/api/v1/currency/${currency.id}`, {
           body: { name },
           alias: 'updateCurrency',
         });
-        cy.intercept('PATCH', `**/api/v1/currency/${ currency.id }`).as('updateCurrency');
+        cy.intercept('PATCH', `**/api/v1/currency/${currency.id}`).as(
+          'updateCurrency',
+        );
 
-        cy.buttonClickOnTable(breakpoints, currency.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
-          breakpointToButtons(breakpoints, ['delete']));
+        cy.buttonClickOnTable(
+          breakpoints,
+          currency.name,
+          'app-table-master-row',
+          'app-table-detail-row',
+          'edit',
+          breakpointToButtons(breakpoints, ['delete']),
+        );
         cy.wait('@getCurrency');
 
         cy.get('.app-surface-eyebrow').contains('Update currency');
@@ -86,7 +100,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
         cy.get('button[type="submit"]').click({ force: true });
 
-        cy.wait('@updateCurrency').then(currencyData => {
+        cy.wait('@updateCurrency').then((currencyData) => {
           const body = currencyData.request.body;
           expect(body.name).to.eq(name);
           expect(body.code).to.eq(code);

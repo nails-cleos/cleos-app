@@ -12,14 +12,36 @@ import {
   viewChild,
 } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import {
+  MatChipGrid,
+  MatChipInput,
+  MatChipRemove,
+  MatChipRow,
+} from '@angular/material/chips';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -35,7 +57,13 @@ import {
   TreatmentForm,
   TreatmentGroup,
 } from './treatment';
-import { createNewDate, formatDuration, getNowTimeZone, getTime, getTimeNumber } from '../util/dates';
+import {
+  createNewDate,
+  formatDuration,
+  getNowTimeZone,
+  getTime,
+  getTimeNumber,
+} from '../util/dates';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { TreatmentStore } from '../store/treatment.store';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
@@ -47,10 +75,34 @@ import { NavigationService } from '../services/navigation.service';
   selector: 'app-treatment',
   templateUrl: './treatment.component.html',
   styleUrls: ['./treatment.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
-    TranslatePipe, RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, BackButtonDirective,
-    BackButtonDirective, MatHint, MatChipGrid, MatChipRow, MatChipInput, MatTabGroup, MatTab, TimepickerDirective,
-    TimepickerComponent, MatChipRemove, MatSuffix],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    RouterLink,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    MatPrefix,
+    BackButtonDirective,
+    BackButtonDirective,
+    MatHint,
+    MatChipGrid,
+    MatChipRow,
+    MatChipInput,
+    MatTabGroup,
+    MatTab,
+    TimepickerDirective,
+    TimepickerComponent,
+    MatChipRemove,
+    MatSuffix,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentComponent {
@@ -61,8 +113,11 @@ export class TreatmentComponent {
 
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly colorStore = inject(ColorStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private subErrorsSignal = this.treatmentStore.subErrors;
 
@@ -84,7 +139,9 @@ export class TreatmentComponent {
   filteredColorSignal: Signal<IColorAll[] | undefined> = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.name),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.name,
+      ),
       combineLatestWith(toObservable(this.allColorsWritableSignal)),
       map(([name, colors]) => {
         if (name) {
@@ -115,11 +172,13 @@ export class TreatmentComponent {
       if (treatment?.id) {
         this.form.patchValue(treatment);
         this.treatmentsSignal.set(
-          treatment.treatments?.map(t => Object.assign({}, t, {
-            time: formatDuration(t.duration),
-            errors: {},
-            primary: t.primary ?? false,
-          })) || [],
+          treatment.treatments?.map((t) =>
+            Object.assign({}, t, {
+              time: formatDuration(t.duration),
+              errors: {},
+              primary: t.primary ?? false,
+            }),
+          ) || [],
         );
       }
     });
@@ -151,12 +210,18 @@ export class TreatmentComponent {
         });
 
         this.colorsSignal.set(selectedColors);
-        this.allColorsWritableSignal.set(this.excludeSelectedColors(allColors, selectedColors));
-        this.currentColorIds = selectedColors.map(({ id }) => id).filter(isString);
+        this.allColorsWritableSignal.set(
+          this.excludeSelectedColors(allColors, selectedColors),
+        );
+        this.currentColorIds = selectedColors
+          .map(({ id }) => id)
+          .filter(isString);
         return;
       }
 
-      this.allColorsWritableSignal.set(this.excludeSelectedColors(allColors, this.colorsSignal()));
+      this.allColorsWritableSignal.set(
+        this.excludeSelectedColors(allColors, this.colorsSignal()),
+      );
     });
   }
 
@@ -173,20 +238,22 @@ export class TreatmentComponent {
     const treatments = this.treatmentsSignal();
     if (!treatments.length) {
       hasError = true;
-      this.errors.update(prev => ({ ...prev, treatments: 'REQUIRED' }));
+      this.errors.update((prev) => ({ ...prev, treatments: 'REQUIRED' }));
     }
-    this.treatmentsSignal.set(treatments.map((tab: ITreatment, i) => {
-      const errors: any = {};
-      if (!tab.name || tab.name.trim().length === 0) {
-        errors.name = 'REQUIRED';
-        hasError = true;
-      }
-      if (!tab.time || tab.time.trim().length === 0) {
-        errors.time = 'REQUIRED';
-        hasError = true;
-      }
-      return Object.assign({}, tab, { errors, order: i });
-    }));
+    this.treatmentsSignal.set(
+      treatments.map((tab: ITreatment, i) => {
+        const errors: any = {};
+        if (!tab.name || tab.name.trim().length === 0) {
+          errors.name = 'REQUIRED';
+          hasError = true;
+        }
+        if (!tab.time || tab.time.trim().length === 0) {
+          errors.time = 'REQUIRED';
+          hasError = true;
+        }
+        return Object.assign({}, tab, { errors, order: i });
+      }),
+    );
 
     if (hasError || this.form.invalid) {
       return;
@@ -207,16 +274,21 @@ export class TreatmentComponent {
   addTab(): void {
     const input = this.nameInput();
     if (input) {
-      const treatment: ITreatment = new Treatment(input.nativeElement.value, !this.treatmentsSignal().length);
+      const treatment: ITreatment = new Treatment(
+        input.nativeElement.value,
+        !this.treatmentsSignal().length,
+      );
       input.nativeElement.value = '';
 
-      this.treatmentsSignal.update(current => [...current, treatment]);
+      this.treatmentsSignal.update((current) => [...current, treatment]);
       this.selected.setValue(this.treatmentsSignal().length - 1);
     }
   }
 
   removeTab = (index: number): void => {
-    this.treatmentsSignal.update(current => current.filter((_, i) => i !== index));
+    this.treatmentsSignal.update((current) =>
+      current.filter((_, i) => i !== index),
+    );
   };
 
   setValue = (treatment: ITreatment, attribute: string, $event: any): void => {
@@ -234,16 +306,24 @@ export class TreatmentComponent {
     const colors = this.colorsSignal();
     const index = colors.findIndex(({ id }) => id === color.id);
     if (index >= 0) {
-      this.colorsSignal.update(current => current.filter((_, i) => i !== index));
-      this.allColorsWritableSignal.update(current => this.addAvailableColor(current, color));
+      this.colorsSignal.update((current) =>
+        current.filter((_, i) => i !== index),
+      );
+      this.allColorsWritableSignal.update((current) =>
+        this.addAvailableColor(current, color),
+      );
       this.getForm.color.setValue(undefined);
     }
   };
 
   selectedColor = (event: MatAutocompleteSelectedEvent): void => {
     const color = event.option.value;
-    this.colorsSignal.update(current => current.some(({ id }) => id === color.id) ? current : [...current, color]);
-    this.allColorsWritableSignal.update(current => current?.filter(c => c.id !== color.id));
+    this.colorsSignal.update((current) =>
+      current.some(({ id }) => id === color.id) ? current : [...current, color],
+    );
+    this.allColorsWritableSignal.update((current) =>
+      current?.filter((c) => c.id !== color.id),
+    );
     const input = this.colorInput();
     if (input) {
       input.nativeElement.value = '';
@@ -251,25 +331,38 @@ export class TreatmentComponent {
     this.getForm.color.setValue(undefined);
   };
 
-  sortColors = (data?: IColorAll[]): IColorAll[] | undefined => data?.sort((a: any, b: any) => {
-    const aName = a.name.toUpperCase();
-    const bName = b.name.toUpperCase();
-    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-  });
+  sortColors = (data?: IColorAll[]): IColorAll[] | undefined =>
+    data?.sort((a: any, b: any) => {
+      const aName = a.name.toUpperCase();
+      const bName = b.name.toUpperCase();
+      return aName > bName ? 1 : bName > aName ? -1 : 0;
+    });
 
-  private filter = (name: string, allColors?: IColorAll[]): IColorAll[] | undefined => allColors?.filter(
-    option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filter = (
+    name: string,
+    allColors?: IColorAll[],
+  ): IColorAll[] | undefined =>
+    allColors?.filter(
+      (option) => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
   private excludeSelectedColors(
     allColors: IColorAll[] | undefined,
     selectedColors: IColorAll[],
   ): IColorAll[] | undefined {
-    const selectedIds = new Set(selectedColors.map(({ id }) => id).filter(isString));
+    const selectedIds = new Set(
+      selectedColors.map(({ id }) => id).filter(isString),
+    );
     return allColors?.filter(({ id }) => !id || !selectedIds.has(id));
   }
 
-  private addAvailableColor(current: IColorAll[] | undefined, color: IColorAll): IColorAll[] {
+  private addAvailableColor(
+    current: IColorAll[] | undefined,
+    color: IColorAll,
+  ): IColorAll[] {
     const colors = current ?? [];
-    return colors.some(({ id }) => id === color.id) ? colors : [...colors, color];
+    return colors.some(({ id }) => id === color.id)
+      ? colors
+      : [...colors, color];
   }
 }

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
@@ -8,8 +9,8 @@ describe('CatalogueCreatePageComponent', () => {
   let fixture: ComponentFixture<CatalogueCreatePageComponent>;
 
   let catalogueStoreSpy: {
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
 
   const mockCatalogue: ICatalogueAll = {
@@ -26,16 +27,15 @@ describe('CatalogueCreatePageComponent', () => {
 
   beforeEach(async () => {
     catalogueStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CatalogueCreatePageComponent],
-      providers: [
-        { provide: CatalogueStore, useValue: catalogueStoreSpy },
-      ],
-    }).overrideTemplate(CatalogueCreatePageComponent, '')
+      providers: [{ provide: CatalogueStore, useValue: catalogueStoreSpy }],
+    })
+      .overrideTemplate(CatalogueCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(CatalogueCreatePageComponent);
@@ -53,7 +53,7 @@ describe('CatalogueCreatePageComponent', () => {
     component.submit({ catalogue: mockCatalogue, resizedImageDataUrl });
 
     expect(catalogueStoreSpy.create).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         name: 'Test Catalogue',
         home: true,
         catalog: true,

@@ -1,7 +1,7 @@
 import { formatBytes, getImage, dataURLToBlob, resizeImage } from './file';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('File Utils', () => {
-
   describe('formatBytes', () => {
     it('should return "0 Bytes" for 0', () => {
       expect(formatBytes(0, 2)).toBe('0 Bytes');
@@ -36,7 +36,9 @@ describe('File Utils', () => {
 
   describe('getImage', () => {
     it('should call URL.createObjectURL with a blob', () => {
-      const spy = spyOn(URL, 'createObjectURL').and.returnValue('blob://fake-url');
+      const spy = vi
+        .spyOn(URL, 'createObjectURL')
+        .mockReturnValue('blob://fake-url');
       const b64 = btoa('fake data');
       const result = getImage(b64, 'image/png');
       expect(spy).toHaveBeenCalled();
@@ -53,9 +55,11 @@ describe('File Utils', () => {
 
       const ctx = canvas.getContext('2d');
       if (ctx) {
-        spyOn(ctx, 'drawImage').and.callThrough();
+        vi.spyOn(ctx, 'drawImage');
       }
-      spyOn(canvas, 'toDataURL').and.returnValue('data:image/jpeg;base64,fake');
+      vi.spyOn(canvas, 'toDataURL').mockReturnValue(
+        'data:image/jpeg;base64,fake',
+      );
 
       const result = resizeImage(img, canvas);
       expect(canvas.width).toBe(200);
@@ -69,5 +73,4 @@ describe('File Utils', () => {
       expect(resizeImage(img)).toBe('');
     });
   });
-
 });

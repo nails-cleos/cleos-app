@@ -12,13 +12,20 @@
   }
   @case ('ios') {
     <div class="ios-prompt">
-      <button class="close-ios-inv" mat-button color="primary" (click)="close()">
+      <button
+        class="close-ios-inv"
+        mat-button
+        color="primary"
+        (click)="close()"
+      >
         <mat-icon>close</mat-icon>
       </button>
       <div>{{ 'COMMON.INSTALL.IOS' | translate }}</div>
-      <div><img src="./assets/ios-menu-btn.svg" alt="ios-menu-btn">
+      <div>
+        <img src="./assets/ios-menu-btn.svg" alt="ios-menu-btn" />
         <mat-icon>navigate_next</mat-icon>
-        <img src="./assets/ios-add-btn.svg" alt="ios-add-btn"></div>
+        <img src="./assets/ios-add-btn.svg" alt="ios-add-btn" />
+      </div>
     </div>
   }
 }

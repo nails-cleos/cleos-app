@@ -12,17 +12,33 @@
     <section class="app-surface-section">
       <div class="app-detail-section-header">
         <div>
-          <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'COMMON.SEARCH.TITLE' | translate
+          }}</span>
         </div>
       </div>
-      <form [formGroup]="form" (keydown.enter)="$event.preventDefault()" (ngSubmit)="downloadZip()">
+      <form
+        [formGroup]="form"
+        (keydown.enter)="$event.preventDefault()"
+        (ngSubmit)="downloadZip()"
+      >
         <div class="app-surface-filter-grid app-inline-field-action">
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-                   autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
-                   type="text" required>
-            <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+            <input
+              (keydown)="keyDownHandler($event)"
+              [formControl]="getForm.office"
+              [matAutocomplete]="autoOffice"
+              autocomplete="off"
+              matInput
+              placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
+              type="text"
+              required
+            />
+            <mat-autocomplete
+              #autoOffice="matAutocomplete"
+              [displayWith]="displayFnOffice"
+            >
               @for (office of filteredOfficeSignal(); track office.id) {
                 <mat-option [value]="office">
                   {{ office.name }}
@@ -30,21 +46,45 @@
               }
             </mat-autocomplete>
             @if (getForm.office.hasError('required')) {
-              <mat-error [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"
+              ></mat-error>
             } @else if (getForm.office.hasError('requireMatch')) {
-              <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'COMMON.OFFICE.INVALID' | translate"
+              ></mat-error>
             }
           </mat-form-field>
           @if (showDateFilter()) {
             <mat-form-field appearance="outline">
-              <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
-              <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
-              <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-              <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
+              <mat-label>{{
+                'COMMON.LABEL.MONTHLY.DATE' | translate
+              }}</mat-label>
+              <input
+                matInput
+                [matDatepicker]="dp"
+                [formControl]="getForm.date"
+                readonly
+                (click)="dp.open()"
+              />
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="dp"
+              ></mat-datepicker-toggle>
+              <mat-datepicker
+                #dp
+                startView="multi-year"
+                (monthSelected)="setMonthAndYear($event, dp)"
+                touchUi
+              >
               </mat-datepicker>
             </mat-form-field>
-            <button mat-stroked-button type="submit" [disabled]="form.invalid || !resultsLengthSignal()"
-                    class="app-surface-filter-action app-detail-action-button">
+            <button
+              mat-stroked-button
+              type="submit"
+              [disabled]="form.invalid || !resultsLengthSignal()"
+              class="app-surface-filter-action app-detail-action-button"
+            >
               <mat-icon>folder_zip</mat-icon>
               <span>{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}</span>
             </button>
@@ -60,34 +100,53 @@
         @if (isLoading()) {
           <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
         } @else if (dataSourceSignal(); as dataSource) {
-          <table [dataSource]="dataSource" mat-table matSort matSortActive="date" matSortDirection="desc"
-                 matSortDisableClear
-                 multiTemplateDataRows>
+          <table
+            [dataSource]="dataSource"
+            mat-table
+            matSort
+            matSortActive="date"
+            matSortDirection="desc"
+            matSortDisableClear
+            multiTemplateDataRows
+          >
             <ng-container matColumnDef="position">
               <th *matHeaderCellDef mat-header-cell>#</th>
-              <td *matCellDef="let document; let i = dataIndex;" mat-cell>
-                <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+              <td *matCellDef="let document; let i = dataIndex" mat-cell>
+                <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="name">
-              <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                {{ 'COMMON.COLUMN.NAME' | translate }}
+              </th>
               <td *matCellDef="let document" mat-cell>
                 <div>{{ document.name }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="date">
-              <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-                  mat-sort-header>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
+              <th
+                *matHeaderCellDef
+                class="app-surface-hide-mobile"
+                mat-header-cell
+                mat-sort-header
+              >
+                {{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
               </th>
-              <td *matCellDef="let document" class="app-surface-hide-mobile" mat-cell>
-                <div>{{ document.date | date:'MM-yyyy' }}</div>
+              <td
+                *matCellDef="let document"
+                class="app-surface-hide-mobile"
+                mat-cell
+              >
+                <div>{{ document.date | date: 'MM-yyyy' }}</div>
               </td>
             </ng-container>
 
             <ng-container matColumnDef="type">
-              <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
+              <th *matHeaderCellDef mat-header-cell mat-sort-header>
+                {{ 'COMMON.COLUMN.TYPE' | translate }}
+              </th>
               <td *matCellDef="let document" mat-cell>
                 <div>{{ document.type }}</div>
               </td>
@@ -95,29 +154,53 @@
 
             <ng-container matColumnDef="actions">
               <th *matHeaderCellDef mat-header-cell>
-                <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
+                <span class="app-surface-hide-mobile">{{
+                  'COMMON.COLUMN.ACTIONS' | translate
+                }}</span>
                 @if (navigationButtons()) {
-                  <button (click)="add()" mat-icon-button id="add-button"
-                          matTooltip="{{ 'DOCUMENT.TITLE' | translate }}" matTooltipPosition="right" type="button">
+                  <button
+                    (click)="add()"
+                    mat-icon-button
+                    id="add-button"
+                    matTooltip="{{ 'DOCUMENT.TITLE' | translate }}"
+                    matTooltipPosition="right"
+                    type="button"
+                  >
                     <mat-icon color="primary">add</mat-icon>
                   </button>
                 }
               </th>
-              <td *matCellDef="let document" class="app-surface-hide-mobile" mat-cell>
+              <td
+                *matCellDef="let document"
+                class="app-surface-hide-mobile"
+                mat-cell
+              >
                 <div>
                   @if (!document.deleted && googleDriveUploadFile) {
-                    <button (click)="download(document)" mat-icon-button
-                            matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}" matTooltipPosition="left">
+                    <button
+                      (click)="download(document)"
+                      mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.DOWNLOAD' | translate }}"
+                      matTooltipPosition="left"
+                    >
                       <mat-icon color="primary">file_download</mat-icon>
                     </button>
                   }
                   @if (navigationButtons() && !document.deleted) {
-                    <button (click)="edit(document)" mat-icon-button
-                            matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                    <button
+                      (click)="edit(document)"
+                      mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                      matTooltipPosition="left"
+                    >
                       <mat-icon color="primary">edit</mat-icon>
                     </button>
-                    <button (click)="delete(document)" mat-icon-button
-                            matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                    <button
+                      (click)="delete(document)"
+                      mat-icon-button
+                      matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                      matTooltipPosition="right"
+                    >
                       <mat-icon color="warn">delete</mat-icon>
                     </button>
                   }
@@ -126,36 +209,60 @@
             </ng-container>
 
             <ng-container matColumnDef="expandedDetail">
-              <td *matCellDef="let document" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop"
-                  mat-cell>
-                <div [class.detail-expanded]="document === expandedDocument"
-                     class="detail app-surface-hide-desktop">
+              <td
+                *matCellDef="let document"
+                [attr.colspan]="displayedColumns.length"
+                class="app-surface-hide-desktop"
+                mat-cell
+              >
+                <div
+                  [class.detail-expanded]="document === expandedDocument"
+                  class="detail app-surface-hide-desktop"
+                >
                   <mat-list>
                     @if (document.date) {
                       <mat-list-item role="list">
-                        <div matListItemTitle>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</div>
-                        <div matListItemLine>{{ document.date | date:'MM-yyyy' }}</div>
+                        <div matListItemTitle>
+                          {{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}
+                        </div>
+                        <div matListItemLine>
+                          {{ document.date | date: 'MM-yyyy' }}
+                        </div>
                       </mat-list-item>
                     }
 
                     @if (!document.deleted) {
-                      <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                      <div mat-subheader>
+                        {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                      </div>
                       @if (googleDriveUploadFile) {
                         <mat-list-item role="list">
-                          <button (click)="download(document)" color="primary" mat-icon-button>
+                          <button
+                            (click)="download(document)"
+                            color="primary"
+                            mat-icon-button
+                          >
                             <mat-icon matListItemIcon>file_download</mat-icon>
                           </button>
                         </mat-list-item>
                       }
                       @if (navigationButtons()) {
                         <mat-list-item role="list">
-                          <button (click)="edit(document)" color="primary" mat-icon-button>
+                          <button
+                            (click)="edit(document)"
+                            color="primary"
+                            mat-icon-button
+                          >
                             <mat-icon matListItemIcon>edit</mat-icon>
                           </button>
                         </mat-list-item>
 
                         <mat-list-item role="list">
-                          <button (click)="delete(document)" color="primary" mat-icon-button>
+                          <button
+                            (click)="delete(document)"
+                            color="primary"
+                            mat-icon-button
+                          >
                             <mat-icon matListItemIcon>delete</mat-icon>
                           </button>
                         </mat-list-item>
@@ -167,26 +274,49 @@
             </ng-container>
 
             <ng-container matColumnDef="noContent">
-              <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+              <td
+                *matFooterCellDef
+                [attr.colspan]="displayedColumns.length"
+                class="no-content bold"
+                mat-footer-cell
+              >
                 {{ 'DOCUMENT.LIST.ERROR.NO_CONTENT' | translate }}
               </td>
             </ng-container>
 
             <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-            <tr *matRowDef="let document; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
-            <tr (click)="expandedDocument = expandedDocument === document ? null : document"
-                *matRowDef="let document; columns: displayedColumns;"
-                class="app-surface-hide-desktop app-table-master-row"
-                mat-row></tr>
-            <tr *matRowDef="let row; columns: ['expandedDetail']"
-                [class.app-table-detail-row--expanded]="row === expandedDocument"
-                class="app-surface-hide-desktop app-table-detail-row"
-                mat-row></tr>
+            <tr
+              *matRowDef="let document; columns: displayedColumns"
+              class="app-surface-hide-mobile"
+              mat-row
+            ></tr>
+            <tr
+              (click)="
+                expandedDocument =
+                  expandedDocument === document ? null : document
+              "
+              *matRowDef="let document; columns: displayedColumns"
+              class="app-surface-hide-desktop app-table-master-row"
+              mat-row
+            ></tr>
+            <tr
+              *matRowDef="let row; columns: ['expandedDetail']"
+              [class.app-table-detail-row--expanded]="row === expandedDocument"
+              class="app-surface-hide-desktop app-table-detail-row"
+              mat-row
+            ></tr>
 
-            <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+            <tr
+              *matFooterRowDef="['noContent']"
+              [hidden]="resultsLength > 0"
+              mat-footer-row
+            ></tr>
           </table>
           @if (resultsLength) {
-            <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+            <mat-paginator
+              [length]="resultsLength"
+              [pageSize]="pageSize"
+            ></mat-paginator>
           }
         }
       </div>

@@ -8,15 +8,8 @@
   "scope": "./",
   "start_url": "/",
   "description": "App to book an appointment to make your nail prettier",
-  "display_override": [
-    "standalone",
-    "window-controls-overlay",
-    "fullscreen"
-  ],
-  "categories": [
-    "beauty",
-    "health"
-  ],
+  "display_override": ["standalone", "window-controls-overlay", "fullscreen"],
+  "categories": ["beauty", "health"],
   "edge_side_panel": {
     "preferred_width": 390
   },

@@ -1,15 +1,26 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { HttpErrorResponse, HttpHandlerFn, HttpRequest, HttpResponse } from '@angular/common/http';
+import {
+  HttpErrorResponse,
+  HttpHandlerFn,
+  HttpRequest,
+  HttpResponse,
+} from '@angular/common/http';
 import { firstValueFrom, of, throwError } from 'rxjs';
 
 import { loadingInterceptor } from './loading-interceptor';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
-
 describe('loadingInterceptor', () => {
-  let loadingOverlayServiceSpy: jasmine.SpyObj<LoadingOverlayService>;
+  let loadingOverlayServiceSpy: {
+    show: Mock;
+    hide: Mock;
+  };
 
   beforeEach(() => {
-    loadingOverlayServiceSpy = jasmine.createSpyObj<LoadingOverlayService>('LoadingOverlayService', ['show', 'hide']);
+    loadingOverlayServiceSpy = {
+      show: vi.fn().mockName('LoadingOverlayService.show'),
+      hide: vi.fn().mockName('LoadingOverlayService.hide'),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -24,18 +35,27 @@ describe('loadingInterceptor', () => {
       return of(new HttpResponse({ status: 200 }));
     };
 
-    await firstValueFrom(TestBed.runInInjectionContext(() =>
-      loadingInterceptor(new HttpRequest('GET', '/v1/users/me'), next)));
+    await firstValueFrom(
+      TestBed.runInInjectionContext(() =>
+        loadingInterceptor(new HttpRequest('GET', '/v1/users/me'), next),
+      ),
+    );
 
     expect(loadingOverlayServiceSpy.show).toHaveBeenCalled();
     expect(loadingOverlayServiceSpy.hide).toHaveBeenCalled();
   });
 
   it('should hide the loading overlay when an internal request errors', async () => {
-    const next: HttpHandlerFn = () => throwError(() => new HttpErrorResponse({ status: 500 }));
+    const next: HttpHandlerFn = () =>
+      throwError(() => new HttpErrorResponse({ status: 500 }));
 
-    await expectAsync(firstValueFrom(TestBed.runInInjectionContext(() =>
-      loadingInterceptor(new HttpRequest('GET', '/v1/users/me'), next)))).toBeRejected();
+    await expect(
+      firstValueFrom(
+        TestBed.runInInjectionContext(() =>
+          loadingInterceptor(new HttpRequest('GET', '/v1/users/me'), next),
+        ),
+      ),
+    ).rejects.toThrow();
 
     expect(loadingOverlayServiceSpy.show).toHaveBeenCalled();
     expect(loadingOverlayServiceSpy.hide).toHaveBeenCalled();
@@ -44,8 +64,14 @@ describe('loadingInterceptor', () => {
   it('should skip the loading overlay for external requests', async () => {
     const next: HttpHandlerFn = () => of(new HttpResponse({ status: 200 }));
 
-    await firstValueFrom(TestBed.runInInjectionContext(() =>
-      loadingInterceptor(new HttpRequest('GET', 'https://maps.googleapis.com/maps/api/place'), next)));
+    await firstValueFrom(
+      TestBed.runInInjectionContext(() =>
+        loadingInterceptor(
+          new HttpRequest('GET', 'https://maps.googleapis.com/maps/api/place'),
+          next,
+        ),
+      ),
+    );
 
     expect(loadingOverlayServiceSpy.show).not.toHaveBeenCalled();
     expect(loadingOverlayServiceSpy.hide).not.toHaveBeenCalled();

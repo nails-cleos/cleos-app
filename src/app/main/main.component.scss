@@ -3,7 +3,9 @@
   height: 100%;
   opacity: 1;
   position: fixed;
-  transition: opacity 1000ms ease-in-out, z-index 1000ms ease-in-out;
+  transition:
+    opacity 1000ms ease-in-out,
+    z-index 1000ms ease-in-out;
   width: 100%;
   z-index: 1100;
 }
@@ -132,7 +134,8 @@
   }
 }
 
-img, svg {
+img,
+svg {
   border-radius: 50%;
   margin-right: 5% !important;
 }
@@ -166,7 +169,8 @@ img, svg {
 }
 
 @media all and (max-device-width: 812px) and (orientation: portrait) {
-  img, svg {
+  img,
+  svg {
     max-width: 52px !important;
   }
 
@@ -177,7 +181,8 @@ img, svg {
 }
 
 @media not all and (max-device-width: 812px) and (orientation: portrait) {
-  img, svg {
+  img,
+  svg {
     max-width: 60px !important;
   }
 
@@ -198,7 +203,10 @@ img, svg {
   border-radius: 0;
   position: fixed;
   z-index: 999999999;
-  transition: background-color 300ms ease-in-out, color 300ms ease-in-out, box-shadow 300ms ease-in-out;
+  transition:
+    background-color 300ms ease-in-out,
+    color 300ms ease-in-out,
+    box-shadow 300ms ease-in-out;
 }
 
 @media (max-width: 599px) {
@@ -235,7 +243,9 @@ img, svg {
   pointer-events: none;
   position: fixed;
   right: 25px;
-  transition: opacity 1000ms ease-in-out, visibility 1000ms ease-in-out;
+  transition:
+    opacity 1000ms ease-in-out,
+    visibility 1000ms ease-in-out;
   visibility: hidden;
   z-index: 9999;
 
@@ -251,11 +261,11 @@ img, svg {
 }
 
 a {
-  -webkit-transition: all .3s ease-in 0s;
-  -moz-transition: all .3s ease-in 0s;
-  -ms-transition: all .3s ease-in 0s;
-  -o-transition: all .3s ease-in 0s;
-  transition: all .3s ease-in 0s;
+  -webkit-transition: all 0.3s ease-in 0s;
+  -moz-transition: all 0.3s ease-in 0s;
+  -ms-transition: all 0.3s ease-in 0s;
+  -o-transition: all 0.3s ease-in 0s;
+  transition: all 0.3s ease-in 0s;
 }
 
 $footer-padding: 70px 10%;
@@ -268,7 +278,6 @@ $footer-bottom-padding: 10px;
 }
 
 .page-container {
-
   display: flex;
   flex-direction: column;
   min-height: 100vh;

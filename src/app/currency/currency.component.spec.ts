@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 
@@ -15,7 +16,7 @@ describe('CurrencyComponent', () => {
   let currencyStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
+    clean: Mock;
   };
 
   const mockCurrency: ICurrencyAll = {
@@ -33,9 +34,11 @@ describe('CurrencyComponent', () => {
     currencyStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
+      clean: vi.fn().mockName('clean'),
     };
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    const navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [CurrencyComponent],
@@ -67,20 +70,18 @@ describe('CurrencyComponent', () => {
   });
 
   it('should handle form errors from subErrorsSignal', () => {
-    const errors = [
-      { field: 'code', message: 'Code required' },
-    ];
+    const errors = [{ field: 'code', message: 'Code required' }];
 
     currencyStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
     expect(errs['code']).toBe('Code required');
-    expect(component.getForm.code.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.code.hasError('incorrect')).toBe(true);
   });
 
   it('should not dispatch when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
@@ -93,7 +94,7 @@ describe('CurrencyComponent', () => {
   });
 
   it('should dispatch createCurrency when in add mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const nameControl = component.getForm.name;
@@ -108,19 +109,26 @@ describe('CurrencyComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Currency',
-      code: 'New Code',
-      icon: 'New Icon',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Currency',
+        code: 'New Code',
+        icon: 'New Icon',
+      }),
+    );
   });
 
   it('should dispatch updateCurrency when in edit mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('currency', { id: '1', name: 'Old', code: 'old', icon: 'Old' });
+    fixture.componentRef.setInput('currency', {
+      id: '1',
+      name: 'Old',
+      code: 'old',
+      icon: 'Old',
+    });
     fixture.detectChanges();
 
     const nameControl = component.getForm.name;
@@ -135,11 +143,13 @@ describe('CurrencyComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      code: 'Updated Code',
-      name: 'Updated Currency',
-      icon: 'Updated Icon',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        code: 'Updated Code',
+        name: 'Updated Currency',
+        icon: 'Updated Icon',
+      }),
+    );
   });
 });

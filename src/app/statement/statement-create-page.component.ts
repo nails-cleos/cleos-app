@@ -20,7 +20,7 @@ export class StatementCreatePageComponent {
     this.documentStore.clean();
   }
 
-  submit(data: { officeId: string; blob: Blob, fileName: string }) {
+  submit(data: { officeId: string; blob: Blob; fileName: string }) {
     this.documentStore.uploadStatement(data.officeId, data.blob, data.fileName);
   }
 }

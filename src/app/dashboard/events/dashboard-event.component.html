@@ -1,38 +1,74 @@
 @let currentViewDate = viewDate();
-<div class="dashboard-events app-surface-canvas app-surface-shell app-surface-stack">
+<div
+  class="dashboard-events app-surface-canvas app-surface-shell app-surface-stack"
+>
   <section class="app-surface-section">
     <div class="dashboard-events-toolbar app-detail-actions">
-      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="decrement()" [disabled]="prevBtnDisabled"
-              mat-stroked-button>
+      <button
+        class="app-surface-hide-desktop dashboard-events-toolbar__compact"
+        (click)="decrement()"
+        [disabled]="prevBtnDisabled"
+        mat-stroked-button
+      >
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <button class="app-surface-hide-mobile" (click)="decrement()" [disabled]="prevBtnDisabled" mat-stroked-button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="decrement()"
+        [disabled]="prevBtnDisabled"
+        mat-stroked-button
+      >
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
-      <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [max]="maxDate" [min]="today"
-             [value]="currentViewDate"
-             hidden matInput>
+      <input
+        (dateChange)="selectDate($event)"
+        [matDatepicker]="picker"
+        [max]="maxDate"
+        [min]="today"
+        [value]="currentViewDate"
+        hidden
+        matInput
+      />
       <mat-datepicker #picker touchUi></mat-datepicker>
-      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="picker.open()" mat-stroked-button>
+      <button
+        class="app-surface-hide-desktop dashboard-events-toolbar__compact"
+        (click)="picker.open()"
+        mat-stroked-button
+      >
         <mat-icon>today</mat-icon>
       </button>
-      <button class="app-surface-hide-mobile" (click)="picker.open()" mat-stroked-button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="picker.open()"
+        mat-stroked-button
+      >
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-      <button class="app-surface-hide-desktop dashboard-events-toolbar__compact" (click)="increment()" [disabled]="nextBtnDisabled"
-              mat-stroked-button>
+      <button
+        class="app-surface-hide-desktop dashboard-events-toolbar__compact"
+        (click)="increment()"
+        [disabled]="nextBtnDisabled"
+        mat-stroked-button
+      >
         <mat-icon>navigate_next</mat-icon>
       </button>
-      <button class="app-surface-hide-mobile" (click)="increment()" [disabled]="nextBtnDisabled" mat-stroked-button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="increment()"
+        [disabled]="nextBtnDisabled"
+        mat-stroked-button
+      >
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
       <div class="app-surface-spacer"></div>
       <div class="dashboard-events-title">
-        <span class="app-surface-eyebrow">{{ 'DASHBOARD.FIELD' | translate }}</span>
-        <h2>{{ displayDate | calendarDate:'dayViewTitle':language }}</h2>
+        <span class="app-surface-eyebrow">{{
+          'DASHBOARD.FIELD' | translate
+        }}</span>
+        <h2>{{ displayDate | calendarDate: 'dayViewTitle' : language }}</h2>
         <app-counter (refreshViewDate)="refreshViewDate($event)"></app-counter>
       </div>
     </div>
@@ -40,13 +76,20 @@
 
   @if (availability()) {
     <section class="app-surface-section">
-      <div class="dashboard-events-calendar app-surface-item app-surface-item--section">
+      <div
+        class="dashboard-events-calendar app-surface-item app-surface-item--section"
+      >
         <app-mwl-day-view-scheduler
           (segmentClicked)="segmentClick($event.date, $event.professionalId)"
-          (eventTimesChanged)="eventTimesChanged($event)" (professionalChanged)="professionalChanged($event)"
+          (eventTimesChanged)="eventTimesChanged($event)"
+          (professionalChanged)="professionalChanged($event)"
           (beforeViewRender)="beforeMonthViewRender($event)"
-          [day]="day" [events]="calendar.calendarEvents" [professionals]="professionals" [locale]="language"
-          [viewDate]="currentViewDate">
+          [day]="day"
+          [events]="calendar.calendarEvents"
+          [professionals]="professionals"
+          [locale]="language"
+          [viewDate]="currentViewDate"
+        >
         </app-mwl-day-view-scheduler>
       </div>
     </section>
@@ -55,7 +98,14 @@
       <div class="dashboard-events-empty app-surface-item">
         <mat-icon>event_busy</mat-icon>
         <h2>
-          {{ 'DASHBOARD.ROOM.NO_OPEN' | translate:{ date: currentViewDate | calendarDate:'dayViewTitle':language } }}
+          {{
+            'DASHBOARD.ROOM.NO_OPEN'
+              | translate
+                : {
+                    date:
+                      currentViewDate | calendarDate: 'dayViewTitle' : language,
+                  }
+          }}
         </h2>
       </div>
     </section>

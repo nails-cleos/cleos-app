@@ -1,4 +1,5 @@
 import { FilterByPipe } from './filterBy.pipe';
+import { describe, expect, it } from 'vitest';
 
 describe('FilterByPipe', () => {
   const pipe = new FilterByPipe();

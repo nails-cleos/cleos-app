@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { IPayment, IPaymentAll } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPrefix } from '@angular/material/input';
@@ -22,7 +29,10 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { NavigationService } from '@app/services/navigation.service';
 import { PaymentStore } from '@app/store/payment.store';
 import { BackButtonDirective } from '@app/directives/back-button.directive';
@@ -31,10 +41,31 @@ import { BackButtonDirective } from '@app/directives/back-button.directive';
   selector: 'app-payment',
   templateUrl: './payment.component.html',
   styleUrls: ['./payment.component.scss'],
-  imports: [MatIcon, MatIconButton, TranslatePipe, DecimalPipe, MatTable, MatColumnDef,
-    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip, MatFooterCellDef, MatFooterCell, MatHeaderRowDef,
-    MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPrefix, MatButton, TableSkeletonComponent,
-    BackButtonDirective],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    TranslatePipe,
+    DecimalPipe,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPrefix,
+    MatButton,
+    TableSkeletonComponent,
+    BackButtonDirective,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentComponent {
@@ -43,7 +74,8 @@ export class PaymentComponent {
   accountId = input<string>();
 
   private readonly paymentStore = inject(PaymentStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private readonly loadingSignal = this.paymentStore.isLoading;
   private readonly paymentResource = this.paymentStore.data;

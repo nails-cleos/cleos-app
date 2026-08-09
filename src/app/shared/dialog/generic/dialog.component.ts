@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   MAT_DIALOG_DATA,
-  MatDialogActions, MatDialogClose,
+  MatDialogActions,
+  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
@@ -15,7 +16,15 @@ import { MatButton } from '@angular/material/button';
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogComponent {

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { NoteComponent } from './note.component';
@@ -5,26 +6,29 @@ import { IUser, IUserAll } from '../user/user';
 import { INoteAll } from './note';
 import { FrequencyEnum } from '../util/helper';
 import { ICommon, IError } from '../interfaces/common';
-import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../util/dates';
+import {
+  backendFormatDate,
+  DEFAULT_LOCALE,
+  getNowTimeZone,
+} from '../util/dates';
 import { addDays } from 'date-fns';
 import { provideAppDateAdapter } from '../util/adapter/app-date.provider';
 import { NavigationService } from '../services/navigation.service';
 import { NoteStore } from '../store/note.store';
 import { signal } from '@angular/core';
 import { UserStore } from '../store/user.store';
-
 describe('NoteComponent', () => {
   let component: NoteComponent;
   let fixture: ComponentFixture<NoteComponent>;
   let noteStoreSpy: {
     navigationParams: ReturnType<typeof navigationParamsSignal.asReadonly>;
     subErrors: ReturnType<typeof subErrorsSignal.asReadonly>;
-    clearError: jasmine.Spy;
-    setNavigationParams: jasmine.Spy;
+    clearError: Mock;
+    setNavigationParams: Mock;
   };
   let userStoreSpy: {
     professionals: ReturnType<typeof allProfessionalsSignal.asReadonly>;
-    loadProfessionals: jasmine.Spy;
+    loadProfessionals: Mock;
   };
 
   const navigationParamsSignal = signal<any>(undefined);
@@ -63,15 +67,17 @@ describe('NoteComponent', () => {
     noteStoreSpy = {
       navigationParams: navigationParamsSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
-      clearError: jasmine.createSpy('clearError'),
-      setNavigationParams: jasmine.createSpy('setNavigationParams'),
+      clearError: vi.fn().mockName('clearError'),
+      setNavigationParams: vi.fn().mockName('setNavigationParams'),
     };
     userStoreSpy = {
       professionals: allProfessionalsSignal.asReadonly(),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
+      loadProfessionals: vi.fn().mockName('loadProfessionals'),
     };
 
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    const navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [NoteComponent],
@@ -113,11 +119,11 @@ describe('NoteComponent', () => {
     fixture.detectChanges();
 
     expect(component.errors()['description']).toBe('Required');
-    expect(component.getForm.description.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.description.hasError('incorrect')).toBe(true);
   });
 
   it('should submit a new note in add mode', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const descriptionControl = component.getForm.description;
@@ -139,16 +145,18 @@ describe('NoteComponent', () => {
 
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'New Test',
-      professionalId: 'p1',
-      repeat: FrequencyEnum.none,
-      date: backendFormatDate(date),
-    }));
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'New Test',
+        professionalId: 'p1',
+        repeat: FrequencyEnum.none,
+        date: backendFormatDate(date),
+      }),
+    );
   });
 
   it('should submit updated note in edit mode', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const mockProfessional: IUserAll = {
@@ -159,7 +167,6 @@ describe('NoteComponent', () => {
       timeZone: '',
       authorities: [],
     };
-    fixture.componentRef.setInput('id', 'note1');
     fixture.componentRef.setInput('note', mockNote);
     fixture.detectChanges();
 
@@ -183,16 +190,18 @@ describe('NoteComponent', () => {
 
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'Updated Test',
-      professionalId: 'p2',
-      date: backendFormatDate(date),
-      repeat: FrequencyEnum.everyDay,
-    }));
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'Updated Test',
+        professionalId: 'p2',
+        date: backendFormatDate(date),
+        repeat: FrequencyEnum.everyDay,
+      }),
+    );
   });
 
   it('should not submit when form invalid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
     component.getForm.description.setValue('');
     component.submit();
@@ -220,8 +229,22 @@ describe('NoteComponent', () => {
 
   it('should filter professionals correctly', () => {
     const profs: IUserAll[] = [
-      { id: 'p1', displayName: 'Alice', email: '', locale: '', timeZone: '', authorities: [] },
-      { id: 'p2', displayName: 'Bob', email: '', locale: '', timeZone: '', authorities: [] },
+      {
+        id: 'p1',
+        displayName: 'Alice',
+        email: '',
+        locale: '',
+        timeZone: '',
+        authorities: [],
+      },
+      {
+        id: 'p2',
+        displayName: 'Bob',
+        email: '',
+        locale: '',
+        timeZone: '',
+        authorities: [],
+      },
     ];
     const result = component['filter']('A', profs);
     expect(result?.length).toBe(1);

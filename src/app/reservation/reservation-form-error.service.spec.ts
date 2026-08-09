@@ -1,5 +1,9 @@
-import { createReservationErrors, ReservationFormField } from './reservation-form.types';
+import {
+  createReservationErrors,
+  ReservationFormField,
+} from './reservation-form.types';
 import { ReservationFormErrorService } from './reservation-form-error.service';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('ReservationFormErrorService', () => {
   let service: ReservationFormErrorService;
@@ -25,14 +29,17 @@ describe('ReservationFormErrorService', () => {
   });
 
   it('should map sub errors into typed reservation errors', () => {
-    const state = service.createErrorState([
-      { field: 'customer', message: 'Customer is required' } as any,
-      { field: 'note', message: 'Note is invalid' } as any,
-    ], {
-      allowedFields: reservationFields,
-      createErrors: createReservationErrors,
-      defaultStepIndex: 0,
-    });
+    const state = service.createErrorState(
+      [
+        { field: 'customer', message: 'Customer is required' } as any,
+        { field: 'note', message: 'Note is invalid' } as any,
+      ],
+      {
+        allowedFields: reservationFields,
+        createErrors: createReservationErrors,
+        defaultStepIndex: 0,
+      },
+    );
 
     expect(state.stepIndex).toBe(0);
     expect(state.errors.customer).toBe('Customer is required');
@@ -41,12 +48,15 @@ describe('ReservationFormErrorService', () => {
   });
 
   it('should use room and professional specific step indexes', () => {
-    const roomState = service.createErrorState([{ field: 'room', message: 'Room is required' } as any], {
-      allowedFields: reservationFields,
-      createErrors: createReservationErrors,
-      defaultStepIndex: 2,
-      stepByField: { room: 1, professional: 3 },
-    });
+    const roomState = service.createErrorState(
+      [{ field: 'room', message: 'Room is required' } as any],
+      {
+        allowedFields: reservationFields,
+        createErrors: createReservationErrors,
+        defaultStepIndex: 2,
+        stepByField: { room: 1, professional: 3 },
+      },
+    );
     const professionalState = service.createErrorState(
       [{ field: 'professional', message: 'Professional is required' } as any],
       {

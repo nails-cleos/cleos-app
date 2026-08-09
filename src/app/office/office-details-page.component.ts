@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { OfficeComponent } from './office.component';
 import { OfficeStore } from '../store/office.store';
 import { IOffice } from './office';
@@ -9,9 +16,13 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-office-details-page',
   template: `
     @if (office(); as office) {
-      <app-office [office]="office" [config]="config" (submitData)="submit($event)"/>
+      <app-office
+        [office]="office"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton [lines]="5"/>
+      <app-skeleton [lines]="5" />
     }
   `,
   imports: [OfficeComponent, SkeletonComponent],

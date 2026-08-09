@@ -6,35 +6,102 @@
   <section class="app-surface-item month-summary-card">
     <div class="month-summary-card__header">
       <div></div>
-      <button (click)="goToMonth(currentMonth.month, 'INCOME')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+      <button
+        (click)="goToMonth(currentMonth.month, 'INCOME')"
+        class="month-summary-card__heading month-summary-card__heading--action"
+        type="button"
+      >
         {{ 'SUMMARY.INCOME' | translate }}
       </button>
-      <button (click)="goToMonth(currentMonth.month, 'EXPENSE')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+      <button
+        (click)="goToMonth(currentMonth.month, 'EXPENSE')"
+        class="month-summary-card__heading month-summary-card__heading--action"
+        type="button"
+      >
         {{ 'SUMMARY.EXPENSE' | translate }}
       </button>
-      <div class="month-summary-card__heading">{{ 'SUMMARY.TOTAL' | translate }}</div>
+      <div class="month-summary-card__heading">
+        {{ 'SUMMARY.TOTAL' | translate }}
+      </div>
     </div>
 
     <div class="month-summary-card__rows">
       <div class="month-summary-card__row">
-        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(income?.gross) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(expense?.gross) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__label">
+          {{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(income?.gross)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(expense?.gross)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div
+          class="month-summary-card__value month-summary-card__value--result"
+        >
+          {{
+            currentMonth.totalWithoutGross
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
       </div>
 
       <div class="month-summary-card__row">
-        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(income?.btw) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(expense?.btw) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__label">
+          {{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(income?.btw)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(expense?.btw)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div
+          class="month-summary-card__value month-summary-card__value--result"
+        >
+          {{
+            currentMonth.totalWithoutBTW
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
       </div>
 
       <div class="month-summary-card__row">
-        <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(income?.net) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value">{{ $safeNavigationMigration(expense?.net) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-        <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalWithoutNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+        <div class="month-summary-card__label">
+          {{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(income?.net)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div class="month-summary-card__value">
+          {{
+            $safeNavigationMigration(expense?.net)
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
+        <div
+          class="month-summary-card__value month-summary-card__value--result"
+        >
+          {{
+            currentMonth.totalWithoutNet
+              | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+          }}
+        </div>
       </div>
     </div>
   </section>
@@ -43,29 +110,77 @@
     <section class="app-surface-item month-summary-card">
       <div class="month-summary-card__header month-summary-card__header--cash">
         <div></div>
-        <button (click)="goToMonth(currentMonth.month, 'CASH')" class="month-summary-card__heading month-summary-card__heading--action" type="button">
+        <button
+          (click)="goToMonth(currentMonth.month, 'CASH')"
+          class="month-summary-card__heading month-summary-card__heading--action"
+          type="button"
+        >
           {{ 'SUMMARY.CASH' | translate }}
         </button>
-        <div class="month-summary-card__heading">{{ 'SUMMARY.TOTAL_CASH' | translate }}</div>
+        <div class="month-summary-card__heading">
+          {{ 'SUMMARY.TOTAL_CASH' | translate }}
+        </div>
       </div>
 
       <div class="month-summary-card__rows">
         <div class="month-summary-card__row month-summary-card__row--cash">
-          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}</div>
-          <div class="month-summary-card__value">{{ $safeNavigationMigration(cash?.gross) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalGross | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__label">
+            {{ 'SUMMARY.MONTHLY.TABLE.GROSS' | translate }}
+          </div>
+          <div class="month-summary-card__value">
+            {{
+              $safeNavigationMigration(cash?.gross)
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
+          <div
+            class="month-summary-card__value month-summary-card__value--result"
+          >
+            {{
+              currentMonth.totalGross
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
         </div>
 
         <div class="month-summary-card__row month-summary-card__row--cash">
-          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}</div>
-          <div class="month-summary-card__value">{{ $safeNavigationMigration(cash?.btw) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalBTW | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__label">
+            {{ 'SUMMARY.MONTHLY.TABLE.BTW' | translate }}
+          </div>
+          <div class="month-summary-card__value">
+            {{
+              $safeNavigationMigration(cash?.btw)
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
+          <div
+            class="month-summary-card__value month-summary-card__value--result"
+          >
+            {{
+              currentMonth.totalBTW
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
         </div>
 
         <div class="month-summary-card__row month-summary-card__row--cash">
-          <div class="month-summary-card__label">{{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}</div>
-          <div class="month-summary-card__value">{{ $safeNavigationMigration(cash?.net) | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
-          <div class="month-summary-card__value month-summary-card__value--result">{{ currentMonth.totalNet | currency: (currentCurrency?.code || 'EUR'): 'symbol': '1.2-2' }}</div>
+          <div class="month-summary-card__label">
+            {{ 'SUMMARY.MONTHLY.TABLE.NET' | translate }}
+          </div>
+          <div class="month-summary-card__value">
+            {{
+              $safeNavigationMigration(cash?.net)
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
+          <div
+            class="month-summary-card__value month-summary-card__value--result"
+          >
+            {{
+              currentMonth.totalNet
+                | currency: currentCurrency?.code || 'EUR' : 'symbol' : '1.2-2'
+            }}
+          </div>
         </div>
       </div>
     </section>

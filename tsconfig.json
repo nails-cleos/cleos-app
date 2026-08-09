@@ -22,9 +22,7 @@
     "target": "ES2022",
     "module": "es2020",
     "useDefineForClassFields": false,
-    "typeRoots": [
-      "node_modules/@types"
-    ]
+    "typeRoots": ["node_modules/@types"]
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

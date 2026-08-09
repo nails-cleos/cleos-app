@@ -1,4 +1,8 @@
-import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+} from '@angular/core';
 import { LegalPageBase } from '../legal-page-base';
 
 @Component({
@@ -13,7 +17,8 @@ export class PrivacyComponent extends LegalPageBase {
   constructor() {
     super({
       routeSegment: 'privacy',
-      unavailableHtml: '<h1>Privacy Policy</h1><p>Privacy policy content is unavailable.</p>',
+      unavailableHtml:
+        '<h1>Privacy Policy</h1><p>Privacy policy content is unavailable.</p>',
       fileName: 'privacy',
     });
   }

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { AuthRedirectEffect } from './auth-redirect.effect';
 import { AuthStore } from '../store/auth.store';
@@ -6,7 +7,6 @@ import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { Role } from '../interfaces/token';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '../util/dates';
-
 describe('AuthRedirectEffect', () => {
   let effect: AuthRedirectEffect;
   let authStoreSpy: {
@@ -17,7 +17,7 @@ describe('AuthRedirectEffect', () => {
   };
 
   let navigationServiceSpy: {
-    reload: jasmine.Spy;
+    reload: Mock;
   };
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('AuthRedirectEffect', () => {
     };
 
     navigationServiceSpy = {
-      reload: jasmine.createSpy('reload'),
+      reload: vi.fn().mockName('reload'),
     };
 
     TestBed.configureTestingModule({

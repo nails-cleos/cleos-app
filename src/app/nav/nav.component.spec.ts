@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NavComponent } from './nav.component';
@@ -5,8 +6,12 @@ import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { TokenService } from '../services/token.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { MessagingService } from '../services/messaging.service';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '../services/auth-user.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { IUser, IUserAll, User } from '../user/user';
 import { NavigationService } from '../services/navigation.service';
@@ -21,7 +26,6 @@ import { NotificationStore } from '../store/notification.store';
 import { AuthStore } from '../store/auth.store';
 import { DateAdapter } from '@angular/material/core';
 import { GLOBAL_FEEDBACK_SOURCE } from '../store/global-feedback-source';
-
 describe('NavComponent', () => {
   let component: NavComponent;
   let fixture: ComponentFixture<NavComponent>;
@@ -29,8 +33,8 @@ describe('NavComponent', () => {
     language: string;
     urlLanguage$: BehaviorSubject<any>;
     language$: ReturnType<typeof signal>;
-    navigate: jasmine.Spy;
-    resetConfig: jasmine.Spy;
+    navigate: Mock;
+    resetConfig: Mock;
   };
 
   let message$: BehaviorSubject<any>;
@@ -38,7 +42,7 @@ describe('NavComponent', () => {
   let userStoreSpy: {
     response: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
-    updateMyUser: jasmine.Spy;
+    updateMyUser: Mock;
   };
   let notificationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
@@ -46,11 +50,11 @@ describe('NavComponent', () => {
     dataRead: ReturnType<typeof signal>;
     dataDeleted: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    read: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadPage: Mock;
+    clearResponse: Mock;
+    read: Mock;
+    delete: Mock;
   };
 
   let authStoreSpy: {
@@ -60,34 +64,59 @@ describe('NavComponent', () => {
     user: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    authRedirect: jasmine.Spy;
-    logOut: jasmine.Spy;
+    authRedirect: Mock;
+    logOut: Mock;
   };
 
-  let navigateSpy: jasmine.Spy;
-  let cookieServiceSpy: jasmine.SpyObj<CookieService>;
-  let tokenServiceSpy: jasmine.SpyObj<TokenService>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let messagingServiceSpy: jasmine.SpyObj<MessagingService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let navigateSpy: Mock;
+  let cookieServiceSpy: Pick<CookieService, 'get' | 'set'> & {
+    get: ReturnType<typeof vi.fn>;
+    set: ReturnType<typeof vi.fn>;
+  };
+  let tokenServiceSpy: {
+    user: ReturnType<typeof vi.fn>;
+    setToken: string;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let authUserServiceSpy: Pick<
+    AuthUserService,
+    'authUser' | 'cookieConsent'
+  > & {
+    cookieConsent: ReturnType<typeof vi.fn>;
+    reloadUser: ReturnType<typeof vi.fn>;
+    updateMode: ReturnType<typeof vi.fn>;
+  };
+  let messagingServiceSpy: {
+    requestPermission: ReturnType<typeof vi.fn>;
+    receiveMessage: ReturnType<typeof vi.fn>;
+    message$: any;
+  };
 
-  const authUserSignal = signal<IAuthUser>(
-    {
-      ...initialAuthUser,
-      isAdmin: true,
-      hasAdminRole: true,
-      isAuthenticated: true,
-      locale: DEFAULT_LOCALE,
-      referralMax: 5,
-    });
+  let toastServiceSpy: {
+    show: Mock;
+  };
+
+  const authUserSignal = signal<IAuthUser>({
+    ...initialAuthUser,
+    isAdmin: true,
+    hasAdminRole: true,
+    isAuthenticated: true,
+    locale: DEFAULT_LOCALE,
+    referralMax: 5,
+  });
 
   const date = new Date();
   const mockNotification: INotification = {
     id: '1',
     message: 'This is a test notification',
     read: true,
-    navigation: `/${ DEFAULT_LOCALE }/reservation/r-1`,
+    navigation: `/${DEFAULT_LOCALE}/reservation/r-1`,
     date: date.getTime() / 1000,
     notDate: date,
     deleted: false,
@@ -117,13 +146,13 @@ describe('NavComponent', () => {
       language: DEFAULT_LOCALE,
       urlLanguage$: new BehaviorSubject(DEFAULT_LOCALE),
       language$: signal(DEFAULT_LOCALE),
-      navigate: jasmine.createSpy('navigate'),
-      resetConfig: jasmine.createSpy('resetConfig'),
+      navigate: vi.fn().mockName('navigate'),
+      resetConfig: vi.fn().mockName('resetConfig'),
     };
     userStoreSpy = {
       response: signal(undefined),
       error: signal(undefined),
-      updateMyUser: jasmine.createSpy('updateMyUser'),
+      updateMyUser: vi.fn().mockName('updateMyUser'),
     };
     message$ = new BehaviorSubject(undefined);
     action$ = new BehaviorSubject(undefined);
@@ -134,11 +163,11 @@ describe('NavComponent', () => {
       dataRead: signal<any>(undefined),
       dataDeleted: signal<any>(undefined),
       response: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadPage: jasmine.createSpy('loadPage'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      read: jasmine.createSpy('read'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadPage: vi.fn().mockName('loadPage'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      read: vi.fn().mockName('read'),
+      delete: vi.fn().mockName('delete'),
     };
     authStoreSpy = {
       isAuthenticated: signal(false),
@@ -147,29 +176,42 @@ describe('NavComponent', () => {
       user: signal(undefined),
       error: signal(undefined),
       response: signal(undefined),
-      authRedirect: jasmine.createSpy('authRedirect'),
-      logOut: jasmine.createSpy('logOut'),
+      authRedirect: vi.fn().mockName('authRedirect'),
+      logOut: vi.fn().mockName('logOut'),
     };
 
-    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'reloadUser', 'updateMode'], {
+    const paramMapSpy = {
+      get: vi.fn().mockName('ParamMap.get'),
+    };
+    cookieServiceSpy = {
+      get: vi.fn().mockName('CookieService.get'),
+      set: vi.fn().mockName('CookieService.set'),
+    };
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
+    authUserServiceSpy = {
+      cookieConsent: vi.fn().mockName('AuthUserService.cookieConsent'),
+      reloadUser: vi.fn().mockName('AuthUserService.reloadUser'),
+      updateMode: vi.fn().mockName('AuthUserService.updateMode'),
       authUser: authUserSignal.asReadonly(),
-    });
-    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['user'], {
+    };
+    tokenServiceSpy = {
+      user: vi.fn().mockName('TokenService.user'),
       setToken: 'mock-token',
-    });
-    messagingServiceSpy = jasmine.createSpyObj('MessagingService', ['requestPermission', 'receiveMessage'], {
+    };
+    messagingServiceSpy = {
+      requestPermission: vi.fn().mockName('MessagingService.requestPermission'),
+      receiveMessage: vi.fn().mockName('MessagingService.receiveMessage'),
       message$: message$.asObservable(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    };
+    activatedRouteSpy = {
       snapshot: {
         paramMap: paramMapSpy,
       },
-    });
+    };
 
-    paramMapSpy.get.and.returnValue(null);
+    paramMapSpy.get.mockReturnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [NavComponent],
@@ -185,21 +227,23 @@ describe('NavComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: NotificationStore, useValue: notificationStoreSpy },
-        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
         { provide: GLOBAL_FEEDBACK_SOURCE, useValue: [feedbackSourceMock] },
       ],
     }).compileComponents();
 
     const router = TestBed.inject(Router);
-    spyOnProperty(router, 'url', 'get').and.returnValue(`/${ DEFAULT_LOCALE }`);
-    navigateSpy = spyOn(router, 'navigate');
+    vi.spyOn(router, 'url', 'get').mockReturnValue(`/${DEFAULT_LOCALE}`);
+    navigateSpy = vi
+      .spyOn(router, 'navigate')
+      .mockReturnValue(undefined as any);
 
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
     fixture = TestBed.createComponent(NavComponent);
 
-    toastServiceSpy.show.and.returnValue({
+    toastServiceSpy.show.mockReturnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
     });
@@ -220,7 +264,7 @@ describe('NavComponent', () => {
 
   it('should update user when change theme is called', () => {
     authStoreSpy.isAuthenticated.set(true);
-    cookieServiceSpy.get.and.returnValue('light-theme');
+    cookieServiceSpy.get.mockReturnValue('light-theme');
 
     const user: IUser = new User();
     user.theme = 'dark-theme';
@@ -228,9 +272,13 @@ describe('NavComponent', () => {
 
     component.changeTheme();
 
-    expect(component.isDarkMode()).toBeTrue();
+    expect(component.isDarkMode()).toBe(true);
     expect(component['cssClass']).toBe('dark-theme');
-    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(user, `/${ DEFAULT_LOCALE }`, message);
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(
+      user,
+      `/${DEFAULT_LOCALE}`,
+      message,
+    );
   });
 
   it('should go to home when goHome is called', () => {
@@ -253,7 +301,9 @@ describe('NavComponent', () => {
 
   it('should close the active menu on outside click and escape', () => {
     component.activeMenu.set('settings');
-    component.onDocumentClick({ target: document.createElement('div') } as unknown as MouseEvent);
+    component.onDocumentClick({
+      target: document.createElement('div'),
+    } as unknown as MouseEvent);
     expect(component.activeMenu()).toBeNull();
 
     component.activeMenu.set('settings');
@@ -263,7 +313,9 @@ describe('NavComponent', () => {
 
   it('should keep the active menu on inside click', () => {
     component.activeMenu.set('settings');
-    component.onDocumentClick({ target: fixture.nativeElement } as unknown as MouseEvent);
+    component.onDocumentClick({
+      target: fixture.nativeElement,
+    } as unknown as MouseEvent);
 
     expect(component.activeMenu()).toBe('settings');
   });
@@ -271,11 +323,17 @@ describe('NavComponent', () => {
   it('should navigate to the notification navigation when it is read', () => {
     component.notification(mockNotification);
 
-    expect(navigateSpy).toHaveBeenCalledWith([`/${ DEFAULT_LOCALE }/reservation/r-1`]);
+    expect(navigateSpy).toHaveBeenCalledWith([
+      `/${DEFAULT_LOCALE}/reservation/r-1`,
+    ]);
   });
 
   it('should mark notification as read and navigate', () => {
-    const unreadNotification = { ...mockNotification, id: 'unread-1', read: false };
+    const unreadNotification = {
+      ...mockNotification,
+      id: 'unread-1',
+      read: false,
+    };
     component.notifications.set([unreadNotification, mockNotification]);
     component.countNotifications.set(2);
     fixture.detectChanges();
@@ -284,8 +342,13 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
-    expect(component.notifications()).toContain({ ...unreadNotification, read: true });
-    expect(notificationStoreSpy.read).toHaveBeenCalledWith(unreadNotification.id);
+    expect(component.notifications()).toContainEqual({
+      ...unreadNotification,
+      read: true,
+    });
+    expect(notificationStoreSpy.read).toHaveBeenCalledWith(
+      unreadNotification.id,
+    );
   });
 
   it('should handle auth state changes', () => {
@@ -296,21 +359,27 @@ describe('NavComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.isAdmin()).toBeTrue();
-    expect(component.showInformation()).toBeTrue();
-    expect(component.isDarkMode()).toBeFalse();
-    expect(component.isProfessional()).toBeFalse();
-    expect(component.isManager()).toBeFalse();
-    expect(component.isAdmin()).toBeTrue();
+    expect(component.isAdmin()).toBe(true);
+    expect(component.showInformation()).toBe(true);
+    expect(component.isDarkMode()).toBe(false);
+    expect(component.isProfessional()).toBe(false);
+    expect(component.isManager()).toBe(false);
+    expect(component.isAdmin()).toBe(true);
     expect(component.currentUserSignal()).toBe(mockUser);
-    expect(component.incomplete).toBeTrue();
+    expect(component.incomplete).toBe(true);
     expect(component.initials).toBe('AU');
-    expect(component.image()).toBe(`data:image/jpeg;base64,${ mockUser.image }`);
+    expect(component.image()).toBe(`data:image/jpeg;base64,${mockUser.image}`);
 
-    expect(notificationStoreSpy.loadPage)
-      .toHaveBeenCalledWith({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
+    expect(notificationStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'date',
+      direction: 'desc',
+      size: PAGE_SIZE,
+    });
 
-    expect(messagingServiceSpy.requestPermission).toHaveBeenCalledWith(mockUser);
+    expect(messagingServiceSpy.requestPermission).toHaveBeenCalledWith(
+      mockUser,
+    );
   });
 
   it('should receive notifications', () => {
@@ -325,20 +394,25 @@ describe('NavComponent', () => {
         totalElements: 3,
       },
       workDay: [
-        { ...mockNotification, id: '5', message: 'Workday notification', read: false },
+        {
+          ...mockNotification,
+          id: '5',
+          message: 'Workday notification',
+          read: false,
+        },
       ],
       unread: 3,
     });
 
     fixture.detectChanges();
 
-    expect(component.notifications()).toContain(mockNotification);
+    expect(component.notifications()).toContainEqual(mockNotification);
     expect(component.countNotifications()).toBe(3);
 
     const mockMessage = {
       id: '4',
       message: 'This is a message notification',
-      navigation: `/${ DEFAULT_LOCALE }/reservation/r-2`,
+      navigation: `/${DEFAULT_LOCALE}/reservation/r-2`,
       date: getNowTimeZone().getTime() / 1000,
     } as INotification;
 
@@ -355,7 +429,9 @@ describe('NavComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.notifications().some(not => not.id === mockMessage.id)).toBeTrue();
+    expect(
+      component.notifications().some((not) => not.id === mockMessage.id),
+    ).toBe(true);
     expect(component.countNotifications()).toBe(4);
   });
 
@@ -397,7 +473,12 @@ describe('NavComponent', () => {
         totalElements: 3,
       },
       workDay: [
-        { ...mockNotification, id: '5', message: 'Workday notification', read: false },
+        {
+          ...mockNotification,
+          id: '5',
+          message: 'Workday notification',
+          read: false,
+        },
       ],
       unread: 3,
     });
@@ -405,9 +486,9 @@ describe('NavComponent', () => {
 
     expect(component.countNotifications()).toBe(3);
     expect(component.notifications()).toEqual([
-      jasmine.objectContaining({ id: '1', read: true }),
-      jasmine.objectContaining({ id: '2', read: false }),
-      jasmine.objectContaining({ id: '3', read: false }),
+      expect.objectContaining({ id: '1', read: true }),
+      expect.objectContaining({ id: '2', read: false }),
+      expect.objectContaining({ id: '3', read: false }),
     ]);
   });
 
@@ -423,7 +504,12 @@ describe('NavComponent', () => {
         totalElements: 3,
       },
       workDay: [
-        { ...mockNotification, id: '5', message: 'Workday notification', read: false },
+        {
+          ...mockNotification,
+          id: '5',
+          message: 'Workday notification',
+          read: false,
+        },
       ],
       unread: 2,
     });
@@ -431,20 +517,25 @@ describe('NavComponent', () => {
 
     expect(component.countNotifications()).toBe(2);
     expect(component.notifications()).toEqual([
-      jasmine.objectContaining({ id: '1', read: true }),
-      jasmine.objectContaining({ id: '2', read: false }),
-      jasmine.objectContaining({ id: '3', read: false }),
+      expect.objectContaining({ id: '1', read: true }),
+      expect.objectContaining({ id: '2', read: false }),
+      expect.objectContaining({ id: '3', read: false }),
     ]);
 
-    const deleted = { ...mockNotification, id: '3', deleted: true, read: false };
+    const deleted = {
+      ...mockNotification,
+      id: '3',
+      deleted: true,
+      read: false,
+    };
 
     notificationStoreSpy.dataDeleted.set(deleted);
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
     expect(component.notifications()).toEqual([
-      jasmine.objectContaining({ id: '1', read: true }),
-      jasmine.objectContaining({ id: '2', read: false }),
+      expect.objectContaining({ id: '1', read: true }),
+      expect.objectContaining({ id: '2', read: false }),
     ]);
   });
 
@@ -463,7 +554,11 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    notificationStoreSpy.dataRead.set({ ...mockNotification, id: 'external-read', read: true });
+    notificationStoreSpy.dataRead.set({
+      ...mockNotification,
+      id: 'external-read',
+      read: true,
+    });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -487,28 +582,29 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(0);
-    expect(component.notifications()).toContain(jasmine.objectContaining({ id: '2', read: true }));
+    expect(component.notifications()).toContainEqual(
+      expect.objectContaining({ id: '2', read: true }),
+    );
   });
 
-  it('should not decrease the badge when the store read success arrives for an already read preloaded notification',
-    () => {
-      notificationStoreSpy.data.set({
-        page: {
-          content: [mockNotification],
-          number: 0,
-          totalElements: 1,
-        },
-        workDay: [],
-        unread: 1,
-      });
-      fixture.detectChanges();
-
-      component.countNotifications.set(1);
-      notificationStoreSpy.dataRead.set({ ...mockNotification, read: true });
-      fixture.detectChanges();
-
-      expect(component.countNotifications()).toBe(1);
+  it('should not decrease the badge when the store read success arrives for an already read preloaded notification', () => {
+    notificationStoreSpy.data.set({
+      page: {
+        content: [mockNotification],
+        number: 0,
+        totalElements: 1,
+      },
+      workDay: [],
+      unread: 1,
     });
+    fixture.detectChanges();
+
+    component.countNotifications.set(1);
+    notificationStoreSpy.dataRead.set({ ...mockNotification, read: true });
+    fixture.detectChanges();
+
+    expect(component.countNotifications()).toBe(1);
+  });
 
   it('should decrease the badge when an unread notification is deleted outside the dropdown preload', () => {
     notificationStoreSpy.data.set({
@@ -525,7 +621,12 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    notificationStoreSpy.dataDeleted.set({ ...mockNotification, id: 'external-delete', deleted: true, read: false });
+    notificationStoreSpy.dataDeleted.set({
+      ...mockNotification,
+      id: 'external-delete',
+      deleted: true,
+      read: false,
+    });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -544,7 +645,11 @@ describe('NavComponent', () => {
     fixture.detectChanges();
 
     component.countNotifications.set(1);
-    notificationStoreSpy.dataDeleted.set({ ...mockNotification, deleted: true, read: true });
+    notificationStoreSpy.dataDeleted.set({
+      ...mockNotification,
+      deleted: true,
+      read: true,
+    });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
@@ -563,11 +668,18 @@ describe('NavComponent', () => {
     });
     fixture.detectChanges();
 
-    notificationStoreSpy.dataDeleted.set({ ...mockNotification, id: '2', deleted: false, read: false });
+    notificationStoreSpy.dataDeleted.set({
+      ...mockNotification,
+      id: '2',
+      deleted: false,
+      read: false,
+    });
     fixture.detectChanges();
 
     expect(component.countNotifications()).toBe(1);
-    expect(component.notifications()).toEqual([jasmine.objectContaining({ id: '2', read: false })]);
+    expect(component.notifications()).toEqual([
+      expect.objectContaining({ id: '2', read: false }),
+    ]);
   });
 
   it('should create response and navigate', () => {
@@ -581,10 +693,16 @@ describe('NavComponent', () => {
     responseSignal.set(response);
     fixture.detectChanges();
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([response.redirect]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      response.redirect,
+    ]);
 
-    expect(toastServiceSpy.show).toHaveBeenCalledWith(response.message, response.toastType, 5000,
-      { actionType: 'link', action: `/${ DEFAULT_LOCALE }/${ response.path }` });
+    expect(toastServiceSpy.show).toHaveBeenCalledWith(
+      response.message,
+      response.toastType,
+      5000,
+      { actionType: 'link', action: `/${DEFAULT_LOCALE}/${response.path}` },
+    );
   });
 
   it('should create response with blob', () => {
@@ -600,17 +718,17 @@ describe('NavComponent', () => {
 
     const fakeUrl = 'blob:http://localhost/fake-url';
 
-    spyOn(URL, 'createObjectURL').and.returnValue(fakeUrl);
-    spyOn(URL, 'revokeObjectURL');
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue(fakeUrl);
+    vi.spyOn(URL, 'revokeObjectURL').mockReturnValue(undefined);
 
-    const clickSpy = jasmine.createSpy('click');
+    const clickSpy = vi.fn().mockName('click');
     const anchorMock = {
       href: '',
       download: '',
       click: clickSpy,
     } as unknown as HTMLAnchorElement;
 
-    spyOn(document, 'createElement').and.returnValue(anchorMock);
+    vi.spyOn(document, 'createElement').mockReturnValue(anchorMock);
 
     responseSignal.set(response);
     fixture.detectChanges();

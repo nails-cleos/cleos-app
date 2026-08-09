@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { ICommon } from '../interfaces/common';
 import { ITreatmentGroup } from './treatment';
 import { TreatmentStore } from '../store/treatment.store';
@@ -9,9 +16,13 @@ import { TreatmentComponent } from './treatment.component';
   selector: 'app-treatment-edit-page',
   template: `
     @if (treatment(); as treatment) {
-      <app-treatment [config]="config" [treatment]="treatment" (submitData)="submit($event)"/>
+      <app-treatment
+        [config]="config"
+        [treatment]="treatment"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton [boxes]="1"/>
+      <app-skeleton [boxes]="1" />
     }
   `,
   imports: [TreatmentComponent, SkeletonComponent],

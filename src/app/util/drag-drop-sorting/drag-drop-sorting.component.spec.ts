@@ -1,5 +1,10 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DragDropSortingComponent, ISorting, Sorted } from './drag-drop-sorting.component';
+import {
+  DragDropSortingComponent,
+  ISorting,
+  Sorted,
+} from './drag-drop-sorting.component';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { NavigationService } from '@app/services/navigation.service';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -8,7 +13,9 @@ describe('DragDropSortingComponent', () => {
   let component: DragDropSortingComponent;
   let fixture: ComponentFixture<DragDropSortingComponent>;
 
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'back'> & {
+    back: ReturnType<typeof vi.fn>;
+  };
 
   const mockItems: ISorting[] = [
     { key: 'name', name: 'Name' },
@@ -17,7 +24,9 @@ describe('DragDropSortingComponent', () => {
   ];
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [DragDropSortingComponent],
@@ -43,7 +52,7 @@ describe('DragDropSortingComponent', () => {
 
   describe('sort()', () => {
     it('should emit sorted items with correct order', () => {
-      spyOn(component.sorted, 'emit');
+      vi.spyOn(component.sorted, 'emit').mockReturnValue(undefined);
 
       component.sort();
 

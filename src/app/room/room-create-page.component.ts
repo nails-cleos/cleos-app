@@ -6,7 +6,8 @@ import { RoomStore } from '../store/room.store';
 
 @Component({
   selector: 'app-room-create-page',
-  template: '<app-room [config]="config" [currencies]="currencies()" [offices]="offices()" (submitData)="submit($event)" />',
+  template:
+    '<app-room [config]="config" [currencies]="currencies()" [offices]="offices()" (submitData)="submit($event)" />',
   imports: [RoomComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

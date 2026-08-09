@@ -1,30 +1,59 @@
-<div class="calendar-page app-surface-canvas app-surface-shell app-surface-stack">
+<div
+  class="calendar-page app-surface-canvas app-surface-shell app-surface-stack"
+>
   <section class="app-surface-section app-detail-panel">
-    <div class="calendar-search__eyebrow app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</div>
-    <form [formGroup]="form" class="calendar-search__form" (keydown.enter)="$event.preventDefault()"
-          (ngSubmit)="search()">
+    <div class="calendar-search__eyebrow app-surface-eyebrow">
+      {{ 'COMMON.SEARCH.TITLE' | translate }}
+    </div>
+    <form
+      [formGroup]="form"
+      class="calendar-search__form"
+      (keydown.enter)="$event.preventDefault()"
+      (ngSubmit)="search()"
+    >
       @let currentOffices = offices();
       @if (!currentOffices?.length) {
-        <button class="only-button app-detail-action-button" mat-stroked-button
-                [routerLink]="['/', language, 'rooms', 'add']" type="button">
-          <mat-icon>add_business</mat-icon> &nbsp;{{ 'RESERVATION.ROOM.TITLE' | translate }}
+        <button
+          class="only-button app-detail-action-button"
+          mat-stroked-button
+          [routerLink]="['/', language, 'rooms', 'add']"
+          type="button"
+        >
+          <mat-icon>add_business</mat-icon> &nbsp;{{
+            'RESERVATION.ROOM.TITLE' | translate
+          }}
         </button>
       } @else {
         <div class="calendar-search__grid app-inline-field-action">
           @if (currentOffices) {
             <mat-form-field appearance="outline">
-              <mat-label>{{ 'COMMON.ROOM.OFFICE.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownOffice($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-                     matInput required type="text">
-              <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+              <mat-label>{{
+                'COMMON.ROOM.OFFICE.FIELD' | translate
+              }}</mat-label>
+              <input
+                (keydown)="keyDownOffice($event)"
+                [formControl]="getForm.office"
+                [matAutocomplete]="autoOffice"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #autoOffice="matAutocomplete"
+                [displayWith]="displayFnOffice"
+              >
                 @for (office of filteredOfficeSignal(); track office) {
                   <mat-option [value]="office">{{ office.name }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.office.hasError('required')) {
-                <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.ROOM.OFFICE.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.office.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.ROOM.OFFICE.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           } @else {
@@ -34,17 +63,30 @@
           @if (roomList()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'COMMON.ROOM.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownRoom($event)" [formControl]="getForm.room" [matAutocomplete]="autoRoom" matInput
-                     required type="text">
-              <mat-autocomplete #autoRoom="matAutocomplete" [displayWith]="displayFnRoom">
+              <input
+                (keydown)="keyDownRoom($event)"
+                [formControl]="getForm.room"
+                [matAutocomplete]="autoRoom"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #autoRoom="matAutocomplete"
+                [displayWith]="displayFnRoom"
+              >
                 @for (room of filteredRoomSignal(); track room) {
                   <mat-option [value]="room">{{ room | roomName }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.room.hasError('required')) {
-                <mat-error [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.ROOM.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.room.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.ROOM.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.ROOM.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           } @else {
@@ -52,25 +94,45 @@
           }
           @if (professionalList()) {
             <mat-form-field appearance="outline">
-              <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, getForm.professional)" [formControl]="getForm.professional"
-                     [matAutocomplete]="autoProfessional" matInput type="text">
-              <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnProfessional">
-                @for (professional of filteredProfessionalSignal(); track professional) {
-                  <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+              <mat-label>{{
+                'COMMON.PROFESSIONAL.FIELD' | translate
+              }}</mat-label>
+              <input
+                (keydown)="keyDownHandler($event, getForm.professional)"
+                [formControl]="getForm.professional"
+                [matAutocomplete]="autoProfessional"
+                matInput
+                type="text"
+              />
+              <mat-autocomplete
+                #autoProfessional="matAutocomplete"
+                [displayWith]="displayFnProfessional"
+              >
+                @for (
+                  professional of filteredProfessionalSignal();
+                  track professional
+                ) {
+                  <mat-option [value]="professional">{{
+                    professional.displayName
+                  }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.professional.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           } @else {
             <div class="ssc-line"></div>
           }
 
-          <button type="submit" [disabled]="form.invalid"
-                  class="app-surface-filter-action app-detail-action-button"
-                  mat-stroked-button>
+          <button
+            type="submit"
+            [disabled]="form.invalid"
+            class="app-surface-filter-action app-detail-action-button"
+            mat-stroked-button
+          >
             <mat-icon matPrefix>search</mat-icon>
             <span>{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
           </button>
@@ -81,42 +143,87 @@
 
   @let calendarDay = calendarDaySignal();
   <section class="app-surface-section">
-    <div class="divider app-surface-actions calendar-toolbar app-detail-actions">
-      <button (click)="decrement()" mat-icon-button class="app-surface-hide-desktop">
+    <div
+      class="divider app-surface-actions calendar-toolbar app-detail-actions"
+    >
+      <button
+        (click)="decrement()"
+        mat-icon-button
+        class="app-surface-hide-desktop"
+      >
         <mat-icon>navigate_before</mat-icon>
       </button>
-      <button class="app-surface-hide-mobile" (click)="decrement()" mat-stroked-button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="decrement()"
+        mat-stroked-button
+      >
         <mat-icon>navigate_before</mat-icon>
         <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
       </button>
-      <input (dateChange)="selectDate($event)" [matDatepicker]="picker" [value]="viewDate"
-             hidden matInput [max]="maxDate" [min]="minDate">
+      <input
+        (dateChange)="selectDate($event)"
+        [matDatepicker]="picker"
+        [value]="viewDate"
+        hidden
+        matInput
+        [max]="maxDate"
+        [min]="minDate"
+      />
       <mat-datepicker #picker touchUi></mat-datepicker>
-        <button (click)="picker.open()" mat-icon-button class="app-surface-hide-desktop">
-          <mat-icon>today</mat-icon>
-        </button>
-      <button class="app-surface-hide-mobile" (click)="picker.open()" mat-stroked-button>
+      <button
+        (click)="picker.open()"
+        mat-icon-button
+        class="app-surface-hide-desktop"
+      >
+        <mat-icon>today</mat-icon>
+      </button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="picker.open()"
+        mat-stroked-button
+      >
         <mat-icon>today</mat-icon>
         <span>{{ 'COMMON.BUTTON.GOTO' | translate }}</span>
       </button>
-        <button (click)="increment()" mat-icon-button class="app-surface-hide-desktop">
-          <mat-icon>navigate_next</mat-icon>
-        </button>
-      <button class="app-surface-hide-mobile" (click)="increment()" mat-stroked-button>
+      <button
+        (click)="increment()"
+        mat-icon-button
+        class="app-surface-hide-desktop"
+      >
+        <mat-icon>navigate_next</mat-icon>
+      </button>
+      <button
+        class="app-surface-hide-mobile"
+        (click)="increment()"
+        mat-stroked-button
+      >
         <mat-icon>navigate_next</mat-icon>
         <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
       </button>
       <div class="app-surface-spacer"></div>
       @if (daysInWeekSignal() >= 5) {
-        <button class="app-surface-hide-mobile" (click)="downloadPDF()" mat-stroked-button>
+        <button
+          class="app-surface-hide-mobile"
+          (click)="downloadPDF()"
+          mat-stroked-button
+        >
           <mat-icon>print</mat-icon>
           <span>{{ 'COMMON.BUTTON.PRINT' | translate }}</span>
         </button>
       }
-        <button mat-icon-button [routerLink]="['/', language, 'reservation']" class="app-surface-hide-desktop">
-          <mat-icon>book_online</mat-icon>
-        </button>
-      <button class="app-surface-hide-mobile" mat-stroked-button [routerLink]="['/', language, 'reservation']">
+      <button
+        mat-icon-button
+        [routerLink]="['/', language, 'reservation']"
+        class="app-surface-hide-desktop"
+      >
+        <mat-icon>book_online</mat-icon>
+      </button>
+      <button
+        class="app-surface-hide-mobile"
+        mat-stroked-button
+        [routerLink]="['/', language, 'reservation']"
+      >
         <mat-icon>book_online</mat-icon>
         <span>{{ 'COMMON.BUTTON.BOOK' | translate }}</span>
       </button>
@@ -140,27 +247,50 @@
         [locale]="language"
         [tooltipTemplate]="calendarTooltip"
         [viewDate]="viewDate()"
-        [weekendDays]="[]"></mwl-calendar-week-view>
+        [weekendDays]="[]"
+      ></mwl-calendar-week-view>
 
       <ng-template #calendarEventTitle let-event="event">
         @if (event.meta?.isReservation) {
-          <span class="calendar-event-detail calendar-event-detail--reservation">
+          <span
+            class="calendar-event-detail calendar-event-detail--reservation"
+          >
             <strong class="calendar-event-detail__time">
-              {{ event.start | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone) }}
-              - {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone) }}
+              {{
+                event.start
+                  | date
+                    : 'HH:mm'
+                    : $safeNavigationMigration(event.meta?.timeZone)
+              }}
+              -
+              {{
+                event.end
+                  | date
+                    : 'HH:mm'
+                    : $safeNavigationMigration(event.meta?.timeZone)
+              }}
             </strong>
             @if (event.meta?.customer) {
-              <span class="calendar-event-detail__line">{{ event.meta?.customer }}</span>
+              <span class="calendar-event-detail__line">{{
+                event.meta?.customer
+              }}</span>
             }
             @if (event.meta?.treatmentName) {
-              <span class="calendar-event-detail__line">{{ event.meta?.treatmentName }}</span>
+              <span class="calendar-event-detail__line">{{
+                event.meta?.treatmentName
+              }}</span>
             }
           </span>
         } @else {
           <span class="calendar-event-detail" [innerHTML]="event.title"></span>
         }
       </ng-template>
-      <ng-template #calendarTooltip let-event="event" let-placement="placement" let-contents="contents">
+      <ng-template
+        #calendarTooltip
+        let-event="event"
+        let-placement="placement"
+        let-contents="contents"
+      >
         @if (!event?.allDay) {
           <div class="cal-tooltip" [ngClass]="'cal-tooltip-' + placement">
             <div class="cal-tooltip-arrow"></div>
@@ -168,16 +298,32 @@
               @if (event?.meta?.isReservation) {
                 <div class="calendar-tooltip-card">
                   <div class="calendar-tooltip-card__time">
-                    {{ event.start | date:'EEE d MMM, HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
+                    {{
+                      event.start
+                        | date
+                          : 'EEE d MMM, HH:mm'
+                          : $safeNavigationMigration(event.meta?.timeZone)
+                          : language
+                    }}
                     -
-                    {{ event.end | date:'HH:mm':$safeNavigationMigration(event.meta?.timeZone):language }}
+                    {{
+                      event.end
+                        | date
+                          : 'HH:mm'
+                          : $safeNavigationMigration(event.meta?.timeZone)
+                          : language
+                    }}
                   </div>
                   <div class="calendar-tooltip-card__row">
-                    <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</span>
+                    <span>{{
+                      'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate
+                    }}</span>
                     <strong>{{ event.meta?.customer }}</strong>
                   </div>
                   <div class="calendar-tooltip-card__row">
-                    <span>{{ 'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate }}</span>
+                    <span>{{
+                      'COMMON.RESERVATION.LIST.COLUMN.PROFESSIONAL' | translate
+                    }}</span>
                     <strong>{{ event.meta?.professionalName }}</strong>
                   </div>
                   <div class="calendar-tooltip-card__row">
@@ -187,14 +333,21 @@
                   <div class="calendar-tooltip-card__row">
                     <span>{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
                     @if (event.meta?.additionalNames?.length) {
-                      <strong>{{ event.meta.additionalNames.join(', ') }}</strong>
+                      <strong>{{
+                        event.meta.additionalNames.join(', ')
+                      }}</strong>
                     } @else {
-                      <strong>{{ 'RESERVATION.FLOW.SUMMARY.NONE' | translate }}</strong>
+                      <strong>{{
+                        'RESERVATION.FLOW.SUMMARY.NONE' | translate
+                      }}</strong>
                     }
                   </div>
                 </div>
               } @else {
-                <div class="calendar-tooltip-fallback" [innerHTML]="contents"></div>
+                <div
+                  class="calendar-tooltip-fallback"
+                  [innerHTML]="contents"
+                ></div>
               }
             </div>
           </div>

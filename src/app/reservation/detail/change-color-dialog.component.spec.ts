@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ChangeColorDialogComponent } from './change-color-dialog.component';
@@ -12,9 +13,11 @@ describe('ChangeColorDialogComponent', () => {
 
   let colorStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadByExternalId: jasmine.Spy;
+    loadByExternalId: Mock;
   };
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ChangeColorDialogComponent>>;
+  let dialogRefSpy: Pick<MatDialogRef<ChangeColorDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockChangeColor = {
     treatmentId: 'treatment1',
@@ -29,10 +32,12 @@ describe('ChangeColorDialogComponent', () => {
   beforeEach(async () => {
     colorStoreSpy = {
       data: signal(undefined),
-      loadByExternalId: jasmine.createSpy('loadByExternalId'),
+      loadByExternalId: vi.fn().mockName('loadByExternalId'),
     };
 
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ChangeColorDialogComponent],
@@ -40,7 +45,7 @@ describe('ChangeColorDialogComponent', () => {
         provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
-          useFactory: () => (mockChangeColor),
+          useFactory: () => mockChangeColor,
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
@@ -58,7 +63,9 @@ describe('ChangeColorDialogComponent', () => {
 
   it('should dispatch clean and getAllColors on init', () => {
     fixture.detectChanges();
-    expect(colorStoreSpy.loadByExternalId).toHaveBeenCalledWith(mockChangeColor.treatmentId);
+    expect(colorStoreSpy.loadByExternalId).toHaveBeenCalledWith(
+      mockChangeColor.treatmentId,
+    );
   });
 
   it('should update colorsWritableSignal when store emits', () => {
@@ -79,7 +86,9 @@ describe('ChangeColorDialogComponent', () => {
 
     component.doAction();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledWith({ colorId: mockColors[0].id });
+    expect(dialogRefSpy.close).toHaveBeenCalledWith({
+      colorId: mockColors[0].id,
+    });
   });
 
   it('should close dialog on cancel', () => {

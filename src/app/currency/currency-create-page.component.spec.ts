@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrencyCreatePageComponent } from './currency-create-page.component';
 import { CurrencyStore } from '../store/currency.store';
@@ -8,7 +9,7 @@ describe('CurrencyCreatePageComponent', () => {
   let fixture: ComponentFixture<CurrencyCreatePageComponent>;
 
   let currencyStoreSpy: {
-    create: jasmine.Spy;
+    create: Mock;
   };
 
   const mockCurrency: Partial<ICurrencyAll> = {
@@ -19,15 +20,14 @@ describe('CurrencyCreatePageComponent', () => {
 
   beforeEach(async () => {
     currencyStoreSpy = {
-      create: jasmine.createSpy('create'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CurrencyCreatePageComponent],
-      providers: [
-        { provide: CurrencyStore, useValue: currencyStoreSpy },
-      ],
-    }).overrideTemplate(CurrencyCreatePageComponent, '')
+      providers: [{ provide: CurrencyStore, useValue: currencyStoreSpy }],
+    })
+      .overrideTemplate(CurrencyCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(CurrencyCreatePageComponent);
@@ -41,10 +41,12 @@ describe('CurrencyCreatePageComponent', () => {
   it('should call create when currency is received', () => {
     component.submit(mockCurrency);
 
-    expect(currencyStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Test Currency',
-      code: 'EUR',
-      icon: 'euro',
-    }));
+    expect(currencyStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Test Currency',
+        code: 'EUR',
+        icon: 'euro',
+      }),
+    );
   });
 });

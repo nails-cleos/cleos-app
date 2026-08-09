@@ -1,22 +1,27 @@
 <div class="app-detail-section-header result-summary-header">
   <div>
-    <span class="app-surface-eyebrow">{{ 'SUMMARY.' + title() | translate }}</span>
+    <span class="app-surface-eyebrow">{{
+      'SUMMARY.' + title() | translate
+    }}</span>
   </div>
 </div>
 @let currentCurrency = currency();
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.GROSS' | translate"
   [value]="calculateAmount('gross')"
-  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)">
+  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)"
+>
 </app-total-summary-item>
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.BTW' | translate"
   [value]="calculateAmount('btw')"
   [currencyCode]="$safeNavigationMigration(currentCurrency?.code)"
-  [isResult]="true">
+  [isResult]="true"
+>
 </app-total-summary-item>
 <app-total-summary-item
   [label]="'SUMMARY.MONTHLY.TABLE.NET' | translate"
   [value]="calculateAmount('net')"
-  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)">
+  [currencyCode]="$safeNavigationMigration(currentCurrency?.code)"
+>
 </app-total-summary-item>

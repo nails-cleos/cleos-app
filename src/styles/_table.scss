@@ -6,16 +6,29 @@
   --app-table-header: rgba(148, 163, 184, 0.08);
   --app-table-footer: rgba(148, 163, 184, 0.08);
   --app-table-shell-bg: linear-gradient(
-      180deg,
-      #{rgba(primitives.$white-base, .985)},
-      color-mix(in srgb, var(--accent-color) 3%, #{rgba(primitives.$white-base, .97)})
+    180deg,
+    #{rgba(primitives.$white-base, 0.985)},
+    color-mix(
+      in srgb,
+      var(--accent-color) 3%,
+      #{rgba(primitives.$white-base, 0.97)}
+    )
   );
   --app-table-text: #{colors.$text-strong-light};
   --app-table-header-text: #65584d;
   --app-table-footer-text: #65584d;
-  --app-table-header-shadow: inset 0 -1px 0 color-mix(in srgb, var(--primary-color) 18%, transparent);
-  --app-table-row-hover: color-mix(in srgb, var(--accent-color) 14%, #{rgba(primitives.$white-base, .96)});
-  --app-table-row-stripe: color-mix(in srgb, var(--accent-color) 2%, transparent);
+  --app-table-header-shadow: inset 0 -1px 0
+    color-mix(in srgb, var(--primary-color) 18%, transparent);
+  --app-table-row-hover: color-mix(
+    in srgb,
+    var(--accent-color) 14%,
+    #{rgba(primitives.$white-base, 0.96)}
+  );
+  --app-table-row-stripe: color-mix(
+    in srgb,
+    var(--accent-color) 2%,
+    transparent
+  );
   --app-table-column-min: 5rem;
 }
 
@@ -24,15 +37,20 @@
   --app-table-header: rgba(255, 255, 255, 0.04);
   --app-table-footer: rgba(255, 255, 255, 0.04);
   --app-table-shell-bg: linear-gradient(
-      180deg,
-      rgba(36, 36, 36, 0.98),
-      color-mix(in srgb, var(--accent-color) 5%, rgba(30, 30, 30, 0.98))
+    180deg,
+    rgba(36, 36, 36, 0.98),
+    color-mix(in srgb, var(--accent-color) 5%, rgba(30, 30, 30, 0.98))
   );
   --app-table-text: #f1e7dc;
-  --app-table-header-text: #{rgba(primitives.$white-base, .58)};
-  --app-table-footer-text: #{rgba(primitives.$white-base, .72)};
-  --app-table-header-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent-color) 18%, transparent);
-  --app-table-row-hover: color-mix(in srgb, var(--accent-color) 14%, rgba(255, 255, 255, 0.04));
+  --app-table-header-text: #{rgba(primitives.$white-base, 0.58)};
+  --app-table-footer-text: #{rgba(primitives.$white-base, 0.72)};
+  --app-table-header-shadow: inset 0 -1px 0
+    color-mix(in srgb, var(--accent-color) 18%, transparent);
+  --app-table-row-hover: color-mix(
+    in srgb,
+    var(--accent-color) 14%,
+    rgba(255, 255, 255, 0.04)
+  );
   --app-table-row-stripe: rgba(255, 255, 255, 0.015);
   --app-table-column-min: 5rem;
 }
@@ -224,7 +242,9 @@ table[mat-table] tr.mat-mdc-row:not(.detail-row):not(.app-table-detail-row) {
   transition: background-color 160ms ease;
 }
 
-table[mat-table] tr.mat-mdc-row:not(.detail-row):not(.app-table-detail-row):hover td.mat-mdc-cell {
+table[mat-table]
+  tr.mat-mdc-row:not(.detail-row):not(.app-table-detail-row):hover
+  td.mat-mdc-cell {
   background: var(--app-table-row-hover) !important;
 }
 

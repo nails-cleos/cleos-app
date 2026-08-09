@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
-import { IMainTreatmentContent, IMainTreatmentContentFile, sections } from '@app/util/MainTreatment';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
+import {
+  IMainTreatmentContent,
+  IMainTreatmentContentFile,
+  sections,
+} from '@app/util/MainTreatment';
 import { NgClass, NgOptimizedImage } from '@angular/common';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatest, map, of, switchMap } from 'rxjs';
@@ -19,21 +28,29 @@ export class MainTreatmentComponent {
   id = input<string>();
 
   private readonly mainContent = inject(MainContentService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
-  private sections$ = combineLatest([toObservable(this.id), toObservable(this.navigationService.language$)]).pipe(
+  private sections$ = combineLatest([
+    toObservable(this.id),
+    toObservable(this.navigationService.language$),
+  ]).pipe(
     switchMap(([treatmentId, lang]) => {
       if (!treatmentId) {
         return of(undefined);
       }
 
-      return TranslateLoaderFactory.loadJson<{ default?: IMainTreatmentContentFile } & IMainTreatmentContentFile>(
-        'treatment/main',
-        lang,
-      ).pipe(
+      return TranslateLoaderFactory.loadJson<
+        { default?: IMainTreatmentContentFile } & IMainTreatmentContentFile
+      >('treatment/main', lang).pipe(
         map((content) => (content.default ?? content).treatments ?? []),
-        map((treatments: IMainTreatmentContent[]) => this.resolveTreatment(treatmentId, treatments)?.translations),
-        map((translations) => translations ? sections(translations) : undefined),
+        map(
+          (treatments: IMainTreatmentContent[]) =>
+            this.resolveTreatment(treatmentId, treatments)?.translations,
+        ),
+        map((translations) =>
+          translations ? sections(translations) : undefined,
+        ),
       );
     }),
   );
@@ -48,6 +65,8 @@ export class MainTreatmentComponent {
     treatmentId: string,
     treatments: IMainTreatmentContent[],
   ): IMainTreatmentContent | undefined {
-    return treatments.find((it: IMainTreatmentContent) => it.id === treatmentId);
+    return treatments.find(
+      (it: IMainTreatmentContent) => it.id === treatmentId,
+    );
   }
 }

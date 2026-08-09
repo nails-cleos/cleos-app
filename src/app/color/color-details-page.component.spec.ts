@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ColorDetailsPageComponent } from './color-details-page.component';
@@ -12,9 +13,9 @@ describe('ColorDetailsPageComponent', () => {
   let colorStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -29,22 +30,24 @@ describe('ColorDetailsPageComponent', () => {
     colorStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
       imports: [ColorDetailsPageComponent],
-      providers: [
-        { provide: ColorStore, useValue: colorStoreSpy },
-      ],
-    }).overrideTemplate(ColorComponent, '')
-      .overrideTemplate(ColorDetailsPageComponent, `
+      providers: [{ provide: ColorStore, useValue: colorStoreSpy }],
+    })
+      .overrideTemplate(ColorComponent, '')
+      .overrideTemplate(
+        ColorDetailsPageComponent,
+        `
         @if (color(); as color) {
           <app-color [color]="color" [config]="config" />
         }
-      `)
+      `,
+      )
       .compileComponents();
 
     fixture = TestBed.createComponent(ColorDetailsPageComponent);
@@ -69,13 +72,16 @@ describe('ColorDetailsPageComponent', () => {
     colorStoreSpy.selected.set(mockColor);
     fixture.detectChanges();
 
-    const colorComponent = fixture.debugElement.children[0].componentInstance as ColorComponent;
+    const colorComponent = fixture.debugElement.children[0]
+      .componentInstance as ColorComponent;
 
-    expect(colorComponent.color()).toEqual(jasmine.objectContaining({
-      id,
-      name: 'Test Color',
-      description: 'Test Description',
-    }));
+    expect(colorComponent.color()).toEqual(
+      expect.objectContaining({
+        id,
+        name: 'Test Color',
+        description: 'Test Description',
+      }),
+    );
   });
 
   it('should call update when color is received', () => {
@@ -83,9 +89,12 @@ describe('ColorDetailsPageComponent', () => {
 
     component.submit(mockColor);
 
-    expect(colorStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Color',
-      description: 'Test Description',
-    }));
+    expect(colorStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Color',
+        description: 'Test Description',
+      }),
+    );
   });
 });

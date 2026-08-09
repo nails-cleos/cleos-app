@@ -11,17 +11,26 @@
       </div>
     </div>
 
-    <form (ngSubmit)="submit()"
-          [formGroup]="form"
-          novalidate
-          (keydown.enter)="$event.preventDefault()"
-          class="app-crud-form">
+    <form
+      (ngSubmit)="submit()"
+      [formGroup]="form"
+      novalidate
+      (keydown.enter)="$event.preventDefault()"
+      class="app-crud-form"
+    >
       <div class="app-crud-form-grid">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'OFFICE.NAME.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.name" autocomplete="name" matInput required>
+          <input
+            [formControl]="getForm.name"
+            autocomplete="name"
+            matInput
+            required
+          />
           @if (getForm.name.hasError('required')) {
-            <mat-error [innerHTML]="'OFFICE.NAME.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'OFFICE.NAME.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['name']) {
             <mat-error>{{ errors()['name'] }}</mat-error>
           }
@@ -33,23 +42,42 @@
           <div class="app-inline-field-action">
             <mat-form-field appearance="outline">
               <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
-              <input [formControl]="getForm.manager" [matAutocomplete]="auto" matInput required type="text">
-              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+              <input
+                [formControl]="getForm.manager"
+                [matAutocomplete]="auto"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                [displayWith]="displayFn"
+              >
                 @for (manager of filteredManagerSignal(); track manager.id) {
-                  <mat-option [value]="manager">{{ manager.displayName }}</mat-option>
+                  <mat-option [value]="manager">{{
+                    manager.displayName
+                  }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.manager.hasError('required')) {
-                <mat-error [innerHTML]="'OFFICE.MANAGER.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'OFFICE.MANAGER.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.manager.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'OFFICE.MANAGER.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'OFFICE.MANAGER.INVALID' | translate"
+                ></mat-error>
               } @else if (errors()['manager']) {
                 <mat-error>{{ errors()['manager'] }}</mat-error>
               }
             </mat-form-field>
 
-            <button mat-stroked-button type="button" (click)="addManager()"
-                    class="app-surface-filter-action app-detail-action-button">
+            <button
+              mat-stroked-button
+              type="button"
+              (click)="addManager()"
+              class="app-surface-filter-action app-detail-action-button"
+            >
               <mat-icon>person_add</mat-icon>
               <span>{{ 'OFFICE.MANAGER.ADD_BUTTON' | translate }}</span>
             </button>
@@ -57,13 +85,13 @@
         } @else {
           <mat-form-field appearance="outline">
             <mat-label>{{ 'OFFICE.MANAGER.FIELD' | translate }}</mat-label>
-            <input [value]="managerName" disabled matInput type="text">
+            <input [value]="managerName" disabled matInput type="text" />
           </mat-form-field>
         }
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.subject" matInput>
+          <input [formControl]="getForm.subject" matInput />
           @let subjectError = errors()['subject'];
           @if (subjectError) {
             <mat-error>{{ subjectError }}</mat-error>
@@ -72,7 +100,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'OFFICE.KVK.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.kvk" matInput>
+          <input [formControl]="getForm.kvk" matInput />
           @let kvkError = errors()['kvk'];
           @if (kvkError) {
             <mat-error>{{ kvkError }}</mat-error>
@@ -81,7 +109,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'OFFICE.ACCOUNT.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.account" matInput>
+          <input [formControl]="getForm.account" matInput />
           @let accountError = errors()['account'];
           @if (accountError) {
             <mat-error>{{ accountError }}</mat-error>
@@ -90,7 +118,7 @@
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'OFFICE.BTW.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.btw" matInput>
+          <input [formControl]="getForm.btw" matInput />
           @let btwError = errors()['btw'];
           @if (btwError) {
             <mat-error>{{ btwError }}</mat-error>
@@ -99,7 +127,7 @@
 
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
           <mat-label>{{ 'OFFICE.ADDRESS.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.billingAddress" matInput>
+          <input [formControl]="getForm.billingAddress" matInput />
           @let billingAddressError = errors()['billingAddress'];
           @if (billingAddressError) {
             <mat-error>{{ billingAddressError }}</mat-error>
@@ -108,7 +136,7 @@
 
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
           <mat-label>{{ 'OFFICE.DRIVE_FOLDER.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.driveFolder" matInput>
+          <input [formControl]="getForm.driveFolder" matInput />
           @let driveFolderError = errors()['driveFolder'];
           @if (driveFolderError) {
             <mat-error>{{ driveFolderError }}</mat-error>

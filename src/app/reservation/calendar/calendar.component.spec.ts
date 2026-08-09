@@ -1,9 +1,22 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CalendarComponent } from './calendar.component';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -17,32 +30,46 @@ import { IUserAll } from '@app/user/user';
 import { States } from '../reservation';
 import { createNewDate, DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { provideAppCalendar, provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import {
+  provideAppCalendar,
+  provideAppDateAdapter,
+} from '@app/util/adapter/app-date.provider';
 import { NavigationService } from '@app/services/navigation.service';
 import { RoomStore } from '@app/store/room.store';
 import { ReservationStore } from '@app/store/reservation.store';
-import anything = jasmine.anything;
 
 describe('CalendarComponent', () => {
   let component: CalendarComponent;
   let fixture: ComponentFixture<CalendarComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let reservationStoreSpy: {
     calendar: ReturnType<typeof signal>;
-    loadAllByRoom: jasmine.Spy;
-    updateTimestamp: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadAllByRoom: Mock;
+    updateTimestamp: Mock;
+    clean: Mock;
   };
   let roomStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
 
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -73,7 +100,8 @@ describe('CalendarComponent', () => {
   };
 
   const mockProfessional1: IUserAll = {
-    id: 'prof-1', displayName: 'Professional 1',
+    id: 'prof-1',
+    displayName: 'Professional 1',
     email: 'professional1@test.com',
     authorities: [],
     locale: 'en',
@@ -81,7 +109,8 @@ describe('CalendarComponent', () => {
   };
 
   const mockProfessional2: IUserAll = {
-    id: 'prof-2', displayName: 'Professional 2',
+    id: 'prof-2',
+    displayName: 'Professional 2',
     email: 'professional2@test.com',
     authorities: [],
     locale: 'en',
@@ -133,20 +162,21 @@ describe('CalendarComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       calendar: signal<any>([mockCalendarData]),
-      loadAllByRoom: jasmine.createSpy('loadAllByRoom'),
-      updateTimestamp: jasmine.createSpy('updateTimestamp'),
-      clean: jasmine.createSpy('clean'),
+      loadAllByRoom: vi.fn().mockName('loadAllByRoom'),
+      updateTimestamp: vi.fn().mockName('updateTimestamp'),
+      clean: vi.fn().mockName('clean'),
     };
     roomStoreSpy = {
       data: signal<any>(undefined),
-      loadAll: jasmine.createSpy('loadCustomers'),
+      loadAll: vi.fn().mockName('loadCustomers'),
     };
-    authUserSignal.update(prev => ({
+    authUserSignal.update((prev) => ({
       ...prev,
       isDarkMode: false,
       professionalId: 'professional-id',
@@ -157,18 +187,24 @@ describe('CalendarComponent', () => {
       breakpoints: {},
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    };
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CalendarComponent],
@@ -230,21 +266,41 @@ describe('CalendarComponent', () => {
 
   describe('Computed Signals', () => {
     it('should compute isDarkMode from authUser', () => {
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: true, professionalId: 'prof-1', isRoomAdmin: false }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: true,
+        professionalId: 'prof-1',
+        isRoomAdmin: false,
+      }));
       fixture.detectChanges();
       expect(component.isDarkMode()).toBe(true);
 
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: false,
+        professionalId: 'prof-1',
+        isRoomAdmin: false,
+      }));
       fixture.detectChanges();
       expect(component.isDarkMode()).toBe(false);
     });
 
     it('should compute isRoomAdmin from authUser', () => {
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: true }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: false,
+        professionalId: 'prof-1',
+        isRoomAdmin: true,
+      }));
       fixture.detectChanges();
       expect(component['isRoomAdmin']()).toBe(true);
 
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: false,
+        professionalId: 'prof-1',
+        isRoomAdmin: false,
+      }));
       fixture.detectChanges();
       expect(component['isRoomAdmin']()).toBe(false);
     });
@@ -324,7 +380,9 @@ describe('CalendarComponent', () => {
     });
 
     it('should display professional display name', () => {
-      const result = component.displayFnProfessional(mockRoom1.professionals![0]);
+      const result = component.displayFnProfessional(
+        mockRoom1.professionals![0],
+      );
       expect(result).toBe('Professional 1');
     });
 
@@ -427,7 +485,9 @@ describe('CalendarComponent', () => {
 
       component.view(event);
 
-      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation-123']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+        'reservation-123',
+      ]);
     });
 
     it('should not navigate when event id is OUT_OF_WORK_ALL_DAY', () => {
@@ -473,7 +533,7 @@ describe('CalendarComponent', () => {
       component.getForm.room.setValue(mockRoom1);
       const futureDate = addDays(new Date(), 5);
 
-      dialogSpy.open.and.returnValue({
+      dialogSpy.open.mockReturnValue({
         afterClosed: () => of('en,reservation,new'),
       } as any);
 
@@ -501,7 +561,10 @@ describe('CalendarComponent', () => {
     });
 
     it('should filter rooms by address name', () => {
-      const filtered = component['filterRoom']('Room 1', [mockRoom1, mockRoom2]);
+      const filtered = component['filterRoom']('Room 1', [
+        mockRoom1,
+        mockRoom2,
+      ]);
 
       expect(filtered?.length).toBe(1);
       expect(filtered?.[0].address.name).toBe('Room 1');
@@ -509,7 +572,10 @@ describe('CalendarComponent', () => {
 
     it('should filter professionals by display name', () => {
       const professionals = mockRoom1.professionals;
-      const filtered = component['filterProfessional']('Professional 1', professionals);
+      const filtered = component['filterProfessional'](
+        'Professional 1',
+        professionals,
+      );
 
       expect(filtered?.length).toBe(1);
       expect(filtered?.[0].displayName).toBe('Professional 1');
@@ -534,7 +600,7 @@ describe('CalendarComponent', () => {
     it('should dispatch updateReservationTimestamp when event times changed is confirmed', () => {
       roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.mockReturnValue({ afterClosed: () => of(true) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const newStart = new Date(2024, 5, 15, 11, 0);
@@ -561,7 +627,7 @@ describe('CalendarComponent', () => {
     it('should revert event times when eventTimesChanged is cancelled', () => {
       roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.mockReturnValue({ afterClosed: () => of(false) } as any);
 
       const oldStart = new Date(2024, 5, 15, 10, 0);
       const oldEnd = new Date(2024, 5, 15, 11, 0);
@@ -588,7 +654,7 @@ describe('CalendarComponent', () => {
 
     it('should not trigger eventTimesChanged when start date is the same', () => {
       const start = new Date(2024, 5, 15, 10, 0);
-      dialogSpy.open.and.returnValue({ afterClosed: () => of(false) } as any);
+      dialogSpy.open.mockReturnValue({ afterClosed: () => of(false) } as any);
       const event: CalendarEvent = {
         id: 'reservation-123',
         start: start,
@@ -597,7 +663,12 @@ describe('CalendarComponent', () => {
         meta: {},
       };
 
-      component.eventTimesChanged({ event, newStart: start, newEnd: new Date(2024, 5, 15, 11, 0), type: '' } as any);
+      component.eventTimesChanged({
+        event,
+        newStart: start,
+        newEnd: new Date(2024, 5, 15, 11, 0),
+        type: '',
+      } as any);
 
       expect(dialogSpy.open).not.toHaveBeenCalled();
     });
@@ -653,10 +724,13 @@ describe('CalendarComponent', () => {
       showNotification: true,
     } as any;
 
-    const events = component['addReservations']({ reservations: [reservation] } as any, false);
+    const events = component['addReservations'](
+      { reservations: [reservation] } as any,
+      false,
+    );
 
     expect(events[0].meta.professionalName).toBe('Professional 1');
-    expect(events[0].meta.isReservation).toBeTrue();
+    expect(events[0].meta.isReservation).toBe(true);
     expect(events[0].meta.treatmentName).toBe('Treatment 1');
     expect(events[0].meta.additionalNames).toEqual(['Additional 1']);
     expect(events[0].cssClass).toContain('approved');
@@ -677,10 +751,15 @@ describe('CalendarComponent', () => {
     it('should dispatch with roomAdmin role when user is room admin', () => {
       roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: true }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: false,
+        professionalId: 'prof-1',
+        isRoomAdmin: true,
+      }));
       fixture.detectChanges();
 
-      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.mockReturnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',
@@ -703,19 +782,24 @@ describe('CalendarComponent', () => {
 
       expect(reservationStoreSpy.updateTimestamp).toHaveBeenCalledWith(
         event.id,
-        anything(),
+        expect.anything(),
         Role.roomAdmin,
-        anything(),
+        expect.anything(),
       );
     });
 
     it('should dispatch with professional role when user is not room admin', () => {
       roomStoreSpy.data.set({ kind: 'list', value: [mockRoom1] });
       fixture.detectChanges();
-      authUserSignal.update(prev => ({ ...prev, isDarkMode: false, professionalId: 'prof-1', isRoomAdmin: false }));
+      authUserSignal.update((prev) => ({
+        ...prev,
+        isDarkMode: false,
+        professionalId: 'prof-1',
+        isRoomAdmin: false,
+      }));
       fixture.detectChanges();
 
-      dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as any);
+      dialogSpy.open.mockReturnValue({ afterClosed: () => of(true) } as any);
 
       const event: CalendarEvent = {
         id: 'reservation-123',
@@ -738,9 +822,9 @@ describe('CalendarComponent', () => {
 
       expect(reservationStoreSpy.updateTimestamp).toHaveBeenCalledWith(
         event.id,
-        anything(),
+        expect.anything(),
         Role.professional,
-        anything(),
+        expect.anything(),
       );
     });
   });

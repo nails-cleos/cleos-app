@@ -15,7 +15,7 @@
 
   .home-divider:before,
   .home-divider:after {
-    content: "______________________";
+    content: '______________________';
     color: mat.m2-get-color-from-palette($primary-palette);
     position: relative;
     bottom: 1.3vh;
@@ -44,7 +44,10 @@
   }
 
   .overlay {
-    background-color: rgba(mat.m2-get-color-from-palette($primary-palette), .9);
+    background-color: rgba(
+      mat.m2-get-color-from-palette($primary-palette),
+      0.9
+    );
     color: mat.m2-get-color-from-palette($foreground, text);
   }
 
@@ -95,7 +98,9 @@
     }
 
     .footer {
-      border-top: 5px solid mat.m2-get-color-from-palette($primary-palette, 900);
+      border-top: 5px
+        solid
+        mat.m2-get-color-from-palette($primary-palette, 900);
       background-color: mat.m2-get-color-from-palette($accent-palette, 900);
     }
   } @else {
@@ -124,7 +129,9 @@
     }
 
     .footer {
-      border-top: 5px solid mat.m2-get-color-from-palette($primary-palette, 500);
+      border-top: 5px
+        solid
+        mat.m2-get-color-from-palette($primary-palette, 500);
       background-color: mat.m2-get-color-from-palette($accent-palette, 500);
     }
   }

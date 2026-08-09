@@ -1,4 +1,5 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { FileDropComponent } from './file-drop.component';
 import { ToastService } from '@app/services/toast.service';
@@ -10,15 +11,19 @@ describe('FileDropComponent', () => {
   let component: FileDropComponent;
   let fixture: ComponentFixture<FileDropComponent>;
 
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let toastServiceSpy: Pick<ToastService, 'show'> & {
+    show: ReturnType<typeof vi.fn>;
+  };
   let action$: BehaviorSubject<void>;
 
   beforeEach(async () => {
     action$ = new BehaviorSubject<void>(void 0);
 
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
 
-    toastServiceSpy.show.and.returnValue({
+    toastServiceSpy.show.mockReturnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
     });
@@ -44,24 +49,30 @@ describe('FileDropComponent', () => {
   });
 
   it('onFileDropped should set file and start upload', () => {
-    spyOn(component as any, 'simulateUpload');
-    const mockFile = new File(['test content'], 'file.jpg', { type: 'image/jpeg' });
+    vi.spyOn(component as any, 'simulateUpload').mockReturnValue(undefined);
+    const mockFile = new File(['test content'], 'file.jpg', {
+      type: 'image/jpeg',
+    });
     const files = [mockFile] as any as FileList;
 
     component.onFileDropped(files);
 
-    expect(component.file()).toEqual(jasmine.objectContaining({
-      name: 'file.jpg',
-      size: jasmine.any(Number),
-      progress: 0,
-      raw: mockFile,
-    }));
+    expect(component.file()).toEqual(
+      expect.objectContaining({
+        name: 'file.jpg',
+        size: expect.any(Number),
+        progress: 0,
+        raw: mockFile,
+      }),
+    );
     expect(component['simulateUpload']).toHaveBeenCalled();
   });
 
   it('fileBrowseHandler should set file and start upload', () => {
-    spyOn(component as any, 'simulateUpload');
-    const mockFile = new File(['test content'], 'file.jpg', { type: 'image/jpeg' });
+    vi.spyOn(component as any, 'simulateUpload').mockReturnValue(undefined);
+    const mockFile = new File(['test content'], 'file.jpg', {
+      type: 'image/jpeg',
+    });
     const mockTarget = {
       value: 'C:\\\\fakepath\\\\file.jpg',
       files: [mockFile],
@@ -69,18 +80,22 @@ describe('FileDropComponent', () => {
 
     component.fileBrowseHandler(mockTarget);
 
-    expect(component.file()).toEqual(jasmine.objectContaining({
-      name: 'file.jpg',
-      size: jasmine.any(Number),
-      progress: 0,
-      raw: mockFile,
-    }));
+    expect(component.file()).toEqual(
+      expect.objectContaining({
+        name: 'file.jpg',
+        size: expect.any(Number),
+        progress: 0,
+        raw: mockFile,
+      }),
+    );
     expect(component['simulateUpload']).toHaveBeenCalled();
     expect((mockTarget as HTMLInputElement).value).toBe('');
   });
 
   it('should set resizedImageDataUrl when catalogue emits an image', () => {
-    fixture.componentRef.setInput('currentFile', { image: 'data:image/jpeg;base64,AAA' });
+    fixture.componentRef.setInput('currentFile', {
+      image: 'data:image/jpeg;base64,AAA',
+    });
     fixture.detectChanges();
 
     expect(component.file()?.image).toContain('data:image/jpeg;base64,AAA');
@@ -103,14 +118,20 @@ describe('FileDropComponent', () => {
   });
 
   it('should show toast, clear image and undo in edit mode', () => {
-    fixture.componentRef.setInput('currentFile', { image: 'data:image/jpeg;base64,AAA' });
+    fixture.componentRef.setInput('currentFile', {
+      image: 'data:image/jpeg;base64,AAA',
+    });
     fixture.componentRef.setInput('undo', true);
     fixture.detectChanges();
 
     component.delete();
 
-    expect(toastServiceSpy.show).toHaveBeenCalledWith('COMMON.FILE.DELETE.MESSAGE', 'warning', 5000,
-      { actionType: 'button', action: 'undo' });
+    expect(toastServiceSpy.show).toHaveBeenCalledWith(
+      'COMMON.FILE.DELETE.MESSAGE',
+      'warning',
+      5000,
+      { actionType: 'button', action: 'undo' },
+    );
     action$.next();
 
     expect(component.file()?.image).toBe('data:image/jpeg;base64,AAA');
@@ -126,29 +147,38 @@ describe('FileDropComponent', () => {
     expect(component.file()?.progress).toBe(100);
   });
 
-  it('should simulate upload until progress reaches 100', fakeAsync(() => {
+  it('should simulate upload until progress reaches 100', () => {
+    vi.useFakeTimers();
+
+    try {
+      const mockFile = new File(['x'], 'file.txt', {
+        type: 'text/plain',
+      });
+
+      component.onFileDropped([mockFile] as any as FileList);
+
+      vi.advanceTimersByTime(4_000);
+
+      expect(component.file()?.progress).toBe(100);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('should not generate image preview for non-image files', async () => {
     const mockFile = new File(['x'], 'file.txt', { type: 'text/plain' });
 
     component.onFileDropped([mockFile] as any as FileList);
+    await Promise.resolve();
 
-    // stepTime = 4ms, progress increments to 100
-    tick(500);
-
-    expect(component.file()?.progress).toBe(100);
-  }));
-
-  it('should not generate image preview for non-image files', fakeAsync(() => {
-    const mockFile = new File(['x'], 'file.txt', { type: 'text/plain' });
-
-    component.onFileDropped([mockFile] as any as FileList);
-    tick(500);
-
-    expect(component.isImage()).toBeFalse();
+    expect(component.isImage()).toBe(false);
     expect(component.file()?.image).toBeUndefined();
-  }));
+  });
 
   it('should emit undefined when deleting without undo', () => {
-    const emitSpy = spyOn(component.fileSelected, 'emit');
+    const emitSpy = vi
+      .spyOn(component.fileSelected, 'emit')
+      .mockReturnValue(undefined);
 
     component.file.set({
       name: 'file.txt',
@@ -164,7 +194,9 @@ describe('FileDropComponent', () => {
   });
 
   it('should emit selection when progress is 100', () => {
-    const emitSpy = spyOn(component.fileSelected, 'emit');
+    const emitSpy = vi
+      .spyOn(component.fileSelected, 'emit')
+      .mockReturnValue(undefined);
 
     fixture.componentRef.setInput('currentFile', undefined);
     const file = {
@@ -209,15 +241,20 @@ describe('FileDropComponent', () => {
     fixture.detectChanges();
 
     expect(component.file()).toBeUndefined();
-    expect(component.isImage()).toBeFalse();
+    expect(component.isImage()).toBe(false);
   });
 
   it('should clear the hidden file input when currentFile input becomes undefined', () => {
-    const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
+    const input = fixture.nativeElement.querySelector(
+      '#fileInput',
+    ) as HTMLInputElement;
     let inputValue = 'C:\\\\fakepath\\\\file.txt';
-    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
-      inputValue = value;
-    });
+    const valueSetter = vi
+      .fn()
+      .mockName('valueSetter')
+      .mockImplementation((value: string) => {
+        inputValue = value;
+      });
     Object.defineProperty(input, 'value', {
       configurable: true,
       get: () => inputValue,
@@ -240,17 +277,22 @@ describe('FileDropComponent', () => {
   });
 
   it('should clear the hidden file input before opening the picker', () => {
-    const input = fixture.nativeElement.querySelector('#fileInput') as HTMLInputElement;
+    const input = fixture.nativeElement.querySelector(
+      '#fileInput',
+    ) as HTMLInputElement;
     let inputValue = 'C:\\\\fakepath\\\\file.txt';
-    const valueSetter = jasmine.createSpy('valueSetter').and.callFake((value: string) => {
-      inputValue = value;
-    });
+    const valueSetter = vi
+      .fn()
+      .mockName('valueSetter')
+      .mockImplementation((value: string) => {
+        inputValue = value;
+      });
     Object.defineProperty(input, 'value', {
       configurable: true,
       get: () => inputValue,
       set: valueSetter,
     });
-    spyOn(input, 'click');
+    vi.spyOn(input, 'click').mockReturnValue(undefined);
 
     component.openFileBrowser();
 
@@ -260,7 +302,9 @@ describe('FileDropComponent', () => {
   });
 
   it('should emit a new local file after currentFile was cleared by the parent', () => {
-    const emitSpy = spyOn(component.fileSelected, 'emit');
+    const emitSpy = vi
+      .spyOn(component.fileSelected, 'emit')
+      .mockReturnValue(undefined);
     const previousFile = {
       name: 'previous.txt',
       size: 100,
@@ -276,11 +320,11 @@ describe('FileDropComponent', () => {
 
     fixture.componentRef.setInput('currentFile', previousFile);
     fixture.detectChanges();
-    emitSpy.calls.reset();
+    emitSpy.mockClear();
 
     fixture.componentRef.setInput('currentFile', undefined);
     fixture.detectChanges();
-    emitSpy.calls.reset();
+    emitSpy.mockClear();
 
     component.file.set(newFile);
     fixture.detectChanges();

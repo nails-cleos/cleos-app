@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MePaymentComponent } from './me-payment.component';
 import { ActivatedRoute } from '@angular/router';
@@ -9,25 +10,27 @@ import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
 import { PaymentStore } from '@app/store/payment.store';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('MePaymentComponent', () => {
   let component: MePaymentComponent;
   let fixture: ComponentFixture<MePaymentComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let paymentStoreSpy: {
     selected: ReturnType<typeof signal>;
     options: ReturnType<typeof signal>;
-    getPayment: jasmine.Spy;
-    getOptions: jasmine.Spy;
-    updateById: jasmine.Spy;
-    clean: jasmine.Spy;
+    getPayment: Mock;
+    getOptions: Mock;
+    updateById: Mock;
+    clean: Mock;
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     paymentStoreSpy = {
       selected: signal(undefined),
       options: signal([
@@ -52,10 +55,10 @@ describe('MePaymentComponent', () => {
           show: true,
         },
       ]),
-      getPayment: jasmine.createSpy('getPayment'),
-      getOptions: jasmine.createSpy('getOptions'),
-      updateById: jasmine.createSpy('updateById'),
-      clean: jasmine.createSpy('clean'),
+      getPayment: vi.fn().mockName('getPayment'),
+      getOptions: vi.fn().mockName('getOptions'),
+      updateById: vi.fn().mockName('updateById'),
+      clean: vi.fn().mockName('clean'),
     };
 
     await TestBed.configureTestingModule({
@@ -64,7 +67,10 @@ describe('MePaymentComponent', () => {
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
@@ -110,9 +116,9 @@ describe('MePaymentComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.options()).toEqual(jasmine.arrayContaining([
-      jasmine.objectContaining({ type: 'MOLLIE' }),
-    ]));
+    expect(component.options()).toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: 'MOLLIE' })]),
+    );
   });
 
   it('should dispatch updateById on update()', () => {
@@ -133,9 +139,9 @@ describe('MePaymentComponent', () => {
 
     component.update();
 
-    expect(paymentStoreSpy.updateById).toHaveBeenCalledWith(
-      'payment-1',
-      { type: 'MOLLIE', percentage: PaymentPercentage.total },
-    );
+    expect(paymentStoreSpy.updateById).toHaveBeenCalledWith('payment-1', {
+      type: 'MOLLIE',
+      percentage: PaymentPercentage.total,
+    });
   });
 });

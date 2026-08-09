@@ -6,14 +6,27 @@ import { OfficeCreatePageComponent } from './office-create-page.component';
 import { OfficeDetailsPageComponent } from './office-details-page.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('office'),
-];
+const providers = [provideFeatureTranslations('office')];
 
 const children: Routes = [
-  { path: '', component: OfficeListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: OfficeCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: OfficeDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  {
+    path: '',
+    component: OfficeListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: 'add',
+    component: OfficeCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: ':id',
+    component: OfficeDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
 ];
 
 export const OFFICE_ROUTES: Routes = [{ path: '', providers, children }];

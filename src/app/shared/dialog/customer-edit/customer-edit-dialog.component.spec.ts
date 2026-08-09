@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CustomerEditDialogComponent } from './customer-edit-dialog.component';
@@ -8,7 +9,9 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('CustomerEditReservationDialogComponent', () => {
   let component: CustomerEditDialogComponent;
   let fixture: ComponentFixture<CustomerEditDialogComponent>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<CustomerEditDialogComponent>>;
+  let dialogRefSpy: Pick<MatDialogRef<CustomerEditDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockData = {
     price: new Price(100, 0, 10, 5, 115, 0, 115, 100, 110, 105, 100, 0),
@@ -16,7 +19,9 @@ describe('CustomerEditReservationDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [CustomerEditDialogComponent],
@@ -51,4 +56,3 @@ describe('CustomerEditReservationDialogComponent', () => {
     expect(dialogRefSpy.close).toHaveBeenCalledWith(true);
   });
 });
-

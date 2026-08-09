@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreatmentTableComponent } from './treatment-table.component';
 import { MatTableDataSource } from '@angular/material/table';
@@ -10,12 +11,15 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('TreatmentTableComponent', () => {
   let component: TreatmentTableComponent;
   let fixture: ComponentFixture<TreatmentTableComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     await TestBed.configureTestingModule({
       imports: [TreatmentTableComponent],
       providers: [
@@ -81,15 +85,17 @@ describe('TreatmentTableComponent', () => {
   });
 
   it('should handle treatment with undefined duration', () => {
-    const treatments = [{
-      id: '3',
-      key: 'key3',
-      name: 'Key 3',
-      order: 5,
-      group: { id: '1', name: 'Group 1' },
-      price: 10,
-      type: ServiceType.treatment,
-    } as ITreatmentAll];
+    const treatments = [
+      {
+        id: '3',
+        key: 'key3',
+        name: 'Key 3',
+        order: 5,
+        group: { id: '1', name: 'Group 1' },
+        price: 10,
+        type: ServiceType.treatment,
+      } as ITreatmentAll,
+    ];
 
     fixture.componentRef.setInput('treatment', treatments);
 

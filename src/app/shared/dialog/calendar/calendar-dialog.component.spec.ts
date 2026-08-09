@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CalendarDialogComponent } from './calendar-dialog.component';
@@ -7,10 +8,14 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('CalendarDialogComponent', () => {
   let component: CalendarDialogComponent;
   let fixture: ComponentFixture<CalendarDialogComponent>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<CalendarDialogComponent>>;
+  let dialogRefSpy: Pick<MatDialogRef<CalendarDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
     await TestBed.configureTestingModule({
       imports: [CalendarDialogComponent],
       providers: [

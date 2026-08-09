@@ -5,9 +5,6 @@ import { DEFAULT_LOCALE, formatDuration } from '../util/dates';
   name: 'durationTime',
 })
 export class DurationTimePipe implements PipeTransform {
-
-  transform = (
-    duration?: string,
-    locale: string = DEFAULT_LOCALE,
-  ): string => duration ? formatDuration(duration, locale) : '';
+  transform = (duration?: string, locale: string = DEFAULT_LOCALE): string =>
+    duration ? formatDuration(duration, locale) : '';
 }

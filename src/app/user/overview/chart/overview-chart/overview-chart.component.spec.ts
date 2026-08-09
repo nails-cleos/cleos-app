@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OverviewChartComponent } from './overview-chart.component';
 import { IChart } from '@app/dashboard/dashboard';
 import { ICurrency } from '@app/currency/currency';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('OverviewChartComponent (with real createChart)', () => {
   let component: OverviewChartComponent;

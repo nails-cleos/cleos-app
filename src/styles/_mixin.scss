@@ -4,7 +4,8 @@
   $bg-color: var(--app-surface-card-bg),
   $bg-opacity: 70%
 ) {
-  border: 1px solid color-mix(in srgb, $border-color $border-opacity, transparent);
+  border: 1px solid
+    color-mix(in srgb, $border-color $border-opacity, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, $bg-color $bg-opacity, transparent);
 }

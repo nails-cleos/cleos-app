@@ -1,41 +1,63 @@
 @if (dataSource(); as dataSource) {
   <table [dataSource]="dataSource" mat-table>
     <ng-container matColumnDef="date">
-      <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell>
+        {{ 'TREATMENT.LIST.COLUMN.DATE' | translate }}
+      </th>
       <td *matCellDef="let treatment" mat-cell>
-        <div>{{ treatment.createdAt | date:'shortDate':undefined:language }}</div>
+        <div>
+          {{ treatment.createdAt | date: 'shortDate' : undefined : language }}
+        </div>
       </td>
     </ng-container>
 
     <ng-container matColumnDef="price">
-      <th *matHeaderCellDef mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.PRICE' | translate }}</th>
+      <th *matHeaderCellDef mat-header-cell>
+        {{ 'TREATMENT.LIST.COLUMN.PRICE' | translate }}
+      </th>
       <td *matCellDef="let treatment" mat-cell>
-        <mat-icon matPrefix class="app-surface-hide-mobile">attach_money</mat-icon>&nbsp;{{ treatment.price | number:'1.2-2' }}
+        <mat-icon matPrefix class="app-surface-hide-mobile"
+          >attach_money</mat-icon
+        >&nbsp;{{ treatment.price | number: '1.2-2' }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="duration">
-      <th *matHeaderCellDef class="app-surface-hide-mobile"
-          mat-header-cell>{{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}
+      <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>
+        {{ 'TREATMENT.LIST.COLUMN.DURATION' | translate }}
       </th>
       <td *matCellDef="let treatment" mat-cell>
-        <mat-icon matPrefix class="app-surface-hide-mobile">timer</mat-icon>&nbsp;
-        {{ treatment.hour | number:'2.0-0' }}:{{ treatment.minute | number:'2.0-0' }}
+        <mat-icon matPrefix class="app-surface-hide-mobile">timer</mat-icon
+        >&nbsp; {{ treatment.hour | number: '2.0-0' }}:{{
+          treatment.minute | number: '2.0-0'
+        }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+      <td
+        *matFooterCellDef
+        [attr.colspan]="displayedColumns.length"
+        class="no-content bold"
+        mat-footer-cell
+      >
         {{ 'TREATMENT.LIST.ERROR.NO_CONTENT' | translate }}
       </td>
     </ng-container>
 
-    <tr *matFooterRowDef="['noContent']" [hidden]="resultsLengthSignal() > 0" mat-footer-row></tr>
+    <tr
+      *matFooterRowDef="['noContent']"
+      [hidden]="resultsLengthSignal() > 0"
+      mat-footer-row
+    ></tr>
 
     <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-    <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+    <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
   </table>
   @if (resultsLengthSignal(); as resultsLength) {
-    <mat-paginator [length]="resultsLength" [pageSize]="pageSizeSignal()"></mat-paginator>
+    <mat-paginator
+      [length]="resultsLength"
+      [pageSize]="pageSizeSignal()"
+    ></mat-paginator>
   }
 }

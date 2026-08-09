@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MonthComponent } from './month.component';
 import { IMonthSummary, ISummaryTotal } from '../../dashboard';
@@ -8,7 +9,9 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('MonthComponent', () => {
   let component: MonthComponent;
   let fixture: ComponentFixture<MonthComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   const monthSummary: IMonthSummary = {
     month: 1,
@@ -26,9 +29,10 @@ describe('MonthComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
 
     await TestBed.configureTestingModule({
       imports: [MonthComponent],

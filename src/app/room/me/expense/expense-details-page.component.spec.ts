@@ -1,9 +1,9 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ExpenseDetailsPageComponent } from './expense-details-page.component';
 import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
-import { ExpenseComponent } from './expense.component';
 import { AwsStore } from '@app/store/aws.store';
 import { AuthUserService } from '@app/services/auth-user.service';
 import { DriveAccessService } from '@app/services/drive-access.service';
@@ -11,7 +11,6 @@ import { NavigationService } from '@app/services/navigation.service';
 import { TokenService } from '@app/services/token.service';
 import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('ExpenseDetailsPageComponent', () => {
   let component: ExpenseDetailsPageComponent;
   let fixture: ComponentFixture<ExpenseDetailsPageComponent>;
@@ -23,10 +22,10 @@ describe('ExpenseDetailsPageComponent', () => {
     response: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadInfo: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadInfo: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const roomId = '1234';
@@ -36,6 +35,7 @@ describe('ExpenseDetailsPageComponent', () => {
     id,
     invoice: 'Test Expense',
     description: 'Test Description',
+    expenseTotals: [],
   };
 
   beforeEach(async () => {
@@ -46,10 +46,10 @@ describe('ExpenseDetailsPageComponent', () => {
       response: signal<any>(undefined),
       error: signal<any>(undefined),
       isLoading: signal(false),
-      clean: jasmine.createSpy('clean'),
-      loadInfo: jasmine.createSpy('loadInfo'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadInfo: vi.fn().mockName('loadInfo'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
@@ -59,21 +59,30 @@ describe('ExpenseDetailsPageComponent', () => {
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         {
           provide: AwsStore,
-          useValue: { data: signal(undefined), processPdf: jasmine.createSpy('processPdf'), clean: jasmine.createSpy('clean') },
+          useValue: {
+            data: signal(undefined),
+            processPdf: vi.fn().mockName('processPdf'),
+            clean: vi.fn().mockName('clean'),
+          },
         },
-        { provide: AuthUserService, useValue: { authUser: signal({ userId: 'user-1' }) } },
-        { provide: DriveAccessService, useValue: { requestAccessIfNeeded: jasmine.createSpy('requestAccessIfNeeded') } },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal({ userId: 'user-1' }) },
+        },
+        {
+          provide: DriveAccessService,
+          useValue: {
+            requestAccessIfNeeded: vi.fn().mockName('requestAccessIfNeeded'),
+          },
+        },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
         { provide: TokenService, useValue: { token: signal('token') } },
         provideAppDateAdapter(),
       ],
-    }).overrideTemplate(ExpenseComponent, '')
-      .overrideTemplate(ExpenseDetailsPageComponent, `
-        @if (expense(); as expense) {
-          <app-expense [roomId]="id()" [expense]="expense" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ExpenseDetailsPageComponent);
 
@@ -97,13 +106,13 @@ describe('ExpenseDetailsPageComponent', () => {
     expenseStoreSpy.selected.set(mockExpense);
     fixture.detectChanges();
 
-    const expenseComponent = fixture.debugElement.children[0].componentInstance as ExpenseComponent;
-
-    expect(expenseComponent.expense()).toEqual(jasmine.objectContaining({
-      id,
-      invoice: 'Test Expense',
-      description: 'Test Description',
-    }));
+    expect(component.expense()).toEqual(
+      expect.objectContaining({
+        id,
+        invoice: 'Test Expense',
+        description: 'Test Description',
+      }),
+    );
   });
 
   it('should call update when expense is received', () => {
@@ -111,9 +120,14 @@ describe('ExpenseDetailsPageComponent', () => {
 
     component.submit({ expense: mockExpense });
 
-    expect(expenseStoreSpy.update).toHaveBeenCalledWith(id, roomId, jasmine.objectContaining({
-      invoice: 'Test Expense',
-      description: 'Test Description',
-    }), undefined);
+    expect(expenseStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      roomId,
+      expect.objectContaining({
+        invoice: 'Test Expense',
+        description: 'Test Description',
+      }),
+      undefined,
+    );
   });
 });

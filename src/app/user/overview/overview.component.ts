@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { getDisplayNameInitials, getUserImage } from '@app/util/helper';
 import { IReservationOverview } from '@app/reservation/reservation';
@@ -27,35 +35,56 @@ import { NavigationService } from '@app/services/navigation.service';
   selector: 'app-overview',
   templateUrl: './overview.component.html',
   styleUrls: ['./overview.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, CurrencyPipe, BackButtonDirective, MatCard,
-    MatCardContent, ErrorComponent, CardComponent, ChartComponent, GoogleMapComponent, BackButtonDirective,
-    AvatarComponent, MatMiniFabButton, MatGridList, MatGridTile],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    CurrencyPipe,
+    BackButtonDirective,
+    MatCard,
+    MatCardContent,
+    ErrorComponent,
+    CardComponent,
+    ChartComponent,
+    GoogleMapComponent,
+    BackButtonDirective,
+    AvatarComponent,
+    MatMiniFabButton,
+    MatGridList,
+    MatGridTile,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewComponent {
   id = input<string>();
 
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly userStore = inject(UserStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
   private authUserSignal = this.authUserService.authUser;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
-  private hasAdminRole = computed(() => this.authUserSignal()?.hasAdminRole ?? false);
+  private hasAdminRole = computed(
+    () => this.authUserSignal()?.hasAdminRole ?? false,
+  );
   private userId = computed(() => this.id() ?? 'me');
 
   overviewSignal = this.userStore.overview;
@@ -93,7 +122,7 @@ export class OverviewComponent {
     };
   });
 
-  chartColumns = computed(() => this.breakpointsSignal().matches ? 1 : 2);
+  chartColumns = computed(() => (this.breakpointsSignal().matches ? 1 : 2));
 
   constructor() {
     this.userStore.clean();
@@ -113,15 +142,17 @@ export class OverviewComponent {
           this.upcoming = overview.upcomingList;
         }
         if (overview.miniCardOverview) {
-          this.miniCardData.set(overview.miniCardOverview?.map((ro: IReservationOverview) => {
-            if (ro.primaryId || ro.secondaryId) {
-              return Object.assign({}, ro, {
-                link: (id: string | undefined) => !id ||
-                  this.navigationService.navigate(['reservation', id]),
-              });
-            }
-            return ro;
-          }));
+          this.miniCardData.set(
+            overview.miniCardOverview?.map((ro: IReservationOverview) => {
+              if (ro.primaryId || ro.secondaryId) {
+                return Object.assign({}, ro, {
+                  link: (id: string | undefined) =>
+                    !id || this.navigationService.navigate(['reservation', id]),
+                });
+              }
+              return ro;
+            }),
+          );
         } else {
           this.miniCardData.set([]);
         }
@@ -143,7 +174,12 @@ export class OverviewComponent {
   }
 
   goTo() {
-    this.navigationService.navigate(['accounts', this.account?.id, 'transactions', 'view']);
+    this.navigationService.navigate([
+      'accounts',
+      this.account?.id,
+      'transactions',
+      'view',
+    ]);
   }
 
   goToProfile() {
@@ -157,17 +193,28 @@ export class OverviewComponent {
   notification() {
     let message: string;
     if (this.upcoming.length === 1) {
-      const date = formatDateTime(newDateTimestamp(this.upcoming[0]), this.language);
-      message = this.translateService.instant('WHATSAPP.SEND.APPROVE', { date });
+      const date = formatDateTime(
+        newDateTimestamp(this.upcoming[0]),
+        this.language,
+      );
+      message = this.translateService.instant('WHATSAPP.SEND.APPROVE', {
+        date,
+      });
     } else {
       message = this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
-      this.upcoming.forEach(r => {
+      this.upcoming.forEach((r) => {
         const date = formatDateTime(newDateTimestamp(r), this.language);
-        message += this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.VALUE', { date });
+        message += this.translateService.instant(
+          'WHATSAPP.SEND.FOLLOWINGS.VALUE',
+          { date },
+        );
       });
       message += this.translateService.instant('WHATSAPP.SEND.ATTENTION');
     }
     const userPhone = this.customer?.phone;
-    window.open(`https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`, '_blank');
+    window.open(
+      `https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`,
+      '_blank',
+    );
   }
 }

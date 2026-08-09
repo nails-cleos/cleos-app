@@ -1,13 +1,18 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainContentComponent } from './main-content.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { ToastService } from '@app/services/toast.service';
 import { ISendMessage } from '../../../main';
 import { ISocialLink } from '../main';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { GoogleMapStubComponent } from '@app/shared/google-map/google-map-stub.component';
+import { GoogleMapStubComponent } from '@app/util/stub/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { provideAppIcons } from '@app/util/app-icons.provider';
@@ -19,46 +24,65 @@ import { NavigationService } from '@app/services/navigation.service';
 describe('MainContentComponent', () => {
   let component: MainContentComponent;
   let fixture: ComponentFixture<MainContentComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
-    getAllHome: jasmine.Spy;
+    getAllHome: Mock;
   };
   let mainStoreSpy: {
     response: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    create: jasmine.Spy;
-    clean: jasmine.Spy;
+    create: Mock;
+    clean: Mock;
   };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let toastServiceSpy: {
+    show: Mock;
+  };
+  let bottomSheetSpy: Pick<MatBottomSheet, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
+    vi.stubGlobal(
+      'IntersectionObserver',
+      class {
+        observe(): void {}
+        unobserve(): void {}
+        disconnect(): void {}
+      },
     );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     catalogueStoreSpy = {
       data: signal<any>(undefined),
-      getAllHome: jasmine.createSpy('getAllHome'),
+      getAllHome: vi.fn().mockName('getAllHome'),
     };
     mainStoreSpy = {
       response: signal<any>(undefined),
       error: signal<any>(undefined),
       isLoading: signal<any>(false),
-      create: jasmine.createSpy('create'),
-      clean: jasmine.createSpy('clean'),
+      create: vi.fn().mockName('create'),
+      clean: vi.fn().mockName('clean'),
     };
 
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
+    };
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
+    bottomSheetSpy = {
+      open: vi.fn().mockName('MatBottomSheet.open'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [MainContentComponent, GoogleMapStubComponent],
@@ -79,10 +103,12 @@ describe('MainContentComponent', () => {
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
     translateService.setTranslation(DEFAULT_LOCALE, {
-      TREATMENTS: [{
-        TITLE: 'Treatment Title',
-        CONTENT: 'Treatment Content',
-      }],
+      TREATMENTS: [
+        {
+          TITLE: 'Treatment Title',
+          CONTENT: 'Treatment Content',
+        },
+      ],
     });
 
     fixture = TestBed.createComponent(MainContentComponent);
@@ -95,12 +121,17 @@ describe('MainContentComponent', () => {
   });
 
   it('should populate form with auth user signal', () => {
-    authUserSignal.update(prev => ({ ...prev, email: 'test@example.com', displayName: 'John Doe', isDarkMode: true }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      email: 'test@example.com',
+      displayName: 'John Doe',
+      isDarkMode: true,
+    }));
     fixture.detectChanges();
 
     expect(component.getForm.email.value).toBe('test@example.com');
     expect(component.getForm.name.value).toBe('John Doe');
-    expect(component.isDarkMode()).toBeTrue();
+    expect(component.isDarkMode()).toBe(true);
   });
 
   it('should dispatch SendMessage action when form is valid', () => {
@@ -113,7 +144,9 @@ describe('MainContentComponent', () => {
 
     component.sendEmail();
 
-    expect(mainStoreSpy.create).toHaveBeenCalledWith(component.form.value as ISendMessage);
+    expect(mainStoreSpy.create).toHaveBeenCalledWith(
+      component.form.value as ISendMessage,
+    );
   });
 
   it('should not dispatch SendMessage action when form is invalid', () => {
@@ -146,14 +179,17 @@ describe('MainContentComponent', () => {
 
   it('should check if current slide index matches', () => {
     component.currentIndex.set(1);
-    expect(component.isCurrentSlideIndex(1)).toBeTrue();
-    expect(component.isCurrentSlideIndex(0)).toBeFalse();
+    expect(component.isCurrentSlideIndex(1)).toBe(true);
+    expect(component.isCurrentSlideIndex(0)).toBe(false);
   });
 
   it('should navigate to biab treatment', () => {
     component.goToTreatment('biab');
-    expect(navigationServiceSpy.navigate)
-      .toHaveBeenCalledWith(['home', 'biab-treatment', 'treatment']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'home',
+      'biab-treatment',
+      'treatment',
+    ]);
   });
 
   it('should not navigate for other treatments', () => {
@@ -162,7 +198,12 @@ describe('MainContentComponent', () => {
   });
 
   it('should update social icon on hover', () => {
-    const social: ISocialLink = { name: 'WHATSAPP', delay: '0ms', href: '', svgIcon: 'WHATSAPP-NO-COLOR' };
+    const social: ISocialLink = {
+      name: 'WHATSAPP',
+      delay: '0ms',
+      href: '',
+      svgIcon: 'WHATSAPP-NO-COLOR',
+    };
     component.onHover(social, true);
     expect(social.svgIcon).toBe('WHATSAPP');
 

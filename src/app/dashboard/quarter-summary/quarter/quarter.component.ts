@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { IMonthSummary } from '../../dashboard';
 import { ICurrencyAll } from '@app/currency/currency';
 import { dateMonthYear, monthTitle } from '@app/util/dates';
@@ -13,7 +18,8 @@ import { NavigationService } from '@app/services/navigation.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuarterComponent {
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   measure = input.required<'long' | 'short'>();
   year = input.required<number>();
@@ -25,12 +31,17 @@ export class QuarterComponent {
 
   private readonly language = this.navigationService.language;
 
-  getMonth = (month: number): string => monthTitle(dateMonthYear(month - 1, this.year()), this.language,
-    this.measure());
+  getMonth = (month: number): string =>
+    monthTitle(
+      dateMonthYear(month - 1, this.year()),
+      this.language,
+      this.measure(),
+    );
 
   goToQuarter = (): void => {
-    this.navigationService.navigate(['dashboard', 'quarter', 'summary'],
-      { state: { year: this.year(), quarter: this.quarter() } });
+    this.navigationService.navigate(['dashboard', 'quarter', 'summary'], {
+      state: { year: this.year(), quarter: this.quarter() },
+    });
   };
 
   goToMonth = (month: number, type?: string): void => {
@@ -46,7 +57,8 @@ export class QuarterComponent {
         step = 2;
         break;
     }
-    this.navigationService.navigate(['dashboard', 'monthly', 'summary'],
-      { state: { date: `${ month }-${ this.year() }`, step } });
+    this.navigationService.navigate(['dashboard', 'monthly', 'summary'], {
+      state: { date: `${month}-${this.year()}`, step },
+    });
   };
 }

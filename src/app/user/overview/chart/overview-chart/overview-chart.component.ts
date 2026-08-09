@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  signal,
+} from '@angular/core';
 import { createChart, IChartUtil } from '@app/util/chart';
 import { IChart } from '@app/dashboard/dashboard';
 import { ICurrency } from '@app/currency/currency';
@@ -25,7 +31,9 @@ export class OverviewChartComponent {
     effect(() => {
       const chartSummary = this.chartSummary();
       if (chartSummary) {
-        this.chartSignal.set(createChart(chartSummary, this.currency(), this.isDark()));
+        this.chartSignal.set(
+          createChart(chartSummary, this.currency(), this.isDark()),
+        );
       }
     });
   }

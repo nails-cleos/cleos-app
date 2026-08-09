@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -19,29 +25,43 @@ import { MatButton } from '@angular/material/button';
 import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 type CancelForm = {
-  paymentCancellation: FormControl<any>,
-}
+  paymentCancellation: FormControl<any>;
+};
 
 type CancelDialogData = {
-  options: string[],
-  paymentOptions?: IPaymentOption[],
-  price?: IPrice,
-  currency: ICurrency,
-  showPenalty?: boolean,
-  small?: boolean,
-}
+  options: string[];
+  paymentOptions?: IPaymentOption[];
+  price?: IPrice;
+  currency: ICurrency;
+  showPenalty?: boolean;
+  small?: boolean;
+};
 
 @Component({
   selector: 'app-cancel-dialog',
   templateUrl: './cancel-dialog.component.html',
   styleUrls: ['./cancel-dialog.component.scss'],
-  imports: [PriceComponent, MatLabel, MatIcon, MatButton, TranslatePipe, MatError, ReactiveFormsModule, MatDialogTitle,
-    MatDialogContent, MatRadioGroup, MatRadioButton, MatDialogActions],
+  imports: [
+    PriceComponent,
+    MatLabel,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatError,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatRadioGroup,
+    MatRadioButton,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CancelDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<CancelDialogComponent>);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   readonly data = inject<CancelDialogData>(MAT_DIALOG_DATA);
 
   form: FormGroup<CancelForm> = this.formBuilder.group<CancelForm>({
@@ -53,7 +73,7 @@ export class CancelDialogComponent {
     option: this.formBuilder.control(undefined),
     percentage: this.formBuilder.control(undefined),
   });
-  paymentOptions?: IPaymentOption[] = this.data.paymentOptions?.map(it => {
+  paymentOptions?: IPaymentOption[] = this.data.paymentOptions?.map((it) => {
     it.hidePercentage = true;
     return it;
   });

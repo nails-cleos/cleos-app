@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ErrorComponent } from './error.component';
@@ -8,14 +9,18 @@ describe('ErrorComponent', () => {
   let component: ErrorComponent;
   let fixture: ComponentFixture<ErrorComponent>;
 
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'reload'> & {
+    reload: ReturnType<typeof vi.fn>;
+  };
 
   const error = {
     status: 'NOT_FOUND',
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
+    navigationServiceSpy = {
+      reload: vi.fn().mockName('NavigationService.reload'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ErrorComponent],

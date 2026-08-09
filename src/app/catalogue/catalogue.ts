@@ -42,7 +42,10 @@ export class Catalogue {
   ): ICatalogue {
     return {
       name: fieldChange(catalogueForm.name, currentCatalogue?.name),
-      description: valueChange(catalogueForm.description.value, currentCatalogue?.description),
+      description: valueChange(
+        catalogueForm.description.value,
+        currentCatalogue?.description,
+      ),
       home: fieldChange(catalogueForm.home, currentCatalogue?.home),
       catalog: fieldChange(catalogueForm.catalog, currentCatalogue?.catalog),
       groupId: catalogueForm.group.value?.id,

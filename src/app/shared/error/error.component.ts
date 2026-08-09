@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+} from '@angular/core';
 import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IError } from '@app/interfaces/common';
@@ -10,7 +16,14 @@ import { MatCard, MatCardContent } from '@angular/material/card';
   selector: 'app-error',
   templateUrl: './error.component.html',
   styleUrls: ['./error.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, BackButtonDirective, MatCard, MatCardContent],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    BackButtonDirective,
+    MatCard,
+    MatCardContent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorComponent {

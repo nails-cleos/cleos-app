@@ -25,7 +25,12 @@ export class PaymentRedirectService {
     query: { [key: string]: any },
   ): void {
     // Full payment payload – we have everything needed to store a successful payment.
-    if (query.payment_type && query.payment_id && query.type && query.reference_id) {
+    if (
+      query.payment_type &&
+      query.payment_id &&
+      query.type &&
+      query.reference_id
+    ) {
       const paymentStatus = new PaymentStatus(
         query.payment_id,
         query.type,
@@ -33,14 +38,25 @@ export class PaymentRedirectService {
         query.reason ?? '',
       );
 
-      this.paymentStore.create(id, path, query.status ?? 'CREATED', paymentStatus);
+      this.paymentStore.create(
+        id,
+        path,
+        query.status ?? 'CREATED',
+        paymentStatus,
+      );
       return;
     }
 
     // Generic Mollie redirect that only carries the payment_type flag.
     // The dedicated payment page will handle fetching the correct state.
     if (query.payment_type) {
-      this.paymentStore.notify(query.payment_id, path, id, query.reference_id, query.payment_type);
+      this.paymentStore.notify(
+        query.payment_id,
+        path,
+        id,
+        query.reference_id,
+        query.payment_type,
+      );
       return;
     }
 

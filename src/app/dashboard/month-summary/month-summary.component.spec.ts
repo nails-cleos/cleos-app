@@ -1,8 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { MonthSummaryComponent } from './month-summary.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import {
   ExpenseType,
   IMonthlySummary,
@@ -12,29 +16,34 @@ import {
   SummaryType,
   TotalType,
 } from '../dashboard';
-import { MatDatepicker } from '@angular/material/datepicker';
-import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { DashboardStore } from '@app/store/dashboard.store';
 import { NavigationService } from '@app/services/navigation.service';
+import fs from 'file-saver';
 
 describe('MonthSummaryComponent', () => {
   let component: MonthSummaryComponent;
   let fixture: ComponentFixture<MonthSummaryComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let dashboardStoreSpy: {
     monthlySummaryMap: ReturnType<typeof signal>;
-    updateMonthlySummary: jasmine.Spy;
-    getMonthlySummary: jasmine.Spy;
-    clean: jasmine.Spy;
+    updateMonthlySummary: Mock;
+    getMonthlySummary: Mock;
+    clean: Mock;
   };
 
-  let saveAsSpy: jasmine.Spy;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let saveAsSpy: ReturnType<typeof vi.spyOn>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
-  const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, showCash: true, displayName: 'Test User' });
+  const authUserSignal = signal<IAuthUser>({
+    ...initialAuthUser,
+    showCash: true,
+    displayName: 'Test User',
+  });
 
   const mockCurrency = {
     id: 'eur',
@@ -75,20 +84,21 @@ describe('MonthSummaryComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     history.replaceState({}, '');
     dashboardStoreSpy = {
       monthlySummaryMap: signal<any>(undefined),
-      updateMonthlySummary: jasmine.createSpy('updateMonthlySummary'),
-      getMonthlySummary: jasmine.createSpy('getMonthlySummary'),
-      clean: jasmine.createSpy('clean'),
+      updateMonthlySummary: vi.fn().mockName('updateMonthlySummary'),
+      getMonthlySummary: vi.fn().mockName('getMonthlySummary'),
+      clean: vi.fn().mockName('clean'),
     };
 
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
       imports: [MonthSummaryComponent],
@@ -107,9 +117,7 @@ describe('MonthSummaryComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
-      // no-op
-    });
+    saveAsSpy = vi.spyOn(fs, 'saveAs').mockImplementation(() => {});
   });
 
   it('should create', () => {
@@ -119,16 +127,20 @@ describe('MonthSummaryComponent', () => {
   describe('Initialization', () => {
     it('should initialize with default values', () => {
       expect(component.stepSignal()).toBe(0);
-      expect(component.showCash()).toBeTrue();
+      expect(component.showCash()).toBe(true);
       expect(component.getForm.amountFormat.value).toBe('ES');
       expect(component.locale).toBe('es');
     });
 
     it('should set date and step from navigation params', () => {
-      history.pushState({
-        step: 1,
-        date: new Date(2024, 0, 15),
-      }, '', '/...');
+      history.pushState(
+        {
+          step: 1,
+          date: new Date(2024, 0, 15),
+        },
+        '',
+        '/...',
+      );
 
       fixture = TestBed.createComponent(MonthSummaryComponent);
       component = fixture.componentInstance;
@@ -140,7 +152,7 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should subscribe to authUserService', () => {
-      expect(component.showCash()).toBeTrue();
+      expect(component.showCash()).toBe(true);
     });
   });
 
@@ -175,7 +187,11 @@ describe('MonthSummaryComponent', () => {
     it('should navigate to quarter summary without state when date is undefined', () => {
       component.getForm.date.setValue(undefined as any);
       component.goBack();
-      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'quarter', 'summary']);
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+        'dashboard',
+        'quarter',
+        'summary',
+      ]);
     });
   });
 
@@ -195,7 +211,9 @@ describe('MonthSummaryComponent', () => {
 
   describe('setMonthAndYear method', () => {
     it('should set month and year from normalized date', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = new Date(2024, 5, 1);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
@@ -207,7 +225,9 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should close datepicker after setting date', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = new Date(2024, 3, 1);
       component.getForm.date.setValue(new Date());
 
@@ -299,17 +319,22 @@ describe('MonthSummaryComponent', () => {
     beforeEach(() => {
       // Set up required component state
       component.getForm.date.setValue(new Date(2024, 0, 1));
-      const summaryMap = new Map([[mockRoom, {
-        summarySale: [],
-        summaryExpenses: [],
-        summaryCashSale: [],
-      }]]);
+      const summaryMap = new Map([
+        [
+          mockRoom,
+          {
+            summarySale: [],
+            summaryExpenses: [],
+            summaryCashSale: [],
+          },
+        ],
+      ]);
       dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
     });
 
     it('should dispatch updateMonthlySummary action for payment type', () => {
-      dashboardStoreSpy.updateMonthlySummary.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.mockClear();
 
       const totalTypes = new TotalType(SummaryType.payment);
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
@@ -321,9 +346,12 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should dispatch updateMonthlySummary action for expense type', () => {
-      dashboardStoreSpy.updateMonthlySummary.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.mockClear();
 
-      const totalTypes = new TotalType(SummaryType.expense, Object.values(ExpenseType));
+      const totalTypes = new TotalType(
+        SummaryType.expense,
+        Object.values(ExpenseType),
+      );
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
 
       component.updateMonthlySummary(totalTypes, summaries);
@@ -332,7 +360,7 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should dispatch updateMonthlySummary action for cash type', () => {
-      dashboardStoreSpy.updateMonthlySummary.calls.reset();
+      dashboardStoreSpy.updateMonthlySummary.mockClear();
 
       const totalTypes = new TotalType(SummaryType.cash);
       const summaries = [{ id: 'summary-1', gross: 100, btw: 20 }];
@@ -414,32 +442,41 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('isInvalidInput should return true for invalid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('')).toBeTrue();
-      expect(MonthSummaryComponent['isInvalidInput']('0')).toBeTrue();
-      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBeTrue();
-      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBeTrue();
+      expect(MonthSummaryComponent['isInvalidInput']('')).toBe(true);
+      expect(MonthSummaryComponent['isInvalidInput']('0')).toBe(true);
+      expect(MonthSummaryComponent['isInvalidInput']('0.0')).toBe(true);
+      expect(MonthSummaryComponent['isInvalidInput']('.0')).toBe(true);
     });
 
     it('isInvalidInput should return false for valid values', () => {
-      expect(MonthSummaryComponent['isInvalidInput']('100')).toBeFalse();
-      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBeFalse();
-      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBeFalse();
+      expect(MonthSummaryComponent['isInvalidInput']('100')).toBe(false);
+      expect(MonthSummaryComponent['isInvalidInput']('50.50')).toBe(false);
+      expect(MonthSummaryComponent['isInvalidInput']('1.23')).toBe(false);
     });
 
     it('getType should return correct SummaryType', () => {
-      expect(MonthSummaryComponent['getType']('payment')).toBe(SummaryType.payment);
-      expect(MonthSummaryComponent['getType']('expense')).toBe(SummaryType.expense);
+      expect(MonthSummaryComponent['getType']('payment')).toBe(
+        SummaryType.payment,
+      );
+      expect(MonthSummaryComponent['getType']('expense')).toBe(
+        SummaryType.expense,
+      );
       expect(MonthSummaryComponent['getType']('cash')).toBe(SummaryType.cash);
     });
   });
 
   describe('Monthly Summary Map Effects', () => {
     it('should process monthlySummaryMap when it emits', () => {
-      const summaryMap = new Map([[mockRoom, {
-        summarySale: [],
-        summaryExpenses: [],
-        summaryCashSale: [],
-      }]]);
+      const summaryMap = new Map([
+        [
+          mockRoom,
+          {
+            summarySale: [],
+            summaryExpenses: [],
+            summaryCashSale: [],
+          },
+        ],
+      ]);
 
       dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
@@ -448,9 +485,17 @@ describe('MonthSummaryComponent', () => {
     });
 
     it('should set primary room when multiple rooms with same currency', () => {
-      const room2 = { ...mockRoom, roomId: 'room-2', roomName: 'Room 2', primary: false };
+      const room2 = {
+        ...mockRoom,
+        roomId: 'room-2',
+        roomName: 'Room 2',
+        primary: false,
+      };
       const summaryMap = new Map([
-        [mockRoom, { summarySale: [], summaryExpenses: [], summaryCashSale: [] }],
+        [
+          mockRoom,
+          { summarySale: [], summaryExpenses: [], summaryCashSale: [] },
+        ],
         [room2, { summarySale: [], summaryExpenses: [], summaryCashSale: [] }],
       ]);
 
@@ -463,7 +508,7 @@ describe('MonthSummaryComponent', () => {
 
   describe('Date Signal Effects', () => {
     it('should dispatch getMonthlySummary when date changes', () => {
-      dashboardStoreSpy.getMonthlySummary.calls.reset();
+      dashboardStoreSpy.getMonthlySummary.mockClear();
 
       component.getForm.date.setValue(new Date(2024, 5, 1));
       fixture.detectChanges();
@@ -473,7 +518,7 @@ describe('MonthSummaryComponent', () => {
   });
 
   describe('exportMonthlySummary method', () => {
-    it('should export monthly summary with workbook', fakeAsync(() => {
+    it('should export monthly summary with workbook', async () => {
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,
         id: 'sale-1',
@@ -505,26 +550,30 @@ describe('MonthSummaryComponent', () => {
       component.summaryExpenses = [mockExpense];
       component.weeks = [];
 
+      saveAsSpy.mockClear();
       component.exportMonthlySummary();
-      tick();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
       expect(component.summaryReservations).toBeDefined();
       expect(component.summaryExpenses).toBeDefined();
-      expect(saveAsSpy).toHaveBeenCalledTimes(1);
 
-      const lastCallArgs = saveAsSpy.calls.mostRecent().args;
-      const fileName = lastCallArgs[1];
+      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall;
+      const fileName = lastCallArgs?.[1];
       expect(fileName).toBe('Report_January_2024.xlsx');
 
-      const blob = lastCallArgs[0];
-      expect(blob instanceof Blob).toBeTrue();
-      expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    }));
+      const blob = lastCallArgs?.[0];
+      expect(blob instanceof Blob).toBe(true);
+      expect(blob.type).toBe(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
   });
 
   describe('exportToExcel method', () => {
-    it('should export payment type to Excel', fakeAsync(() => {
-      dashboardStoreSpy.updateMonthlySummary.calls.reset();
+    it('should export payment type to Excel', async () => {
+      dashboardStoreSpy.updateMonthlySummary.mockClear();
 
       const mockSale: IMonthlySummarySale = {
         ...mockMonthlySummary,
@@ -548,31 +597,40 @@ describe('MonthSummaryComponent', () => {
       component.weeks = [];
 
       // Set up room
-      const summaryMap = new Map([[mockRoom, {
-        summarySale: [],
-        summaryExpenses: [],
-        summaryCashSale: [],
-      }]]);
+      const summaryMap = new Map([
+        [
+          mockRoom,
+          {
+            summarySale: [],
+            summaryExpenses: [],
+            summaryCashSale: [],
+          },
+        ],
+      ]);
       dashboardStoreSpy.monthlySummaryMap.set(summaryMap);
       fixture.detectChanges();
 
+      saveAsSpy.mockClear();
       component.exportToExcel('TITLE', totalTypes, values, data);
-      tick();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
       expect(dashboardStoreSpy.updateMonthlySummary).toHaveBeenCalled();
-      expect(saveAsSpy).toHaveBeenCalledTimes(1);
 
-      const lastCallArgs = saveAsSpy.calls.mostRecent().args;
+      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall!;
       const fileName = lastCallArgs[1];
       expect(fileName).toBe('PAYMENT-01-2024.xlsx');
 
       const blob = lastCallArgs[0];
-      expect(blob instanceof Blob).toBeTrue();
-      expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    }));
+      expect(blob instanceof Blob).toBe(true);
+      expect(blob.type).toBe(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
 
-    it('should not export when data is empty', () => {
-      dashboardStoreSpy.updateMonthlySummary.calls.reset();
+    it('should not export when data is empty', async () => {
+      dashboardStoreSpy.updateMonthlySummary.mockClear();
 
       const totalTypes = new TotalType(SummaryType.payment);
       const values = [{ id: 'summary-1', gross: 100, btw: 20 }];
@@ -580,10 +638,13 @@ describe('MonthSummaryComponent', () => {
 
       component.getForm.date.setValue(new Date(2024, 0, 15));
 
+      saveAsSpy.mockClear();
       component.exportToExcel('TITLE', totalTypes, values, data);
+      await vi.waitFor(() => {
+        expect(saveAsSpy).not.toHaveBeenCalled();
+      });
 
       expect(dashboardStoreSpy.updateMonthlySummary).not.toHaveBeenCalled();
-      expect(saveAsSpy).not.toHaveBeenCalled();
     });
   });
 });

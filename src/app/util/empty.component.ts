@@ -4,6 +4,4 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
-export class EmptyComponent {
-
-}
+export class EmptyComponent {}

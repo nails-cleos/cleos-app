@@ -1,9 +1,28 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Color, ColorForm, IColor, IColorAll } from './color';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -13,8 +32,19 @@ import { ColorStore } from '../store/color.store';
   selector: 'app-color',
   templateUrl: './color.component.html',
   styleUrls: ['./color.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
-    BackButtonDirective, BackButtonDirective, MatHint],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatError,
+    BackButtonDirective,
+    BackButtonDirective,
+    MatHint,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorComponent {
@@ -24,7 +54,9 @@ export class ColorComponent {
   submitData = output<IColor>();
 
   private readonly colorStore = inject(ColorStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
   private subErrorsSignal = this.colorStore.subErrors;
   errors = signal<Record<string, unknown>>({});

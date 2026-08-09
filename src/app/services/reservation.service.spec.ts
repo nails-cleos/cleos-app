@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ReservationService } from './reservation.service';
 import {
@@ -19,7 +20,12 @@ import { dateToTimestamp, getNowTimeZone } from '../util/dates';
 
 describe('ReservationService', () => {
   let service: ReservationService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const currency: ICurrencyAll = {
     id: 'eur',
@@ -143,7 +149,12 @@ describe('ReservationService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
       providers: [
         ReservationService,
@@ -159,155 +170,195 @@ describe('ReservationService', () => {
 
   describe('loadPage', () => {
     it('should get all reservations when all is true', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadPage(0, 'start', 'asc', 10, true).subscribe(result => {
+      service.loadPage(0, 'start', 'asc', 10, true).subscribe((result) => {
         expect(result).toEqual(mockPagination);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/pages', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/pages',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should get reservations by room when roomId provided', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadPage(0, 'start', 'desc', 20, false, 'room-123').subscribe(result => {
-        expect(result).toEqual(mockPagination);
-      });
+      service
+        .loadPage(0, 'start', 'desc', 20, false, 'room-123')
+        .subscribe((result) => {
+          expect(result).toEqual(mockPagination);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/rooms/room-123/pages', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/rooms/room-123/pages',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should get reservations by professional when professionalId provided', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadPage(1, 'customer', 'asc', 15, false, undefined, 'prof-123').subscribe(result => {
-        expect(result).toEqual(mockPagination);
-      });
+      service
+        .loadPage(1, 'customer', 'asc', 15, false, undefined, 'prof-123')
+        .subscribe((result) => {
+          expect(result).toEqual(mockPagination);
+        });
 
-      expect(httpSpy.get)
-        .toHaveBeenCalledWith('v1/reservations/professionals/prof-123/pages', jasmine.objectContaining({
-          params: jasmine.any(Object),
-        }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/professionals/prof-123/pages',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
   describe('loadAllByCustomer', () => {
     it('should get customer reservations with all parameters', () => {
-      httpSpy.get.and.returnValue(of(mockCustomerReservation));
+      httpSpy.get.mockReturnValue(of(mockCustomerReservation));
 
-      service.loadAllByCustomer(0, 'start', 'desc', 10).subscribe(result => {
+      service.loadAllByCustomer(0, 'start', 'desc', 10).subscribe((result) => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/customer', jasmine.objectContaining({
-        params: jasmine.any(Object), ...skipLoadingOverlay(),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/customer',
+        expect.objectContaining({
+          params: expect.any(Object),
+          ...skipLoadingOverlay(),
+        }),
+      );
     });
 
     it('should get customer reservations without sort and direction', () => {
-      httpSpy.get.and.returnValue(of(mockCustomerReservation));
+      httpSpy.get.mockReturnValue(of(mockCustomerReservation));
 
-      service.loadAllByCustomer(1, '', '', 20).subscribe(result => {
+      service.loadAllByCustomer(1, '', '', 20).subscribe((result) => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/customer', jasmine.objectContaining({
-        params: jasmine.any(Object), ...skipLoadingOverlay(),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/customer',
+        expect.objectContaining({
+          params: expect.any(Object),
+          ...skipLoadingOverlay(),
+        }),
+      );
     });
   });
 
   describe('loadAllFiltered', () => {
     it('should get filtered reservations with all parameters', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadAllFiltered(
-        0,
-        'start',
-        'asc',
-        10,
-        'user-123',
-        ['confirmed', 'pending'],
-      ).subscribe(result => {
-        expect(result).toEqual(mockPagination);
-      });
+      service
+        .loadAllFiltered(0, 'start', 'asc', 10, 'user-123', [
+          'confirmed',
+          'pending',
+        ])
+        .subscribe((result) => {
+          expect(result).toEqual(mockPagination);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/filter', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/filter',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should get filtered reservations without optional parameters', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadAllFiltered(1, 'start', 'desc', 20).subscribe(result => {
+      service.loadAllFiltered(1, 'start', 'desc', 20).subscribe((result) => {
         expect(result).toEqual(mockPagination);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/filter', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/filter',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
   describe('loadAllByRoom', () => {
     it('should get room reservations grouping with professional', () => {
       const date = new Date('2024-01-15');
-      httpSpy.get.and.returnValue(of([mockRoomReservation]));
+      httpSpy.get.mockReturnValue(of([mockRoomReservation]));
 
-      service.loadAllByRoom(7, date, 'room-123', 'prof-123').subscribe(result => {
-        expect(result).toEqual([mockRoomReservation]);
-      });
+      service
+        .loadAllByRoom(7, date, 'room-123', 'prof-123')
+        .subscribe((result) => {
+          expect(result).toEqual([mockRoomReservation]);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/rooms/room-123', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/rooms/room-123',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should get room reservations grouping without professional', () => {
       const date = new Date('2024-01-15');
-      httpSpy.get.and.returnValue(of([mockRoomReservation]));
+      httpSpy.get.mockReturnValue(of([mockRoomReservation]));
 
-      service.loadAllByRoom(3, date, 'room-123').subscribe(result => {
+      service.loadAllByRoom(3, date, 'room-123').subscribe((result) => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/rooms/room-123', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/rooms/room-123',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
   describe('loadCalendar', () => {
     it('should search availability with professional', () => {
       const dates = [new Date('2024-01-15'), new Date('2024-01-16')];
-      httpSpy.get.and.returnValue(of([mockRoomReservation]));
+      httpSpy.get.mockReturnValue(of([mockRoomReservation]));
 
-      service.loadCalendar('room-123', 2, dates, 'prof-123').subscribe(result => {
-        expect(result).toEqual([mockRoomReservation]);
-      });
+      service
+        .loadCalendar('room-123', 2, dates, 'prof-123')
+        .subscribe((result) => {
+          expect(result).toEqual([mockRoomReservation]);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/rooms/room-123', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/rooms/room-123',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should search availability without professional', () => {
       const dates = [new Date('2024-01-15')];
-      httpSpy.get.and.returnValue(of([mockRoomReservation]));
+      httpSpy.get.mockReturnValue(of([mockRoomReservation]));
 
-      service.loadCalendar('room-123', 1, dates).subscribe(result => {
+      service.loadCalendar('room-123', 1, dates).subscribe((result) => {
         expect(result).toEqual([mockRoomReservation]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/rooms/room-123', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/rooms/room-123',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
@@ -315,93 +366,112 @@ describe('ReservationService', () => {
     it('should search for customer with additional services', () => {
       const date = new Date('2024-01-15');
       const availabilities = [{ dateTime: dateToTimestamp(getNowTimeZone()) }];
-      httpSpy.get.and.returnValue(of(availabilities));
+      httpSpy.get.mockReturnValue(of(availabilities));
 
-      service.customerSearch(
-        'room-123',
-        'treatment-123',
-        date,
-        'prof-123',
-        ['add-1', 'add-2'],
-      ).subscribe(result => {
-        expect(result).toEqual(availabilities);
-      });
+      service
+        .customerSearch('room-123', 'treatment-123', date, 'prof-123', [
+          'add-1',
+          'add-2',
+        ])
+        .subscribe((result) => {
+          expect(result).toEqual(availabilities);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/search', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/search',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should search for customer without additional services', () => {
       const date = new Date('2024-01-15');
       const availabilities = [{ dateTime: dateToTimestamp(getNowTimeZone()) }];
-      httpSpy.get.and.returnValue(of(availabilities));
+      httpSpy.get.mockReturnValue(of(availabilities));
 
-      service.customerSearch('room-123', 'treatment-123', date, 'prof-123').subscribe(result => {
-        expect(result).toEqual(availabilities);
-      });
+      service
+        .customerSearch('room-123', 'treatment-123', date, 'prof-123')
+        .subscribe((result) => {
+          expect(result).toEqual(availabilities);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/search', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/search',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
   describe('getReservation', () => {
     it('should get reservation by id', () => {
-      httpSpy.get.and.returnValue(of(mockReservation));
+      httpSpy.get.mockReturnValue(of(mockReservation));
 
-      service.getReservation('res-123').subscribe(result => {
+      service.getReservation('res-123').subscribe((result) => {
         expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', {
+        ...skipLoadingOverlay(),
+      });
     });
 
     it('should get reservation with edit path', () => {
-      httpSpy.get.and.returnValue(of(mockReservation));
+      httpSpy.get.mockReturnValue(of(mockReservation));
 
-      service.getReservation('res-123').subscribe(result => {
+      service.getReservation('res-123').subscribe((result) => {
         expect(result).toEqual(mockReservationAll as IUpcomingAll);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getReservationHistory', () => {
     it('should get reservation history', () => {
       const history = [mockReservationAll];
-      httpSpy.get.and.returnValue(of(history));
+      httpSpy.get.mockReturnValue(of(history));
 
-      service.loadHistory('res-123').subscribe(result => {
+      service.loadHistory('res-123').subscribe((result) => {
         expect(result).toEqual(history);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/history', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/res-123/history',
+        { ...skipLoadingOverlay() },
+      );
     });
   });
 
   describe('createReservation', () => {
     it('should create reservation', () => {
-      const reservations: IApiResponse[] = [{
-        id: mockReservation.id!,
-        timestamp: mockReservation.timestamp,
-        timeZone: mockReservation.room?.timeZone,
-      }];
-      httpSpy.post.and.returnValue(of(reservations));
+      const reservations: IApiResponse[] = [
+        {
+          id: mockReservation.id!,
+          timestamp: mockReservation.timestamp,
+          timeZone: mockReservation.room?.timeZone,
+        },
+      ];
+      httpSpy.post.mockReturnValue(of(reservations));
 
-      service.createReservation(mockReservation).subscribe(result => {
+      service.createReservation(mockReservation).subscribe((result) => {
         expect(result).toEqual(reservations);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations', mockReservation);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/reservations',
+        mockReservation,
+      );
     });
   });
 
   describe('deleteReservation', () => {
     it('should delete reservation', () => {
-      httpSpy.delete.and.returnValue(of(void 0));
+      httpSpy.delete.mockReturnValue(of(void 0));
 
       service.deleteReservation('res-123');
 
@@ -416,44 +486,57 @@ describe('ReservationService', () => {
         timestamp: mockReservation.timestamp,
         timeZone: mockReservation.room?.timeZone,
       };
-      httpSpy.patch.and.returnValue(of(reservations));
+      httpSpy.patch.mockReturnValue(of(reservations));
 
-      service.updateReservationById('res-123', mockReservation).subscribe(result => {
-        expect(result).toEqual(reservations);
-      });
+      service
+        .updateReservationById('res-123', mockReservation)
+        .subscribe((result) => {
+          expect(result).toEqual(reservations);
+        });
 
-      expect(httpSpy.patch).toHaveBeenCalledWith('v1/reservations/res-123', mockReservation);
+      expect(httpSpy.patch).toHaveBeenCalledWith(
+        'v1/reservations/res-123',
+        mockReservation,
+      );
     });
   });
 
   describe('changeState', () => {
     it('should change reservation state with extras', () => {
       const extras = { reason: 'Customer request' };
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.changeState('res-123', 'cancel', extras).subscribe(result => {
+      service.changeState('res-123', 'cancel', extras).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations/res-123/cancel', extras);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/reservations/res-123/cancel',
+        extras,
+      );
     });
 
     it('should change reservation state without extras', () => {
-      httpSpy.post.and.returnValue(of(undefined));
+      httpSpy.post.mockReturnValue(of(undefined));
 
       service.changeState('res-123', 'confirm').subscribe();
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/reservations/res-123/confirm', undefined);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/reservations/res-123/confirm',
+        undefined,
+      );
     });
   });
 
   describe('updateReservationCustomer', () => {
     it('should update reservation customer', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationCustomer('res-123', 'customer-456').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationCustomer('res-123', 'customer-456')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/customers/customer-456',
@@ -464,11 +547,13 @@ describe('ReservationService', () => {
 
   describe('updateReservationColor', () => {
     it('should update reservation color', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationColor('res-123', 'color-456').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationColor('res-123', 'color-456')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/colors/color-456',
@@ -479,9 +564,9 @@ describe('ReservationService', () => {
 
   describe('loadUpcoming', () => {
     it('should get upcoming reservation', () => {
-      httpSpy.get.and.returnValue(of(mockCustomerReservation));
+      httpSpy.get.mockReturnValue(of(mockCustomerReservation));
 
-      service.loadUpcoming().subscribe(result => {
+      service.loadUpcoming().subscribe((result) => {
         expect(result).toEqual(mockCustomerReservation);
       });
 
@@ -491,7 +576,7 @@ describe('ReservationService', () => {
 
   describe('completeReservationPayment', () => {
     it('should complete reservation payment', () => {
-      httpSpy.post.and.returnValue(of(undefined));
+      httpSpy.post.mockReturnValue(of(undefined));
 
       service.completeReservationPayment('res-123').subscribe();
 
@@ -504,9 +589,9 @@ describe('ReservationService', () => {
 
   describe('createReview', () => {
     it('should create review', () => {
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.createReview(mockReview).subscribe(result => {
+      service.createReview(mockReview).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -519,23 +604,28 @@ describe('ReservationService', () => {
 
   describe('getReview', () => {
     it('should get review', () => {
-      httpSpy.get.and.returnValue(of(mockReview));
+      httpSpy.get.mockReturnValue(of(mockReview));
 
-      service.getReview('res-123').subscribe(result => {
+      service.getReview('res-123').subscribe((result) => {
         expect(result).toEqual(mockReview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/res-123/reviews', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/res-123/reviews',
+        { ...skipLoadingOverlay() },
+      );
     });
   });
 
   describe('updateReservationNote', () => {
     it('should update reservation note with both notes', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationNote('res-123', 'Staff note', 'Customer note').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationNote('res-123', 'Staff note', 'Customer note')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/notes',
@@ -544,11 +634,13 @@ describe('ReservationService', () => {
     });
 
     it('should update reservation note with only staff note', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationNote('res-123', 'Staff note').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationNote('res-123', 'Staff note')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/notes',
@@ -559,11 +651,13 @@ describe('ReservationService', () => {
 
   describe('updateReservationDiscount', () => {
     it('should update reservation discount', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationDiscount('res-123', 'discount-456').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationDiscount('res-123', 'discount-456')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/discounts/discount-456',
@@ -574,11 +668,13 @@ describe('ReservationService', () => {
 
   describe('updateReservationTimestamp', () => {
     it('should update reservation timestamp', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateReservationTimestamp('res-123', '2024-01-15T12:00:00.000Z').subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateReservationTimestamp('res-123', '2024-01-15T12:00:00.000Z')
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/reservations/res-123/timestamp',
@@ -590,10 +686,10 @@ describe('ReservationService', () => {
   describe('error handling', () => {
     it('should handle HTTP errors gracefully', () => {
       const errorResponse = new Error('Network error');
-      httpSpy.get.and.returnValue(throwError(() => errorResponse));
+      httpSpy.get.mockReturnValue(throwError(() => errorResponse));
 
       service.getReservation('res-123').subscribe({
-        next: () => fail('Should have failed'),
+        next: () => expect.fail('Should have failed'),
         error: (error) => {
           expect(error).toEqual(errorResponse);
         },
@@ -602,10 +698,10 @@ describe('ReservationService', () => {
 
     it('should handle reservation creation errors', () => {
       const errorResponse = new Error('Creation failed');
-      httpSpy.post.and.returnValue(throwError(() => errorResponse));
+      httpSpy.post.mockReturnValue(throwError(() => errorResponse));
 
       service.createReservation(mockReservation).subscribe({
-        next: () => fail('Should have failed'),
+        next: () => expect.fail('Should have failed'),
         error: (error) => {
           expect(error).toEqual(errorResponse);
         },
@@ -615,32 +711,42 @@ describe('ReservationService', () => {
 
   describe('edge cases', () => {
     it('should handle undefined reservation response', () => {
-      httpSpy.get.and.returnValue(of(undefined));
+      httpSpy.get.mockReturnValue(of(undefined));
 
-      service.getReservation('non-existent').subscribe(result => {
+      service.getReservation('non-existent').subscribe((result) => {
         expect(result).toBeUndefined();
       });
     });
 
     it('should handle empty states array in filter', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.loadAllFiltered(0, 'start', 'asc', 10, 'user-123', []).subscribe();
+      service
+        .loadAllFiltered(0, 'start', 'asc', 10, 'user-123', [])
+        .subscribe();
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/filter', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/filter',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should handle empty additional IDs in customer search', () => {
       const date = new Date('2024-01-15');
-      httpSpy.get.and.returnValue(of(mockRoomReservation));
+      httpSpy.get.mockReturnValue(of(mockRoomReservation));
 
-      service.customerSearch('room-123', 'treatment-123', date, 'prof-123', []).subscribe();
+      service
+        .customerSearch('room-123', 'treatment-123', date, 'prof-123', [])
+        .subscribe();
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/reservations/search', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/reservations/search',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 });

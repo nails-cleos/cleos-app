@@ -11,9 +11,12 @@
         </div>
         <div matListItemLine>
           @if (getDuration(extra); as duration) {
-            &#9202; {{ duration | durationTime }} · {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+            &#9202; {{ duration | durationTime }} ·
+            {{ currency() | currencySymbol }}
+            {{ extra.price | number: '1.2-2' }}
           } @else {
-            {{ currency() | currencySymbol }} {{ extra.price | number:'1.2-2' }}
+            {{ currency() | currencySymbol }}
+            {{ extra.price | number: '1.2-2' }}
           }
         </div>
       </mat-list-item>
@@ -22,7 +25,7 @@
       <mat-list-item>
         <mat-icon matListItemIcon>equal</mat-icon>
         <div matListItemTitle>
-          {{ currency() | currencySymbol }} {{ total() | number:'1.2-2' }}
+          {{ currency() | currencySymbol }} {{ total() | number: '1.2-2' }}
         </div>
       </mat-list-item>
     }

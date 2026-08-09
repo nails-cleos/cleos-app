@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
@@ -10,12 +11,19 @@ describe('BottomSheetBookAppointmentComponent', () => {
   let component: BottomSheetBookAppointmentComponent;
   let fixture: ComponentFixture<BottomSheetBookAppointmentComponent>;
 
-  let bottomSheetRefSpy: jasmine.SpyObj<MatBottomSheetRef<BottomSheetBookAppointmentComponent>>;
-  let windowOpenSpy: jasmine.Spy;
+  let bottomSheetRefSpy: Pick<
+    MatBottomSheetRef<BottomSheetBookAppointmentComponent>,
+    'dismiss'
+  > & {
+    dismiss: ReturnType<typeof vi.fn>;
+  };
+  let windowOpenSpy: Mock;
 
   beforeEach(async () => {
-    bottomSheetRefSpy = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
-    windowOpenSpy = spyOn(window, 'open');
+    bottomSheetRefSpy = {
+      dismiss: vi.fn().mockName('MatBottomSheetRef.dismiss'),
+    };
+    windowOpenSpy = vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
     await TestBed.configureTestingModule({
       imports: [BottomSheetBookAppointmentComponent],
@@ -68,7 +76,10 @@ describe('BottomSheetBookAppointmentComponent', () => {
   it('should open Instagram link', () => {
     triggerClick('instagram');
 
-    expect(windowOpenSpy).toHaveBeenCalledWith('https://ig.me/m/carlanailscleos.nl', '_blank');
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      'https://ig.me/m/carlanailscleos.nl',
+      '_blank',
+    );
   });
 
   it('should open Facebook link', () => {
@@ -83,12 +94,15 @@ describe('BottomSheetBookAppointmentComponent', () => {
   it('should open email link', () => {
     triggerClick('email');
 
-    expect(windowOpenSpy).toHaveBeenCalledWith('mailto:test@example.com', '_blank');
+    expect(windowOpenSpy).toHaveBeenCalledWith(
+      'mailto:test@example.com',
+      '_blank',
+    );
   });
 
   const triggerClick = (key: any) => {
     const event = new MouseEvent('click');
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     component.openLink(event, key);
 

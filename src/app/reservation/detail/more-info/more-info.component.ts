@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { IPaymentAll } from '@app/interfaces/payment';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { getDiffTime, newDateTimestamp } from '@app/util/dates';
@@ -30,7 +37,10 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { NavigationService } from '@app/services/navigation.service';
 import { PaymentStore } from '@app/store/payment.store';
 import { TrackingStore } from '@app/store/tracking.store';
@@ -40,10 +50,36 @@ import { ReservationStore } from '@app/store/reservation.store';
   selector: 'app-more-info',
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
-  imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, DecimalPipe, NgClass,
-    DatePipe, MatTable, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatTooltip,
-    MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
-    BackButtonDirective, TimeDetailPipe, RatingComponent, BackButtonDirective, TableSkeletonComponent],
+  imports: [
+    TimeDetailPipe,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    TranslatePipe,
+    DecimalPipe,
+    NgClass,
+    DatePipe,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatTooltip,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    BackButtonDirective,
+    TimeDetailPipe,
+    RatingComponent,
+    BackButtonDirective,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MoreInfoComponent {
@@ -53,8 +89,10 @@ export class MoreInfoComponent {
   private readonly reservationStore = inject(ReservationStore);
   private readonly paymentStore = inject(PaymentStore);
   private readonly trackingStore = inject(TrackingStore);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly clipboard: Clipboard = inject(Clipboard);
   private readonly toastService: ToastService = inject(ToastService);
 
@@ -80,8 +118,10 @@ export class MoreInfoComponent {
   readonly totalTime = computed(() => {
     const tracking = this.trackingSignal();
     if (tracking?.startedTimestamp && tracking?.completedTimestamp) {
-      return getDiffTime(newDateTimestamp(tracking.completedTimestamp),
-        newDateTimestamp(tracking.startedTimestamp));
+      return getDiffTime(
+        newDateTimestamp(tracking.completedTimestamp),
+        newDateTimestamp(tracking.startedTimestamp),
+      );
     }
     return undefined;
   });
@@ -109,23 +149,37 @@ export class MoreInfoComponent {
     const id = this.id();
     if (id) {
       const tracking = this.trackingSignal();
-      executeDialog(this.dialog, UpdateTrackingDialogComponent, {
-        startedTimestamp: tracking?.startedTimestamp,
-        completedTimestamp: tracking?.completedTimestamp,
-      }, result => {
-        if (result) {
-          this.trackingStore.updateByReservationId(id, result.started, result.completed);
-        }
-      }, true);
+      executeDialog(
+        this.dialog,
+        UpdateTrackingDialogComponent,
+        {
+          startedTimestamp: tracking?.startedTimestamp,
+          completedTimestamp: tracking?.completedTimestamp,
+        },
+        (result) => {
+          if (result) {
+            this.trackingStore.updateByReservationId(
+              id,
+              result.started,
+              result.completed,
+            );
+          }
+        },
+        true,
+      );
     }
   }
 
-  resend = (payment: IPaymentAll): void => this.paymentStore.recreate(payment.id, payment.type);
+  resend = (payment: IPaymentAll): void =>
+    this.paymentStore.recreate(payment.id, payment.type);
 
   copy = (payment: IPaymentAll): void => {
     if (payment.link) {
       this.clipboard.copy(payment.link);
-      this.toastService.show(this.translateService.instant('PAYMENT.COPY'), 'info');
+      this.toastService.show(
+        this.translateService.instant('PAYMENT.COPY'),
+        'info',
+      );
     }
   };
 }

@@ -24,20 +24,20 @@ export enum ReservationIconName {
   clone = 'file_copy',
   overview = 'person',
   note = 'note_add',
-  discount = 'switch_access_shortcut_add'
+  discount = 'switch_access_shortcut_add',
 }
 
 export enum RoomIconName {
   calendarToday = 'calendar_today',
   eventAvailable = 'event_available',
-  eventBusy = 'event_busy'
+  eventBusy = 'event_busy',
 }
 
 export enum RoleIconName {
   roleCustomer = 'person',
   roleProfessional = 'group',
   roleManager = 'supervisor_account',
-  roleAdmin = 'manage_accounts'
+  roleAdmin = 'manage_accounts',
 }
 
 export type ReservationIconKey = keyof typeof ReservationIconName;

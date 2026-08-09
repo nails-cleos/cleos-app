@@ -6,7 +6,7 @@ import { EnvService } from '@app/services/env.service';
 
 export type BottomSheetShareData = {
   code: string;
-}
+};
 
 @Component({
   selector: 'app-bottom-sheet-share',
@@ -16,7 +16,8 @@ export type BottomSheetShareData = {
 })
 export class BottomSheetShareComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly data = inject<BottomSheetShareData>(MAT_BOTTOM_SHEET_DATA);
 
   private url = this.env.appServer;

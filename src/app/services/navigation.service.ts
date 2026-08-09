@@ -1,6 +1,11 @@
 import { DestroyRef, inject, Injectable, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, NavigationEnd, NavigationExtras, Router } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  NavigationExtras,
+  Router,
+} from '@angular/router';
 import { currentLanguageFromUrl, getLocale } from '../util/helper';
 import { I18NStore } from '../store/i18n.store';
 import { distinctUntilChanged, filter, map, startWith } from 'rxjs';
@@ -20,7 +25,8 @@ export class NavigationService {
   private static readonly HISTORY_STORAGE_KEY = 'cleos-navigation-history';
   private static readonly HISTORY_LIMIT = 40;
 
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly seoService = inject(SeoService);
   private readonly cookieService = inject(CookieService);
   private readonly themeService = inject(ThemeService);
@@ -70,7 +76,10 @@ export class NavigationService {
     this.syncCurrentUrl(false);
     const current = this.normalizeUrl(this.router.url);
 
-    while (this.history.length && this.history[this.history.length - 1] === current) {
+    while (
+      this.history.length &&
+      this.history[this.history.length - 1] === current
+    ) {
       this.history.pop();
     }
 
@@ -81,10 +90,17 @@ export class NavigationService {
     void this.router.navigateByUrl(target, { state: { date, step } });
   }
 
-  navigate(path?: (string | number | undefined)[], extras?: NavigationExtras, callback?: () => void) {
+  navigate(
+    path?: (string | number | undefined)[],
+    extras?: NavigationExtras,
+    callback?: () => void,
+  ) {
     let navigation: Promise<boolean>;
     if (path) {
-      navigation = this.router.navigate([`/${ this.language$() }/${ path.join('/') }`], extras);
+      navigation = this.router.navigate(
+        [`/${this.language$()}/${path.join('/')}`],
+        extras,
+      );
     } else {
       navigation = this.router.navigate([this.router.url]);
     }
@@ -111,16 +127,18 @@ export class NavigationService {
       this.dateLocaleService.setLanguage(currentLocale.language);
     }
 
-    this.cssClass.set(resetTheme(
-      this.overlayContainer,
-      this.cookieService,
-      this.themeService,
-      theme,
-      this.cssClass(),
-    ));
+    this.cssClass.set(
+      resetTheme(
+        this.overlayContainer,
+        this.cookieService,
+        this.themeService,
+        theme,
+        this.cssClass(),
+      ),
+    );
   };
 
-  scrollToAnchor(hostElement: HTMLElement, id?: string) {
+  scrollToAnchor(hostElement: Pick<HTMLElement, 'querySelector'>, id?: string) {
     let anchorId;
     if (id) {
       anchorId = id.trim();
@@ -134,7 +152,7 @@ export class NavigationService {
       return;
     }
 
-    const target = hostElement.querySelector<HTMLElement>(`#${ anchorId }`);
+    const target = hostElement.querySelector<HTMLElement>(`#${anchorId}`);
     if (target) {
       goTo(target);
     }
@@ -153,11 +171,13 @@ export class NavigationService {
     const segments = currentUrl.split('/').filter(Boolean);
 
     if (segments.length <= 1) {
-      return `/${ currentLang }`;
+      return `/${currentLang}`;
     }
 
     const parentSegments = segments.slice(0, -1);
-    return parentSegments.length ? `/${ parentSegments.join('/') }` : `/${ currentLang }`;
+    return parentSegments.length
+      ? `/${parentSegments.join('/')}`
+      : `/${currentLang}`;
   }
 
   private pushHistory(url: string): void {
@@ -172,15 +192,21 @@ export class NavigationService {
       return;
     }
 
-    this.history = [...this.history, normalized].slice(-NavigationService.HISTORY_LIMIT);
+    this.history = [...this.history, normalized].slice(
+      -NavigationService.HISTORY_LIMIT,
+    );
     this.writeHistory();
   }
 
   private shouldTrackUrl(url: string): boolean {
-    return !url.includes('/payment/success?')
-      && !url.includes('/payment/failure?')
-      && !/\/payment\/(approved|pending|cancelled|failure|success|status)(\?|$)/.test(url)
-      && !url.includes('/auth/redirect');
+    return (
+      !url.includes('/payment/success?') &&
+      !url.includes('/payment/failure?') &&
+      !/\/payment\/(approved|pending|cancelled|failure|success|status)(\?|$)/.test(
+        url,
+      ) &&
+      !url.includes('/auth/redirect')
+    );
   }
 
   private normalizeUrl(url: string): string {
@@ -195,7 +221,9 @@ export class NavigationService {
       }
 
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed.filter((it): it is string => typeof it === 'string') : [];
+      return Array.isArray(parsed)
+        ? parsed.filter((it): it is string => typeof it === 'string')
+        : [];
     } catch {
       return [];
     }
@@ -203,7 +231,10 @@ export class NavigationService {
 
   private writeHistory(): void {
     try {
-      sessionStorage.setItem(NavigationService.HISTORY_STORAGE_KEY, JSON.stringify(this.history));
+      sessionStorage.setItem(
+        NavigationService.HISTORY_STORAGE_KEY,
+        JSON.stringify(this.history),
+      );
     } catch {
       // Ignore storage failures and keep in-memory behavior.
     }
@@ -211,7 +242,10 @@ export class NavigationService {
 
   reload(url?: string[], data?: any, queryParams?: any): void {
     if (url) {
-      void this.router.navigate(url.filter(Boolean), { state: data, queryParams });
+      void this.router.navigate(url.filter(Boolean), {
+        state: data,
+        queryParams,
+      });
     } else {
       void this.router.navigate([], {
         relativeTo: this.route,

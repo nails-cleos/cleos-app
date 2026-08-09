@@ -2,7 +2,9 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'ME.REFERRAL.TITLE' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'ME.REFERRAL.TITLE' | translate
+        }}</span>
       </div>
     </div>
 
@@ -16,11 +18,18 @@
     @if (currentUserId) {
       <div class="app-surface-item referrals-code-card">
         <div>
-          <span class="app-surface-item__label">{{ 'ME.REFERRAL.TITLE' | translate }}</span>
+          <span class="app-surface-item__label">{{
+            'ME.REFERRAL.TITLE' | translate
+          }}</span>
           <strong class="referrals-code">{{ currentUserId }}</strong>
         </div>
 
-        <button (click)="copy()" [disabled]="!showShare()" mat-stroked-button type="button">
+        <button
+          (click)="copy()"
+          [disabled]="!showShare()"
+          mat-stroked-button
+          type="button"
+        >
           <mat-icon>content_copy</mat-icon>
           <span>{{ 'COMMON.BUTTON.COPY' | translate }}</span>
         </button>
@@ -28,11 +37,21 @@
     }
 
     <div class="app-detail-actions">
-      <button (click)="openBottomSheetShare()" [disabled]="!showShare()" mat-stroked-button type="button">
+      <button
+        (click)="openBottomSheetShare()"
+        [disabled]="!showShare()"
+        mat-stroked-button
+        type="button"
+      >
         <mat-icon>share</mat-icon>
         <span>{{ 'COMMON.BUTTON.SHARE' | translate }}</span>
       </button>
-      <button (click)="openBottomSheetReferral()" [disabled]="!showInvites()" mat-stroked-button type="button">
+      <button
+        (click)="openBottomSheetReferral()"
+        [disabled]="!showInvites()"
+        mat-stroked-button
+        type="button"
+      >
         <mat-icon>group_add</mat-icon>
         <span>{{ 'ME.REFERRAL.INVITE.TITLE' | translate }}</span>
       </button>

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { OfficeService } from './office.service';
@@ -5,11 +6,20 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { IOfficeAll } from '../office/office';
 import { createFilter } from '../util/service-helper';
-import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import {
+  paginated,
+  Pagination,
+  skipLoadingOverlay,
+} from '../interfaces/pagination';
 
 describe('OfficeService', () => {
   let service: OfficeService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -25,12 +35,14 @@ describe('OfficeService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        OfficeService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [OfficeService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(OfficeService);
   });
@@ -40,13 +52,15 @@ describe('OfficeService', () => {
   });
 
   it('should fetch all office', () => {
-    httpSpy.get.and.returnValue(of([mockOffice]));
+    httpSpy.get.mockReturnValue(of([mockOffice]));
 
     service.getAllMyOffices().subscribe((result) => {
       expect(result).toEqual([mockOffice]);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/me', { ...skipLoadingOverlay() });
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/me', {
+      ...skipLoadingOverlay(),
+    });
   });
 
   it('should fetch office page with correct parameters', () => {
@@ -54,14 +68,15 @@ describe('OfficeService', () => {
     const size = 10;
     const sort = 'name';
     const direction = 'asc';
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.mockReturnValue(of(mockPagination));
 
     service.getOfficesPage(page, sort, direction, size).subscribe((result) => {
       expect(result).toEqual(mockPagination);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/pages', {
-      params: createFilter(page, size, sort, direction), ...paginated(),
+      params: createFilter(page, size, sort, direction),
+      ...paginated(),
     });
   });
 });

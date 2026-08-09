@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountStore } from '../store/discount.store';
@@ -9,12 +10,12 @@ describe('DiscountCreatePageComponent', () => {
   let fixture: ComponentFixture<DiscountCreatePageComponent>;
 
   let discountStoreSpy: {
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
 
   let currencyStoreSpy: {
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
 
   const mockDiscount: Partial<IDiscountAll> = {
@@ -24,11 +25,11 @@ describe('DiscountCreatePageComponent', () => {
 
   beforeEach(async () => {
     discountStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
     currencyStoreSpy = {
-      loadAll: jasmine.createSpy('loadAll'),
+      loadAll: vi.fn().mockName('loadAll'),
     };
 
     await TestBed.configureTestingModule({
@@ -37,7 +38,8 @@ describe('DiscountCreatePageComponent', () => {
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: CurrencyStore, useValue: currencyStoreSpy },
       ],
-    }).overrideTemplate(DiscountCreatePageComponent, '')
+    })
+      .overrideTemplate(DiscountCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(DiscountCreatePageComponent);
@@ -51,9 +53,11 @@ describe('DiscountCreatePageComponent', () => {
   it('should call create when discount is received', () => {
     component.submit(mockDiscount);
 
-    expect(discountStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Test Discount',
-      description: 'Test Description',
-    }));
+    expect(discountStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Test Discount',
+        description: 'Test Description',
+      }),
+    );
   });
 });

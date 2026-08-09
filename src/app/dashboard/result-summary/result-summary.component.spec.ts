@@ -4,6 +4,7 @@ import { ResultSummaryComponent } from './result-summary.component';
 import { ICurrencyAll } from '@app/currency/currency';
 import { ISummaryTotals } from '../dashboard';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('ResultSummaryComponent', () => {
   let component: ResultSummaryComponent;

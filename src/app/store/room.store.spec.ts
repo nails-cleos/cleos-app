@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,29 +10,50 @@ import { NavigationService } from '../services/navigation.service';
 
 describe('RoomStore', () => {
   let store: InstanceType<typeof RoomStore>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let roomServiceSpy: jasmine.SpyObj<RoomService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
+  let roomServiceSpy: {
+    getRoomsPage: Mock;
+    getAllRoomsInfo: Mock;
+    getRoom: Mock;
+    createRoom: Mock;
+    updateRoom: Mock;
+    deleteRoom: Mock;
+    getServices: Mock;
+    updateServices: Mock;
+    getAllCustomersInfo: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+    getCurrentLang: Mock;
+  };
 
   beforeEach(() => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    roomServiceSpy = {
+      getRoomsPage: vi.fn().mockName('RoomService.getRoomsPage'),
+      getAllRoomsInfo: vi.fn().mockName('RoomService.getAllRoomsInfo'),
+      getRoom: vi.fn().mockName('RoomService.getRoom'),
+      createRoom: vi.fn().mockName('RoomService.createRoom'),
+      updateRoom: vi.fn().mockName('RoomService.updateRoom'),
+      deleteRoom: vi.fn().mockName('RoomService.deleteRoom'),
+      getServices: vi.fn().mockName('RoomService.getServices'),
+      updateServices: vi.fn().mockName('RoomService.updateServices'),
+      getAllCustomersInfo: vi.fn().mockName('RoomService.getAllCustomersInfo'),
+    };
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+      getCurrentLang: vi.fn().mockName('TranslateService.getCurrentLang'),
+    };
+    translateSpy.instant.mockImplementation(
+      (key: string, params?: Record<string, string>) =>
+        `${key}:${params?.['name'] ?? ''}`,
     );
-    roomServiceSpy = jasmine.createSpyObj<RoomService>('RoomService', [
-      'getRoomsPage',
-      'getAllRoomsInfo',
-      'getRoom',
-      'createRoom',
-      'updateRoom',
-      'deleteRoom',
-      'getServices',
-      'updateServices',
-      'getAllCustomersInfo',
-    ]);
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
-    translateSpy.instant.and.callFake(
-      (key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
-    translateSpy.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
+    translateSpy.getCurrentLang.mockReturnValue(DEFAULT_LOCALE);
 
     TestBed.configureTestingModule({
       providers: [
@@ -61,11 +83,11 @@ describe('RoomStore', () => {
       selectedTreatments: [],
     } as any;
     const customers = [{ customerId: 'customer-1' }] as any;
-    roomServiceSpy.getRoomsPage.and.returnValue(of(value));
-    roomServiceSpy.getAllRoomsInfo.and.returnValue(of(roomInfo));
-    roomServiceSpy.getRoom.and.returnValue(of(room));
-    roomServiceSpy.getServices.and.returnValue(of(services));
-    roomServiceSpy.getAllCustomersInfo.and.returnValue(of(customers));
+    roomServiceSpy.getRoomsPage.mockReturnValue(of(value));
+    roomServiceSpy.getAllRoomsInfo.mockReturnValue(of(roomInfo));
+    roomServiceSpy.getRoom.mockReturnValue(of(room));
+    roomServiceSpy.getServices.mockReturnValue(of(services));
+    roomServiceSpy.getAllCustomersInfo.mockReturnValue(of(customers));
 
     store.loadPage({ page: 0, sort: 'office', direction: 'asc', size: 10 });
     store.loadInfo();
@@ -83,10 +105,14 @@ describe('RoomStore', () => {
   });
 
   it('should expose response metadata for create, update, delete, and service update success', () => {
-    roomServiceSpy.createRoom.and.returnValue(of({ id: 'room-1', name: 'Room 1' } as any));
-    roomServiceSpy.updateRoom.and.returnValue(of({ id: 'room-1', name: 'Room Updated' } as any));
-    roomServiceSpy.deleteRoom.and.returnValue(of({} as any));
-    roomServiceSpy.updateServices.and.returnValue(of(void 0));
+    roomServiceSpy.createRoom.mockReturnValue(
+      of({ id: 'room-1', name: 'Room 1' } as any),
+    );
+    roomServiceSpy.updateRoom.mockReturnValue(
+      of({ id: 'room-1', name: 'Room Updated' } as any),
+    );
+    roomServiceSpy.deleteRoom.mockReturnValue(of({} as any));
+    roomServiceSpy.updateServices.mockReturnValue(of(void 0));
 
     store.create({} as any);
     expect(store.response()).toEqual({
@@ -110,8 +136,10 @@ describe('RoomStore', () => {
     });
 
     store.updateServices('room-1', []);
-    expect(store.response()).toEqual({ message: 'ROOM.ME.SERVICES.UPDATE.MESSAGE' });
-    expect(store.isLoading()).toBeFalse();
+    expect(store.response()).toEqual({
+      message: 'ROOM.ME.SERVICES.UPDATE.MESSAGE',
+    });
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should select and navigate to room details', () => {
@@ -120,11 +148,16 @@ describe('RoomStore', () => {
     store.selectAndNavigate(room);
 
     expect(store.selected()).toBe(room);
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['rooms', 'room-1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'rooms',
+      'room-1',
+    ]);
   });
 
   it('should clear response and error state', () => {
-    roomServiceSpy.createRoom.and.returnValue(of({ id: 'room-1', name: 'Room 1' } as any));
+    roomServiceSpy.createRoom.mockReturnValue(
+      of({ id: 'room-1', name: 'Room 1' } as any),
+    );
 
     store.create({} as any);
     store.clearResponse();
@@ -136,20 +169,27 @@ describe('RoomStore', () => {
   });
 
   it('should map service failures into error state', () => {
-    roomServiceSpy.getRoom.and.returnValue(throwError(() => new HttpErrorResponse({
-      status: 404,
-      error: {
-        message: 'ROOM.NOT_FOUND',
-      },
-    })));
+    roomServiceSpy.getRoom.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            error: {
+              message: 'ROOM.NOT_FOUND',
+            },
+          }),
+      ),
+    );
 
     store.loadById('missing');
 
     expect(store.response()).toBeUndefined();
-    expect(store.error()).toEqual(jasmine.objectContaining({
-      status: 'NOT_FOUND',
-      message: 'ROOM.NOT_FOUND',
-    }));
-    expect(store.isLoading()).toBeFalse();
+    expect(store.error()).toEqual(
+      expect.objectContaining({
+        status: 'NOT_FOUND',
+        message: 'ROOM.NOT_FOUND',
+      }),
+    );
+    expect(store.isLoading()).toBe(false);
   });
 });

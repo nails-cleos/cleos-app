@@ -1,13 +1,17 @@
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MainComponent } from './main.component';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { AuthUserService, initialAuthUser } from '../services/auth-user.service';
+import {
+  AuthUserService,
+  initialAuthUser,
+} from '../services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { MainContentService } from '../services/main-content.service';
 import { TokenService } from '../services/token.service';
 import { NavigationService } from '../services/navigation.service';
-import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
+import { GoogleMapStubComponent } from '../util/stub/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { FirebaseService } from '../services/firebase.service';
@@ -23,21 +27,40 @@ describe('MainComponent', () => {
   let navigationServiceSpy: {
     language: string;
     language$: ReturnType<typeof signal>;
-    navigate: jasmine.Spy;
+    navigate: Mock;
   };
 
   let userStoreSpy: {
-    updateMyUser: jasmine.Spy;
+    updateMyUser: Mock;
   };
   let authStoreSpy: {
-    authRedirect: jasmine.Spy;
+    authRedirect: Mock;
   };
 
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let mainContentServiceSpy: jasmine.SpyObj<MainContentService>;
-  let tokenServiceSpy: jasmine.SpyObj<TokenService>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let firebaseServiceSpy: { isAuthenticated: ReturnType<typeof signal<boolean>> };
+  let authUserServiceSpy: Pick<
+    AuthUserService,
+    'authUser' | 'cookieConsent' | 'updateMode'
+  > & {
+    cookieConsent: ReturnType<typeof vi.fn>;
+    updateMode: ReturnType<typeof vi.fn>;
+  };
+  let mainContentServiceSpy: {
+    value: any;
+  };
+  let tokenServiceSpy: {
+    token: Mock;
+    setToken: '';
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let firebaseServiceSpy: {
+    isAuthenticated: ReturnType<typeof signal<boolean>>;
+  };
 
   let translateService: TranslateService;
 
@@ -45,35 +68,48 @@ describe('MainComponent', () => {
     navigationServiceSpy = {
       language: DEFAULT_LOCALE,
       language$: signal(DEFAULT_LOCALE),
-      navigate: jasmine.createSpy('navigate'),
+      navigate: vi.fn().mockName('navigate'),
     };
     userStoreSpy = {
-      updateMyUser: jasmine.createSpy('updateMyUser'),
+      updateMyUser: vi.fn().mockName('updateMyUser'),
     };
     authStoreSpy = {
-      authRedirect: jasmine.createSpy('authRedirect'),
+      authRedirect: vi.fn().mockName('authRedirect'),
     };
-    const paramMapSpy = jasmine.createSpyObj('ParamMap', ['get', 'lang']);
+    const paramMapSpy = {
+      get: vi.fn().mockName('ParamMap.get'),
+      lang: vi.fn().mockName('ParamMap.lang'),
+    };
     const authUserSignal = signal({ ...initialAuthUser });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['cookieConsent', 'updateMode'], {
+    authUserServiceSpy = {
+      cookieConsent: vi.fn().mockName('AuthUserService.cookieConsent'),
+      updateMode: vi.fn().mockName('AuthUserService.updateMode'),
       authUser: authUserSignal.asReadonly(),
-    });
-    mainContentServiceSpy = jasmine.createSpyObj('MainContentService', [], {
-      value: { showPreload: false, navigationHeader: 'close', showArrow: false },
-    });
-    tokenServiceSpy = jasmine.createSpyObj('TokenService', ['token'], {
+    };
+    mainContentServiceSpy = {
+      value: {
+        showPreload: false,
+        navigationHeader: 'close',
+        showArrow: false,
+      },
+    };
+    tokenServiceSpy = {
+      token: vi.fn().mockName('TokenService.token'),
       setToken: '',
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    };
+    activatedRouteSpy = {
       snapshot: {
         paramMap: paramMapSpy,
       },
-    });
+    };
     firebaseServiceSpy = {
       isAuthenticated: signal(false),
     };
 
-    paramMapSpy.get.and.returnValue(DEFAULT_LOCALE);
+    paramMapSpy.get.mockReturnValue(DEFAULT_LOCALE);
+
+    Element.prototype.scrollIntoView = vi.fn();
+
     await TestBed.configureTestingModule({
       imports: [MainComponent, GoogleMapStubComponent],
       providers: [
@@ -105,23 +141,31 @@ describe('MainComponent', () => {
   });
 
   it('should initialize with correct default values', () => {
-    expect(component.isAuthenticated()).toBeFalse();
-    expect(component.showLoader).toBeFalse();
+    expect(component.isAuthenticated()).toBe(false);
+    expect(component.showLoader).toBe(false);
     expect(component.navigationState()).toBe('close');
-    expect(component.showArrow).toBeFalse();
+    expect(component.showArrow).toBe(false);
   });
 
-  it('should navigate and scroll to element in scrollToElement', fakeAsync(() => {
+  it('should navigate and scroll to element in scrollToElement', async () => {
     const element = 'test-element';
-    navigationServiceSpy.navigate.and.returnValue(Promise.resolve(true));
+    navigationServiceSpy.navigate.mockResolvedValue(true);
 
     component.scrollToElement(element);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home'], undefined, jasmine.any(Function));
-  }));
+    await Promise.resolve();
+
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['home'],
+      undefined,
+      expect.any(Function),
+    );
+  });
 
   it('should initialize language on construction', () => {
-    expect(authUserServiceSpy.cookieConsent).toHaveBeenCalledWith(translateService);
+    expect(authUserServiceSpy.cookieConsent).toHaveBeenCalledWith(
+      translateService,
+    );
   });
 
   it('should toggle theme in changeTheme', () => {
@@ -134,13 +178,17 @@ describe('MainComponent', () => {
 
   it('should persist theme only when toggled by an authenticated user', () => {
     firebaseServiceSpy.isAuthenticated.set(true);
-    userStoreSpy.updateMyUser.calls.reset();
+    userStoreSpy.updateMyUser.mockClear();
 
     component.changeTheme();
 
     const authenticatedUser: IUser = new User();
     authenticatedUser.theme = 'dark-theme';
-    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(authenticatedUser, jasmine.any(String), jasmine.any(String));
+    expect(userStoreSpy.updateMyUser).toHaveBeenCalledWith(
+      authenticatedUser,
+      expect.any(String),
+      expect.any(String),
+    );
   });
 
   it('should dispatch Redirect action in redirect()', () => {
@@ -151,6 +199,10 @@ describe('MainComponent', () => {
   it('should call treatment and navigate to biab-treatment/treatment', () => {
     component.treatment();
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['home', 'biab-treatment', 'treatment']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'home',
+      'biab-treatment',
+      'treatment',
+    ]);
   });
 });

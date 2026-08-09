@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdditionalDetailsPageComponent } from './additional-details-page.component';
@@ -13,19 +14,21 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('AdditionalDetailsPageComponent', () => {
   let component: AdditionalDetailsPageComponent;
   let fixture: ComponentFixture<AdditionalDetailsPageComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let additionalStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   let treatmentStoreStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllGroups: jasmine.Spy;
+    loadAllGroups: Mock;
   };
 
   const id = '123';
@@ -38,19 +41,20 @@ describe('AdditionalDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     additionalStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
     treatmentStoreStoreSpy = {
       data: signal<any>(undefined),
-      loadAllGroups: jasmine.createSpy('loadAllGroups'),
+      loadAllGroups: vi.fn().mockName('loadAllGroups'),
     };
 
     await TestBed.configureTestingModule({
@@ -60,14 +64,18 @@ describe('AdditionalDetailsPageComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
-        { provide: DateAdapter, useValue: { setLocale: jasmine.createSpy() } },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(AdditionalComponent, '<input #groupInput />')
-      .overrideTemplate(AdditionalDetailsPageComponent, `
+    })
+      .overrideTemplate(AdditionalComponent, '<input #groupInput />')
+      .overrideTemplate(
+        AdditionalDetailsPageComponent,
+        `
         @if (additional(); as additional) {
           <app-additional [additional]="additional" [config]="config" />
         }
-      `)
+      `,
+      )
       .compileComponents();
 
     fixture = TestBed.createComponent(AdditionalDetailsPageComponent);
@@ -92,14 +100,17 @@ describe('AdditionalDetailsPageComponent', () => {
     additionalStoreSpy.selected.set(mockAdditional);
     fixture.detectChanges();
 
-    const additionalComponent = fixture.debugElement.children[0].componentInstance as AdditionalComponent;
+    const additionalComponent = fixture.debugElement.children[0]
+      .componentInstance as AdditionalComponent;
 
-    expect(additionalComponent.additional()).toEqual(jasmine.objectContaining({
-      id,
-      name: 'Test Additional',
-      description: 'Test Description',
-      duration: '00:30',
-    }));
+    expect(additionalComponent.additional()).toEqual(
+      expect.objectContaining({
+        id,
+        name: 'Test Additional',
+        description: 'Test Description',
+        duration: '00:30',
+      }),
+    );
   });
 
   it('should call update when additional is received', () => {
@@ -107,10 +118,13 @@ describe('AdditionalDetailsPageComponent', () => {
 
     component.submit(mockAdditional);
 
-    expect(additionalStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Additional',
-      description: 'Test Description',
-      duration: '00:30',
-    }));
+    expect(additionalStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Additional',
+        description: 'Test Description',
+        duration: '00:30',
+      }),
+    );
   });
 });

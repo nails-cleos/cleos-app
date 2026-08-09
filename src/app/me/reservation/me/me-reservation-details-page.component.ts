@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { MeReservationComponent } from './me-reservation.component';
 import { IReservation } from '@app/reservation/reservation';
 import { Role } from '@app/interfaces/token';
@@ -18,6 +23,4 @@ export class MeReservationDetailsPageComponent {
   submit(data: { reservation: IReservation; role: Role }) {
     this.reservationStore.updateById(this.id(), data.reservation, data.role);
   }
-
-
 }

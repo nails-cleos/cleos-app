@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MiniCardComponent } from './mini-card.component';
@@ -9,12 +10,15 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('MiniCardComponent', () => {
   let component: MiniCardComponent;
   let fixture: ComponentFixture<MiniCardComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     await TestBed.configureTestingModule({
       imports: [MiniCardComponent],
       providers: [
@@ -50,7 +54,9 @@ describe('MiniCardComponent', () => {
     fixture.componentRef.setInput('isCurrency', true);
     fixture.componentRef.setInput('isProjection', false);
     fixture.componentRef.setInput('isLoading', false);
-    fixture.componentRef.setInput('error', { message: 'Error occurred' } as IError);
+    fixture.componentRef.setInput('error', {
+      message: 'Error occurred',
+    } as IError);
 
     expect(component.title()).toBe('Test Title');
     expect(component.icon()).toBe('test-icon');
@@ -62,11 +68,11 @@ describe('MiniCardComponent', () => {
     expect(component.value()).toBe(1000);
     expect(component.previousPeriodValue()).toBe(850);
     expect(component.color()).toBe('primary');
-    expect(component.isIncrease()).toBeTrue();
-    expect(component.isInfinity()).toBeFalse();
-    expect(component.isCurrency()).toBeTrue();
-    expect(component.isProjection()).toBeFalse();
-    expect(component.isLoading()).toBeFalse();
+    expect(component.isIncrease()).toBe(true);
+    expect(component.isInfinity()).toBe(false);
+    expect(component.isCurrency()).toBe(true);
+    expect(component.isProjection()).toBe(false);
+    expect(component.isLoading()).toBe(false);
     expect(component.error()).toEqual({ message: 'Error occurred' } as IError);
     expect(component.language).toEqual(DEFAULT_LOCALE);
   });

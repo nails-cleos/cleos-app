@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { IPaymentOption } from '@app/interfaces/payment';
@@ -12,8 +17,18 @@ import { MatListItem } from '@angular/material/list';
   selector: 'app-payment-option-select',
   templateUrl: './payment-option-select.component.html',
   styleUrls: ['./payment-option-select.component.scss'],
-  imports: [MatFormField, MatLabel, MatSelect, MatOption, MatIcon, MatListItem, TranslatePipe, MatError,
-    ReactiveFormsModule, MatSelectTrigger],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatListItem,
+    TranslatePipe,
+    MatError,
+    ReactiveFormsModule,
+    MatSelectTrigger,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentOptionSelectComponent {
@@ -34,7 +49,7 @@ export class PaymentOptionSelectComponent {
     }
 
     const allowedTypes = new Set(allowedValues);
-    return options.filter(option => allowedTypes.has(option.type));
+    return options.filter((option) => allowedTypes.has(option.type));
   });
 
   getSelectedOption(): IPaymentOption | undefined {
@@ -46,7 +61,7 @@ export class PaymentOptionSelectComponent {
     }
 
     if (this.valueMode() === 'type') {
-      return options.find(option => option.type === value);
+      return options.find((option) => option.type === value);
     }
 
     return value as IPaymentOption;

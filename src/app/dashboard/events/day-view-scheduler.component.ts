@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, Injectable, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  Injectable,
+  input,
+  output,
+} from '@angular/core';
 import {
   CalendarUtils,
   CalendarWeekViewComponent,
@@ -19,13 +26,26 @@ import {
   WeekViewAllDayEvent,
   WeekViewTimeEvent,
 } from 'calendar-utils';
-import { DragEndEvent, DraggableDirective, DragMoveEvent, DroppableDirective } from 'angular-draggable-droppable';
+import {
+  DragEndEvent,
+  DraggableDirective,
+  DragMoveEvent,
+  DroppableDirective,
+} from 'angular-draggable-droppable';
 import { Day } from '@app/reservation/reservation';
 import { ConvertHMPipe } from '@app/pipes/convert-hm.pipe';
 import { DatePipe, NgClass, TitleCasePipe } from '@angular/common';
-import { ResizableDirective, ResizeHandleDirective } from 'angular-resizable-element';
+import {
+  ResizableDirective,
+  ResizeHandleDirective,
+} from 'angular-resizable-element';
 import { MatIcon } from '@angular/material/icon';
-import { MatCard, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
 
 export interface IProfessional {
   id: string;
@@ -74,7 +94,9 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
     };
 
     view.professionals.forEach((professional, columnIndex) => {
-      const events = args.events?.filter((event) => event.meta.professional.id === professional.id);
+      const events = args.events?.filter(
+        (event) => event.meta.professional.id === professional.id,
+      );
       const columnView = super.getWeekView({
         ...args,
         events,
@@ -100,10 +122,27 @@ export class DayViewSchedulerCalendarUtils extends CalendarUtils {
   selector: 'app-mwl-day-view-scheduler',
   templateUrl: './day-view-scheduler.component.html',
   styleUrls: ['./dashboard-event.component.scss'],
-  imports: [MatIcon, NgClass, DatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle,
-    ConvertHMPipe, DatePipe, NgClass, TitleCasePipe, CalendarWeekViewHourSegmentComponent,
-    CalendarWeekViewCurrentTimeMarkerComponent, DroppableDirective, DraggableDirective, ResizableDirective,
-    ResizeHandleDirective, CalendarWeekViewEventComponent, ClickDirective],
+  imports: [
+    MatIcon,
+    NgClass,
+    DatePipe,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    ConvertHMPipe,
+    DatePipe,
+    NgClass,
+    TitleCasePipe,
+    CalendarWeekViewHourSegmentComponent,
+    CalendarWeekViewCurrentTimeMarkerComponent,
+    DroppableDirective,
+    DraggableDirective,
+    ResizableDirective,
+    ResizeHandleDirective,
+    CalendarWeekViewEventComponent,
+    ClickDirective,
+  ],
   providers: [
     provideCalendar({
       provide: DateAdapter,
@@ -120,8 +159,11 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
   day = input.required<Day>();
   professionals = input<IProfessional[]>([]);
 
-  professionalChanged = output<{ event: CalendarEvent; newProfessional: IProfessional; }>();
-  segmentClicked = output<{ date: Date; professionalId: string; }>();
+  professionalChanged = output<{
+    event: CalendarEvent;
+    newProfessional: IProfessional;
+  }>();
+  segmentClicked = output<{ date: Date; professionalId: string }>();
 
   view!: DayViewScheduler;
 
@@ -142,22 +184,34 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
 
   trackByProfessionalId = (_: number, row: IProfessional) => row.id;
 
-  getDayColumnWidth = (
-    eventRowContainer: HTMLElement,
-  ): number => Math.floor(eventRowContainer.offsetWidth / this.professionals.length);
+  getDayColumnWidth = (eventRowContainer: HTMLElement): number =>
+    Math.floor(eventRowContainer.offsetWidth / this.professionals.length);
 
   dragMove = (dayEvent: WeekViewTimeEvent, dragEvent: DragMoveEvent): void => {
     if (this.snapDraggedEvents) {
-      const professional = this.getDraggedProfessionalColumn(dayEvent, dragEvent.x);
-      const newEventTimes = this.getDragMovedEventTimes(dayEvent, { ...dragEvent, x: 0 }, this.dayColumnWidth, true);
+      const professional = this.getDraggedProfessionalColumn(
+        dayEvent,
+        dragEvent.x,
+      );
+      const newEventTimes = this.getDragMovedEventTimes(
+        dayEvent,
+        { ...dragEvent, x: 0 },
+        this.dayColumnWidth,
+        true,
+      );
       const originalEvent = dayEvent.event;
       const adjustedEvent = {
         ...originalEvent,
         ...newEventTimes,
         meta: { ...originalEvent.meta, professional },
       };
-      const tempEvents = this.events.map((event) => event === originalEvent ? adjustedEvent : event);
-      this.restoreOriginalEvents(tempEvents, new Map([[adjustedEvent, originalEvent]]));
+      const tempEvents = this.events.map((event) =>
+        event === originalEvent ? adjustedEvent : event,
+      );
+      this.restoreOriginalEvents(
+        tempEvents,
+        new Map([[adjustedEvent, originalEvent]]),
+      );
     }
     this.dragAlreadyMoved = true;
   };
@@ -168,14 +222,27 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
     dayWidth: number,
     useY = false,
   ): void => {
-    super.dragEnded(weekEvent,
+    super.dragEnded(
+      weekEvent,
       {
         ...dragEndEvent,
         x: 0,
-      }, dayWidth, useY);
-    const newProfessional = this.getDraggedProfessionalColumn(weekEvent, dragEndEvent.x);
-    if (newProfessional && newProfessional !== weekEvent.event.meta.professional) {
-      this.professionalChanged.emit({ event: weekEvent.event, newProfessional });
+      },
+      dayWidth,
+      useY,
+    );
+    const newProfessional = this.getDraggedProfessionalColumn(
+      weekEvent,
+      dragEndEvent.x,
+    );
+    if (
+      newProfessional &&
+      newProfessional !== weekEvent.event.meta.professional
+    ) {
+      this.professionalChanged.emit({
+        event: weekEvent.event,
+        newProfessional,
+      });
     }
   };
 
@@ -225,8 +292,9 @@ export class DayViewSchedulerComponent extends CalendarWeekViewComponent {
     xPixels: number,
   ): IProfessional => {
     const columnsMoved = Math.round(xPixels / this.dayColumnWidth);
-    const currentColumnIndex = this.view.professionals
-      .findIndex((professional) => professional === dayEvent.event.meta.professional);
+    const currentColumnIndex = this.view.professionals.findIndex(
+      (professional) => professional === dayEvent.event.meta.professional,
+    );
     const newIndex = currentColumnIndex + columnsMoved;
     return this.view.professionals[newIndex];
   };

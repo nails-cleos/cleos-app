@@ -1,8 +1,13 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OverviewComponent } from './overview.component';
 import { BehaviorSubject } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IOverview } from '../user';
 import { IReservationOverview } from '@app/reservation/reservation';
@@ -12,11 +17,17 @@ import { UserStore } from '@app/store/user.store';
 import { NavigationService } from '@app/services/navigation.service';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('OverviewComponent', () => {
   let component: OverviewComponent;
   let fixture: ComponentFixture<OverviewComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language' | 'reload'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+    reload: ReturnType<typeof vi.fn>;
+  };
 
   let overviewSignal: WritableSignal<IOverview | undefined>;
   let errorSignal: WritableSignal<any>;
@@ -24,15 +35,21 @@ describe('OverviewComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let userStoreSpy: {
+    loadOverview: Mock;
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService',
-      ['navigate', 'back', 'reload'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      back: vi.fn().mockName('NavigationService.back'),
+      reload: vi.fn().mockName('NavigationService.reload'),
+      language: DEFAULT_LOCALE,
+    };
     overviewSignal = signal<IOverview | undefined>(undefined);
     errorSignal = signal(undefined);
     isLoadingSignal = signal(false);
@@ -44,18 +61,22 @@ describe('OverviewComponent', () => {
       },
     });
 
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['loadOverview']);
+    userStoreSpy = {
+      loadOverview: vi.fn().mockName('UserStore.loadOverview'),
+    };
     Object.assign(userStoreSpy, {
       overview: overviewSignal.asReadonly(),
       error: errorSignal.asReadonly(),
       isLoading: isLoadingSignal.asReadonly(),
-      clean: jasmine.createSpy('clean'),
+      clean: vi.fn().mockName('clean'),
     });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['authUser'], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [OverviewComponent],
@@ -116,14 +137,14 @@ describe('OverviewComponent', () => {
   });
 
   it('should set has admin role', () => {
-    authUserSignal.update(prev => ({ ...prev, hasAdminRole: true }));
+    authUserSignal.update((prev) => ({ ...prev, hasAdminRole: true }));
     fixture.detectChanges();
 
     expect(component['hasAdminRole']()).toBe(true);
   });
 
   it('should load overview when userId emits a value', () => {
-    userStoreSpy.loadOverview.calls.reset();
+    userStoreSpy.loadOverview.mockClear();
     fixture.componentRef.setInput('id', '123');
     fixture.detectChanges();
 
@@ -131,15 +152,19 @@ describe('OverviewComponent', () => {
   });
 
   it('should fill the overview data when overview$ emits a value', () => {
-    const miniCardOverview: IReservationOverview[] = [{
-      title: 'Account Balance',
-      primaryValue: '$1000',
-      color: 'primary',
-      icon: 'account_balance',
-    }];
-    const chartOverview: IChart[] = [{
-      title: 'Reservations Over Time',
-    }];
+    const miniCardOverview: IReservationOverview[] = [
+      {
+        title: 'Account Balance',
+        primaryValue: '$1000',
+        color: 'primary',
+        icon: 'account_balance',
+      },
+    ];
+    const chartOverview: IChart[] = [
+      {
+        title: 'Reservations Over Time',
+      },
+    ];
     const mockOverview: IOverview = {
       chartOverview,
       miniCardOverview,
@@ -168,10 +193,14 @@ describe('OverviewComponent', () => {
     overviewSignal.set(mockOverview);
     fixture.detectChanges();
 
-    expect(component.image).toBe(`data:image/jpeg;base64,${ mockOverview.account.customer.image }`);
+    expect(component.image).toBe(
+      `data:image/jpeg;base64,${mockOverview.account.customer.image}`,
+    );
     expect(component.initials).toBe('UT');
     expect(component.upcoming).toEqual([1, 2, 3]);
-    expect(component.miniCardData()).toEqual(jasmine.arrayContaining(miniCardOverview));
+    expect(component.miniCardData()).toEqual(
+      expect.arrayContaining(miniCardOverview),
+    );
     expect(component.charts()).toEqual(chartOverview);
     expect(component.customer).toEqual(mockOverview.account.customer);
   });

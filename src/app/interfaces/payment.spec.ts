@@ -1,8 +1,14 @@
 import { PaymentPercentage, PaymentStatus } from './payment';
+import { describe, expect, it } from 'vitest';
 
 describe('Payment helpers', () => {
   it('should create payment status', () => {
-    const status = new PaymentStatus('payment-1', 'MOLLIE', 'pref-1', PaymentPercentage.total);
+    const status = new PaymentStatus(
+      'payment-1',
+      'MOLLIE',
+      'pref-1',
+      PaymentPercentage.total,
+    );
 
     expect(status.paymentId).toBe('payment-1');
     expect(status.paymentType).toBe('MOLLIE');

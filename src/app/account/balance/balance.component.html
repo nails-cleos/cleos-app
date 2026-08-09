@@ -4,26 +4,70 @@
     @let lang = language();
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'ACCOUNT.BALANCE' | translate }}</span>
-        <h2 class="balance-title">{{ userAccount.balance | currency: $safeNavigationMigration(userAccount?.currency?.code): 'symbol': '1.2-2' }}</h2>
-        <p class="balance-subtitle">{{ 'ACCOUNT.TITLE' | translate }} {{ userAccount.id }}</p>
+        <span class="app-surface-eyebrow">{{
+          'ACCOUNT.BALANCE' | translate
+        }}</span>
+        <h2 class="balance-title">
+          {{
+            userAccount.balance
+              | currency
+                : $safeNavigationMigration(userAccount?.currency?.code)
+                : 'symbol'
+                : '1.2-2'
+          }}
+        </h2>
+        <p class="balance-subtitle">
+          {{ 'ACCOUNT.TITLE' | translate }} {{ userAccount.id }}
+        </p>
       </div>
 
       <div class="app-detail-actions">
         @if (showAdd()) {
-          <button mat-stroked-button [routerLink]="['/', lang, 'accounts', userAccount.id, 'transactions', 'add']" type="button">
+          <button
+            mat-stroked-button
+            [routerLink]="[
+              '/',
+              lang,
+              'accounts',
+              userAccount.id,
+              'transactions',
+              'add',
+            ]"
+            type="button"
+          >
             <mat-icon>add</mat-icon>
             <span>{{ 'COMMON.BUTTON.ADD' | translate }}</span>
           </button>
         }
         @if (showView()) {
-          <button mat-stroked-button [routerLink]="['/', lang, 'accounts', userAccount.id, 'transactions', 'view']" type="button">
+          <button
+            mat-stroked-button
+            [routerLink]="[
+              '/',
+              lang,
+              'accounts',
+              userAccount.id,
+              'transactions',
+              'view',
+            ]"
+            type="button"
+          >
             <mat-icon>account_balance</mat-icon>
             <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
           </button>
         }
         @if (showUser() && userAccount.customer) {
-          <button mat-stroked-button [routerLink]="['/', lang, 'accounts', 'customers', userAccount.customer.id]" type="button">
+          <button
+            mat-stroked-button
+            [routerLink]="[
+              '/',
+              lang,
+              'accounts',
+              'customers',
+              userAccount.customer.id,
+            ]"
+            type="button"
+          >
             <mat-icon>account_circle</mat-icon>
             <span>{{ 'ACCOUNT.TITLE' | translate }}</span>
           </button>
@@ -34,10 +78,23 @@
     <div class="balance-content">
       <div class="balance-gauge">
         <div id="account-spinner" class="spinner-parent-center">
-          <mat-progress-spinner [color]="'primary'" [mode]="'determinate'" [value]="balancePercentage" [diameter]="200"/>
+          <mat-progress-spinner
+            [color]="'primary'"
+            [mode]="'determinate'"
+            [value]="balancePercentage"
+            [diameter]="200"
+          />
         </div>
         <div class="spinner-text-inside">
-          <h1>{{ userAccount.balance | currency: $safeNavigationMigration(userAccount?.currency?.code): 'symbol': '1.2-2' }}</h1>
+          <h1>
+            {{
+              userAccount.balance
+                | currency
+                  : $safeNavigationMigration(userAccount?.currency?.code)
+                  : 'symbol'
+                  : '1.2-2'
+            }}
+          </h1>
         </div>
       </div>
     </div>

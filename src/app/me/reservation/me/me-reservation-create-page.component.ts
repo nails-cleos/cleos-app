@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { MeReservationComponent } from './me-reservation.component';
 import { RoomStore } from '@app/store/room.store';
 import { IReservation } from '@app/reservation/reservation';
@@ -7,7 +12,8 @@ import { ReservationStore } from '@app/store/reservation.store';
 
 @Component({
   selector: 'app-me-reservation-create-page',
-  template: '<app-me-reservation [rooms]="rooms()" [params]="params()" (submitData)="submit($event)" />',
+  template:
+    '<app-me-reservation [rooms]="rooms()" [params]="params()" (submitData)="submit($event)" />',
   imports: [MeReservationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

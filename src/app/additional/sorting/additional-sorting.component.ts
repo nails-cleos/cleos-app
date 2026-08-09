@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import {
   DragDropSortingComponent,
   ISorted,
@@ -25,8 +31,16 @@ export class AdditionalSortingComponent {
   });
   private responseSignal = this.additionalStore.response;
 
-  itemsSignal = computed(() => this.additionalListSignal()?.map(
-    (iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)));
+  itemsSignal = computed(() =>
+    this.additionalListSignal()?.map(
+      (iAdditionalAll: IAdditionalAll) =>
+        new ItemSorting(
+          iAdditionalAll.id,
+          iAdditionalAll.name,
+          iAdditionalAll.order,
+        ),
+    ),
+  );
   isLoading = this.additionalStore.isLoading;
 
   constructor() {
@@ -40,5 +54,6 @@ export class AdditionalSortingComponent {
     });
   }
 
-  sorted = (additionalList: ISorted[]): void => this.additionalStore.sort(additionalList);
+  sorted = (additionalList: ISorted[]): void =>
+    this.additionalStore.sort(additionalList);
 }

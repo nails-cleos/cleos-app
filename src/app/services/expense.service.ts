@@ -1,17 +1,24 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { IExpense, IExpenseAll, IExpenseInfo } from '../room/me/expense/expense';
+import {
+  IExpense,
+  IExpenseAll,
+  IExpenseInfo,
+} from '../room/me/expense/expense';
 import { createFilter } from '../util/service-helper';
 import { SortDirection } from '@angular/material/sort';
 import { IApiResponse } from '../interfaces/common';
-import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import {
+  paginated,
+  Pagination,
+  skipLoadingOverlay,
+} from '../interfaces/pagination';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExpenseService {
-
   private urlV1 = 'v1/rooms/{roomId}/expenses';
 
   private http: HttpClient = inject(HttpClient);
@@ -30,20 +37,25 @@ export class ExpenseService {
       params = params.append('date', dateFilter);
     }
 
-    return this.http.get<Pagination<IExpenseAll>>(this.updatePathVariable(roomId, ['pages']),
-      { ...paginated(), params });
+    return this.http.get<Pagination<IExpenseAll>>(
+      this.updatePathVariable(roomId, ['pages']),
+      { ...paginated(), params },
+    );
   };
 
-  getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> => this.http.get<IExpenseInfo>(
-    this.updatePathVariable(roomId, ['info']), { ...skipLoadingOverlay() },
-  );
+  getAllExpensesInfo = (roomId: string): Observable<IExpenseInfo> =>
+    this.http.get<IExpenseInfo>(this.updatePathVariable(roomId, ['info']), {
+      ...skipLoadingOverlay(),
+    });
 
   getExpense = (
     roomId: string,
     id: string,
-  ): Observable<IExpenseAll | undefined> => this.http.get<IExpenseAll | undefined>(
-    this.updatePathVariable(roomId, [id]), { ...skipLoadingOverlay() },
-  );
+  ): Observable<IExpenseAll | undefined> =>
+    this.http.get<IExpenseAll | undefined>(
+      this.updatePathVariable(roomId, [id]),
+      { ...skipLoadingOverlay() },
+    );
 
   createExpense = (
     roomId: string,
@@ -52,16 +64,21 @@ export class ExpenseService {
   ): Observable<IApiResponse> => {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(expense)], {
+      type: 'application/json',
+    });
     formData.append('expense', blob);
 
     const headers = new HttpHeaders().set('Upload', 'true');
-    return this.http.post<IApiResponse>(this.updatePathVariable(roomId), formData, { headers });
+    return this.http.post<IApiResponse>(
+      this.updatePathVariable(roomId),
+      formData,
+      { headers },
+    );
   };
 
-  deleteExpense = (roomId: string, id: string): Observable<void> => this.http.delete<void>(
-    this.updatePathVariable(roomId, [id]),
-  );
+  deleteExpense = (roomId: string, id: string): Observable<void> =>
+    this.http.delete<void>(this.updatePathVariable(roomId, [id]));
 
   updateExpense = (
     id: string,
@@ -73,18 +90,27 @@ export class ExpenseService {
     if (file) {
       formData.append('file', file, file.name);
     }
-    const blob = new Blob([JSON.stringify(expense)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(expense)], {
+      type: 'application/json',
+    });
     formData.append('expense', blob);
 
     const headers = new HttpHeaders().set('Upload', 'true');
 
-    return this.http.patch<IApiResponse>(this.updatePathVariable(roomId, [id]), formData, { headers });
+    return this.http.patch<IApiResponse>(
+      this.updatePathVariable(roomId, [id]),
+      formData,
+      { headers },
+    );
   };
 
-  private updatePathVariable(roomId: string, args?: (string | null | undefined)[]): string {
+  private updatePathVariable(
+    roomId: string,
+    args?: (string | null | undefined)[],
+  ): string {
     let url = this.urlV1;
     if (args && args.length) {
-      url = `${ this.urlV1 }/${ args.join('/') }`;
+      url = `${this.urlV1}/${args.join('/')}`;
     }
     return url.replace('{roomId}', roomId);
   }

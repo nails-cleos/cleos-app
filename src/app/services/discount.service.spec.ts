@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { DiscountService } from './discount.service';
@@ -9,7 +10,12 @@ import { DiscountType, IDiscountAll } from '../discount/discount';
 
 describe('DiscountService', () => {
   let service: DiscountService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockDiscountAll: IDiscountAll = {
     amount: 10,
@@ -28,12 +34,14 @@ describe('DiscountService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        DiscountService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [DiscountService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(DiscountService);
   });
@@ -47,14 +55,17 @@ describe('DiscountService', () => {
     const size = 10;
     const sort = 'name';
     const direction = 'asc';
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.mockReturnValue(of(mockPagination));
 
-    service.getDiscountsPage(page, sort, direction, size).subscribe((result) => {
-      expect(result).toEqual(mockPagination);
-    });
+    service
+      .getDiscountsPage(page, sort, direction, size)
+      .subscribe((result) => {
+        expect(result).toEqual(mockPagination);
+      });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/discounts/pages', {
-      params: createFilter(page, size, sort, direction), ...paginated(),
+      params: createFilter(page, size, sort, direction),
+      ...paginated(),
     });
   });
 });

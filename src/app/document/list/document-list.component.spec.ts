@@ -1,3 +1,12 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -8,8 +17,11 @@ import { DocumentListComponent } from './document-list.component';
 import { DriveAccessService } from '@app/services/drive-access.service';
 import { IOfficeAll } from '@app/office/office';
 import { DocumentTypeEnum, IDocument } from '../document';
-import { getDateQuarter, getNowTimeZone, monthViewTitle } from '@app/util/dates';
-import { MatDatepicker } from '@angular/material/datepicker';
+import {
+  getDateQuarter,
+  getNowTimeZone,
+  monthViewTitle,
+} from '@app/util/dates';
 import { DocumentStore } from '@app/store/document.store';
 import { OfficeStore } from '@app/store/office.store';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -17,23 +29,33 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('DocumentListComponent', () => {
   let component: DocumentListComponent;
   let fixture: ComponentFixture<DocumentListComponent>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let driveAccessServiceSpy: {
+    requestAccessIfNeeded: Mock;
+  };
   let documentStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    download: jasmine.Spy;
-    downloadZip: jasmine.Spy;
+    clean: Mock;
+    clearResponse: Mock;
+    loadPage: Mock;
+    download: Mock;
+    downloadZip: Mock;
   };
   let officeStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
-    loadMyOffices: jasmine.Spy;
+    loadMyOffices: Mock;
   };
 
   const mockOffice: IOfficeAll = {
@@ -43,8 +65,18 @@ describe('DocumentListComponent', () => {
   };
 
   const mockDocument: IDocument[] = [
-    { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense },
-    { id: '2', name: 'Document 2', date: new Date(2024, 1, 1), type: DocumentTypeEnum.invoice },
+    {
+      id: '1',
+      name: 'Document 1',
+      date: new Date(2024, 2, 1),
+      type: DocumentTypeEnum.expense,
+    },
+    {
+      id: '2',
+      name: 'Document 2',
+      date: new Date(2024, 1, 1),
+      type: DocumentTypeEnum.invoice,
+    },
   ];
 
   const mockPagination = {
@@ -63,31 +95,39 @@ describe('DocumentListComponent', () => {
       },
     });
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    driveAccessServiceSpy = {
+      requestAccessIfNeeded: vi
+        .fn()
+        .mockName('DriveAccessService.requestAccessIfNeeded'),
+    };
     documentStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(mockPagination),
       response: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      loadPage: jasmine.createSpy('loadPage'),
-      download: jasmine.createSpy('download'),
-      downloadZip: jasmine.createSpy('downloadZip'),
+      clean: vi.fn().mockName('clean'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      loadPage: vi.fn().mockName('loadPage'),
+      download: vi.fn().mockName('download'),
+      downloadZip: vi.fn().mockName('downloadZip'),
     };
     officeStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(undefined),
-      loadMyOffices: jasmine.createSpy('loadMyOffices'),
+      loadMyOffices: vi.fn().mockName('loadMyOffices'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [DocumentListComponent],
@@ -109,6 +149,7 @@ describe('DocumentListComponent', () => {
 
   afterEach(() => {
     breakpoint$.complete();
+    vi.resetAllMocks();
   });
 
   it('should create', () => {
@@ -174,7 +215,12 @@ describe('DocumentListComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(documentStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -193,30 +239,37 @@ describe('DocumentListComponent', () => {
     component.getForm.date.setValue(date);
     officeStoreSpy.data.set({ kind: 'list', value: [mockOffice] });
     fixture.detectChanges();
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
 
-    component['paginator'] = signal(paginatorMock);
+    component['paginator'] = signal(paginatorMock) as any;
 
     documentStoreSpy.response.set({ success: true });
 
     fixture.detectChanges();
 
     expect(documentStoreSpy.clearResponse).toHaveBeenCalled();
-    expect(documentStoreSpy.loadPage).toHaveBeenCalledWith(jasmine.objectContaining({
-      officeId: mockOffice.id,
-      date,
-      page: 0,
-      sort: 'date',
-      direction: 'desc',
-      size: PAGE_SIZE,
-    }));
+    expect(documentStoreSpy.loadPage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        officeId: mockOffice.id,
+        date,
+        page: 0,
+        sort: 'date',
+        direction: 'desc',
+        size: PAGE_SIZE,
+      }),
+    );
   });
 
   it('should dispatch documentSelected when edit is called', () => {
     const item = mockDocument[0];
     component.download(item);
 
-    expect(documentStoreSpy.download).toHaveBeenCalledWith({ id: item.id, fileName: item.name });
+    expect(documentStoreSpy.download).toHaveBeenCalledWith({
+      id: item.id,
+      fileName: item.name,
+    });
   });
 
   it('should auto-select office when only one office is available', () => {
@@ -238,7 +291,14 @@ describe('DocumentListComponent', () => {
   it('should filter office correctly using filteredOfficeSignal', () => {
     officeStoreSpy.data.set({
       kind: 'list',
-      value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+      value: [
+        mockOffice,
+        {
+          id: '2',
+          name: 'Another Office',
+          manager: { id: '1', displayName: 'Officer' },
+        },
+      ],
     });
     (component.getForm.office as any).setValue('A');
     fixture.detectChanges();
@@ -256,19 +316,25 @@ describe('DocumentListComponent', () => {
 
   describe('setMonthAndYear', () => {
     it('should set month and year from undefined date', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = getNowTimeZone();
       component.getForm.date.setValue(undefined);
 
       component.setMonthAndYear(newDate, mockDatepicker);
 
       expect(component.getForm.date.value?.getMonth()).toBe(newDate.getMonth());
-      expect(component.getForm.date.value?.getFullYear()).toBe(newDate.getFullYear());
+      expect(component.getForm.date.value?.getFullYear()).toBe(
+        newDate.getFullYear(),
+      );
       expect(mockDatepicker.close).toHaveBeenCalled();
     });
 
     it('should set month and year from normalized date', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = new Date(2024, 5, 1);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
@@ -280,7 +346,9 @@ describe('DocumentListComponent', () => {
     });
 
     it('should close datepicker after setting date', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = new Date(2024, 3, 1);
       component.getForm.date.setValue(new Date());
 
@@ -302,7 +370,7 @@ describe('DocumentListComponent', () => {
       expect(documentStoreSpy.downloadZip).toHaveBeenCalledWith({
         officeId: mockOffice.id,
         date,
-        fileName: `${ mockOffice.name } Q${ getDateQuarter(date) } ${ monthViewTitle(date) }.zip`,
+        fileName: `${mockOffice.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`,
       });
     });
 
@@ -311,7 +379,14 @@ describe('DocumentListComponent', () => {
       component.getForm.date.setValue(date);
       officeStoreSpy.data.set({
         kind: 'list',
-        value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+        value: [
+          mockOffice,
+          {
+            id: '2',
+            name: 'Another Office',
+            manager: { id: '1', displayName: 'Officer' },
+          },
+        ],
       });
       fixture.detectChanges();
 
@@ -332,7 +407,7 @@ describe('DocumentListComponent', () => {
   });
 
   it('should emit add button', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.addOutput.subscribe(emitSpy);
 
     fixture.detectChanges();
@@ -343,10 +418,15 @@ describe('DocumentListComponent', () => {
   });
 
   it('should emit edit button', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.editOutput.subscribe(emitSpy);
 
-    const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+    const document = {
+      id: '1',
+      name: 'Document 1',
+      date: new Date(2024, 2, 1),
+      type: DocumentTypeEnum.expense,
+    };
 
     fixture.detectChanges();
 
@@ -356,10 +436,15 @@ describe('DocumentListComponent', () => {
   });
 
   it('should emit delete button', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.deleteOutput.subscribe(emitSpy);
 
-    const document = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+    const document = {
+      id: '1',
+      name: 'Document 1',
+      date: new Date(2024, 2, 1),
+      type: DocumentTypeEnum.expense,
+    };
 
     fixture.detectChanges();
 

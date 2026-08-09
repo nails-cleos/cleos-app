@@ -1,6 +1,11 @@
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import { configs, templateParser, templatePlugin, tsPlugin, } from 'angular-eslint';
+import {
+  configs,
+  templateParser,
+  templatePlugin,
+  tsPlugin,
+} from 'angular-eslint';
 import cypress from 'eslint-plugin-cypress';
 
 export default tseslint.config(
@@ -27,10 +32,7 @@ export default tseslint.config(
 
     languageOptions: {
       parserOptions: {
-        project: [
-          './tsconfig.json',
-          './e2e/tsconfig.json',
-        ],
+        project: ['./tsconfig.json', './e2e/tsconfig.json'],
       },
     },
 
@@ -39,15 +41,9 @@ export default tseslint.config(
     },
 
     rules: {
-      quotes: [
-        'error',
-        'single',
-      ],
+      quotes: ['error', 'single'],
 
-      semi: [
-        'error',
-        'always',
-      ],
+      semi: ['error', 'always'],
 
       'no-console': [
         'error',
@@ -58,10 +54,7 @@ export default tseslint.config(
 
       eqeqeq: 'error',
 
-      curly: [
-        'error',
-        'all',
-      ],
+      curly: ['error', 'all'],
 
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
@@ -80,20 +73,11 @@ export default tseslint.config(
 
       'no-shadow': 'off',
 
-      'comma-dangle': [
-        'error',
-        'always-multiline',
-      ],
+      'comma-dangle': ['error', 'always-multiline'],
 
-      'object-curly-spacing': [
-        'error',
-        'always',
-      ],
+      'object-curly-spacing': ['error', 'always'],
 
-      'array-bracket-spacing': [
-        'error',
-        'never',
-      ],
+      'array-bracket-spacing': ['error', 'never'],
 
       '@typescript-eslint/no-explicit-any': 'off',
 
@@ -144,6 +128,9 @@ export default tseslint.config(
     },
     rules: {
       ...cypress.configs.recommended.rules,
+      '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'cypress/no-unnecessary-waiting': 'warn',
     },
   },
   {

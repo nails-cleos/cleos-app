@@ -4,7 +4,9 @@
       <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>badge</mat-icon>
       </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.PROFESSIONAL.SELECT' | translate }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">
+        {{ 'RESERVATION.PROFESSIONAL.SELECT' | translate }}
+      </h1>
     </div>
   </div>
 
@@ -15,17 +17,36 @@
       @if (professionals()) {
         <mat-form-field appearance="outline">
           <mat-label>{{ 'COMMON.PROFESSIONAL.FIELD' | translate }}</mat-label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional"
-                 [matAutocomplete]="autoProfessional" autocomplete="off" matInput required type="text">
-          <mat-autocomplete #autoProfessional="matAutocomplete" [displayWith]="displayFnUser">
-            @for (professional of filteredProfessionalSignal(); track professional) {
-              <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+          <input
+            (keydown)="keyDownHandler($event)"
+            [formControl]="getForm.professional"
+            [matAutocomplete]="autoProfessional"
+            autocomplete="off"
+            matInput
+            required
+            type="text"
+          />
+          <mat-autocomplete
+            #autoProfessional="matAutocomplete"
+            [displayWith]="displayFnUser"
+          >
+            @for (
+              professional of filteredProfessionalSignal();
+              track professional
+            ) {
+              <mat-option [value]="professional">{{
+                professional.displayName
+              }}</mat-option>
             }
           </mat-autocomplete>
           @if (getForm.professional.hasError('required')) {
-            <mat-error [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COMMON.PROFESSIONAL.REQUIRED' | translate"
+            ></mat-error>
           } @else if (getForm.professional.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COMMON.PROFESSIONAL.INVALID' | translate"
+            ></mat-error>
           }
         </mat-form-field>
       } @else {
@@ -37,8 +58,16 @@
   <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
   <div mat-dialog-actions class="app-detail-actions">
-    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" [disabled]="form.invalid" cdkFocusInitial mat-stroked-button type="button">
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
+    <button
+      (click)="doAction()"
+      [disabled]="form.invalid"
+      cdkFocusInitial
+      mat-stroked-button
+      type="button"
+    >
       {{ 'COMMON.BUTTON.UPDATE' | translate }}
     </button>
   </div>

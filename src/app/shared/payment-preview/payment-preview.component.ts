@@ -5,14 +5,27 @@ import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { IPrice } from '@app/treatment/treatment';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';
 import { MatIcon } from '@angular/material/icon';
-import { MatDivider, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatDivider,
+  MatListItem,
+  MatListItemIcon,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
 
 @Component({
   selector: 'app-payment-preview',
   templateUrl: './payment-preview.component.html',
   styleUrls: ['./payment-preview.component.scss'],
-  imports: [MatIcon, MatListItem, MatListSubheaderCssMatStyler, TranslatePipe, MatListItemIcon, CurrencySymbolPipe,
-    PricePreviewComponent, MatDivider],
+  imports: [
+    MatIcon,
+    MatListItem,
+    MatListSubheaderCssMatStyler,
+    TranslatePipe,
+    MatListItemIcon,
+    CurrencySymbolPipe,
+    PricePreviewComponent,
+    MatDivider,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PaymentPreviewComponent {

@@ -1,5 +1,14 @@
 import { inject, Injectable } from '@angular/core';
-import { from, interval, map, Observable, of, switchMap, throwError, timer } from 'rxjs';
+import {
+  from,
+  interval,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+  timer,
+} from 'rxjs';
 import { filter, take } from 'rxjs/operators';
 import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
 import type { AwsCredentialIdentityProvider } from '@smithy/types';
@@ -29,13 +38,14 @@ class AwsLambdaService {
     file: File,
     userId?: string,
   ): Observable<IAwsExtract> {
-
     const jobId = crypto.randomUUID();
 
     return this.getCredentials(firebaseIdToken).pipe(
-      switchMap(credentials =>
+      switchMap((credentials) =>
         from(file.arrayBuffer()).pipe(
-          switchMap(buffer => this.uploadPdfToS3(credentials, buffer, file, jobId)),
+          switchMap((buffer) =>
+            this.uploadPdfToS3(credentials, buffer, file, jobId),
+          ),
           switchMap(() => this.startStepFunction(credentials, jobId, userId)),
           switchMap(() => timer(10000)),
           switchMap(() => this.pollResult(jobId, credentials)),
@@ -58,15 +68,22 @@ class AwsLambdaService {
           return throwError(() => new Error('Textract result not ready'));
         }
 
-        return this.callLambda(credentials, this.getPDFLambdaUrl, 'application/json', JSON.stringify({ JobId: jobId }));
+        return this.callLambda(
+          credentials,
+          this.getPDFLambdaUrl,
+          'application/json',
+          JSON.stringify({ JobId: jobId }),
+        );
       }),
-      filter(res => res.status !== 202),
-      map(res => res.body as IAwsExtract),
+      filter((res) => res.status !== 202),
+      map((res) => res.body as IAwsExtract),
       take(1),
     );
   }
 
-  private getCredentials(firebaseIdToken: string): Observable<AwsCredentialIdentityProvider> {
+  private getCredentials(
+    firebaseIdToken: string,
+  ): Observable<AwsCredentialIdentityProvider> {
     return of(
       fromCognitoIdentityPool({
         clientConfig: { region: this.region },
@@ -84,9 +101,8 @@ class AwsLambdaService {
     file: File,
     jobId: string,
   ): Observable<void> {
-
     const s3 = new S3Client({ region: this.region, credentials });
-    const key = `uploads/${ jobId }.pdf`;
+    const key = `uploads/${jobId}.pdf`;
 
     return from(
       s3.send(
@@ -145,7 +161,7 @@ class AwsLambdaService {
     });
 
     return from(signer.sign(request)).pipe(
-      switchMap(async signed => {
+      switchMap(async (signed) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { host, ...headers } = signed.headers;
         const response = await fetch(lambdaUrl, {

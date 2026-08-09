@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
@@ -14,7 +15,13 @@ import { DEFAULT_LOCALE } from '../util/dates';
 describe('OfficeComponent', () => {
   let component: OfficeComponent;
   let fixture: ComponentFixture<OfficeComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let officeStoreSpy: {
     subErrors: ReturnType<typeof signal>;
@@ -37,9 +44,11 @@ describe('OfficeComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     officeStoreSpy = {
       subErrors: signal<any>(undefined),
       isLoading: signal(false),
@@ -76,20 +85,18 @@ describe('OfficeComponent', () => {
   });
 
   it('should handle form errors from subErrorsSignal', () => {
-    const errors = [
-      { field: 'name', message: 'Name required' },
-    ];
+    const errors = [{ field: 'name', message: 'Name required' }];
 
     officeStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
   });
 
   it('should not call store when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('');
@@ -101,7 +108,7 @@ describe('OfficeComponent', () => {
   });
 
   it('should call create when in add mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('New Office');
@@ -111,19 +118,19 @@ describe('OfficeComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Office',
-      managerId: mockManager.id,
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Office',
+        managerId: mockManager.id,
+      }),
+    );
   });
 
   it('should call update when in edit mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('id', 'abc-123');
-    fixture.detectChanges();
     fixture.componentRef.setInput('office', mockOffice);
     fixture.detectChanges();
 
@@ -134,17 +141,33 @@ describe('OfficeComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      subject: 'Updated subject',
-      name: 'Updated Office',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: 'Updated subject',
+        name: 'Updated Office',
+      }),
+    );
   });
 
   it('should filter managers correctly', () => {
     const managers: IUserAll[] = [
-      { id: 'p1', displayName: 'Alice', email: '', locale: '', timeZone: '', authorities: [] },
-      { id: 'p2', displayName: 'Bob', email: '', locale: '', timeZone: '', authorities: [] },
+      {
+        id: 'p1',
+        displayName: 'Alice',
+        email: '',
+        locale: '',
+        timeZone: '',
+        authorities: [],
+      },
+      {
+        id: 'p2',
+        displayName: 'Bob',
+        email: '',
+        locale: '',
+        timeZone: '',
+        authorities: [],
+      },
     ];
     const result = component['filter']('A', managers);
     expect(result?.length).toBe(1);
@@ -153,6 +176,9 @@ describe('OfficeComponent', () => {
 
   it('should navigate to add manager page', () => {
     component.addManager();
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'add'], { state: { role: Role.manager } });
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['users', 'add'],
+      { state: { role: Role.manager } },
+    );
   });
 });

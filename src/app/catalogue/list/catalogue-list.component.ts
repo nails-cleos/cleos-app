@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -23,13 +29,24 @@ import { NavigationService } from '@app/services/navigation.service';
   selector: 'app-catalogue-list',
   templateUrl: './catalogue-list.component.html',
   styleUrls: ['./catalogue-list.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, RouterLink, CdkDropList, CdkDrag, CdkDragHandle, CdkDragPreview,
-    CardListSkeletonComponent],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    RouterLink,
+    CdkDropList,
+    CdkDrag,
+    CdkDragHandle,
+    CdkDragPreview,
+    CardListSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueListComponent {
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly responseSignal = this.catalogueStore.response;
@@ -38,7 +55,9 @@ export class CatalogueListComponent {
 
   catalogues = computed(() => {
     const list = this.cataloguesSignal() || [];
-    return list.map(it => it.blob ? { ...it, image: `data:image/jpeg;base64,${it.blob}` } : it);
+    return list.map((it) =>
+      it.blob ? { ...it, image: `data:image/jpeg;base64,${it.blob}` } : it,
+    );
   });
   isLoading = computed(() => this.isLoadingSignal());
 
@@ -70,11 +89,18 @@ export class CatalogueListComponent {
 
   delete(catalogue: ICatalogueAll): void {
     const title = this.translateService.instant('CATALOGUE.DELETED.TITLE');
-    const content = this.translateService.instant('CATALOGUE.DELETED.CONTENT', { name: catalogue.name });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: catalogue, variant: 'warning' }, result => {
-      if (result) {
-        this.catalogueStore.delete(result.id, result.name);
-      }
+    const content = this.translateService.instant('CATALOGUE.DELETED.CONTENT', {
+      name: catalogue.name,
     });
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: catalogue, variant: 'warning' },
+      (result) => {
+        if (result) {
+          this.catalogueStore.delete(result.id, result.name);
+        }
+      },
+    );
   }
 }

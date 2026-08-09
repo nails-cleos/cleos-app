@@ -4,20 +4,25 @@ import { firstValueFrom, of } from 'rxjs';
 
 import { EnvService } from '../services/env.service';
 import { noopInterceptor } from './noop-interceptor';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('noopInterceptor', () => {
   const envMock = {
     baseUrl: 'https://api.example.com',
   } as EnvService;
 
-  const runInterceptor = async (req: HttpRequest<unknown>): Promise<HttpRequest<unknown>> => {
+  const runInterceptor = async (
+    req: HttpRequest<unknown>,
+  ): Promise<HttpRequest<unknown>> => {
     let capturedRequest: HttpRequest<unknown> | undefined;
     const next: HttpHandlerFn = (request: HttpRequest<unknown>) => {
       capturedRequest = request;
       return of(new HttpResponse({ status: 200 }));
     };
 
-    await firstValueFrom(TestBed.runInInjectionContext(() => noopInterceptor(req, next)));
+    await firstValueFrom(
+      TestBed.runInInjectionContext(() => noopInterceptor(req, next)),
+    );
 
     expect(capturedRequest).toBeDefined();
     return capturedRequest as HttpRequest<unknown>;
@@ -25,9 +30,7 @@ describe('noopInterceptor', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        { provide: EnvService, useValue: envMock },
-      ],
+      providers: [{ provide: EnvService, useValue: envMock }],
     });
   });
 

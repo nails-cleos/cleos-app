@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrencyDetailsPageComponent } from './currency-details-page.component';
@@ -10,9 +11,9 @@ describe('CurrencyDetailsPageComponent', () => {
 
   let currencyStoreSpy: {
     selected: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -27,17 +28,16 @@ describe('CurrencyDetailsPageComponent', () => {
   beforeEach(async () => {
     currencyStoreSpy = {
       selected: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CurrencyDetailsPageComponent],
-      providers: [
-        { provide: CurrencyStore, useValue: currencyStoreSpy },
-      ],
-    }).overrideTemplate(CurrencyDetailsPageComponent, '')
+      providers: [{ provide: CurrencyStore, useValue: currencyStoreSpy }],
+    })
+      .overrideTemplate(CurrencyDetailsPageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(CurrencyDetailsPageComponent);
@@ -62,10 +62,13 @@ describe('CurrencyDetailsPageComponent', () => {
 
     component.submit(mockCurrency);
 
-    expect(currencyStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Currency',
-      code: 'EUR',
-      icon: 'euro',
-    }));
+    expect(currencyStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Currency',
+        code: 'EUR',
+        icon: 'euro',
+      }),
+    );
   });
 });

@@ -1,4 +1,13 @@
-import { Component, computed, effect, inject, input, output, viewChild, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  viewChild,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
@@ -7,7 +16,13 @@ import { createMatTableState } from '@app/util/mat-table-state';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { DriveAccessService } from '@app/services/drive-access.service';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { requireMatch } from '@app/util/validators';
 import { IOfficeAll } from '@app/office/office';
 import { map, startWith } from 'rxjs/operators';
@@ -17,16 +32,37 @@ import { DocumentStore } from '@app/store/document.store';
 import { OfficeStore } from '@app/store/office.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '@app/util/adapter/app-date.provider';
-import { getDateQuarter, getNowTimeZone, monthViewTitle } from '@app/util/dates';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import {
+  getDateQuarter,
+  getNowTimeZone,
+  monthViewTitle,
+} from '@app/util/dates';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { EnvService } from '@app/services/env.service';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatList,
+  MatListItem,
+  MatListItemIcon,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import {
   MatCell,
   MatCellDef,
@@ -44,7 +80,10 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
 
 type DocumentsForm = {
@@ -54,12 +93,49 @@ type DocumentsForm = {
 
 @Component({
   selector: 'app-document-list',
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatOption,
-    MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton, MatButton, ReactiveFormsModule,
-    TranslatePipe, DatePipe, MatAutocomplete, MatError, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
-    MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell,
-    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatSuffix,
-    MatAutocompleteTrigger, TableSkeletonComponent, SkeletonComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatOption,
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatListSubheaderCssMatStyler,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    DatePipe,
+    MatAutocomplete,
+    MatError,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatListItemIcon,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    MatSuffix,
+    MatAutocompleteTrigger,
+    TableSkeletonComponent,
+    SkeletonComponent,
+  ],
   templateUrl: './document-list.component.html',
   styleUrl: './document-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,17 +151,29 @@ export class DocumentListComponent {
   deleteOutput = output<IDocument>();
 
   private readonly env: EnvService = inject(EnvService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly officeStore = inject(OfficeStore);
   private readonly documentStore = inject(DocumentStore);
-  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+  private readonly driveAccessService: DriveAccessService =
+    inject(DriveAccessService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'date', 'desc');
+  private tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'date',
+    'desc',
+  );
 
   private allOfficesSignal = computed(() => {
     const data = this.officeStore.data();
@@ -93,24 +181,24 @@ export class DocumentListComponent {
   });
   private dataSignal = this.documentStore.data;
   private responseSignal = this.documentStore.response;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = this.documentStore.isLoading;
   isOfficeLoading = this.officeStore.isLoading;
   dataSourceSignal = computed(() => this.dataSignal()?.content ?? []);
   resultsLengthSignal = computed(() => this.dataSignal()?.totalElements || 0);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
 
   tableColumns: TableSkeletonColumn[] = [
     { key: 'position' },
@@ -133,7 +221,9 @@ export class DocumentListComponent {
   filteredOfficeSignal = toSignal(
     this.getForm.office.valueChanges.pipe(
       startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.code,
+      ),
       combineLatestWith(toObservable(this.allOfficesSignal)),
       map(([name, offices]) => {
         if (name) {
@@ -187,7 +277,9 @@ export class DocumentListComponent {
       });
     });
 
-    this.tableState.resetOn(this.responseSignal, () => this.documentStore.clearResponse());
+    this.tableState.resetOn(this.responseSignal, () =>
+      this.documentStore.clearResponse(),
+    );
 
     effect(() => {
       const data = this.dataSourceSignal()?.[0]?.id;
@@ -213,7 +305,10 @@ export class DocumentListComponent {
     return this.env.googleDriveUploadFile;
   }
 
-  setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
+  setMonthAndYear = (
+    normalizedMonthAndYear: Date,
+    datepicker: Pick<MatDatepicker<Date>, 'close'>,
+  ): void => {
     const ctrlValue = new Date(this.getForm.date.value || getNowTimeZone());
     ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
@@ -223,7 +318,8 @@ export class DocumentListComponent {
     datepicker.close();
   };
 
-  download = (document: IDocument): void => this.documentStore.download({ id: document.id, fileName: document.name });
+  download = (document: IDocument): void =>
+    this.documentStore.download({ id: document.id, fileName: document.name });
 
   add = (): void => {
     this.addOutput.emit();
@@ -243,7 +339,7 @@ export class DocumentListComponent {
     if (!office || !date) {
       return;
     }
-    const fileName = `${ office.name } Q${ getDateQuarter(date) } ${ monthViewTitle(date) }.zip`;
+    const fileName = `${office.name} Q${getDateQuarter(date)} ${monthViewTitle(date)}.zip`;
     this.documentStore.downloadZip({ officeId: office.id, date, fileName });
   };
 
@@ -253,8 +349,13 @@ export class DocumentListComponent {
     }
   };
 
-  displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
+  displayFnOffice = (office: IOfficeAll): string => (office ? office.name : '');
 
-  private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterOffice = (
+    name: string,
+    offices: IOfficeAll[],
+  ): IOfficeAll[] | undefined =>
+    offices?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

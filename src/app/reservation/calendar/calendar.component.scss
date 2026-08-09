@@ -155,8 +155,27 @@ span.cal-event-actions {
   font-weight: 700;
 }
 
-:host ::ng-deep .cal-week-view :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header),
-:host ::ng-deep .cal-week-view :is(.cal-day-headers, .cal-header, .cal-time-label-column, .cal-hour-headers, .cal-day-column-header) * {
+:host
+  ::ng-deep
+  .cal-week-view
+  :is(
+    .cal-day-headers,
+    .cal-header,
+    .cal-time-label-column,
+    .cal-hour-headers,
+    .cal-day-column-header
+  ),
+:host
+  ::ng-deep
+  .cal-week-view
+  :is(
+    .cal-day-headers,
+    .cal-header,
+    .cal-time-label-column,
+    .cal-hour-headers,
+    .cal-day-column-header
+  )
+  * {
   color: var(--app-surface-text);
 }
 
@@ -167,7 +186,11 @@ span.cal-event-actions {
   white-space: normal;
 }
 
-:host ::ng-deep .cal-week-view :is(.cal-time-events, .cal-all-day-events) .cal-event {
+:host
+  ::ng-deep
+  .cal-week-view
+  :is(.cal-time-events, .cal-all-day-events)
+  .cal-event {
   padding: 4px 6px !important;
   overflow: hidden;
   color: var(--app-surface-text, #111111) !important;
@@ -193,7 +216,11 @@ span.cal-event-actions {
   line-height: 1.2 !important;
 }
 
-:host ::ng-deep .cal-week-view .cal-all-day-events :is(.cal-event-title, .calendar-event-detail, .calendar-event-detail *) {
+:host
+  ::ng-deep
+  .cal-week-view
+  .cal-all-day-events
+  :is(.cal-event-title, .calendar-event-detail, .calendar-event-detail *) {
   display: block !important;
   color: var(--app-surface-text, #111111) !important;
   line-height: 1.25 !important;

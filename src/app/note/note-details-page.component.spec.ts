@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoteDetailsPageComponent } from './note-details-page.component';
@@ -10,25 +11,26 @@ import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '../store/user.store';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('NoteDetailsPageComponent', () => {
   let component: NoteDetailsPageComponent;
   let fixture: ComponentFixture<NoteDetailsPageComponent>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
 
   let noteStoreSpy: {
     navigationParams: ReturnType<typeof signal>;
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    delete: jasmine.Spy;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    delete: Mock;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   let userStoreSpy: {
     professionals: ReturnType<typeof signal>;
-    loadProfessionals: jasmine.Spy;
+    loadProfessionals: Mock;
   };
 
   const id = '123';
@@ -55,16 +57,18 @@ describe('NoteDetailsPageComponent', () => {
       navigationParams: signal<any>(undefined),
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      delete: jasmine.createSpy('delete'),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      delete: vi.fn().mockName('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
     userStoreSpy = {
       professionals: signal<any>(undefined),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
+      loadProfessionals: vi.fn().mockName('loadProfessionals'),
     };
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [NoteDetailsPageComponent],
@@ -74,12 +78,16 @@ describe('NoteDetailsPageComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
-    }).overrideTemplate(NoteComponent, '')
-      .overrideTemplate(NoteDetailsPageComponent, `
+    })
+      .overrideTemplate(NoteComponent, '')
+      .overrideTemplate(
+        NoteDetailsPageComponent,
+        `
         @if (note(); as note) {
           <app-note [note]="note" [config]="config" />
         }
-      `)
+      `,
+      )
       .compileComponents();
 
     fixture = TestBed.createComponent(NoteDetailsPageComponent);
@@ -104,13 +112,16 @@ describe('NoteDetailsPageComponent', () => {
     noteStoreSpy.selected.set(mockNote);
     fixture.detectChanges();
 
-    const noteComponent = fixture.debugElement.children[0].componentInstance as NoteComponent;
+    const noteComponent = fixture.debugElement.children[0]
+      .componentInstance as NoteComponent;
 
-    expect(noteComponent.note()).toEqual(jasmine.objectContaining({
-      id,
-      description: 'Test Description',
-      professional: mockProfessional,
-    }));
+    expect(noteComponent.note()).toEqual(
+      expect.objectContaining({
+        id,
+        description: 'Test Description',
+        professional: mockProfessional,
+      }),
+    );
   });
 
   it('should call update when note is received', () => {
@@ -118,16 +129,19 @@ describe('NoteDetailsPageComponent', () => {
 
     component.submit(mockNote);
 
-    expect(noteStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      description: 'Test Description',
-      professional: mockProfessional,
-    }));
+    expect(noteStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        description: 'Test Description',
+        professional: mockProfessional,
+      }),
+    );
   });
 
   it('should call deleteNote on delete', () => {
-    spyOn(component, 'note').and.returnValue(mockNote as any);
+    vi.spyOn(component, 'note').mockReturnValue(mockNote as any);
 
-    dialogSpy.open.and.returnValue({ afterClosed: () => of(mockNote) } as any);
+    dialogSpy.open.mockReturnValue({ afterClosed: () => of(mockNote) } as any);
 
     component.delete();
 

@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import {
   FormArray,
   FormControl,
@@ -15,7 +24,12 @@ import { CurrencyPipe } from '@angular/common';
 import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs/operators';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatFabButton, MatIconButton } from '@angular/material/button';
 import {
@@ -44,20 +58,45 @@ export type ExtraForm = {
 
 type FormFieldsForm = {
   items: FormArray<FormGroup<ExtraForm>>;
-}
+};
 
 @Component({
   selector: 'app-form-field-adder',
   templateUrl: './form-field-adder.component.html',
   styleUrl: './form-field-adder.component.scss',
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, TranslatePipe, CurrencyPipe, MatError, MatTable,
-    MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatFooterCellDef, MatFooterCell,
-    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatFabButton, ReactiveFormsModule,
-    PaymentOptionSelectComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatIconButton,
+    TranslatePipe,
+    CurrencyPipe,
+    MatError,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatFabButton,
+    ReactiveFormsModule,
+    PaymentOptionSelectComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldAdderComponent {
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
   allPaymentOptions = input.required<IPaymentOption[]>();
   key = input.required<string>();
@@ -82,16 +121,25 @@ export class FormFieldAdderComponent {
   );
 
   extras = signal<IExtras[]>([]);
-  total = computed(() => this.extras().reduce((acc, item) => acc + item.price, 0));
+  total = computed(() =>
+    this.extras().reduce((acc, item) => acc + item.price, 0),
+  );
 
   tableColumns = computed<TableSkeletonColumn[]>(() => {
-    const base: TableSkeletonColumn[] = [{ key: 'description' }, { key: 'price' }];
+    const base: TableSkeletonColumn[] = [
+      { key: 'description' },
+      { key: 'price' },
+    ];
     return this.split()
       ? [...base, { key: 'paymentType' }, { key: 'actions' }]
       : [...base, { key: 'actions' }];
   });
-  displayedColumns = computed(() => this.tableColumns().map((column) => column.key));
-  remainsToBeSplit = computed(() => this.split() ? this.toPaid() - this.total() : null);
+  displayedColumns = computed(() =>
+    this.tableColumns().map((column) => column.key),
+  );
+  remainsToBeSplit = computed(() =>
+    this.split() ? this.toPaid() - this.total() : null,
+  );
 
   constructor() {
     effect(() => {
@@ -114,7 +162,9 @@ export class FormFieldAdderComponent {
       if (valid) {
         this.changeOutput.emit(extras);
       }
-      this.isValid.emit(this.split() ? valid && this.total() === this.toPaid() : valid);
+      this.isValid.emit(
+        this.split() ? valid && this.total() === this.toPaid() : valid,
+      );
     });
   }
 
@@ -129,21 +179,23 @@ export class FormFieldAdderComponent {
       ...(this.split() ? { paymentType: undefined } : {}),
     };
 
-    this.extras.update(list => [...list, row]);
+    this.extras.update((list) => [...list, row]);
     this.formArray.push(this.createItemFormGroup());
   }
 
   deleteRow(index: number): void {
-    this.extras.update(list => list.filter((_, i) => i !== index));
+    this.extras.update((list) => list.filter((_, i) => i !== index));
     this.formArray.removeAt(index);
   }
 
-  getFormGroup = (index: number): FormGroup<ExtraForm> => this.formArray.at(index);
+  getFormGroup = (index: number): FormGroup<ExtraForm> =>
+    this.formArray.at(index);
 
-  getFormGroupControls = (index: number): ExtraForm => this.getFormGroup(index).controls;
+  getFormGroupControls = (index: number): ExtraForm =>
+    this.getFormGroup(index).controls;
 
-  getPaymentOptionControl = (index: number): FormControl<string | undefined> => this.getFormGroupControls(
-    index).paymentOption!;
+  getPaymentOptionControl = (index: number): FormControl<string | undefined> =>
+    this.getFormGroupControls(index).paymentOption!;
 
   private createItemFormGroup = (): FormGroup<ExtraForm> => {
     return this.formBuilder.group<ExtraForm>({
@@ -153,13 +205,20 @@ export class FormFieldAdderComponent {
       price: this.formBuilder.control(0, {
         validators: [Validators.required],
       }),
-      ...(this.split() ? { paymentOption: this.formBuilder.control(undefined, Validators.required) } : {}),
+      ...(this.split()
+        ? {
+            paymentOption: this.formBuilder.control(
+              undefined,
+              Validators.required,
+            ),
+          }
+        : {}),
     });
   };
 
   updateExtra(index: number) {
     const group = this.getFormGroup(index).controls;
-    this.extras.update(list => {
+    this.extras.update((list) => {
       const copy = [...list];
       copy[index] = {
         description: group.description.value,

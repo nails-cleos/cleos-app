@@ -1,5 +1,18 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PaymentOptionSelectComponent } from '../payment-option-select/payment-option-select.component';
@@ -14,8 +27,13 @@ export type BankForm = {
   selector: 'app-bank',
   templateUrl: './bank.component.html',
   styleUrls: ['./bank.component.scss'],
-  imports: [TranslatePipe, ReactiveFormsModule, PaymentOptionSelectComponent, MatRadioGroup,
-    MatRadioButton],
+  imports: [
+    TranslatePipe,
+    ReactiveFormsModule,
+    PaymentOptionSelectComponent,
+    MatRadioGroup,
+    MatRadioButton,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BankComponent {
@@ -29,7 +47,9 @@ export class BankComponent {
   private selectedOption = signal<IPaymentOption | undefined>(undefined);
   private selectedPercentage = signal<PaymentPercentage | undefined>(undefined);
 
-  option = computed(() => this.selectedOption() ?? this.form().controls.option.value);
+  option = computed(
+    () => this.selectedOption() ?? this.form().controls.option.value,
+  );
 
   constructor() {
     // Subscribe to form valueChanges once form is available
@@ -41,13 +61,13 @@ export class BankComponent {
 
       // Subscribe to type changes
       this.selectedOption.set(form.controls.option.value);
-      form.controls.option.valueChanges.subscribe(value => {
+      form.controls.option.valueChanges.subscribe((value) => {
         this.selectedOption.set(value);
       });
 
       // Subscribe to percentage changes
       this.selectedPercentage.set(form.controls.percentage.value);
-      form.controls.percentage.valueChanges.subscribe(value => {
+      form.controls.percentage.valueChanges.subscribe((value) => {
         this.selectedPercentage.set(value);
       });
     });

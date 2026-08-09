@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { DocumentService } from './document.service';
@@ -9,15 +10,22 @@ import { getNowTimeZone } from '../util/dates';
 
 describe('DocumentService', () => {
   let service: DocumentService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        DocumentService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [DocumentService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(DocumentService);
   });
@@ -28,30 +36,37 @@ describe('DocumentService', () => {
 
   it('should get document', () => {
     const id = '123';
-    const document: IDocument = { date: getNowTimeZone(), type: DocumentTypeEnum.statement, id, name: 'test.pdf' };
-    httpSpy.get.and.returnValue(of(document));
+    const document: IDocument = {
+      date: getNowTimeZone(),
+      type: DocumentTypeEnum.statement,
+      id,
+      name: 'test.pdf',
+    };
+    httpSpy.get.mockReturnValue(of(document));
 
-    service.getDocument(id).subscribe(result => {
+    service.getDocument(id).subscribe((result) => {
       expect(result).toBe(document);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith(`v1/documents/${id}`, { ...skipLoadingOverlay() });
+    expect(httpSpy.get).toHaveBeenCalledWith(`v1/documents/${id}`, {
+      ...skipLoadingOverlay(),
+    });
   });
 
   it('should download document', () => {
     const blob = new Blob(['test'], { type: 'application/pdf' });
-    httpSpy.get.and.returnValue(of(blob));
+    httpSpy.get.mockReturnValue(of(blob));
 
-    service.view('123').subscribe(result => {
+    service.view('123').subscribe((result) => {
       expect(result).toBe(blob);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith(
       'v1/documents/123/file',
-      jasmine.objectContaining({ responseType: 'blob' }),
+      expect.objectContaining({ responseType: 'blob' }),
     );
 
-    const [, options] = httpSpy.get.calls.mostRecent().args as any;
+    const [, options] = vi.mocked(httpSpy.get).mock.lastCall as any;
 
     expect(options.responseType).toBe('blob');
     expect(options.headers.get('Accept')).toBe('application/octet-stream');
@@ -65,16 +80,17 @@ describe('DocumentService', () => {
       totalElements: 0,
     };
 
-    httpSpy.get.and.returnValue(of(response));
+    httpSpy.get.mockReturnValue(of(response));
 
-    service.getDocumentsPage('1', 0, 'date', 'asc', 10, '2026-01')
-      .subscribe(result => {
+    service
+      .getDocumentsPage('1', 0, 'date', 'asc', 10, '2026-01')
+      .subscribe((result) => {
         expect(result).toEqual(response);
       });
 
     expect(httpSpy.get).toHaveBeenCalledWith(
       'v1/documents/offices/1/pages',
-      jasmine.objectContaining({ params: jasmine.any(HttpParams) }),
+      expect.objectContaining({ params: expect.any(HttpParams) }),
     );
   });
 
@@ -86,34 +102,37 @@ describe('DocumentService', () => {
       totalElements: 0,
     };
 
-    httpSpy.get.and.returnValue(of(response));
+    httpSpy.get.mockReturnValue(of(response));
 
-    service.getDocumentsPage('1', 0, 'date', 'asc', 10, undefined, [DocumentTypeEnum.statement])
-      .subscribe(result => {
+    service
+      .getDocumentsPage('1', 0, 'date', 'asc', 10, undefined, [
+        DocumentTypeEnum.statement,
+      ])
+      .subscribe((result) => {
         expect(result).toEqual(response);
       });
 
     expect(httpSpy.get).toHaveBeenCalledWith(
       'v1/documents/offices/1/pages',
-      jasmine.objectContaining({ params: jasmine.any(HttpParams) }),
+      expect.objectContaining({ params: expect.any(HttpParams) }),
     );
   });
 
   it('should download zip', () => {
     const blob = new Blob(['test'], { type: 'application/zip' });
     const date = '01-2026';
-    httpSpy.get.and.returnValue(of(blob));
+    httpSpy.get.mockReturnValue(of(blob));
 
-    service.documentDownloadZip('123', date).subscribe(result => {
+    service.documentDownloadZip('123', date).subscribe((result) => {
       expect(result).toBe(blob);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith(
       'v1/documents/offices/123',
-      jasmine.objectContaining({ responseType: 'blob' }),
+      expect.objectContaining({ responseType: 'blob' }),
     );
 
-    const [, options] = httpSpy.get.calls.mostRecent().args as any;
+    const [, options] = vi.mocked(httpSpy.get).mock.lastCall as any;
 
     expect(options.responseType).toBe('blob');
     expect(options.headers.get('Accept')).toBe('application/zip');

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ITreatmentAll } from '../treatment';
 import { TreatmentStore } from '@app/store/treatment.store';
@@ -21,8 +28,14 @@ export class TreatmentSortingComponent {
 
   private readonly treatmentStore = inject(TreatmentStore);
 
-  itemsSignal = computed(() => this.treatmentStore.selected()?.treatments?.map(
-    (treatment: ITreatmentAll) => new ItemSorting(treatment.id, treatment.name, treatment.order)));
+  itemsSignal = computed(() =>
+    this.treatmentStore
+      .selected()
+      ?.treatments?.map(
+        (treatment: ITreatmentAll) =>
+          new ItemSorting(treatment.id, treatment.name, treatment.order),
+      ),
+  );
 
   constructor() {
     this.treatmentStore.clean();
@@ -33,5 +46,6 @@ export class TreatmentSortingComponent {
     });
   }
 
-  sorted = (treatments: ISorted[]): void => this.treatmentStore.sortTreatments(treatments);
+  sorted = (treatments: ISorted[]): void =>
+    this.treatmentStore.sortTreatments(treatments);
 }

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from '@app/util/mat-table-state';
@@ -18,7 +26,10 @@ import { UpcomingComponent } from '../upcoming/upcoming.component';
 import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
 import { ReservationIconPipe } from '@app/pipes/reservation-icon.pipe';
 import { ErrorComponent } from '@app/shared/error/error.component';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseService } from '@app/services/firebase.service';
 import { DiscountStore } from '@app/store/discount.store';
@@ -52,27 +63,69 @@ import { ReservationStore } from '@app/store/reservation.store';
   selector: 'app-reservation-list',
   templateUrl: './reservation-list.component.html',
   styleUrls: ['./reservation-list.component.scss'],
-  imports: [TimeDetailPipe, MatIcon, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
-    MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip,
-    MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef,
-    MatPaginator, MatPrefix, UpcomingComponent, TimeDetailPipe, ReservationIconPipe, ErrorComponent,
-    TableSkeletonComponent, MatTabGroup, MatTab, UpcomingSkeletonComponent],
+  imports: [
+    TimeDetailPipe,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    TranslatePipe,
+    RouterLink,
+    DatePipe,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    MatPrefix,
+    UpcomingComponent,
+    TimeDetailPipe,
+    ReservationIconPipe,
+    ErrorComponent,
+    TableSkeletonComponent,
+    MatTabGroup,
+    MatTab,
+    UpcomingSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationListComponent {
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly reservationStore = inject(ReservationStore);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly firebaseService = inject(FirebaseService);
   private readonly discountStore = inject(DiscountStore);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
+  private tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'timestamp',
+    'desc',
+  );
 
   private customerReservationSignal = computed(() => {
     const data = this.reservationStore.data();
@@ -80,17 +133,15 @@ export class ReservationListComponent {
   });
   private responseSignal = this.reservationStore.response;
   errorSignal = this.reservationStore.error;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
   noContent = signal(true);
   paginatorPageIndex = this.tableState.pageIndex;
@@ -104,19 +155,32 @@ export class ReservationListComponent {
   ];
 
   isLoading = this.reservationStore.isLoading;
-  reservationSignal = computed(() => this.customerReservationSignal()?.reservations);
+  reservationSignal = computed(
+    () => this.customerReservationSignal()?.reservations,
+  );
   upcomingSignal = computed(() => this.customerReservationSignal()?.upcoming);
-  dataSourceSignal = computed(() => this.reservationSignal()?.content?.map((reservation: IReservationAll) => {
-    if (this.showReview && reservation.state === States.completed
-      && isToday(newDateTimestamp(reservation.timestamp, reservation.room.timeZone))
-      && !reservation.review) {
-      this.onRatingChanged(reservation);
-      this.showReview = false;
-    }
-    return reservation;
-  }));
-  resultsLengthSignal = computed(() => this.reservationSignal()?.totalElements || 0);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  dataSourceSignal = computed(() =>
+    this.reservationSignal()?.content?.map((reservation: IReservationAll) => {
+      if (
+        this.showReview &&
+        reservation.state === States.completed &&
+        isToday(
+          newDateTimestamp(reservation.timestamp, reservation.room.timeZone),
+        ) &&
+        !reservation.review
+      ) {
+        this.onRatingChanged(reservation);
+        this.showReview = false;
+      }
+      return reservation;
+    }),
+  );
+  resultsLengthSignal = computed(
+    () => this.reservationSignal()?.totalElements || 0,
+  );
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
   small = computed(() => this.breakpointsSignal()?.matches);
 
   displayedColumns: string[] = this.tableColumns.map((column) => column.key);
@@ -129,9 +193,14 @@ export class ReservationListComponent {
     this.reservationStore.clean();
     effect(() => {
       const request = this.tableState.baseRequest();
-      this.reservationStore.loadAllByCustomer({ ...request, size: this.pageSizeSignal() });
+      this.reservationStore.loadAllByCustomer({
+        ...request,
+        size: this.pageSizeSignal(),
+      });
     });
-    this.tableState.resetOn(this.responseSignal, () => this.discountStore.clean());
+    this.tableState.resetOn(this.responseSignal, () =>
+      this.discountStore.clean(),
+    );
 
     effect(() => {
       if (this.isLoading()) {
@@ -139,7 +208,7 @@ export class ReservationListComponent {
       }
       const upcoming = this.upcomingSignal();
       this.noContent.set(!upcoming || !upcoming.length);
-      upcoming?.forEach(u => {
+      upcoming?.forEach((u) => {
         if (u.state === States.cancelledPaymentRequired) {
           let link = null;
           let paymentId = null;
@@ -161,7 +230,13 @@ export class ReservationListComponent {
           } else if (paymentId) {
             this.navigationService.navigate(['me', 'payment', paymentId]);
           } else if (!pending) {
-            this.navigationService.navigate(['me', 'reservation', u.id, 'payment', 'option']);
+            this.navigationService.navigate([
+              'me',
+              'reservation',
+              u.id,
+              'payment',
+              'option',
+            ]);
           }
         }
       });
@@ -175,22 +250,36 @@ export class ReservationListComponent {
     });
   }
 
-  showTimeZone = (reservation: IReservationAll): boolean => !isSameTimeZone(reservation.room.timeZone);
+  showTimeZone = (reservation: IReservationAll): boolean =>
+    !isSameTimeZone(reservation.room.timeZone);
 
-  onRatingChanged = (reservation: IReservationAll): void => executeDialogNoWidth(
-    this.dialog, ReviewDialogComponent, reservation, result => {
-      if (result && result.rating) {
-        const review: IReview = new Review(result.rating);
-        review.reservationId = reservation?.id;
-        review.detail = result.detail ? result.detail :
-          this.translateService.instant(`ME.REVIEW.RATING.${ result.rating }`);
-        this.reservationStore.createReview(review);
-      }
-    },
-  );
+  onRatingChanged = (reservation: IReservationAll): void =>
+    executeDialogNoWidth(
+      this.dialog,
+      ReviewDialogComponent,
+      reservation,
+      (result) => {
+        if (result && result.rating) {
+          const review: IReview = new Review(result.rating);
+          review.reservationId = reservation?.id;
+          review.detail = result.detail
+            ? result.detail
+            : this.translateService.instant(
+                `ME.REVIEW.RATING.${result.rating}`,
+              );
+          this.reservationStore.createReview(review);
+        }
+      },
+    );
 
   openDialog = (reservation: IReservationAll): void => {
     const time = newDateTimestamp(reservation.timestamp);
-    openDialog(reservation.room, this.language, this.translateService, this.dialog, time);
+    openDialog(
+      reservation.room,
+      this.language,
+      this.translateService,
+      this.dialog,
+      time,
+    );
   };
 }

@@ -4,6 +4,7 @@ import { FormGroup, NonNullableFormBuilder, Validators } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { provideAppIcons } from '@app/util/app-icons.provider';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('BankComponent', () => {
   let component: BankComponent;
@@ -53,7 +54,10 @@ describe('BankComponent', () => {
     });
 
     fixture.componentRef.setInput('form', form);
-    fixture.componentRef.setInput('options', [paymentTypeWithPercentage, paymentTypeWithoutPercentage]);
+    fixture.componentRef.setInput('options', [
+      paymentTypeWithPercentage,
+      paymentTypeWithoutPercentage,
+    ]);
     fixture.componentRef.setInput('firstTime', false);
 
     fixture.detectChanges();
@@ -73,11 +77,13 @@ describe('BankComponent', () => {
     form.controls.option.setValue(paymentTypeWithPercentage);
     fixture.detectChanges();
 
-    expect(form.controls.percentage.hasValidator(Validators.required)).toBeTrue();
+    expect(form.controls.percentage.hasValidator(Validators.required)).toBe(
+      true,
+    );
   });
 
   it('should emit correct percentage when percentage changes', () => {
-    spyOn(component.percentageEmitter, 'emit');
+    vi.spyOn(component.percentageEmitter, 'emit').mockReturnValue(undefined);
 
     form.controls.percentage.setValue(PaymentPercentage.deposit_50);
     fixture.detectChanges();
@@ -93,7 +99,7 @@ describe('BankComponent', () => {
     fixture.detectChanges();
 
     expect(form.controls.percentage.value).toBe(PaymentPercentage.total);
-    expect(form.controls.option.hasValidator(Validators.required)).toBeTrue();
+    expect(form.controls.option.hasValidator(Validators.required)).toBe(true);
   });
 
   it('should auto-select type if firstTime and only one option', () => {

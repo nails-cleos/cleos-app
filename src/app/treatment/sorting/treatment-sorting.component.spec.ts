@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { ServiceType } from '@app/room/room';
@@ -14,9 +15,9 @@ describe('TreatmentSortingComponent', () => {
   let treatmentStoreSpy: {
     selected: ReturnType<typeof signal<ITreatmentGroupAll | undefined>>;
     response: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    sortTreatments: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    sortTreatments: Mock;
   };
 
   const mockTreatmentList: ITreatmentAll[] = [
@@ -58,9 +59,9 @@ describe('TreatmentSortingComponent', () => {
         treatments: mockTreatmentList,
       }),
       response: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      sortTreatments: jasmine.createSpy('sortTreatments'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      sortTreatments: vi.fn().mockName('sortTreatments'),
     };
 
     await TestBed.configureTestingModule({
@@ -68,7 +69,10 @@ describe('TreatmentSortingComponent', () => {
       providers: [
         provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
       ],
     }).compileComponents();
 

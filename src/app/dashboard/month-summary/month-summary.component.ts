@@ -1,6 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { toSignal } from '@angular/core/rxjs-interop';
 import {
   dateMonthYear,
@@ -36,7 +52,11 @@ import {
 import { RouterLink } from '@angular/router';
 import { AuthUserService } from '@app/services/auth-user.service';
 import fs from 'file-saver';
-import { createMonthlyExpenseWorkbook, createMonthlyIncomeWorkbook, createMonthlySummary } from '@app/util/report';
+import {
+  createMonthlyExpenseWorkbook,
+  createMonthlyIncomeWorkbook,
+  createMonthlySummary,
+} from '@app/util/report';
 import { FilterByPipe } from '@app/pipes/filterBy.pipe';
 import { TimeDetailPipe } from '@app/pipes/time-detail.pipe';
 import { TwoDigitsDirective } from '@app/directives/two-digits.directive';
@@ -47,7 +67,11 @@ import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 import { MatIcon } from '@angular/material/icon';
-import { MatList, MatListItem, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatList,
+  MatListItem,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
 import {
   MatAccordion,
   MatExpansionPanel,
@@ -73,36 +97,74 @@ type MonthlySummaryForm = {
   date: FormControl<Date>;
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
   amountFormat: FormControl<string>;
-}
+};
 
 @Component({
   selector: 'app-month-summary',
   templateUrl: './month-summary.component.html',
   styleUrls: ['./month-summary.component.scss'],
-  imports: [FilterByPipe, TimeDetailPipe, TwoDigitsDirective, MatFormField, MatLabel, MatInput,
-    MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect, MatOption, MatIcon, MatList, MatListItem,
-    MatAccordion, MatExpansionPanel, MatExpansionPanelHeader, MatExpansionPanelTitle, MatExpansionPanelDescription,
-    MatListSubheaderCssMatStyler, MatIconButton, MatExpansionPanelActionRow, MatButton, ReactiveFormsModule,
-    TranslatePipe, KeyValuePipe, CurrencyPipe, DecimalPipe, NgClass, RouterLink, NgTemplateOutlet, DatePipe,
-    SlicePipe, MatSuffix],
+  imports: [
+    FilterByPipe,
+    TimeDetailPipe,
+    TwoDigitsDirective,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatAccordion,
+    MatExpansionPanel,
+    MatExpansionPanelHeader,
+    MatExpansionPanelTitle,
+    MatExpansionPanelDescription,
+    MatListSubheaderCssMatStyler,
+    MatIconButton,
+    MatExpansionPanelActionRow,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    KeyValuePipe,
+    CurrencyPipe,
+    DecimalPipe,
+    NgClass,
+    RouterLink,
+    NgTemplateOutlet,
+    DatePipe,
+    SlicePipe,
+    MatSuffix,
+  ],
   providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly dashboardStore = inject(DashboardStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
   private authUserSignal = this.authUserService.authUser;
 
-  private selectedRoomSignal = signal<ISummaryRoom | 'All' | undefined>(undefined);
+  private selectedRoomSignal = signal<ISummaryRoom | 'All' | undefined>(
+    undefined,
+  );
   private primaryRoomSignal = signal<ISummaryRoom | undefined>(undefined);
 
   private userName = computed(() => this.authUserSignal()?.displayName);
-  private timeZone = computed(() => getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
+  private timeZone = computed(() =>
+    getTimeZoneFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()),
+  );
   private roomId = computed(() => {
     const room = this.selectedRoomSignal();
     const primaryRoom = this.primaryRoomSignal();
@@ -114,11 +176,12 @@ export class MonthSummaryComponent {
     return undefined;
   });
 
-  form: FormGroup<MonthlySummaryForm> = this.formBuilder.group<MonthlySummaryForm>({
-    date: this.formBuilder.control(getNowTimeZone()),
-    selectedRoom: this.formBuilder.control(undefined),
-    amountFormat: this.formBuilder.control('ES'),
-  });
+  form: FormGroup<MonthlySummaryForm> =
+    this.formBuilder.group<MonthlySummaryForm>({
+      date: this.formBuilder.control(getNowTimeZone()),
+      selectedRoom: this.formBuilder.control(undefined),
+      amountFormat: this.formBuilder.control('ES'),
+    });
 
   private dateSignal = toSignal(this.getForm.date.valueChanges);
   private amountFormatSignal = toSignal(this.getForm.amountFormat.valueChanges);
@@ -127,7 +190,9 @@ export class MonthSummaryComponent {
 
   showCash = computed(() => this.authUserSignal().showCash);
   stepSignal = signal<number>(0);
-  currencySignal = computed(() => getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()));
+  currencySignal = computed(() =>
+    getCurrencyFromRoom(this.selectedRoomSignal(), this.primaryRoomSignal()),
+  );
 
   private now = getNowTimeZone(this.timeZone());
 
@@ -137,7 +202,10 @@ export class MonthSummaryComponent {
   summaryCash?: IMonthlySummary[];
   weeks = getWeeksInMonth(this.now);
   reservationMonth: ITotalType = new TotalType(SummaryType.payment);
-  expenseMonth: ITotalType = new TotalType(SummaryType.expense, Object.values(ExpenseType));
+  expenseMonth: ITotalType = new TotalType(
+    SummaryType.expense,
+    Object.values(ExpenseType),
+  );
   cashMonth: ITotalType = new TotalType(SummaryType.cash);
   monthlySummaryPayment: IMonthlySummaryRequest[] = [];
 
@@ -174,9 +242,13 @@ export class MonthSummaryComponent {
       if (monthlySummaryMapValue) {
         monthlySummaryMapValue.forEach((value, key) => {
           monthlySummaryMapValue.set(key, {
-            summarySale: value.summarySale.map(s => this.getNewObject(s)),
-            summaryExpenses: value.summaryExpenses.map(s => this.getNewObject(s)),
-            summaryCashSale: value.summaryCashSale.map(s => this.getNewObject(s)),
+            summarySale: value.summarySale.map((s) => this.getNewObject(s)),
+            summaryExpenses: value.summaryExpenses.map((s) =>
+              this.getNewObject(s),
+            ),
+            summaryCashSale: value.summaryCashSale.map((s) =>
+              this.getNewObject(s),
+            ),
           });
         });
 
@@ -191,8 +263,13 @@ export class MonthSummaryComponent {
               this.selectedRoomSignal.set(key);
             }
           });
-          if (monthlySummaryMapValue.size > 1 &&
-            allElementsHaveSameKeyFilterValue(monthlySummaryMapValue, ['currency', 'id'])) {
+          if (
+            monthlySummaryMapValue.size > 1 &&
+            allElementsHaveSameKeyFilterValue(monthlySummaryMapValue, [
+              'currency',
+              'id',
+            ])
+          ) {
             const selectedRoomValue = this.getForm.selectedRoom.value;
             if (selectedRoomValue && typeof selectedRoomValue !== 'string') {
               this.primaryRoomSignal.set(selectedRoomValue);
@@ -222,28 +299,45 @@ export class MonthSummaryComponent {
       const monthlySummaryMapValue = this.monthlySummaryMapSignal();
 
       if (room && monthlySummaryMapValue) {
-        let summary: {
-          summarySale: IMonthlySummarySale[];
-          summaryExpenses: IMonthlySummaryExpense[];
-          summaryCashSale: IMonthlySummarySale[];
-        } | undefined;
+        let summary:
+          | {
+              summarySale: IMonthlySummarySale[];
+              summaryExpenses: IMonthlySummaryExpense[];
+              summaryCashSale: IMonthlySummarySale[];
+            }
+          | undefined;
 
         if (room === 'All' && this.primaryRoom) {
-          summary = [...monthlySummaryMapValue.values()].reduce((prev, curr) => {
-            prev.summarySale = prev.summarySale.concat(curr.summarySale);
-            prev.summaryExpenses = prev.summaryExpenses.concat(curr.summaryExpenses);
-            prev.summaryCashSale = prev.summaryCashSale.concat(curr.summaryCashSale);
-            return prev;
-          }, { summarySale: [], summaryExpenses: [], summaryCashSale: [] });
-          summary.summarySale = summary.summarySale.sort((a, b) => a.timestamp - b.timestamp);
+          summary = [...monthlySummaryMapValue.values()].reduce(
+            (prev, curr) => {
+              prev.summarySale = prev.summarySale.concat(curr.summarySale);
+              prev.summaryExpenses = prev.summaryExpenses.concat(
+                curr.summaryExpenses,
+              );
+              prev.summaryCashSale = prev.summaryCashSale.concat(
+                curr.summaryCashSale,
+              );
+              return prev;
+            },
+            { summarySale: [], summaryExpenses: [], summaryCashSale: [] },
+          );
+          summary.summarySale = summary.summarySale.sort(
+            (a, b) => a.timestamp - b.timestamp,
+          );
         } else if (room !== 'All') {
           summary = monthlySummaryMapValue.get(room);
         }
 
         this.summaryReservations = summary?.summarySale.map((s, i) => {
           if (s.id) {
-            const reservationDate = newDateTimestamp(s.timestamp, this.timeZone());
-            return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
+            const reservationDate = newDateTimestamp(
+              s.timestamp,
+              this.timeZone(),
+            );
+            return Object.assign({}, s, {
+              day: reservationDate.getDate(),
+              position: i,
+            });
           }
           return s;
         });
@@ -252,7 +346,10 @@ export class MonthSummaryComponent {
         this.summaryExpenses = summary?.summaryExpenses.map((s, i) => {
           if (s.id) {
             const expenseDate = newDateTimestamp(s.timestamp, this.timeZone());
-            return Object.assign({}, s, { day: expenseDate.getDate(), position: i });
+            return Object.assign({}, s, {
+              day: expenseDate.getDate(),
+              position: i,
+            });
           }
           return s;
         });
@@ -260,8 +357,14 @@ export class MonthSummaryComponent {
 
         this.summaryCash = summary?.summaryCashSale.map((s, i) => {
           if (s.id) {
-            const reservationDate = newDateTimestamp(s.timestamp, this.timeZone());
-            return Object.assign({}, s, { day: reservationDate.getDate(), position: i });
+            const reservationDate = newDateTimestamp(
+              s.timestamp,
+              this.timeZone(),
+            );
+            return Object.assign({}, s, {
+              day: reservationDate.getDate(),
+              position: i,
+            });
           }
           return s;
         });
@@ -279,70 +382,89 @@ export class MonthSummaryComponent {
   }
 
   get dateFormatted(): string {
-    return this.getForm.date.value ? monthViewTitle(this.getForm.date.value, this.language) : '';
+    return this.getForm.date.value
+      ? monthViewTitle(this.getForm.date.value, this.language)
+      : '';
   }
 
-  private static groupSummary = (summaries?: IMonthlySummary[]): Map<string, IMonthlySummary[]> =>
-    summaries?.reduce((grouped: Map<string, IMonthlySummary[]>, item: IMonthlySummary) => {
-      const length = item.total.payments.length;
-      if (length) {
-        item.total.payments.forEach(total => {
-          const key = total.expenseType;
+  private static groupSummary = (
+    summaries?: IMonthlySummary[],
+  ): Map<string, IMonthlySummary[]> =>
+    summaries?.reduce(
+      (grouped: Map<string, IMonthlySummary[]>, item: IMonthlySummary) => {
+        const length = item.total.payments.length;
+        if (length) {
+          item.total.payments.forEach((total) => {
+            const key = total.expenseType;
+            const group = grouped.get(key) || [];
+            const newItem = { ...item };
+            newItem.total = {
+              ...newItem.total,
+              gross: total.gross,
+              btw: total.btw,
+              net: total.net,
+              payments: [],
+            };
+            group.push(newItem);
+            grouped.set(key, group);
+          });
+        } else {
+          const key = item.total.expenseType;
           const group = grouped.get(key) || [];
-          const newItem = { ...item };
-          newItem.total = {
-            ...newItem.total,
-            gross: total.gross,
-            btw: total.btw,
-            net: total.net,
-            payments: [],
-          };
-          group.push(newItem);
+          group.push(item);
           grouped.set(key, group);
-        });
-      } else {
-        const key = item.total.expenseType;
-        const group = grouped.get(key) || [];
-        group.push(item);
-        grouped.set(key, group);
-      }
-      return grouped;
-    }, new Map()) || new Map();
+        }
+        return grouped;
+      },
+      new Map(),
+    ) || new Map();
 
-  private static calculateTotals = (summaries?: IMonthlySummary[]): { gross: number; btw: number; net: number } => {
-    const t = summaries?.map(s => s.total).reduce((totals: any, next: ISummaryTotal) => {
-      let gross;
-      let net;
-      let btw;
-      if (next.payments?.length) {
-        const paid = next.payments.reduce((payments: any, payment: ISummaryTotal) => {
-          payments.gross += payment.gross;
-          payments.net += payment.net;
-          payments.btw += payment.btw;
-          return payments;
-        }, { gross: 0, net: 0, btw: 0 });
-        gross = paid.gross;
-        net = paid.net;
-        btw = paid.btw;
-      } else {
-        gross = next.gross;
-        net = next.net;
-        btw = next.btw;
-      }
-      totals.gross += gross;
-      totals.net += net;
-      totals.btw += btw;
-      return totals;
-    }, { gross: 0, net: 0, btw: 0 });
+  private static calculateTotals = (
+    summaries?: IMonthlySummary[],
+  ): { gross: number; btw: number; net: number } => {
+    const t = summaries
+      ?.map((s) => s.total)
+      .reduce(
+        (totals: any, next: ISummaryTotal) => {
+          let gross;
+          let net;
+          let btw;
+          if (next.payments?.length) {
+            const paid = next.payments.reduce(
+              (payments: any, payment: ISummaryTotal) => {
+                payments.gross += payment.gross;
+                payments.net += payment.net;
+                payments.btw += payment.btw;
+                return payments;
+              },
+              { gross: 0, net: 0, btw: 0 },
+            );
+            gross = paid.gross;
+            net = paid.net;
+            btw = paid.btw;
+          } else {
+            gross = next.gross;
+            net = next.net;
+            btw = next.btw;
+          }
+          totals.gross += gross;
+          totals.net += net;
+          totals.btw += btw;
+          return totals;
+        },
+        { gross: 0, net: 0, btw: 0 },
+      );
 
     return { gross: t?.gross || 0, net: t?.net || 0, btw: t?.btw || 0 };
   };
 
-  private static isInvalidInput = (value: string): boolean => !value
-    || new RegExp(/^0\.?0{0,2}$/g).test(value)
-    || new RegExp(/^\.0{0,2}$/g).test(value);
+  private static isInvalidInput = (value: string): boolean =>
+    !value ||
+    new RegExp(/^0\.?0{0,2}$/g).test(value) ||
+    new RegExp(/^\.0{0,2}$/g).test(value);
 
-  private static getType = (key: string): SummaryType => SummaryType[key.toLowerCase() as keyof typeof SummaryType];
+  private static getType = (key: string): SummaryType =>
+    SummaryType[key.toLowerCase() as keyof typeof SummaryType];
 
   private static addSummary = (
     id: string,
@@ -351,9 +473,9 @@ export class MonthSummaryComponent {
     summaries: IMonthlySummaryRequest[],
   ): IMonthlySummaryRequest[] => {
     const newSummary = { id, gross, btw };
-    const exist = summaries.find(ms => ms.id === id);
+    const exist = summaries.find((ms) => ms.id === id);
     if (exist) {
-      return summaries.map(u => u.id !== newSummary.id ? u : newSummary);
+      return summaries.map((u) => (u.id !== newSummary.id ? u : newSummary));
     }
     return [...summaries, newSummary];
   };
@@ -365,10 +487,20 @@ export class MonthSummaryComponent {
     gross: number = 0,
     net: number = 0,
     btw: number = 0,
-  ): { monthlySummary: IMonthlySummary; newSummaries: IMonthlySummaryRequest[] } => {
-    newSummaries = MonthSummaryComponent.addSummary(id, gross, btw, newSummaries);
+  ): {
+    monthlySummary: IMonthlySummary;
+    newSummaries: IMonthlySummaryRequest[];
+  } => {
+    newSummaries = MonthSummaryComponent.addSummary(
+      id,
+      gross,
+      btw,
+      newSummaries,
+    );
     if (summary.total.payments?.length) {
-      const objIndex = summary.total.payments?.findIndex((obj => obj.id === id));
+      const objIndex = summary.total.payments?.findIndex(
+        (obj) => obj.id === id,
+      );
       const payment = summary.total.payments[objIndex];
 
       const updatedObj = Object.assign({}, payment, { gross, net, btw });
@@ -378,25 +510,35 @@ export class MonthSummaryComponent {
         updatedObj,
         ...summary.total.payments.slice(objIndex + 1),
       ];
-      return { monthlySummary: Object.assign({}, summary, { total: { ...summary.total, payments } }), newSummaries };
+      return {
+        monthlySummary: Object.assign({}, summary, {
+          total: { ...summary.total, payments },
+        }),
+        newSummaries,
+      };
     } else {
       return {
-        monthlySummary: Object.assign({}, summary, { total: { ...summary.total, gross, net, btw } }),
+        monthlySummary: Object.assign({}, summary, {
+          total: { ...summary.total, gross, net, btw },
+        }),
         newSummaries,
       };
     }
   };
 
-  private static parseValue(total: ISummaryTotal, key: 'btw' | 'gross' | 'net', id?: string): number {
+  private static parseValue(
+    total: ISummaryTotal,
+    key: 'btw' | 'gross' | 'net',
+    id?: string,
+  ): number {
     if (id) {
-      const t = total.payments?.find(payment => payment.id === id);
+      const t = total.payments?.find((payment) => payment.id === id);
       if (t) {
         return t[key] >= 0 ? t[key] : total[key];
       }
       return total[key];
     }
     return total[key];
-
   }
 
   private static updateAmounts(
@@ -405,35 +547,46 @@ export class MonthSummaryComponent {
     input: HTMLInputElement,
     index: number,
     id: string,
-  ): { monthlySummaries: IMonthlySummary[]; newSummaries: IMonthlySummaryRequest[] } {
-    const objIndex = summaries.findIndex((obj => obj.position === index));
+  ): {
+    monthlySummaries: IMonthlySummary[];
+    newSummaries: IMonthlySummaryRequest[];
+  } {
+    const objIndex = summaries.findIndex((obj) => obj.position === index);
     const isInvalidInput = MonthSummaryComponent.isInvalidInput(input.value);
     const summary = summaries[objIndex];
     const total = summary.total;
-    let gross = isInvalidInput ? this.parseValue(total, 'gross', id) : parseFloat(input.value);
+    let gross = isInvalidInput
+      ? this.parseValue(total, 'gross', id)
+      : parseFloat(input.value);
     const btwCurrent = this.parseValue(total, 'btw', id);
     const netCurrent = this.parseValue(total, 'net', id);
     const btwPercentage = Math.round((btwCurrent / netCurrent) * 100);
     let net = gross;
     let btw = 0;
     if (input.id === 'grossInput') {
-      net = gross * 100 / (btwPercentage + 100);
+      net = (gross * 100) / (btwPercentage + 100);
       btw = gross - net;
     } else if (input.id === 'netInput') {
       if (!isInvalidInput) {
         net = parseFloat(input.value);
-        gross = net * ((btwPercentage / 100) + 1);
+        gross = net * (btwPercentage / 100 + 1);
         btw = gross - net;
       }
     } else if (input.id === 'btwInput') {
       if (!isInvalidInput) {
         btw = parseFloat(input.value);
-        net = btw * 100 / btwPercentage;
+        net = (btw * 100) / btwPercentage;
         gross = btw + net;
       }
     }
-    const { monthlySummary, newSummaries } = MonthSummaryComponent.newSummary(summary, summaryRequests, id, gross, net,
-      btw);
+    const { monthlySummary, newSummaries } = MonthSummaryComponent.newSummary(
+      summary,
+      summaryRequests,
+      id,
+      gross,
+      net,
+      btw,
+    );
 
     const monthlySummaries = [
       ...summaries.slice(0, objIndex),
@@ -448,7 +601,9 @@ export class MonthSummaryComponent {
     if (this.getForm.date.value) {
       const year = this.getForm.date.value.getFullYear();
       const quarter = getDateQuarter(this.getForm.date.value);
-      this.navigationService.navigate(['dashboard', 'quarter', 'summary'], { state: { year, quarter } });
+      this.navigationService.navigate(['dashboard', 'quarter', 'summary'], {
+        state: { year, quarter },
+      });
     } else {
       this.navigationService.navigate(['dashboard', 'quarter', 'summary']);
     }
@@ -459,7 +614,10 @@ export class MonthSummaryComponent {
     this.stepSignal.set(index);
   };
 
-  setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
+  setMonthAndYear = (
+    normalizedMonthAndYear: Date,
+    datepicker: Pick<MatDatepicker<Date>, 'close'>,
+  ): void => {
     const ctrlValue = new Date(this.getForm.date.value);
     ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
@@ -469,7 +627,12 @@ export class MonthSummaryComponent {
     datepicker.close();
   };
 
-  twoDigit = (input: HTMLInputElement, index: number, key: string, id: string): void => {
+  twoDigit = (
+    input: HTMLInputElement,
+    index: number,
+    key: string,
+    id: string,
+  ): void => {
     const type = MonthSummaryComponent.getType(key);
     switch (type) {
       case SummaryType.payment:
@@ -493,19 +656,30 @@ export class MonthSummaryComponent {
     }
   };
 
-  getTotal = (total: ITotalType, attribute: 'gross' | 'net' | 'btw'): number => {
+  getTotal = (
+    total: ITotalType,
+    attribute: 'gross' | 'net' | 'btw',
+  ): number => {
     let sum = 0;
-    total.totals.forEach(value => sum += value[attribute]);
+    total.totals.forEach((value) => (sum += value[attribute]));
 
     return sum;
   };
 
   exportMonthlySummary = (): void => {
-    const title = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
-    const workbook = createMonthlySummary(title, this.weeks, currencySymbol(this.currencySignal()),
+    const title = monthViewTitle(
+      this.getForm.date.value || getNowTimeZone(this.timeZone()),
+    );
+    const workbook = createMonthlySummary(
+      title,
+      this.weeks,
+      currencySymbol(this.currencySignal()),
       this.translateService,
-      this.env, this.timeZone(), this.summaryReservations as IMonthlySummarySale[],
-      this.summaryExpenses as IMonthlySummaryExpense[]);
+      this.env,
+      this.timeZone(),
+      this.summaryReservations as IMonthlySummarySale[],
+      this.summaryExpenses as IMonthlySummaryExpense[],
+    );
 
     workbook.creator = this.userName() || '';
     workbook.created = getNowTimeZone(this.timeZone());
@@ -515,7 +689,7 @@ export class MonthSummaryComponent {
       const blob = new Blob([content], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
-      fs.saveAs(blob, `Report_${ title.replace(' ', '_') }.xlsx`);
+      fs.saveAs(blob, `Report_${title.replace(' ', '_')}.xlsx`);
     });
   };
 
@@ -526,27 +700,55 @@ export class MonthSummaryComponent {
     data?: IMonthlySummary[],
   ): void => {
     if (data?.length) {
-      const workbookName = `${ titleCase(totalTypes.type) }-${ getDateFormat(this.getForm.date.value) }`;
-      const name = this.translateService.instant(`SUMMARY.${ title }`);
+      const workbookName = `${titleCase(totalTypes.type)}-${getDateFormat(this.getForm.date.value)}`;
+      const name = this.translateService.instant(`SUMMARY.${title}`);
 
       let workbook;
-      const header = monthViewTitle(this.getForm.date.value || getNowTimeZone(this.timeZone()));
+      const header = monthViewTitle(
+        this.getForm.date.value || getNowTimeZone(this.timeZone()),
+      );
 
       switch (totalTypes.type) {
         case SummaryType.payment:
-          workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
-            this.env, this.timeZone());
+          workbook = createMonthlyIncomeWorkbook(
+            header,
+            data as IMonthlySummarySale[],
+            this.weeks,
+            name,
+            totalTypes.type,
+            workbookName,
+            this.translateService,
+            currencySymbol(this.currencySignal()),
+            this.env,
+            this.timeZone(),
+          );
           break;
         case SummaryType.expense:
-          workbook = createMonthlyExpenseWorkbook(header, data as IMonthlySummaryExpense[], this.weeks,
-            name, workbookName, this.translateService, currencySymbol(this.currencySignal()), this.env,
-            this.timeZone());
+          workbook = createMonthlyExpenseWorkbook(
+            header,
+            data as IMonthlySummaryExpense[],
+            this.weeks,
+            name,
+            workbookName,
+            this.translateService,
+            currencySymbol(this.currencySignal()),
+            this.env,
+            this.timeZone(),
+          );
           break;
         case SummaryType.cash:
-          workbook = createMonthlyIncomeWorkbook(header, data as IMonthlySummarySale[], this.weeks,
-            name, totalTypes.type, workbookName, this.translateService, currencySymbol(this.currencySignal()),
-            this.env, this.timeZone());
+          workbook = createMonthlyIncomeWorkbook(
+            header,
+            data as IMonthlySummarySale[],
+            this.weeks,
+            name,
+            totalTypes.type,
+            workbookName,
+            this.translateService,
+            currencySymbol(this.currencySignal()),
+            this.env,
+            this.timeZone(),
+          );
           break;
       }
 
@@ -558,14 +760,17 @@ export class MonthSummaryComponent {
         const blob = new Blob([content], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         });
-        fs.saveAs(blob, `${ workbookName }.xlsx`);
+        fs.saveAs(blob, `${workbookName}.xlsx`);
       });
 
       this.updateMonthlySummary(totalTypes, values);
     }
   };
 
-  updateMonthlySummary = (totalTypes: ITotalType, summaries: IMonthlySummaryRequest[]): void => {
+  updateMonthlySummary = (
+    totalTypes: ITotalType,
+    summaries: IMonthlySummaryRequest[],
+  ): void => {
     let totals: ITotal[];
     switch (totalTypes.type) {
       case SummaryType.cash:
@@ -591,34 +796,58 @@ export class MonthSummaryComponent {
     );
   };
 
-  private setSummaryReservation = (input: HTMLInputElement, index: number, id: string): void => {
+  private setSummaryReservation = (
+    input: HTMLInputElement,
+    index: number,
+    id: string,
+  ): void => {
     if (this.summaryReservations) {
-      const {
-        monthlySummaries,
-        newSummaries,
-      } = MonthSummaryComponent.updateAmounts(this.summaryReservations, this.monthlySummaryPayment, input, index, id);
+      const { monthlySummaries, newSummaries } =
+        MonthSummaryComponent.updateAmounts(
+          this.summaryReservations,
+          this.monthlySummaryPayment,
+          input,
+          index,
+          id,
+        );
       this.summaryReservations = monthlySummaries;
       this.monthlySummaryPayment = newSummaries;
     }
   };
 
-  private setSummaryExpense = (input: HTMLInputElement, index: number, id: string): void => {
+  private setSummaryExpense = (
+    input: HTMLInputElement,
+    index: number,
+    id: string,
+  ): void => {
     if (this.summaryExpenses) {
-      const {
-        monthlySummaries,
-        newSummaries,
-      } = MonthSummaryComponent.updateAmounts(this.summaryExpenses, this.monthlySummaryExpense, input, index, id);
+      const { monthlySummaries, newSummaries } =
+        MonthSummaryComponent.updateAmounts(
+          this.summaryExpenses,
+          this.monthlySummaryExpense,
+          input,
+          index,
+          id,
+        );
       this.summaryExpenses = monthlySummaries;
       this.monthlySummaryExpense = newSummaries;
     }
   };
 
-  private setSummaryCash = (input: HTMLInputElement, index: number, id: string): void => {
+  private setSummaryCash = (
+    input: HTMLInputElement,
+    index: number,
+    id: string,
+  ): void => {
     if (this.summaryCash) {
-      const {
-        monthlySummaries,
-        newSummaries,
-      } = MonthSummaryComponent.updateAmounts(this.summaryCash, this.monthlySummaryCash, input, index, id);
+      const { monthlySummaries, newSummaries } =
+        MonthSummaryComponent.updateAmounts(
+          this.summaryCash,
+          this.monthlySummaryCash,
+          input,
+          index,
+          id,
+        );
       this.summaryCash = monthlySummaries;
       this.monthlySummaryCash = newSummaries;
     }
@@ -629,38 +858,65 @@ export class MonthSummaryComponent {
     this.summaryExpenses = undefined;
     this.summaryCash = undefined;
     this.reservationMonth = new TotalType(SummaryType.payment);
-    this.expenseMonth = new TotalType(SummaryType.expense, Object.values(ExpenseType));
+    this.expenseMonth = new TotalType(
+      SummaryType.expense,
+      Object.values(ExpenseType),
+    );
     this.cashMonth = new TotalType(SummaryType.cash);
     this.dashboardStore.getMonthlySummary(date);
   };
 
   private calculateReservationSummary = (): void => {
     this.reservationMonth = this.reservationMonth.reset();
-    MonthSummaryComponent.groupSummary(this.summaryReservations)?.forEach((it, key) => {
-      const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.reservationMonth = this.reservationMonth.withTotal(gross, net, btw, it.length, key);
-    });
+    MonthSummaryComponent.groupSummary(this.summaryReservations)?.forEach(
+      (it, key) => {
+        const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
+        this.reservationMonth = this.reservationMonth.withTotal(
+          gross,
+          net,
+          btw,
+          it.length,
+          key,
+        );
+      },
+    );
   };
 
   private calculateExpenseSummary = (): void => {
     this.expenseMonth = this.expenseMonth.reset(Object.values(ExpenseType));
-    MonthSummaryComponent.groupSummary(this.summaryExpenses)?.forEach((it, key) => {
-      const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.expenseMonth = this.expenseMonth.withTotal(gross, net, btw, it.length, key);
-    });
+    MonthSummaryComponent.groupSummary(this.summaryExpenses)?.forEach(
+      (it, key) => {
+        const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
+        this.expenseMonth = this.expenseMonth.withTotal(
+          gross,
+          net,
+          btw,
+          it.length,
+          key,
+        );
+      },
+    );
   };
 
   private calculateCashSummary = (): void => {
     this.cashMonth = this.cashMonth.reset();
     MonthSummaryComponent.groupSummary(this.summaryCash)?.forEach((it, key) => {
       const { gross, net, btw } = MonthSummaryComponent.calculateTotals(it);
-      this.cashMonth = this.cashMonth.withTotal(gross, net, btw, it.length, key);
+      this.cashMonth = this.cashMonth.withTotal(
+        gross,
+        net,
+        btw,
+        it.length,
+        key,
+      );
     });
   };
 
   private getNewObject = (s: IMonthlySummary): any => {
     if (s?.paths) {
-      const paths = Array.isArray(s.paths) ? `/${ this.language }/${ s.paths.join('/') }` : s.paths;
+      const paths = Array.isArray(s.paths)
+        ? `/${this.language}/${s.paths.join('/')}`
+        : s.paths;
       return Object.assign({}, s, { paths });
     }
     return s;

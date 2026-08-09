@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { INotification } from '../notification';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -17,14 +24,25 @@ const NOTIFICATION_LEAVE_ANIMATION_MS = 260;
   selector: 'app-notification-list',
   templateUrl: './notification-list.component.html',
   styleUrls: ['./notification-list.component.scss'],
-  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, DatePipe, MatTooltip],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    TranslatePipe,
+    DatePipe,
+    MatTooltip,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationListComponent {
-  readonly skeletonNotificationCards = Array.from({ length: 3 }, (_, index) => index);
+  readonly skeletonNotificationCards = Array.from(
+    { length: 3 },
+    (_, index) => index,
+  );
   private readonly router: Router = inject(Router);
   private readonly notificationStore = inject(NotificationStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private notificationsSignal = computed(() => this.notificationStore.data());
 
@@ -41,7 +59,12 @@ export class NotificationListComponent {
     effect(() => {
       const page = this.page();
       this.pageLoading.set(true);
-      this.notificationStore.loadPage({ page: page, sort: 'date', direction: 'desc', size: PAGE_SIZE });
+      this.notificationStore.loadPage({
+        page: page,
+        sort: 'date',
+        direction: 'desc',
+        size: PAGE_SIZE,
+      });
     });
 
     effect(() => {
@@ -50,9 +73,12 @@ export class NotificationListComponent {
         this.pageLoading.set(false);
         if (notifications.page?.content?.length) {
           const page = this.page();
-          const pageNotifications = notifications.page.content
-            .map((not: any) => Object.assign({}, not, { date: zoneDateToDate(not.date) }));
-          this.notifications.update(currents => page === 0 ? pageNotifications : currents.concat(pageNotifications));
+          const pageNotifications = notifications.page.content.map((not: any) =>
+            Object.assign({}, not, { date: zoneDateToDate(not.date) }),
+          );
+          this.notifications.update((currents) =>
+            page === 0 ? pageNotifications : currents.concat(pageNotifications),
+          );
           this.showMore = !notifications.page.last;
           this.badge = notifications.unread;
         } else {
@@ -88,24 +114,27 @@ export class NotificationListComponent {
       return;
     }
 
-    this.notifications.update(currents => currents.map((current, currentIndex) => currentIndex === index
-      ? { ...current, deleted: true }
-      : current));
+    this.notifications.update((currents) =>
+      currents.map((current, currentIndex) =>
+        currentIndex === index ? { ...current, deleted: true } : current,
+      ),
+    );
     this.notificationStore.delete({ ...notification, deleted: true });
 
     if (!notification.read) {
       --this.badge;
     }
 
-    const visibleNotifications = this.notifications().filter(n => !n.deleted);
+    const visibleNotifications = this.notifications().filter((n) => !n.deleted);
     if (visibleNotifications.length === 0 && this.showMore) {
       this.page.set(0);
       this.getMoreNotifications();
     }
 
     setTimeout(() => {
-      this.notifications.update(currents => currents.filter(current => current.id !== notification.id));
+      this.notifications.update((currents) =>
+        currents.filter((current) => current.id !== notification.id),
+      );
     }, NOTIFICATION_LEAVE_ANIMATION_MS);
   };
-
 }

@@ -1,8 +1,12 @@
-import { getProfessionalColor, lightenDarkenColor, createEventColor } from './color';
+import {
+  createEventColor,
+  getProfessionalColor,
+  lightenDarkenColor,
+} from './color';
 import { ColorEvent } from '../dashboard/dashboard';
+import { describe, expect, it } from 'vitest';
 
 describe('Color Utils', () => {
-
   describe('lightenDarkenColor', () => {
     it('should lighten a color', () => {
       const result = lightenDarkenColor('#000000', 20);
@@ -55,8 +59,7 @@ describe('Color Utils', () => {
   describe('randomColor', () => {
     it('should generate a valid hex color', () => {
       const color = getProfessionalColor(false).primary; // Using your function indirectly
-      expect(/^#[0-9a-f]{6}$/i.test(color)).toBeTrue();
+      expect(/^#[0-9a-f]{6}$/i.test(color)).toBe(true);
     });
   });
-
 });

@@ -1,24 +1,47 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormArray } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 import { ReservationComponent } from './reservation.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '../services/auth-user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { IUserAll } from '../user/user';
 import { IRoomAll, ServiceType } from '../room/room';
 import { IOfficeAll } from '../office/office';
 import { IAdditionalAll } from '../additional/additional';
 import { IPaymentOption } from '../interfaces/payment';
-import { IGroupService, ITreatment, ITreatmentAll, Price } from '../treatment/treatment';
+import {
+  IGroupService,
+  ITreatment,
+  ITreatmentAll,
+  Price,
+} from '../treatment/treatment';
 import { DiscountType, IUserDiscount } from '../discount/discount';
 import { DataEvent } from '../util/event';
-import { DEFAULT_LOCALE, Duration, getTime, newDateTimestamp } from '../util/dates';
+import {
+  DEFAULT_LOCALE,
+  Duration,
+  getTime,
+  newDateTimestamp,
+} from '../util/dates';
 import { addMonths } from 'date-fns';
 import { MAX_RESERVATION_MONTH } from './reservation';
 import { provideHttpClient, withXhr } from '@angular/common/http';
-import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
+import { GoogleMapStubComponent } from '../util/stub/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,47 +57,63 @@ import { ReservationStore } from '../store/reservation.store';
 describe('ReservationComponent', () => {
   let component: ReservationComponent;
   let fixture: ComponentFixture<ReservationComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
   const cashPaymentOption = { type: 'CASH' } as IPaymentOption;
 
   let reservationStoreSpy: {
     calendar: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    loadCalendar: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadCalendar: Mock;
+    clean: Mock;
   };
   let userStoreSpy: {
     customers: ReturnType<typeof signal>;
     customerInfo: ReturnType<typeof signal>;
-    getCustomerInformation: jasmine.Spy;
+    getCustomerInformation: Mock;
   };
   let roomStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
   let treatmentStoreSpy: {
     treatmentDiscount: ReturnType<typeof signal>;
-    getAllTreatments: jasmine.Spy;
+    getAllTreatments: Mock;
   };
   let additionalStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllByGroupId: jasmine.Spy;
+    loadAllByGroupId: Mock;
   };
   let paymentStoreSpy: {
     options: ReturnType<typeof signal>;
-    getOptions: jasmine.Spy;
+    getOptions: Mock;
   };
 
   let matches$: BehaviorSubject<any>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'>;
+  let snackBarSpy: Pick<MatSnackBar, 'openFromComponent'> & {
+    openFromComponent: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let toastServiceSpy: Pick<ToastService, 'show'> & {
+    show: ReturnType<typeof vi.fn>;
+  };
 
-  const authUserSignal = signal<IAuthUser>({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
+  const authUserSignal = signal<IAuthUser>({
+    ...initialAuthUser,
+    isDarkMode: true,
+    professionalId: 'prof-123',
+  });
 
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
 
   const mockCustomer: IUserAll = {
     authorities: [],
@@ -103,14 +142,16 @@ describe('ReservationComponent', () => {
     timeZone: 'Europe/Amsterdam',
     currency: { code: 'EUR', name: 'Euro', id: 'eur', icon: '€' },
     office: mockOffice,
-    professionals: [{
-      id: 'professional-1',
-      displayName: 'John Doe',
-      email: 'john@professional.com',
-      authorities: [],
-      locale: '',
-      timeZone: '',
-    }],
+    professionals: [
+      {
+        id: 'professional-1',
+        displayName: 'John Doe',
+        email: 'john@professional.com',
+        authorities: [],
+        locale: '',
+        timeZone: '',
+      },
+    ],
     availabilities: [
       { day: 'MONDAY', start: '09:00', end: '17:00' },
       { day: 'TUESDAY', start: '09:00', end: '17:00' },
@@ -157,32 +198,34 @@ describe('ReservationComponent', () => {
   });
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       calendar: signal(undefined),
       subErrors: signal(undefined),
       isLoading: signal(false),
-      loadCalendar: jasmine.createSpy('loadCalendar'),
-      clean: jasmine.createSpy('clean'),
+      loadCalendar: vi.fn().mockName('loadCalendar'),
+      clean: vi.fn().mockName('clean'),
     };
     userStoreSpy = {
       customers: signal<any>(undefined),
       customerInfo: signal<any>(undefined),
-      getCustomerInformation: jasmine.createSpy('getCustomerInformation'),
+      getCustomerInformation: vi.fn().mockName('getCustomerInformation'),
     };
     roomStoreSpy = {
       data: signal<any>(undefined),
-      loadAll: jasmine.createSpy('loadCustomers'),
+      loadAll: vi.fn().mockName('loadCustomers'),
     };
     treatmentStoreSpy = {
       treatmentDiscount: signal<any>(undefined),
-      getAllTreatments: jasmine.createSpy('getAllTreatments'),
+      getAllTreatments: vi.fn().mockName('getAllTreatments'),
     };
     additionalStoreSpy = {
       data: signal<any>(undefined),
-      loadAllByGroupId: jasmine.createSpy('loadAllByGroupId'),
+      loadAllByGroupId: vi.fn().mockName('loadAllByGroupId'),
     };
     paymentStoreSpy = {
       options: signal([
@@ -198,21 +241,31 @@ describe('ReservationComponent', () => {
           icon: 'cash',
         },
       ]),
-      getOptions: jasmine.createSpy('getOptions'),
+      getOptions: vi.fn().mockName('getOptions'),
     };
-    authUserSignal.set({ ...initialAuthUser, isDarkMode: true, professionalId: 'prof-123' });
+    authUserSignal.set({
+      ...initialAuthUser,
+      isDarkMode: true,
+      professionalId: 'prof-123',
+    });
     matches$ = new BehaviorSubject(undefined);
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe'], {
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
       observe: () => matches$.asObservable(),
-    });
-    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['openFromComponent']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    };
+    snackBarSpy = {
+      openFromComponent: vi.fn().mockName('MatSnackBar.openFromComponent'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    toastServiceSpy.show.and.returnValue({
+    };
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
+    toastServiceSpy.show.mockReturnValue({
       onAction: () => of(void 0),
       onDismiss: () => of(void 0),
     });
@@ -245,6 +298,10 @@ describe('ReservationComponent', () => {
     component = fixture.componentInstance;
   });
 
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -261,18 +318,20 @@ describe('ReservationComponent', () => {
     });
 
     it('should set up form controls with proper validators', () => {
-      expect(component.getCustomerForm.customer.hasError('required')).toBeTrue();
-      expect(component.getTreatmentForm.group.hasError('required')).toBeTrue();
-      expect(component.getTreatmentForm.treatment.hasError('required')).toBeTrue();
-      expect(component.getOfficeForm.office.hasError('required')).toBeTrue();
-      expect(component.getOfficeForm.room.hasError('required')).toBeTrue();
+      expect(component.getCustomerForm.customer.hasError('required')).toBe(
+        true,
+      );
+      expect(component.getTreatmentForm.group.hasError('required')).toBe(true);
+      expect(component.getTreatmentForm.treatment.hasError('required')).toBe(
+        true,
+      );
+      expect(component.getOfficeForm.office.hasError('required')).toBe(true);
+      expect(component.getOfficeForm.room.hasError('required')).toBe(true);
     });
 
     it('should initialize with signals', () => {
-      fixture.componentRef.setInput('id', undefined);
-      fixture.detectChanges();
-      expect(component.isEditing()).toBeFalse();
-      expect(component.isAdmin()).toBeFalse();
+      expect(component.isEditing()).toBe(false);
+      expect(component.isAdmin()).toBe(false);
     });
   });
 
@@ -371,31 +430,31 @@ describe('ReservationComponent', () => {
 
   describe('Step Navigation', () => {
     it('should validate customer form before proceeding to step 2', () => {
-      spyOn(component, 'callStepTwo');
+      vi.spyOn(component, 'callStepTwo').mockReturnValue(undefined);
       component.customerForm.setErrors({ invalid: true });
       component.callStepTwo(true);
-      expect(component.customerForm.invalid).toBeTrue();
+      expect(component.customerForm.invalid).toBe(true);
     });
 
     it('should validate office form before proceeding to step 3', () => {
-      spyOn(component, 'callStepThree');
+      vi.spyOn(component, 'callStepThree').mockReturnValue(undefined);
       component.officeForm.setErrors({ invalid: true });
       component.callStepThree(true);
-      expect(component.officeForm.invalid).toBeTrue();
+      expect(component.officeForm.invalid).toBe(true);
     });
 
     it('should validate treatment form before proceeding to step 4', () => {
-      spyOn(component, 'callStepFour');
+      vi.spyOn(component, 'callStepFour').mockReturnValue(undefined);
       component.treatmentForm.setErrors({ invalid: true });
       component.callStepFour(true);
-      expect(component.treatmentForm.invalid).toBeTrue();
+      expect(component.treatmentForm.invalid).toBe(true);
     });
 
     it('should validate configuration form before proceeding to step 6', () => {
-      spyOn(component, 'callStepSix');
+      vi.spyOn(component, 'callStepSix').mockReturnValue(undefined);
       component.configurationForm.setErrors({ invalid: true });
       component.callStepSix(true);
-      expect(component.configurationForm.invalid).toBeTrue();
+      expect(component.configurationForm.invalid).toBe(true);
     });
   });
 
@@ -433,13 +492,27 @@ describe('ReservationComponent', () => {
   describe('Additional Services', () => {
     it('should handle additional services selection', () => {
       const mockAdditional: IAdditionalAll[] = [
-        { key: 'add-1', id: 'add-1', name: 'Additional 1', price: 20, duration: '30M', type: ServiceType.additional },
-        { key: 'add-2', id: 'add-2', name: 'Additional 2', price: 30, duration: '15M', type: ServiceType.additional },
+        {
+          key: 'add-1',
+          id: 'add-1',
+          name: 'Additional 1',
+          price: 20,
+          duration: '30M',
+          type: ServiceType.additional,
+        },
+        {
+          key: 'add-2',
+          id: 'add-2',
+          name: 'Additional 2',
+          price: 30,
+          duration: '15M',
+          type: ServiceType.additional,
+        },
       ];
 
       const selectionList = {
         selectedOptions: {
-          selected: mockAdditional.map(item => ({ value: item })),
+          selected: mockAdditional.map((item) => ({ value: item })),
         },
       } as any;
       component.onChange(selectionList);
@@ -448,19 +521,29 @@ describe('ReservationComponent', () => {
     });
 
     it('should check if additional service is selected', () => {
-      const additional = { id: 'add-1', name: 'Additional 1' } as IAdditionalAll;
+      const additional = {
+        id: 'add-1',
+        name: 'Additional 1',
+      } as IAdditionalAll;
       component.additionalSelected.set([additional]);
 
-      expect(component.isSelected(additional)).toBeTrue();
-      expect(component.isSelected({ id: 'add-2', name: 'Additional 2' } as IAdditionalAll)).toBeFalse();
+      expect(component.isSelected(additional)).toBe(true);
+      expect(
+        component.isSelected({
+          id: 'add-2',
+          name: 'Additional 2',
+        } as IAdditionalAll),
+      ).toBe(false);
     });
   });
 
   describe('Navigation and Router', () => {
     it('should navigate to add customer page', () => {
       void component.addCustomer;
-      expect(navigationServiceSpy.navigate)
-        .toHaveBeenCalledWith(['users', 'add'], { state: { role: 'ROLE_CUSTOMER' } });
+      expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+        ['users', 'add'],
+        { state: { role: 'ROLE_CUSTOMER' } },
+      );
     });
   });
 
@@ -490,7 +573,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should dispatch CreateReservation action when creating a new reservation', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
 
       component.create();
@@ -498,18 +581,27 @@ describe('ReservationComponent', () => {
     });
 
     it('should include customer ID in reservation', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
 
       component.create();
-      expect(emitSpy.calls.mostRecent().args[0].reservation.customerId).toBe(mockCustomer.id);
+      expect(
+        vi.mocked(emitSpy).mock.lastCall?.[0].reservation?.customerId,
+      ).toBe(mockCustomer.id);
     });
 
     it('should include additional services in reservation', () => {
       const mockAdditional: IAdditionalAll[] = [
-        { key: 'add-1', id: 'add-1', name: 'Additional 1', price: 20, duration: '30M', type: ServiceType.additional },
+        {
+          key: 'add-1',
+          id: 'add-1',
+          name: 'Additional 1',
+          price: 20,
+          duration: '30M',
+          type: ServiceType.additional,
+        },
       ];
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.additionalSelected.set(mockAdditional);
       component.create();
@@ -517,7 +609,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should include payment information when amount and type are provided', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.amount.setValue(150);
       component.getConfigurationForm.option.setValue(cashPaymentOption);
@@ -527,7 +619,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should include customer change flag in reservation', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.customerChange.setValue(true);
       component.getConfigurationForm.reference.setValue('Test reference');
@@ -536,7 +628,7 @@ describe('ReservationComponent', () => {
     });
 
     it('should include note in reservation', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.getConfigurationForm.note.setValue('Test note');
       component.create();
@@ -555,14 +647,14 @@ describe('ReservationComponent', () => {
       } as any);
       fixture.detectChanges();
 
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.create();
       expect(emitSpy).toHaveBeenCalled();
     });
 
     it('should not dispatch action if no dates are provided', () => {
-      const emitSpy = jasmine.createSpy('emit');
+      const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       while (component.events.length > 0) {
         component.events.removeAt(0);
@@ -582,11 +674,11 @@ describe('ReservationComponent', () => {
     it('should set isPreview to false when currently in preview mode', () => {
       component.isPreview = true;
       component['alreadyCreated'] = false;
-      spyOn<any>(component, 'cleanEvent');
+      vi.spyOn<any, any>(component, 'cleanEvent').mockReturnValue(undefined);
 
       component.back();
 
-      expect(component.isPreview).toBeFalse();
+      expect(component.isPreview).toBe(false);
       expect(component['cleanEvent']).not.toHaveBeenCalled();
     });
 
@@ -596,12 +688,12 @@ describe('ReservationComponent', () => {
 
       component.back();
 
-      expect(component['alreadyCreated']).toBeTrue();
+      expect(component['alreadyCreated']).toBe(true);
     });
 
     it('should call cleanEvent when not in preview mode', () => {
       component.isPreview = false;
-      spyOn<any>(component, 'cleanEvent');
+      vi.spyOn<any, any>(component, 'cleanEvent').mockReturnValue(undefined);
 
       component.back();
 
@@ -610,7 +702,7 @@ describe('ReservationComponent', () => {
 
     it('should not call cleanEvent when in preview mode', () => {
       component.isPreview = true;
-      spyOn<any>(component, 'cleanEvent');
+      vi.spyOn<any, any>(component, 'cleanEvent').mockReturnValue(undefined);
 
       component.back();
 
@@ -648,7 +740,7 @@ describe('ReservationComponent', () => {
 
     it('should check if add button is disabled', () => {
       component.dateTimeList.setErrors({ invalid: true });
-      expect(component.isAddButtonDisabled).toBeTrue();
+      expect(component.isAddButtonDisabled).toBe(true);
     });
 
     it('should use the selected reservation as summary fallback and derive summary totals', () => {
@@ -675,40 +767,40 @@ describe('ReservationComponent', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
       const result = component['dateIsValid'](futureDate);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should invalidate date outside allowed range', () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 7);
       const result = component['dateIsValid'](pastDate);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
   });
 
   describe('Form Validation', () => {
     it('should mark customer form as invalid when empty', () => {
-      expect(component.customerForm.invalid).toBeTrue();
+      expect(component.customerForm.invalid).toBe(true);
     });
 
     it('should mark customer form as valid when filled', () => {
       component.getCustomerForm.customer.setValue(mockCustomer);
-      expect(component.getCustomerForm.customer.valid).toBeTrue();
+      expect(component.getCustomerForm.customer.valid).toBe(true);
     });
 
     it('should mark office form as invalid when empty', () => {
-      expect(component.officeForm.invalid).toBeTrue();
+      expect(component.officeForm.invalid).toBe(true);
     });
 
     it('should mark office form as valid when filled', () => {
       component.getOfficeForm.office.setValue(mockOffice);
       component.getOfficeForm.room.setValue(mockRoom);
       component.getOfficeForm.professional.setValue(mockRoom.professionals![0]);
-      expect(component.officeForm.valid).toBeTrue();
+      expect(component.officeForm.valid).toBe(true);
     });
 
     it('should mark treatment form as invalid when empty', () => {
-      expect(component.treatmentForm.invalid).toBeTrue();
+      expect(component.treatmentForm.invalid).toBe(true);
     });
 
     it('should mark treatment form as valid when filled', () => {
@@ -720,21 +812,34 @@ describe('ReservationComponent', () => {
       };
       component.getTreatmentForm.group.setValue(mockGroup);
       component.getTreatmentForm.treatment.setValue(mockTreatment);
-      expect(component.getTreatmentForm.group.valid).toBeTrue();
-      expect(component.getTreatmentForm.treatment.valid).toBeTrue();
+      expect(component.getTreatmentForm.group.valid).toBe(true);
+      expect(component.getTreatmentForm.treatment.valid).toBe(true);
     });
 
     it('should map sub errors to form controls through the shared service', () => {
-      spyOn(document, 'querySelector').and.returnValue(null);
-      component['applySubErrors']([{ field: 'room', message: 'Room is invalid' }] as any);
+      component['applySubErrors']([
+        { field: 'room', message: 'Room is invalid' },
+      ] as any);
 
       expect(component.errors().room).toBe('Room is invalid');
-      expect(component.getOfficeForm.room.hasError('incorrect')).toBeTrue();
+      expect(component.getOfficeForm.room.hasError('incorrect')).toBe(true);
     });
 
     it('should apply shared sub errors to customer and configuration controls', () => {
-      const inputSpy = jasmine.createSpyObj<HTMLInputElement>('input', ['focus', 'blur']);
-      spyOn(document, 'querySelector').and.returnValue(inputSpy);
+      const inputSpy = {
+        focus: vi.fn(),
+        blur: vi.fn(),
+      };
+
+      const originalQuerySelector = document.querySelector.bind(document);
+
+      vi.spyOn(document, 'querySelector').mockImplementation((selector) => {
+        if (selector === 'input[formControlName="customer"]') {
+          return inputSpy as any;
+        }
+
+        return originalQuerySelector(selector);
+      });
 
       component['applySubErrors']([
         { field: 'customer', message: 'Customer is invalid' },
@@ -743,17 +848,24 @@ describe('ReservationComponent', () => {
 
       expect(component.errors().customer).toBe('Customer is invalid');
       expect(component.errors().note).toBe('Note is invalid');
-      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
-      expect(component.getConfigurationForm.note.hasError('incorrect')).toBeTrue();
+
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
+        true,
+      );
+      expect(component.getConfigurationForm.note.hasError('incorrect')).toBe(
+        true,
+      );
+
       expect(inputSpy.focus).toHaveBeenCalled();
       expect(inputSpy.blur).toHaveBeenCalled();
     });
 
     it('should move the stepper to the mapped step when applying shared sub errors', () => {
       component.currentStepIndex.set(0);
-      spyOn(document, 'querySelector').and.returnValue(null);
 
-      component['applySubErrors']([{ field: 'professional', message: 'Professional is invalid' }] as any);
+      component['applySubErrors']([
+        { field: 'professional', message: 'Professional is invalid' },
+      ] as any);
 
       expect(component.currentStepIndex()).toBe(3);
     });
@@ -761,33 +873,44 @@ describe('ReservationComponent', () => {
     it('should use the editing default step for unmapped sub errors when the user is not admin', () => {
       component.currentStepIndex.set(0);
       fixture.componentRef.setInput('isEditing', true);
-      spyOn(document, 'querySelector').and.returnValue(null);
 
-      component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
+      component['applySubErrors']([
+        { field: 'customer', message: 'Customer is invalid' },
+      ] as any);
 
       expect(component.currentStepIndex()).toBe(2);
-      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
+        true,
+      );
     });
 
     it('should use the admin editing default step for unmapped sub errors', () => {
       component.currentStepIndex.set(0);
       fixture.componentRef.setInput('isEditing', true);
       fixture.componentRef.setInput('isAdmin', true);
-      spyOn(document, 'querySelector').and.returnValue(null);
+      vi.spyOn(document, 'querySelector').mockReturnValue(null);
 
-      component['applySubErrors']([{ field: 'customer', message: 'Customer is invalid' }] as any);
+      component['applySubErrors']([
+        { field: 'customer', message: 'Customer is invalid' },
+      ] as any);
 
       expect(component.currentStepIndex()).toBe(1);
-      expect(component.getCustomerForm.customer.hasError('incorrect')).toBeTrue();
+      expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
+        true,
+      );
     });
 
     it('should still map shared sub errors without throwing', () => {
-      spyOn(document, 'querySelector').and.returnValue(null);
-
-      expect(() => component['applySubErrors']([{ field: 'note', message: 'Note is invalid' }] as any)).not.toThrow();
+      expect(() =>
+        component['applySubErrors']([
+          { field: 'note', message: 'Note is invalid' },
+        ] as any),
+      ).not.toThrow();
 
       expect(component.errors().note).toBe('Note is invalid');
-      expect(component.getConfigurationForm.note.hasError('incorrect')).toBeTrue();
+      expect(component.getConfigurationForm.note.hasError('incorrect')).toBe(
+        true,
+      );
     });
   });
 
@@ -802,8 +925,12 @@ describe('ReservationComponent', () => {
     });
 
     it('should clear group when room changes', () => {
-      component.getTreatmentForm.group.setValue(
-        { id: 'group-1', name: 'Test Group', treatments: [mockTreatment], selectedTreatments: [] });
+      component.getTreatmentForm.group.setValue({
+        id: 'group-1',
+        name: 'Test Group',
+        treatments: [mockTreatment],
+        selectedTreatments: [],
+      });
       fixture.detectChanges();
 
       const differentRoom = { ...mockRoom, id: 'room-2' };
@@ -839,7 +966,9 @@ describe('ReservationComponent', () => {
       component.getTreatmentForm.treatment.setValue(mockTreatment);
       component.getTreatmentForm.discount.setValue(mockDiscount.id);
 
-      expect(component.getTreatmentForm.discount.value).toEqual(mockDiscount.id);
+      expect(component.getTreatmentForm.discount.value).toEqual(
+        mockDiscount.id,
+      );
     });
 
     it('should clear discount', () => {
@@ -868,75 +997,116 @@ describe('ReservationComponent', () => {
       component['setData'](reservation as any);
       await Promise.resolve();
 
-      expect(component.getCustomerForm.customer.value).toEqual(reservation.customer);
-      expect(component.getOfficeForm.office.value).toEqual(reservation.room.office);
+      expect(component.getCustomerForm.customer.value).toEqual(
+        reservation.customer,
+      );
+      expect(component.getOfficeForm.office.value).toEqual(
+        reservation.room.office,
+      );
       expect(component.getOfficeForm.room.value).toEqual(reservation.room);
-      expect(component.getOfficeForm.professional.value).toEqual(reservation.professional);
-      expect(component.getTreatmentForm.treatment.value).toEqual(reservation.treatment);
+      expect(component.getOfficeForm.professional.value).toEqual(
+        reservation.professional,
+      );
+      expect(component.getTreatmentForm.treatment.value).toEqual(
+        reservation.treatment,
+      );
       expect(component.getConfigurationForm.note.value).toBe('Important note');
       expect(component.getConfigurationForm.reference.value).toBe('REF-1');
-      expect(component.getConfigurationForm.customerChange.value).toBeTrue();
-      expect(component.additionalSelected().map(item => item.id)).toEqual(['additional-1']);
+      expect(component.getConfigurationForm.customerChange.value).toBe(true);
+      expect(component.additionalSelected().map((item) => item.id)).toEqual([
+        'additional-1',
+      ]);
       expect(component.price().total).toBe(105);
       expect(component.currentStepIndex()).toBe(2);
-      expect(component['hydratingEdit']).toBeFalse();
+      expect(component['hydratingEdit']).toBe(false);
     });
 
     it('should reuse the first date-time control when hydrating edit data', async () => {
       const reservation = createEditReservation();
       fixture.componentRef.setInput('isEditing', true);
-      const expectedDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
+      const expectedDate = newDateTimestamp(
+        reservation.timestamp,
+        reservation.room.timeZone,
+      );
       const expectedStart = getTime(expectedDate, component['language']);
 
       component['setData'](reservation as any);
       await Promise.resolve();
 
       expect(component.dateTimeList.length).toBe(1);
-      expect(component.getFormDateTimeControls(0).date.value).toEqual(expectedDate);
-      expect(component.getFormDateTimeControls(0).start.value).toBe(expectedStart);
+      expect(component.getFormDateTimeControls(0).date.value).toEqual(
+        expectedDate,
+      );
+      expect(component.getFormDateTimeControls(0).start.value).toBe(
+        expectedStart,
+      );
     });
   });
 
   describe('Additional Selection Sync', () => {
     it('should compare additionals by id', () => {
-      expect(component.compareAdditional(
-        { id: 'additional-1' } as any,
-        { id: 'additional-1' } as any,
-      )).toBeTrue();
-      expect(component.compareAdditional(
-        { id: 'additional-1' } as any,
-        { id: 'additional-2' } as any,
-      )).toBeFalse();
+      expect(
+        component.compareAdditional(
+          { id: 'additional-1' } as any,
+          { id: 'additional-1' } as any,
+        ),
+      ).toBe(true);
+      expect(
+        component.compareAdditional(
+          { id: 'additional-1' } as any,
+          { id: 'additional-2' } as any,
+        ),
+      ).toBe(false);
     });
 
     it('should sync rendered additional selections from stored ids', async () => {
-      const selected = { id: 'additional-1', name: 'Removal' } as IAdditionalAll;
+      const selected = {
+        id: 'additional-1',
+        name: 'Removal',
+      } as IAdditionalAll;
       const optionA = { value: selected, selected: false };
-      const optionB = { value: { id: 'additional-2', name: 'Powder' }, selected: true };
-      (component as any).additionalLists = () => [{ options: [optionA, optionB] }];
+      const optionB = {
+        value: { id: 'additional-2', name: 'Powder' },
+        selected: true,
+      };
+      (component as any).additionalLists = () => [
+        { options: [optionA, optionB] },
+      ];
       component.additionalSelected.set([selected]);
 
       component['syncRenderedAdditionalSelections']();
       await Promise.resolve();
 
-      expect(optionA.selected).toBeTrue();
-      expect(optionB.selected).toBeFalse();
+      expect(optionA.selected).toBe(true);
+      expect(optionB.selected).toBe(false);
     });
 
     it('should detect when additional selections need syncing', () => {
-      const current = [{ id: 'additional-1' }, { id: 'additional-2' }] as IAdditionalAll[];
+      const current = [
+        { id: 'additional-1' },
+        { id: 'additional-2' },
+      ] as IAdditionalAll[];
       const same = current.slice();
-      const differentOrder = [{ id: 'additional-2' }, { id: 'additional-1' }] as IAdditionalAll[];
+      const differentOrder = [
+        { id: 'additional-2' },
+        { id: 'additional-1' },
+      ] as IAdditionalAll[];
 
-      expect(component['shouldSyncAdditionalSelection'](current, same)).toBeFalse();
-      expect(component['shouldSyncAdditionalSelection'](current, differentOrder)).toBeTrue();
+      expect(component['shouldSyncAdditionalSelection'](current, same)).toBe(
+        false,
+      );
+      expect(
+        component['shouldSyncAdditionalSelection'](current, differentOrder),
+      ).toBe(true);
     });
   });
 
   describe('Time Zone Handling', () => {
     it('should use room timezone for date calculations', () => {
       component.getOfficeForm.room.setValue(mockRoom);
-      expect(component.getOfficeForm.room.value?.timeZone).toBe('Europe/Amsterdam');
+      expect(component.getOfficeForm.room.value?.timeZone).toBe(
+        'Europe/Amsterdam',
+      );
     });
 
     it('should handle UTC timezone', () => {
@@ -967,7 +1137,9 @@ describe('ReservationComponent', () => {
       const lastIndex = component.dateTimeList.length - 1;
       component.timeChange('16:45', lastIndex);
 
-      const updatedDate = component.dateTimeList.at(lastIndex).get('date')?.value;
+      const updatedDate = component.dateTimeList
+        .at(lastIndex)
+        .get('date')?.value;
       expect(updatedDate?.getHours()).toBe(16);
       expect(updatedDate?.getMinutes()).toBe(45);
     });
@@ -989,7 +1161,7 @@ describe('ReservationComponent', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 7);
       const result = component['dateIsValid'](futureDate);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
   });
 
@@ -1000,7 +1172,7 @@ describe('ReservationComponent', () => {
     it('should complete step 2 and move to step 3', () => {
       component.getCustomerForm.customer.setValue(mockCustomer);
       component.callStepTwo(false);
-      expect(component.customerForm.valid).toBeTrue();
+      expect(component.customerForm.valid).toBe(true);
     });
 
     it('should complete step 3 and move to step 4', () => {
@@ -1008,12 +1180,12 @@ describe('ReservationComponent', () => {
       component.getOfficeForm.room.setValue(mockRoom);
       component.getOfficeForm.professional.setValue(mockRoom.professionals![0]);
       component.callStepThree(false);
-      expect(component.officeForm.valid).toBeTrue();
+      expect(component.officeForm.valid).toBe(true);
     });
 
     it('should handle step 5 navigation', () => {
       component.callStepFive(false);
-      expect(component.isPreview).toBeFalse();
+      expect(component.isPreview).toBe(false);
     });
   });
 
@@ -1024,7 +1196,9 @@ describe('ReservationComponent', () => {
     });
 
     it('should clear customer info when customer changes', () => {
-      component.customerInfo.set({ treatment: { name: 'Old Treatment' } } as any);
+      component.customerInfo.set({
+        treatment: { name: 'Old Treatment' },
+      } as any);
       component.getCustomerForm.customer.setValue(mockCustomer);
       fixture.detectChanges();
       expect(component.customerInfo()).toBeUndefined();
@@ -1045,7 +1219,9 @@ describe('ReservationComponent', () => {
 
     it('should set payment type', () => {
       component.getConfigurationForm.option.setValue(cashPaymentOption);
-      expect(component.getConfigurationForm.option.value).toBe(cashPaymentOption);
+      expect(component.getConfigurationForm.option.value).toBe(
+        cashPaymentOption,
+      );
     });
 
     it('should set transfer reference', () => {
@@ -1054,8 +1230,12 @@ describe('ReservationComponent', () => {
     });
 
     it('should set payment reference', () => {
-      component.getConfigurationForm.reference.setValue('Payment for treatment');
-      expect(component.getConfigurationForm.reference.value).toBe('Payment for treatment');
+      component.getConfigurationForm.reference.setValue(
+        'Payment for treatment',
+      );
+      expect(component.getConfigurationForm.reference.value).toBe(
+        'Payment for treatment',
+      );
     });
   });
 
@@ -1122,7 +1302,7 @@ describe('ReservationComponent', () => {
       component['professionalId'].set('professional-1');
       component['totalDuration'] = new Duration(1);
 
-      dialogSpy.open.and.callFake((_: any, config: any) => {
+      dialogSpy.open.mockImplementation((_: any, config: any) => {
         return {
           afterClosed: () => of({ value: config.data.value }),
         } as any;
@@ -1130,22 +1310,20 @@ describe('ReservationComponent', () => {
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy.open).toHaveBeenCalledWith(
-        jasmine.any(Function),
-        {
-          data: {
-            title: 'RESERVATION.EVENT.CHANGE.TITLE',
-            content: 'RESERVATION.EVENT.CHANGE.CONTENT',
-            value: jasmine.objectContaining({
-              start: nextMonday,
-              end: jasmine.any(Date),
-              title: 'RESERVATION.EVENT.DETAIL',
-              meta: jasmine.objectContaining({
-                isReservation: true,
-              }),
+      expect(dialogSpy.open).toHaveBeenCalledWith(expect.any(Function), {
+        data: {
+          title: 'RESERVATION.EVENT.CHANGE.TITLE',
+          content: 'RESERVATION.EVENT.CHANGE.CONTENT',
+          value: expect.objectContaining({
+            start: nextMonday,
+            end: expect.any(Date),
+            title: 'RESERVATION.EVENT.DETAIL',
+            meta: expect.objectContaining({
+              isReservation: true,
             }),
-          },
-        });
+          }),
+        },
+      });
     });
 
     it('should check for professionalId before proceeding', () => {
@@ -1156,45 +1334,48 @@ describe('ReservationComponent', () => {
       nextMonday.setDate(today.getDate() + daysUntilMonday);
       nextMonday.setHours(12, 0, 0, 0);
 
-      component.professionalList.set([mockProfessional, { ...mockProfessional, id: 'professional-2' }]);
+      component.professionalList.set([
+        mockProfessional,
+        { ...mockProfessional, id: 'professional-2' },
+      ]);
       component.dataEvents.set('event', new DataEvent([], 0, nextMonday, 0));
       component['totalDuration'] = new Duration(1);
       matches$.next({ matches: true });
 
-      dialogSpy.open.and.callFake((_: any, config: any) => {
+      dialogSpy.open.mockImplementation((_: any, config: any) => {
         return {
-          afterClosed: () => of({ value: config.data.value, professional: mockProfessional }),
+          afterClosed: () =>
+            of({ value: config.data.value, professional: mockProfessional }),
         } as any;
       });
 
       component.segmentClick(nextMonday, 'CREATED', 'event');
 
-      expect(dialogSpy.open).toHaveBeenCalledWith(
-        jasmine.any(Function),
-        {
-          disableClose: true,
-          data: {
-            professionals: [mockProfessional, { ...mockProfessional, id: 'professional-2' }],
-            small: true,
-          },
-        });
+      expect(dialogSpy.open).toHaveBeenCalledWith(expect.any(Function), {
+        disableClose: true,
+        data: {
+          professionals: [
+            mockProfessional,
+            { ...mockProfessional, id: 'professional-2' },
+          ],
+          small: true,
+        },
+      });
 
-      expect(dialogSpy.open).toHaveBeenCalledWith(
-        jasmine.any(Function),
-        {
-          data: {
-            title: 'RESERVATION.EVENT.CHANGE.TITLE',
-            content: 'RESERVATION.EVENT.CHANGE.CONTENT',
-            value: jasmine.objectContaining({
-              start: nextMonday,
-              end: jasmine.any(Date),
-              title: 'RESERVATION.EVENT.DETAIL',
-              meta: jasmine.objectContaining({
-                isReservation: true,
-              }),
+      expect(dialogSpy.open).toHaveBeenCalledWith(expect.any(Function), {
+        data: {
+          title: 'RESERVATION.EVENT.CHANGE.TITLE',
+          content: 'RESERVATION.EVENT.CHANGE.CONTENT',
+          value: expect.objectContaining({
+            start: nextMonday,
+            end: expect.any(Date),
+            title: 'RESERVATION.EVENT.DETAIL',
+            meta: expect.objectContaining({
+              isReservation: true,
             }),
-          },
-        });
+          }),
+        },
+      });
     });
 
     it('should not set the segment if event data does not exist', () => {
@@ -1243,16 +1424,24 @@ describe('ReservationComponent', () => {
 
     it('should not delegate room availability setup when no room is selected', () => {
       component.getOfficeForm.room.setValue(undefined);
-      spyOn(component['reservationCalendarService'], 'addRoomAvailabilityEvents');
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'addRoomAvailabilityEvents',
+      ).mockReturnValue(undefined as any);
 
       component['addNotAvailable']({} as any);
 
-      expect(component['reservationCalendarService'].addRoomAvailabilityEvents).not.toHaveBeenCalled();
+      expect(
+        component['reservationCalendarService'].addRoomAvailabilityEvents,
+      ).not.toHaveBeenCalled();
     });
 
     it('should delegate room availability setup to the calendar service', () => {
       const mockDay = new (component as any).day.constructor();
-      spyOn(component['reservationCalendarService'], 'addRoomAvailabilityEvents').and.returnValue({
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'addRoomAvailabilityEvents',
+      ).mockReturnValue({
         weekendDays: [1, 2],
         day: mockDay,
         minTime: '09:00',
@@ -1262,36 +1451,53 @@ describe('ReservationComponent', () => {
 
       component['addNotAvailable']({} as any);
 
-      expect(component['reservationCalendarService'].addRoomAvailabilityEvents).toHaveBeenCalled();
+      expect(
+        component['reservationCalendarService'].addRoomAvailabilityEvents,
+      ).toHaveBeenCalled();
       expect(component.weekendDays).toEqual([1, 2]);
       expect(component.day).toBe(mockDay);
     });
 
     it('should delegate reservation event creation to the calendar service', () => {
       const events = [{ id: 'event-1' }] as any;
-      spyOn(component['reservationCalendarService'], 'buildReservationEvents').and.returnValue(events);
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'buildReservationEvents',
+      ).mockReturnValue(events);
 
       const result = component['addReservations']([] as any);
 
-      expect(component['reservationCalendarService'].buildReservationEvents).toHaveBeenCalled();
+      expect(
+        component['reservationCalendarService'].buildReservationEvents,
+      ).toHaveBeenCalled();
       expect(result).toBe(events);
     });
 
     it('should delegate unavailable list creation to the calendar service', () => {
-      spyOn(component['reservationCalendarService'], 'addUnavailableEvents');
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'addUnavailableEvents',
+      ).mockReturnValue(undefined);
 
       component['addUnavailableList']({} as any, [] as any);
 
-      expect(component['reservationCalendarService'].addUnavailableEvents).toHaveBeenCalled();
+      expect(
+        component['reservationCalendarService'].addUnavailableEvents,
+      ).toHaveBeenCalled();
     });
 
     it('should pass an undefined room timezone when creating unavailable events without a selected room', () => {
       component.getOfficeForm.room.setValue(undefined);
-      spyOn(component['reservationCalendarService'], 'addUnavailableEvents');
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'addUnavailableEvents',
+      ).mockReturnValue(undefined);
 
       component['addUnavailableList']({} as any, [] as any);
 
-      expect(component['reservationCalendarService'].addUnavailableEvents).toHaveBeenCalledWith(
+      expect(
+        component['reservationCalendarService'].addUnavailableEvents,
+      ).toHaveBeenCalledWith(
         {} as any,
         [] as any,
         undefined,
@@ -1302,19 +1508,35 @@ describe('ReservationComponent', () => {
 
     it('should create unavailable events through the calendar service', () => {
       const event = { id: 'event-1' } as any;
-      const addEvent = jasmine.createSpy('addEvent');
-      spyOn(component['reservationCalendarService'], 'createUnavailableEvent').and.returnValue(event);
+      const addEvent = vi.fn().mockName('addEvent');
+      vi.spyOn(
+        component['reservationCalendarService'],
+        'createUnavailableEvent',
+      ).mockReturnValue(event);
 
-      component['createUnavailableEvent']({ allDay: false }, new Date(), new Date(), { addEvent } as any);
+      component['createUnavailableEvent'](
+        { allDay: false },
+        new Date(),
+        new Date(),
+        { addEvent } as any,
+      );
 
-      expect(component['reservationCalendarService'].createUnavailableEvent).toHaveBeenCalled();
+      expect(
+        component['reservationCalendarService'].createUnavailableEvent,
+      ).toHaveBeenCalled();
       expect(addEvent).toHaveBeenCalledWith(event);
     });
 
     it('should validate unavailable dates before creating an event', () => {
-      spyOn(component as any, 'createUnavailableEvent');
+      vi.spyOn(component as any, 'createUnavailableEvent').mockReturnValue(
+        undefined,
+      );
 
-      component['validateUnavailable'](new Date(), { allDay: false, duration: { hour: 1, minute: 0 } }, {} as any);
+      component['validateUnavailable'](
+        new Date(),
+        { allDay: false, duration: { hour: 1, minute: 0 } },
+        {} as any,
+      );
 
       expect(component['createUnavailableEvent']).toHaveBeenCalled();
     });
@@ -1323,7 +1545,13 @@ describe('ReservationComponent', () => {
       component.getTreatmentForm.treatment.setValue(undefined);
       component.getCustomerForm.customer.setValue(undefined);
 
-      const event = component['createNewEvent'](new Date(), new Date(), 'CREATED', mockRoom.timeZone, 'event-1');
+      const event = component['createNewEvent'](
+        new Date(),
+        new Date(),
+        'CREATED',
+        mockRoom.timeZone,
+        'event-1',
+      );
 
       expect(event).toBeUndefined();
     });
@@ -1331,33 +1559,47 @@ describe('ReservationComponent', () => {
 
   describe('Form Getters', () => {
     it('should return customer form controls', () => {
-      expect(component.getCustomerForm).toBe(component['getForm'].customerForm.controls);
+      expect(component.getCustomerForm).toBe(
+        component['getForm'].customerForm.controls,
+      );
     });
 
     it('should return office form controls', () => {
-      expect(component.getOfficeForm).toBe(component['getForm'].officeForm.controls);
+      expect(component.getOfficeForm).toBe(
+        component['getForm'].officeForm.controls,
+      );
     });
 
     it('should return treatment form controls', () => {
-      expect(component.getTreatmentForm).toBe(component['getForm'].treatmentForm.controls);
+      expect(component.getTreatmentForm).toBe(
+        component['getForm'].treatmentForm.controls,
+      );
     });
 
     it('should return event group form controls', () => {
-      expect(component.getEventGroupForm).toBe(component['getForm'].eventGroup.controls);
+      expect(component.getEventGroupForm).toBe(
+        component['getForm'].eventGroup.controls,
+      );
     });
 
     it('should return configuration form controls', () => {
-      expect(component.getConfigurationForm).toBe(component['getForm'].configurationForm.controls);
+      expect(component.getConfigurationForm).toBe(
+        component['getForm'].configurationForm.controls,
+      );
     });
   });
 
   describe('FormArray Getters', () => {
     it('should return events FormArray', () => {
-      expect(component.events).toBe(component['getForm'].eventGroup.controls.events);
+      expect(component.events).toBe(
+        component['getForm'].eventGroup.controls.events,
+      );
     });
 
     it('should return dateTimeList FormArray', () => {
-      expect(component.dateTimeList).toBe(component['getForm'].treatmentForm.controls.dateTimeList);
+      expect(component.dateTimeList).toBe(
+        component['getForm'].treatmentForm.controls.dateTimeList,
+      );
     });
   });
 
@@ -1393,13 +1635,15 @@ describe('ReservationComponent', () => {
     it('should return true when timezones are different', () => {
       component.getOfficeForm.room.setValue({ timeZone: 'UTC' } as any);
 
-      expect(component.showTimeZone).toBeTrue();
+      expect(component.showTimeZone).toBe(true);
     });
 
     it('should return false when timezones are same', () => {
-      component.getOfficeForm.room.setValue({ timeZone: 'Europe/Amsterdam' } as any);
+      component.getOfficeForm.room.setValue({
+        timeZone: 'Europe/Amsterdam',
+      } as any);
 
-      expect(component.showTimeZone).toBeFalse();
+      expect(component.showTimeZone).toBe(false);
     });
   });
 
@@ -1420,7 +1664,10 @@ describe('ReservationComponent', () => {
       } as any);
       fixture.detectChanges();
 
-      expect(component.summaryCustomer).toEqual({ ...reservation.customer, id: 'c2' });
+      expect(component.summaryCustomer).toEqual({
+        ...reservation.customer,
+        id: 'c2',
+      });
     });
 
     it('should return room from form or fallback', () => {

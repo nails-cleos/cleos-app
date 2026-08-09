@@ -42,13 +42,28 @@ export interface UploadFile {
   selector: 'app-file-drop',
   templateUrl: './file-drop.component.html',
   styleUrls: ['./file-drop.component.scss'],
-  imports: [MatIcon, MatIconButton, MatButton, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle,
-    MatCardContent, DragDropDirective, ReactiveFormsModule, MatCardTitleGroup, MatProgressBar, PercentPipe],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    TranslatePipe,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    DragDropDirective,
+    ReactiveFormsModule,
+    MatCardTitleGroup,
+    MatProgressBar,
+    PercentPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FileDropComponent {
   private readonly destroyRef: DestroyRef = inject(DestroyRef);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private hadCurrentFile = false;
 
@@ -68,7 +83,8 @@ export class FileDropComponent {
   private fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
   private canvas = viewChild<ElementRef<HTMLCanvasElement>>('canvas');
   private canvasXs = viewChild<ElementRef<HTMLCanvasElement>>('canvasXs');
-  private resizedImage = viewChild<ElementRef<HTMLImageElement>>('resizedImage');
+  private resizedImage =
+    viewChild<ElementRef<HTMLImageElement>>('resizedImage');
 
   constructor() {
     effect(() => {
@@ -128,8 +144,14 @@ export class FileDropComponent {
     if (!this.undo()) {
       this.fileSelected.emit(undefined);
     } else {
-      const content = this.translateService.instant('COMMON.FILE.DELETE.MESSAGE', { name: file?.name });
-      const toastRef = this.toastService.show(content, 'warning', 5000, { actionType: 'button', action: 'undo' });
+      const content = this.translateService.instant(
+        'COMMON.FILE.DELETE.MESSAGE',
+        { name: file?.name },
+      );
+      const toastRef = this.toastService.show(content, 'warning', 5000, {
+        actionType: 'button',
+        action: 'undo',
+      });
       toastRef.onAction().subscribe(() => {
         this.file.set(file);
         this.fileSelected.emit(file);
@@ -139,7 +161,12 @@ export class FileDropComponent {
 
   private handleFile(file: File) {
     const progress = this.animate() ? 0 : 100;
-    const uploadFile: UploadFile = { raw: file, name: file.name, size: file.size, progress };
+    const uploadFile: UploadFile = {
+      raw: file,
+      name: file.name,
+      size: file.size,
+      progress,
+    };
     this.isImage.set(file.type.startsWith('image/'));
     this.file.set(uploadFile);
     this.simulateUpload(uploadFile);
@@ -152,15 +179,23 @@ export class FileDropComponent {
 
     const stepTime = 4;
 
-    interval(stepTime).pipe(
-      takeUntilDestroyed(this.destroyRef),
-      takeWhile(() => (this.file()?.progress ?? 0) < 99, true),
-      finalize(() => {
-        this.file.update(prev => prev ? { ...prev, progress: 100 } : prev);
-        this.processImage();
-      })).subscribe(() => this.file.update(prev => prev ? { ...prev, progress: prev.progress + 1 } : prev));
+    interval(stepTime)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        takeWhile(() => (this.file()?.progress ?? 0) < 99, true),
+        finalize(() => {
+          this.file.update((prev) =>
+            prev ? { ...prev, progress: 100 } : prev,
+          );
+          this.processImage();
+        }),
+      )
+      .subscribe(() =>
+        this.file.update((prev) =>
+          prev ? { ...prev, progress: prev.progress + 1 } : prev,
+        ),
+      );
   }
-
 
   private processImage() {
     const file = this.file()?.raw;
@@ -168,7 +203,7 @@ export class FileDropComponent {
       return;
     }
     if (!file.type.startsWith('image/')) {
-      this.file.update(prev => prev ? { ...prev, image: undefined } : prev);
+      this.file.update((prev) => (prev ? { ...prev, image: undefined } : prev));
       return;
     }
 
@@ -176,8 +211,11 @@ export class FileDropComponent {
     reader.onload = (e: any) => {
       const img = new Image();
       img.onload = () => {
-        const image = resizeImage(img, this.canvas()?.nativeElement || this.canvasXs()?.nativeElement);
-        this.file.update(prev => prev ? { ...prev, image } : prev);
+        const image = resizeImage(
+          img,
+          this.canvas()?.nativeElement || this.canvasXs()?.nativeElement,
+        );
+        this.file.update((prev) => (prev ? { ...prev, image } : prev));
         this.image.emit(image);
         const resizedImage = this.resizedImage();
         if (resizedImage) {

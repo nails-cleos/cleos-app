@@ -12,22 +12,48 @@ import {
   viewChild,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Additional, AdditionalForm, IAdditional, IAdditionalAll } from './additional';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  Additional,
+  AdditionalForm,
+  IAdditional,
+  IAdditionalAll,
+} from './additional';
 import { ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError, isString } from '../interfaces/common';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { MatOption } from '@angular/material/core';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
-import { MatChipGrid, MatChipInput, MatChipRemove, MatChipRow } from '@angular/material/chips';
+import {
+  MatChipGrid,
+  MatChipInput,
+  MatChipRemove,
+  MatChipRow,
+} from '@angular/material/chips';
 import { AdditionalStore } from '../store/additional.store';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
@@ -38,10 +64,30 @@ import { NavigationService } from '../services/navigation.service';
   selector: 'app-additional',
   templateUrl: './additional.component.html',
   styleUrls: ['./additional.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe,
-    RouterLink, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
-    ReactiveFormsModule, TimepickerDirective, TimepickerComponent, MatHint, MatChipGrid, MatChipRow, MatChipInput,
-    MatChipRemove, BackButtonDirective, SkeletonComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    RouterLink,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    MatPrefix,
+    ReactiveFormsModule,
+    TimepickerDirective,
+    TimepickerComponent,
+    MatHint,
+    MatChipGrid,
+    MatChipRow,
+    MatChipInput,
+    MatChipRemove,
+    BackButtonDirective,
+    SkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdditionalComponent {
@@ -51,8 +97,11 @@ export class AdditionalComponent {
 
   private readonly additionalStore = inject(AdditionalStore);
   private readonly treatmentStore = inject(TreatmentStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private readonly allGroupsSignal = computed(() => {
     const data = this.treatmentStore.data();
@@ -74,7 +123,9 @@ export class AdditionalComponent {
   filteredGroupSignal: Signal<ITreatmentGroupAll[] | undefined> = toSignal(
     this.getForm.group.valueChanges.pipe(
       startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.name),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.name,
+      ),
       combineLatestWith(toObservable(this.allGroupsSignal)),
       map(([name, groups]) => {
         if (name) {
@@ -86,7 +137,9 @@ export class AdditionalComponent {
     ),
   );
   groupsSignal = signal<ITreatmentGroupAll[]>([]);
-  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(this.allGroupsSignal());
+  allGroupsWritableSignal = signal<ITreatmentGroupAll[] | undefined>(
+    this.allGroupsSignal(),
+  );
   errors = signal<Record<string, unknown>>({});
 
   groupInput = viewChild.required<ElementRef<HTMLInputElement>>('groupInput');
@@ -139,12 +192,14 @@ export class AdditionalComponent {
         const selectedGroups: ITreatmentGroupAll[] = [];
         additional.groups?.forEach((group: ITreatmentGroupAll) => {
           selectedGroups.push(group);
-          filteredGroups = filteredGroups?.filter(c => c.id !== group.id);
+          filteredGroups = filteredGroups?.filter((c) => c.id !== group.id);
         });
 
         this.groupsSignal.set(selectedGroups);
         this.allGroupsWritableSignal.set(filteredGroups);
-        this.currentGroupIds = selectedGroups.map(({ id }) => id).filter(isString);
+        this.currentGroupIds = selectedGroups
+          .map(({ id }) => id)
+          .filter(isString);
       }
     });
   }
@@ -162,37 +217,55 @@ export class AdditionalComponent {
       return;
     }
 
-    const newGroupIds: string[] = this.groupsSignal().map(({ id }) => id).filter(isString);
-    this.submitData.emit(Additional.fromForm(this.getForm, this.additional(), newGroupIds, this.currentGroupIds));
+    const newGroupIds: string[] = this.groupsSignal()
+      .map(({ id }) => id)
+      .filter(isString);
+    this.submitData.emit(
+      Additional.fromForm(
+        this.getForm,
+        this.additional(),
+        newGroupIds,
+        this.currentGroupIds,
+      ),
+    );
   }
 
   remove = (group: ITreatmentGroupAll): void => {
     const groups = this.groupsSignal();
     const index = groups.indexOf(group);
     if (index >= 0) {
-      this.groupsSignal.update(current => current.filter((_, i) => i !== index));
-      this.allGroupsWritableSignal.update(current => current ? [...current, group] : [group]);
+      this.groupsSignal.update((current) =>
+        current.filter((_, i) => i !== index),
+      );
+      this.allGroupsWritableSignal.update((current) =>
+        current ? [...current, group] : [group],
+      );
       this.getForm.group.setValue(undefined);
     }
   };
 
   selectedGroup = (event: MatAutocompleteSelectedEvent): void => {
     const group = event.option.value;
-    this.groupsSignal.update(current => [...current, group]);
-    this.allGroupsWritableSignal.update(current => current?.filter(c => c.id !== group.id));
+    this.groupsSignal.update((current) => [...current, group]);
+    this.allGroupsWritableSignal.update((current) =>
+      current?.filter((c) => c.id !== group.id),
+    );
     this.groupInput().nativeElement.value = '';
     this.getForm.group.setValue(undefined);
   };
 
-  sortGroups = (data: any): ITreatmentGroupAll[] => data.sort((a: any, b: any) => {
-    const aName = a.name.toUpperCase();
-    const bName = b.name.toUpperCase();
-    return (aName > bName) ? 1 : ((bName > aName) ? -1 : 0);
-  });
+  sortGroups = (data: any): ITreatmentGroupAll[] =>
+    data.sort((a: any, b: any) => {
+      const aName = a.name.toUpperCase();
+      const bName = b.name.toUpperCase();
+      return aName > bName ? 1 : bName > aName ? -1 : 0;
+    });
 
   private filterGroup = (
     name: string,
     groups: ITreatmentGroupAll[],
-  ): ITreatmentGroupAll[] | undefined => groups?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  ): ITreatmentGroupAll[] | undefined =>
+    groups?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

@@ -9,10 +9,8 @@ export const matIconRegistryStub: Partial<MatIconRegistry> = {
 
   getDefaultFontSetClass: () => ['material-icons'],
 
-  addSvgIcon: (
-    _iconName: string,
-    _url: SafeResourceUrl,
-  ) => matIconRegistryStub as MatIconRegistry,
+  addSvgIcon: (_iconName: string, _url: SafeResourceUrl) =>
+    matIconRegistryStub as MatIconRegistry,
 
   addSvgIconInNamespace: (
     _namespace: string,
@@ -20,12 +18,9 @@ export const matIconRegistryStub: Partial<MatIconRegistry> = {
     _url: SafeResourceUrl,
   ) => matIconRegistryStub as MatIconRegistry,
 
-  addSvgIconSet: (
-    _url: SafeResourceUrl,
-  ) => matIconRegistryStub as MatIconRegistry,
+  addSvgIconSet: (_url: SafeResourceUrl) =>
+    matIconRegistryStub as MatIconRegistry,
 
-  addSvgIconSetInNamespace: (
-    _namespace: string,
-    _url: SafeResourceUrl,
-  ) => matIconRegistryStub as MatIconRegistry,
+  addSvgIconSetInNamespace: (_namespace: string, _url: SafeResourceUrl) =>
+    matIconRegistryStub as MatIconRegistry,
 };

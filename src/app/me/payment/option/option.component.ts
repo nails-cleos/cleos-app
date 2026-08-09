@@ -1,9 +1,24 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { getPrice, newPercentage } from '@app/util/helper';
 import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { IPrice, Price } from '@app/treatment/treatment';
-import { IReservationAll, IReservationPayment } from '@app/reservation/reservation';
+import {
+  IReservationAll,
+  IReservationPayment,
+} from '@app/reservation/reservation';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BankComponent, BankForm } from '@app/shared/bank/bank.component';
 import { PaymentPreviewComponent } from '@app/shared/payment-preview/payment-preview.component';
@@ -21,9 +36,22 @@ import { ReservationStore } from '@app/store/reservation.store';
   selector: 'app-option',
   templateUrl: './option.component.html',
   styleUrls: ['./option.component.scss'],
-  imports: [MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, DecimalPipe, NgTemplateOutlet, BankComponent,
-    BackButtonDirective, CurrencySymbolPipe, BankComponent, PaymentPreviewComponent, BackButtonDirective,
-    CurrencySymbolPipe, MatProgressSpinner],
+  imports: [
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    DecimalPipe,
+    NgTemplateOutlet,
+    BankComponent,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    BankComponent,
+    PaymentPreviewComponent,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    MatProgressSpinner,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OptionComponent {
@@ -31,8 +59,11 @@ export class OptionComponent {
 
   private readonly paymentStore = inject(PaymentStore);
   private readonly reservationStore = inject(ReservationStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private readonly paymentOptionsSignal = this.paymentStore.options;
   private readonly paymentResource = this.paymentStore.data;
@@ -43,13 +74,17 @@ export class OptionComponent {
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
-  private readonly paymentOptions = computed(
-    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  private readonly paymentOptions = computed(() =>
+    this.paymentOptionsSignal().filter(
+      (option) => option.enabled && option.enabledCustomer,
+    ),
   );
 
   reservation = signal<IReservationAll | undefined>(undefined);
   price = signal<IPrice>(new Price());
-  professionalName = computed(() => this.reservation()?.professional?.displayName ?? '');
+  professionalName = computed(
+    () => this.reservation()?.professional?.displayName ?? '',
+  );
   first = true;
   currentStepIndex = signal(0);
 
@@ -71,8 +106,11 @@ export class OptionComponent {
       if (reservation) {
         const options = this.paymentOptions();
         const types = reservation.room.paymentTypes.filter(
-          p => !['cash', 'transfer'].includes(p.toLowerCase()));
-        this.options.set(options.filter(option => types?.includes(option.type)));
+          (p) => !['cash', 'transfer'].includes(p.toLowerCase()),
+        );
+        this.options.set(
+          options.filter((option) => types?.includes(option.type)),
+        );
         const price = getPrice(reservation, payments);
         this.price.set(price);
         if (price.isPaid) {
@@ -81,7 +119,9 @@ export class OptionComponent {
           if (reservation.state !== 'CANCELLED_PAYMENT_REQUIRED') {
             this.first = price.totalPaid === 0;
           } else if (payments) {
-            this.price.set(new Price(0, 0, 0, 0, 0, payments[payments.length - 1].amount));
+            this.price.set(
+              new Price(0, 0, 0, 0, 0, payments[payments.length - 1].amount),
+            );
           }
           this.reservation.set(reservation);
         }
@@ -94,7 +134,7 @@ export class OptionComponent {
   }
 
   back() {
-    this.currentStepIndex.update(index => Math.max(index - 1, 0));
+    this.currentStepIndex.update((index) => Math.max(index - 1, 0));
   }
 
   pay() {
@@ -103,7 +143,8 @@ export class OptionComponent {
       return;
     }
     const type = option.type;
-    const percentage = this.getForm.percentage?.value || PaymentPercentage.total;
+    const percentage =
+      this.getForm.percentage?.value || PaymentPercentage.total;
     const payment: IReservationPayment = { type, percentage };
     const reservationId = this.id();
     if (!reservationId) {

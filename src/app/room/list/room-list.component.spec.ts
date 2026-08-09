@@ -1,3 +1,12 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -16,20 +25,32 @@ import { NavigationService } from '@app/services/navigation.service';
 describe('RoomListComponent', () => {
   let component: RoomListComponent;
   let fixture: ComponentFixture<RoomListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
   let translateService: TranslateService;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let roomStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    selectAndNavigate: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadPage: Mock;
+    selectAndNavigate: Mock;
+    delete: Mock;
   };
 
   const address: IAddress = {
@@ -75,9 +96,10 @@ describe('RoomListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -86,25 +108,31 @@ describe('RoomListComponent', () => {
       },
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     roomStoreSpy = {
       isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadPage: jasmine.createSpy('loadPage'),
-      selectAndNavigate: jasmine.createSpy('selectAndNavigate'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadPage: vi.fn().mockName('loadPage'),
+      selectAndNavigate: vi.fn().mockName('selectAndNavigate'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [RoomListComponent],
@@ -180,7 +208,12 @@ describe('RoomListComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(roomStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -192,9 +225,11 @@ describe('RoomListComponent', () => {
   });
 
   it('should clear response and reset paginator when response emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
 
-    component['paginator'] = signal(paginatorMock);
+    component['paginator'] = signal(paginatorMock) as any;
 
     roomStoreSpy.response.set({ success: true });
 
@@ -212,7 +247,7 @@ describe('RoomListComponent', () => {
 
   it('should call delete when dialog returns a result', () => {
     const item = mockRooms[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 

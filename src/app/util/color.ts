@@ -1,7 +1,10 @@
 import { ColorEvent } from '../dashboard/dashboard';
 
-export const getProfessionalColor = (isDark: boolean, darkColor?: string, lightColor?: string): ColorEvent =>
-  isDark ? getDarkColor(darkColor) : getLightColor(lightColor);
+export const getProfessionalColor = (
+  isDark: boolean,
+  darkColor?: string,
+  lightColor?: string,
+): ColorEvent => (isDark ? getDarkColor(darkColor) : getLightColor(lightColor));
 
 export const lightenDarkenColor = (color: string, amount: number): string => {
   color = color.replace(/#/g, '');
@@ -11,8 +14,8 @@ export const lightenDarkenColor = (color: string, amount: number): string => {
 
   // Shift the red, green, and blue components by 'amount'
   let r = (num >> 16) + amount;
-  let b = ((num >> 8) & 0x00FF) + amount;
-  let g = (num & 0x0000FF) + amount;
+  let b = ((num >> 8) & 0x00ff) + amount;
+  let g = (num & 0x0000ff) + amount;
 
   // Ensure that the values are within the valid range [0, 255]
   r = Math.min(Math.max(r, 0), 255);
@@ -31,17 +34,22 @@ const createColor = (color: string, isDarkMode: boolean): ColorEvent => {
   return new ColorEvent(color, lightenDarken);
 };
 
-export const createEventColor = (hex: string, isDarkMode: boolean): ColorEvent => createColor(hex, isDarkMode);
+export const createEventColor = (
+  hex: string,
+  isDarkMode: boolean,
+): ColorEvent => createColor(hex, isDarkMode);
 
-const getDarkColor = (hex?: string): ColorEvent => hex ? createColor(hex, true) : createColor(randomColor(true), true);
+const getDarkColor = (hex?: string): ColorEvent =>
+  hex ? createColor(hex, true) : createColor(randomColor(true), true);
 
-const getLightColor = (hex?: string): ColorEvent => hex ? createColor(hex, false) :
-  createColor(randomColor(false), false);
+const getLightColor = (hex?: string): ColorEvent =>
+  hex ? createColor(hex, false) : createColor(randomColor(false), false);
 
 const convertRGBToHex = (red: number, green: number, blue: number): string =>
   '#' + getRGBColor(red) + getRGBColor(green) + getRGBColor(blue);
 
-const getRGBColor = (value: number): string => `0${ value.toString(16) }`.slice(-2);
+const getRGBColor = (value: number): string =>
+  `0${value.toString(16)}`.slice(-2);
 
 export const randomColor = (dark: boolean): string => {
   const factor = dark ? 1.5 : 0.5;

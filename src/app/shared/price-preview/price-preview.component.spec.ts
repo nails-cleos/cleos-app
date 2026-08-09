@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PricePreviewComponent } from './price-preview.component';
 import { Price } from '@app/treatment/treatment';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PricePreviewComponent', () => {
   let component: PricePreviewComponent;
@@ -27,7 +28,7 @@ describe('PricePreviewComponent', () => {
     expect(component.resultAmount).toBe(0);
     expect(component.accountCreditAmount).toBe(0);
     expect(component.accountBalanceUsed).toBe(0);
-    expect(component.hasBalanceSummary).toBeFalse();
+    expect(component.hasBalanceSummary).toBe(false);
   });
 
   it('should prefer toPaid when it is positive', () => {
@@ -79,7 +80,7 @@ describe('PricePreviewComponent', () => {
     fixture.detectChanges();
 
     expect(component.accountBalanceUsed).toBe(20);
-    expect(component.hasBalanceSummary).toBeTrue();
+    expect(component.hasBalanceSummary).toBe(true);
   });
 
   it('should derive account credit from price and penalty when explicit credit is absent', () => {

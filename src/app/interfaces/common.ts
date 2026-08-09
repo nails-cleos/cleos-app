@@ -9,7 +9,7 @@ export interface ICommon {
     icon: string;
     label: string;
     showDelete?: boolean;
-  }
+  };
 }
 
 export interface IApiResponse {
@@ -48,9 +48,7 @@ interface IResponseWithFile extends IBaseResponseMeta {
   message?: undefined;
 }
 
-export type IResponseSuccess =
-  | IResponseWithMessage
-  | IResponseWithFile;
+export type IResponseSuccess = IResponseWithMessage | IResponseWithFile;
 
 export class PageRequest {
   page: number;
@@ -58,7 +56,12 @@ export class PageRequest {
   direction: SortDirection;
   size: number;
 
-  constructor(page: number, sort: string, direction: SortDirection, size: number = PAGE_SIZE) {
+  constructor(
+    page: number,
+    sort: string,
+    direction: SortDirection,
+    size: number = PAGE_SIZE,
+  ) {
     this.page = page;
     this.sort = sort;
     this.direction = direction;
@@ -73,8 +76,16 @@ export const success = <T extends (...args: any[]) => any>(
   reload: boolean = false,
   toastType: ToastType = 'success',
   ...extraActions: any[]
-): Observable<ReturnType<T>> => successResponse(actionCreator, message, path, undefined, reload, toastType,
-    ...extraActions);
+): Observable<ReturnType<T>> =>
+  successResponse(
+    actionCreator,
+    message,
+    path,
+    undefined,
+    reload,
+    toastType,
+    ...extraActions,
+  );
 
 export const successResponse = <T extends (...args: any[]) => any>(
   actionCreator: T,
@@ -85,7 +96,13 @@ export const successResponse = <T extends (...args: any[]) => any>(
   toastType: ToastType = 'success',
   ...additionalActions: any[]
 ): Observable<ReturnType<T>> => {
-  const mainAction = actionCreator({ message, path, reload, toastType, redirect });
+  const mainAction = actionCreator({
+    message,
+    path,
+    reload,
+    toastType,
+    redirect,
+  });
   return of(mainAction, ...additionalActions);
 };
 

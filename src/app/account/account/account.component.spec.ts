@@ -1,8 +1,20 @@
+import {
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type MockedObject,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { AccountComponent } from './account.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { IAccountAll, ITransaction } from '../account';
 import { AccountStore } from '@app/store/account.store';
 import { signal } from '@angular/core';
@@ -13,10 +25,16 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('AccountComponent', () => {
   let component: AccountComponent;
   let fixture: ComponentFixture<AccountComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let accountStoreSpy: jasmine.SpyObj<any>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let accountStoreSpy: MockedObject<any>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   let selectedAccountSignal: ReturnType<typeof signal<any>>;
   let subErrorsSignal: ReturnType<typeof signal<any>>;
@@ -45,23 +63,30 @@ describe('AccountComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     authUserSignal.set(initialAuthUser);
     selectedAccountSignal = signal<any>(undefined);
     subErrorsSignal = signal<any>(undefined);
     responseSignal = signal<any>(undefined);
 
-    accountStoreSpy = jasmine.createSpyObj('AccountStore', ['clean', 'loadAccountByCustomerId', 'updateAccount'], {
+    accountStoreSpy = {
+      clean: vi.fn().mockName('AccountStore.clean'),
+      loadAccountByCustomerId: vi
+        .fn()
+        .mockName('AccountStore.loadAccountByCustomerId'),
+      updateAccount: vi.fn().mockName('AccountStore.updateAccount'),
       selected: selectedAccountSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
       response: responseSignal.asReadonly(),
       isLoading: signal(false).asReadonly(),
-    });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
       imports: [AccountComponent],
@@ -94,23 +119,33 @@ describe('AccountComponent', () => {
     fixture.detectChanges();
 
     expect(accountStoreSpy.clean).toHaveBeenCalled();
-    expect(accountStoreSpy.loadAccountByCustomerId).toHaveBeenCalledWith('customer-123');
+    expect(accountStoreSpy.loadAccountByCustomerId).toHaveBeenCalledWith(
+      'customer-123',
+    );
   });
 
   it('should update showAdd correctly based on admin role and customerId', () => {
-    authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      customerId: 'user-1',
+      hasAdminRole: true,
+    }));
     fixture.componentRef.setInput('customerId', 'customer-2');
     fixture.detectChanges();
 
-    expect(component.showAdd()).toBeTrue();
+    expect(component.showAdd()).toBe(true);
 
-    authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: false }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      customerId: 'user-1',
+      hasAdminRole: false,
+    }));
     fixture.detectChanges();
-    expect(component.showAdd()).toBeFalse();
+    expect(component.showAdd()).toBe(false);
   });
 
   it('should patch form when selectedAccountSignal emits', () => {
-    spyOn(component.form, 'patchValue');
+    vi.spyOn(component.form, 'patchValue').mockReturnValue(undefined);
 
     selectedAccountSignal.set(mockAccount);
     fixture.detectChanges();
@@ -135,17 +170,32 @@ describe('AccountComponent', () => {
   });
 
   it('should navigate after responseSignal emits', () => {
-    authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      customerId: 'user-1',
+      hasAdminRole: true,
+    }));
     component.language = 'en';
     fixture.componentRef.setInput('customerId', 'user-1');
     responseSignal.set({ success: true });
     fixture.detectChanges();
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['users', 'user-1', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'users',
+      'user-1',
+      'overview',
+    ]);
 
-    authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: false }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      customerId: 'user-1',
+      hasAdminRole: false,
+    }));
     responseSignal.set({ success: true });
     fixture.detectChanges();
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'overview']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'me',
+      'overview',
+    ]);
   });
 
   it('should dispatch updateAccount on valid submit', () => {
@@ -158,7 +208,7 @@ describe('AccountComponent', () => {
 
     expect(accountStoreSpy.updateAccount).toHaveBeenCalledWith(
       'account-123',
-      jasmine.objectContaining({
+      expect.objectContaining({
         customerId: 'user-1',
         gift: 10,
       } as ITransaction),
@@ -167,11 +217,15 @@ describe('AccountComponent', () => {
 
   it('should not dispatch updateAccount if form is invalid', () => {
     selectedAccountSignal.set(mockAccount);
-    authUserSignal.update(prev => ({ ...prev, customerId: 'user-1', hasAdminRole: true }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      customerId: 'user-1',
+      hasAdminRole: true,
+    }));
     fixture.detectChanges();
 
     component.form.patchValue({ currency: undefined, gift: undefined });
-    accountStoreSpy.updateAccount.calls.reset();
+    accountStoreSpy.updateAccount.mockClear();
 
     component.submit();
 

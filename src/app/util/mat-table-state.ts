@@ -68,12 +68,13 @@ export const createMatTableState = (
     paginator()?.firstPage();
   };
 
-  const resetOn = (trigger: Signal<unknown>, onReset: () => void) => effect(() => {
-    if (trigger()) {
-      onReset();
-      resetPage();
-    }
-  });
+  const resetOn = (trigger: Signal<unknown>, onReset: () => void) =>
+    effect(() => {
+      if (trigger()) {
+        onReset();
+        resetPage();
+      }
+    });
 
   return {
     paginator,

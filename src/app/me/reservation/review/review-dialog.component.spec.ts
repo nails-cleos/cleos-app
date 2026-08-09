@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReviewDialogComponent } from './review-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -14,14 +15,21 @@ describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
   let fixture: ComponentFixture<ReviewDialogComponent>;
 
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReviewDialogComponent>>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
+  let dialogRefSpy: Pick<MatDialogRef<ReviewDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     const customer: IUserAll = {
       id: 'customer-id',

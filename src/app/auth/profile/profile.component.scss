@@ -75,7 +75,11 @@
   pointer-events: none;
   border-radius: 50%;
   z-index: 1;
-  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--app-surface-card-bg) 92%, black 8%));
+  background: linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--app-surface-card-bg) 92%, black 8%)
+  );
 }
 
 .hoverable:hover .hover-text,

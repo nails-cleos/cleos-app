@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
@@ -8,21 +9,32 @@ import { OfficeService } from '../services/office.service';
 
 describe('OfficeStore', () => {
   let store: InstanceType<typeof OfficeStore>;
-  let officeServiceSpy: jasmine.SpyObj<OfficeService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let officeServiceSpy: {
+    getOfficesPage: Mock;
+    getAllMyOffices: Mock;
+    getOffice: Mock;
+    createOffice: Mock;
+    updateOffice: Mock;
+    deleteOffice: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+  };
 
   beforeEach(() => {
-    officeServiceSpy = jasmine.createSpyObj<OfficeService>('OfficeService', [
-      'getOfficesPage',
-      'getAllMyOffices',
-      'getOffice',
-      'createOffice',
-      'updateOffice',
-      'deleteOffice',
-    ]);
+    officeServiceSpy = {
+      getOfficesPage: vi.fn().mockName('OfficeService.getOfficesPage'),
+      getAllMyOffices: vi.fn().mockName('OfficeService.getAllMyOffices'),
+      getOffice: vi.fn().mockName('OfficeService.getOffice'),
+      createOffice: vi.fn().mockName('OfficeService.createOffice'),
+      updateOffice: vi.fn().mockName('OfficeService.updateOffice'),
+      deleteOffice: vi.fn().mockName('OfficeService.deleteOffice'),
+    };
 
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake(
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+    };
+    translateSpy.instant.mockImplementation(
       (key: string, params?: Record<string, string>) =>
         `${key}:${params?.['name'] ?? ''}`,
     );
@@ -40,7 +52,7 @@ describe('OfficeStore', () => {
 
   it('should load offices page', () => {
     const page = { content: [] } as any;
-    officeServiceSpy.getOfficesPage.and.returnValue(of(page));
+    officeServiceSpy.getOfficesPage.mockReturnValue(of(page));
 
     store.loadPage({
       page: 0,
@@ -61,12 +73,12 @@ describe('OfficeStore', () => {
       value: page,
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load my offices list', () => {
     const list = [{ id: '1' }] as any;
-    officeServiceSpy.getAllMyOffices.and.returnValue(of(list));
+    officeServiceSpy.getAllMyOffices.mockReturnValue(of(list));
 
     store.loadMyOffices();
 
@@ -77,35 +89,34 @@ describe('OfficeStore', () => {
       value: list,
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load office by id', () => {
     const office = { id: 'o1' } as any;
-    officeServiceSpy.getOffice.and.returnValue(of(office));
+    officeServiceSpy.getOffice.mockReturnValue(of(office));
 
     store.loadById('o1');
 
     expect(officeServiceSpy.getOffice).toHaveBeenCalledWith('o1');
     expect(store.selected()).toEqual(office);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should create office and set response', () => {
-    officeServiceSpy.createOffice.and.returnValue(
+    officeServiceSpy.createOffice.mockReturnValue(
       of({ id: '1', name: 'HQ' } as any),
     );
 
     store.create({ name: 'HQ' } as any);
 
     expect(officeServiceSpy.createOffice).toHaveBeenCalledWith(
-      jasmine.any(Object),
+      expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'OFFICE.CREATED',
-      { name: 'HQ' },
-    );
+    expect(translateSpy.instant).toHaveBeenCalledWith('OFFICE.CREATED', {
+      name: 'HQ',
+    });
 
     expect(store.response()).toEqual({
       message: 'OFFICE.CREATED:HQ',
@@ -113,11 +124,11 @@ describe('OfficeStore', () => {
       redirect: 'offices',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should update office and set response', () => {
-    officeServiceSpy.updateOffice.and.returnValue(
+    officeServiceSpy.updateOffice.mockReturnValue(
       of({ id: '2', name: 'Updated Office' } as any),
     );
 
@@ -125,7 +136,7 @@ describe('OfficeStore', () => {
 
     expect(officeServiceSpy.updateOffice).toHaveBeenCalledWith(
       '2',
-      jasmine.any(Object),
+      expect.any(Object),
     );
 
     expect(translateSpy.instant).toHaveBeenCalledWith(
@@ -139,11 +150,11 @@ describe('OfficeStore', () => {
       redirect: 'offices',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should delete office and show warning response', () => {
-    officeServiceSpy.deleteOffice.and.returnValue(of(void 0));
+    officeServiceSpy.deleteOffice.mockReturnValue(of(void 0));
 
     store.delete('o1', 'Main Office');
 
@@ -161,33 +172,34 @@ describe('OfficeStore', () => {
       toastType: 'warning',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should map HTTP errors into error state', () => {
-    officeServiceSpy.getOffice.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 404,
-          error: { message: 'OFFICE.NOT_FOUND' },
-        }),
+    officeServiceSpy.getOffice.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            error: { message: 'OFFICE.NOT_FOUND' },
+          }),
       ),
     );
 
     store.loadById('missing');
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         status: 'NOT_FOUND',
         message: 'OFFICE.NOT_FOUND',
       }),
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should reset state on clean()', () => {
-    officeServiceSpy.getOfficesPage.and.returnValue(of({ content: [] } as any));
+    officeServiceSpy.getOfficesPage.mockReturnValue(of({ content: [] } as any));
 
     store.loadPage({
       page: 0,
@@ -203,7 +215,7 @@ describe('OfficeStore', () => {
   });
 
   it('should clear response and error', () => {
-    officeServiceSpy.getOfficesPage.and.returnValue(of({ content: [] } as any));
+    officeServiceSpy.getOfficesPage.mockReturnValue(of({ content: [] } as any));
 
     store.loadPage({
       page: 0,

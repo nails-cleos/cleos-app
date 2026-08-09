@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -6,22 +7,46 @@ import { BehaviorSubject, of } from 'rxjs';
 
 import { UserListComponent } from './user-list.component';
 import { IUser, IUserAll, User } from '../user';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '@app/interfaces/pagination';
+import {
+  MOBILE_PAGE_SIZE,
+  PAGE_SIZE,
+  Pagination,
+} from '@app/interfaces/pagination';
 import { signal, WritableSignal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '@app/store/user.store';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
-
 describe('UserListComponent', () => {
   let component: UserListComponent;
   let fixture: ComponentFixture<UserListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let userStoreSpy: {
+    clean: Mock;
+    loadPage: Mock;
+    selectAndNavigate: Mock;
+    delete: Mock;
+    restore: Mock;
+    resendToken: Mock;
+    mergeUsers: Mock;
+    setRole: Mock;
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
 
   let breakpoint$: BehaviorSubject<any>;
   let paginationSignal: WritableSignal<Pagination<IUserAll> | undefined>;
@@ -42,9 +67,10 @@ describe('UserListComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     paginationSignal = signal(mockPagination);
     responseSignal = signal(undefined);
     isLoadingSignal = signal(false);
@@ -56,31 +82,37 @@ describe('UserListComponent', () => {
       },
     });
 
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', [
-      'loadPage',
-      'clean',
-      'selectAndNavigate',
-      'delete',
-      'restore',
-      'resendToken',
-      'mergeUsers',
-      'setRole',
-    ]);
+    userStoreSpy = {
+      loadPage: vi.fn().mockName('UserStore.loadPage'),
+      clean: vi.fn().mockName('UserStore.clean'),
+      selectAndNavigate: vi.fn().mockName('UserStore.selectAndNavigate'),
+      delete: vi.fn().mockName('UserStore.delete'),
+      restore: vi.fn().mockName('UserStore.restore'),
+      resendToken: vi.fn().mockName('UserStore.resendToken'),
+      mergeUsers: vi.fn().mockName('UserStore.mergeUsers'),
+      setRole: vi.fn().mockName('UserStore.setRole'),
+    };
     Object.assign(userStoreSpy, {
       data: paginationSignal.asReadonly(),
       response: responseSignal.asReadonly(),
       isLoading: isLoadingSignal.asReadonly(),
     });
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [UserListComponent],
@@ -153,7 +185,7 @@ describe('UserListComponent', () => {
   });
 
   it('should load users when filter changes', () => {
-    userStoreSpy.loadPage.calls.reset();
+    userStoreSpy.loadPage.mockClear();
     const filterValue = ' filterValue ';
     component.getForm.filter.setValue(filterValue);
     fixture.detectChanges();
@@ -189,43 +221,45 @@ describe('UserListComponent', () => {
 
   it('should delete when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'USER.DELETED.TITLE',
           content: 'USER.DELETED.CONTENT',
           value: item,
           variant: 'warning',
         },
-      }));
+      }),
+    );
 
     expect(userStoreSpy.delete).toHaveBeenCalledWith(item.id, item.displayName);
   });
 
   it('should restore when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.restore(item);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'USER.RESTORE.TITLE',
           content: 'USER.RESTORE.CONTENT',
           value: item,
         },
-      }));
+      }),
+    );
 
     const restoreUser: IUser = new User();
     restoreUser.id = item.id;
@@ -236,21 +270,22 @@ describe('UserListComponent', () => {
 
   it('should resend invite when dialog returns a result', () => {
     const item = mockUsers[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.sendInvite(item);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'USER.ACTIVATION_RESEND.TITLE',
           content: 'USER.ACTIVATION_RESEND.CONTENT',
           value: item,
         },
-      }));
+      }),
+    );
 
     expect(userStoreSpy.resendToken).toHaveBeenCalledWith(item.id);
   });
@@ -258,12 +293,15 @@ describe('UserListComponent', () => {
   it('should merge when dialog returns a result', () => {
     const oldUser = mockUsers[0];
     const newUser = mockUsers[1];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(oldUser),
     } as any);
 
     component.merge(newUser);
 
-    expect(userStoreSpy.mergeUsers).toHaveBeenCalledWith(oldUser.id, newUser.id);
+    expect(userStoreSpy.mergeUsers).toHaveBeenCalledWith(
+      oldUser.id,
+      newUser.id,
+    );
   });
 });

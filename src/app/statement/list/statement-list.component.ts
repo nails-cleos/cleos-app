@@ -12,12 +12,16 @@ import { NavigationService } from '@app/services/navigation.service';
   selector: 'app-statement-list',
   imports: [DocumentListComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <app-document-list [showDateFilter]="false" [navigationButtons]="true" (deleteOutput)="delete($event)"
-                       (editOutput)="edit($event)" (addOutput)="add()" [types]="types"></app-document-list>`,
+  template: ` <app-document-list
+    [showDateFilter]="false"
+    [navigationButtons]="true"
+    (deleteOutput)="delete($event)"
+    (editOutput)="edit($event)"
+    (addOutput)="add()"
+    [types]="types"
+  ></app-document-list>`,
 })
 export class StatementListComponent {
-
   private readonly translateService = inject(TranslateService);
   private readonly dialog = inject(MatDialog);
   private readonly documentStore = inject(DocumentStore);
@@ -35,13 +39,19 @@ export class StatementListComponent {
 
   delete = (document: IDocument): void => {
     const title = this.translateService.instant('DOCUMENT.DELETED.TITLE');
-    const content = this.translateService.instant('DOCUMENT.DELETED.CONTENT', { name: document.name });
+    const content = this.translateService.instant('DOCUMENT.DELETED.CONTENT', {
+      name: document.name,
+    });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: document, variant: 'warning' },
-      result => {
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: document, variant: 'warning' },
+      (result) => {
         if (result) {
           this.documentStore.delete(result.id, result.name);
         }
-      });
+      },
+    );
   };
 }

@@ -10,7 +10,7 @@ export type ExpenseForm = {
   supplyStore: FormControl<string | ISupplyStore>;
   date: FormControl<Date | undefined>;
   totals: FormArray;
-}
+};
 
 export interface IExpense {
   id?: string | null;
@@ -25,7 +25,7 @@ export interface IExpense {
   date?: string;
   timestamp?: number;
   room?: IRoomAll;
-  expenseTotals?: ITotalExpense[],
+  expenseTotals?: ITotalExpense[];
   deleted?: boolean;
 }
 
@@ -74,12 +74,18 @@ export class Expense {
     currentExpense?: IExpenseAll,
     expenseTotals?: ITotalExpense[],
   ): IExpense {
-    const supplyStore = fieldChange(expenseForm.supplyStore, currentExpense?.supplyStore);
+    const supplyStore = fieldChange(
+      expenseForm.supplyStore,
+      currentExpense?.supplyStore,
+    );
     return {
       invoice: fieldChange(expenseForm.invoice, currentExpense?.invoice),
       supplyStoreString: supplyStore?.id ? supplyStore.id : supplyStore.name,
       expenseTotals,
-      date: createNewDateZonedTime(date, currentExpense?.room?.timeZone).toLocaleString(DEFAULT_LOCALE),
+      date: createNewDateZonedTime(
+        date,
+        currentExpense?.room?.timeZone,
+      ).toLocaleString(DEFAULT_LOCALE),
     };
   }
 }

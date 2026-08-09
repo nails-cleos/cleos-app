@@ -1,6 +1,6 @@
 <div class="app-avatar" [class.app-avatar--placeholder]="!src()">
   @if (src()) {
-    <img [alt]="alt()" [src]="src()">
+    <img [alt]="alt()" [src]="src()" />
   } @else {
     <span class="app-avatar__initials">{{ initials() }}</span>
   }

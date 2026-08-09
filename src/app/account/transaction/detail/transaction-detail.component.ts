@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { newDateTimestamp } from '@app/util/dates';
@@ -14,8 +21,16 @@ import { PaymentStore } from '@app/store/payment.store';
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
   styleUrls: ['./transaction-detail.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, DecimalPipe, RouterLink, DatePipe,
-    BackButtonDirective, BackButtonDirective],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    DecimalPipe,
+    RouterLink,
+    DatePipe,
+    BackButtonDirective,
+    BackButtonDirective,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionDetailComponent {
@@ -24,7 +39,8 @@ export class TransactionDetailComponent {
 
   private readonly paymentStore = inject(PaymentStore);
   private readonly accountStore = inject(AccountStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private responseSignal = this.paymentStore.response;
   private subErrorsSignal = this.paymentStore.subErrors;
@@ -32,9 +48,9 @@ export class TransactionDetailComponent {
   transactionSignal = computed(() => {
     const transaction = this.accountStore.selectedTransaction();
     if (transaction) {
-      return Object.assign(
-        {}, transaction, { date: newDateTimestamp(transaction.payment?.timestamp) },
-      );
+      return Object.assign({}, transaction, {
+        date: newDateTimestamp(transaction.payment?.timestamp),
+      });
     }
     return transaction;
   });
@@ -58,7 +74,12 @@ export class TransactionDetailComponent {
       if (path) {
         this.navigationService.navigate([path]);
       } else if (this.subErrorsSignal()?.[0]?.message) {
-        this.navigationService.navigate(['me', 'transaction', this.transactionId(), 'payment']);
+        this.navigationService.navigate([
+          'me',
+          'transaction',
+          this.transactionId(),
+          'payment',
+        ]);
       }
     });
   }

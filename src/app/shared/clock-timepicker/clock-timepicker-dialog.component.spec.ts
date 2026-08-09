@@ -1,13 +1,22 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { ClockTimepickerDialogComponent, ClockTimepickerDialogData } from './clock-timepicker-dialog.component';
+import {
+  ClockTimepickerDialogComponent,
+  ClockTimepickerDialogData,
+} from './clock-timepicker-dialog.component';
 
 describe('ClockTimepickerDialogComponent', () => {
   let fixture: ComponentFixture<ClockTimepickerDialogComponent>;
   let component: ClockTimepickerDialogComponent;
   let dialogData: ClockTimepickerDialogData;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ClockTimepickerDialogComponent>>;
+  let dialogRefSpy: Pick<
+    MatDialogRef<ClockTimepickerDialogComponent>,
+    'close'
+  > & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const createComponent = (data: ClockTimepickerDialogData): void => {
     dialogData = data;
@@ -17,7 +26,9 @@ describe('ClockTimepickerDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ClockTimepickerDialogComponent],
@@ -62,7 +73,7 @@ describe('ClockTimepickerDialogComponent', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 15 });
 
     component.setView('minute');
-    const values = component.dialOptions.map(option => option.value);
+    const values = component.dialOptions.map((option) => option.value);
 
     expect(component.view).toBe('minute');
     expect(values).toEqual([0, 15, 30, 45]);
@@ -71,8 +82,10 @@ describe('ClockTimepickerDialogComponent', () => {
   it('should switch to minute view after selecting an hour', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 15 });
 
-    const hourOption = component.dialOptions.find(option => option.value === 13 && !option.disabled)
-      || component.dialOptions.find(option => !option.disabled);
+    const hourOption =
+      component.dialOptions.find(
+        (option) => option.value === 13 && !option.disabled,
+      ) || component.dialOptions.find((option) => !option.disabled);
 
     expect(hourOption).toBeDefined();
     if (!hourOption) {
@@ -89,7 +102,9 @@ describe('ClockTimepickerDialogComponent', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 15 });
     component.setView('minute');
 
-    const minuteOption = component.dialOptions.find(option => option.value === 30 && !option.disabled);
+    const minuteOption = component.dialOptions.find(
+      (option) => option.value === 30 && !option.disabled,
+    );
     expect(minuteOption).toBeDefined();
     if (!minuteOption) {
       return;
@@ -122,16 +137,20 @@ describe('ClockTimepickerDialogComponent', () => {
       minutesGap: 15,
     });
 
-    const hourNine = component.dialOptions.find(option => option.value === 9);
-    const hourTen = component.dialOptions.find(option => option.value === 10);
-    expect(hourNine?.disabled).toBeTrue();
-    expect(hourTen?.disabled).toBeFalse();
+    const hourNine = component.dialOptions.find((option) => option.value === 9);
+    const hourTen = component.dialOptions.find((option) => option.value === 10);
+    expect(hourNine?.disabled).toBe(true);
+    expect(hourTen?.disabled).toBe(false);
 
     component.setView('minute');
-    const minuteFortyFive = component.dialOptions.find(option => option.value === 45);
-    const minuteFifteen = component.dialOptions.find(option => option.value === 15);
-    expect(minuteFortyFive?.disabled).toBeTrue();
-    expect(minuteFifteen?.disabled).toBeFalse();
+    const minuteFortyFive = component.dialOptions.find(
+      (option) => option.value === 45,
+    );
+    const minuteFifteen = component.dialOptions.find(
+      (option) => option.value === 15,
+    );
+    expect(minuteFortyFive?.disabled).toBe(true);
+    expect(minuteFifteen?.disabled).toBe(false);
   });
 
   it('should snap to nearest valid time when initial value is out of range', () => {
@@ -162,7 +181,7 @@ describe('ClockTimepickerDialogComponent', () => {
     component.hour = 13;
     component.minute = 10;
     component.meridiem = 'PM';
-    dialogRefSpy.close.calls.reset();
+    dialogRefSpy.close.mockClear();
 
     component.confirm();
 
@@ -178,7 +197,7 @@ describe('ClockTimepickerDialogComponent', () => {
       minutesGap: 15,
     });
 
-    expect(component.isConfirmDisabled).toBeTrue();
+    expect(component.isConfirmDisabled).toBe(true);
     component.confirm();
 
     expect(dialogRefSpy.close).not.toHaveBeenCalled();
@@ -212,7 +231,7 @@ describe('ClockTimepickerDialogComponent', () => {
 
   it('should keep current view when selecting the same view', () => {
     createComponent({ format: 24, initialTime: '10:00' });
-    const refreshSpy = spyOn<any>(component, 'refreshDial').and.callThrough();
+    const refreshSpy = vi.spyOn<any, any>(component, 'refreshDial');
 
     component.setView('hour');
     expect(component.view).toBe('hour');
@@ -225,7 +244,7 @@ describe('ClockTimepickerDialogComponent', () => {
 
   it('should ignore meridiem change in 24-hour format', () => {
     createComponent({ format: 24, initialTime: '14:00' });
-    const refreshSpy = spyOn<any>(component, 'refreshDial').and.callThrough();
+    const refreshSpy = vi.spyOn<any, any>(component, 'refreshDial');
 
     component.setMeridiem('AM');
 
@@ -236,7 +255,7 @@ describe('ClockTimepickerDialogComponent', () => {
 
   it('should ignore meridiem change when same value is selected in 12-hour format', () => {
     createComponent({ format: 12, initialTime: '08:00 AM' });
-    const refreshSpy = spyOn<any>(component, 'refreshDial').and.callThrough();
+    const refreshSpy = vi.spyOn<any, any>(component, 'refreshDial');
 
     component.setMeridiem('AM');
 
@@ -254,7 +273,9 @@ describe('ClockTimepickerDialogComponent', () => {
       minutesGap: 15,
     });
     component.setView('minute');
-    const disabledMinute = component.dialOptions.find(option => option.value === 45 && option.disabled);
+    const disabledMinute = component.dialOptions.find(
+      (option) => option.value === 45 && option.disabled,
+    );
     expect(disabledMinute).toBeDefined();
     if (!disabledMinute) {
       return;
@@ -295,7 +316,7 @@ describe('ClockTimepickerDialogComponent', () => {
   it('should normalize minutes gap to 1 when invalid', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 0 });
     component.setView('minute');
-    const values = component.dialOptions.map(option => option.value);
+    const values = component.dialOptions.map((option) => option.value);
 
     expect(values.length).toBe(60);
     expect(values.slice(0, 4)).toEqual([0, 1, 2, 3]);
@@ -305,12 +326,16 @@ describe('ClockTimepickerDialogComponent', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 1 });
     component.setView('minute');
 
-    const minuteSeven = component.dialOptions.find(option => option.value === 7);
-    const minuteFifteen = component.dialOptions.find(option => option.value === 15);
+    const minuteSeven = component.dialOptions.find(
+      (option) => option.value === 7,
+    );
+    const minuteFifteen = component.dialOptions.find(
+      (option) => option.value === 15,
+    );
 
     expect(minuteSeven?.label).toBe('07');
     expect(minuteSeven?.displayLabel).toBe('');
-    expect(minuteSeven?.disabled).toBeFalse();
+    expect(minuteSeven?.disabled).toBe(false);
     expect(minuteFifteen?.displayLabel).toBe('15');
   });
 
@@ -318,7 +343,9 @@ describe('ClockTimepickerDialogComponent', () => {
     createComponent({ format: 24, initialTime: '10:00', minutesGap: 31.9 });
     component.setView('minute');
 
-    expect(component.dialOptions.map(option => option.value)).toEqual([0, 30]);
+    expect(component.dialOptions.map((option) => option.value)).toEqual([
+      0, 30,
+    ]);
   });
 
   it('should parse 12 AM correctly', () => {
@@ -338,28 +365,32 @@ describe('ClockTimepickerDialogComponent', () => {
   });
 
   it('should fallback to current time when initial time cannot be parsed', () => {
-    jasmine.clock().install();
+    vi.useFakeTimers();
     try {
-      jasmine.clock().mockDate(new Date(2026, 2, 19, 8, 59, 0));
-      createComponent({ format: 24, initialTime: 'invalid-time', minutesGap: 15 });
+      vi.setSystemTime(new Date(2026, 2, 19, 8, 59, 0));
+      createComponent({
+        format: 24,
+        initialTime: 'invalid-time',
+        minutesGap: 15,
+      });
 
       expect(component.hour).toBe(8);
       expect(component.minute).toBe(0);
     } finally {
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
     }
   });
 
   it('should fallback to current time when initial hour is out of range', () => {
-    jasmine.clock().install();
+    vi.useFakeTimers();
     try {
-      jasmine.clock().mockDate(new Date(2026, 2, 19, 11, 22, 0));
+      vi.setSystemTime(new Date(2026, 2, 19, 11, 22, 0));
       createComponent({ format: 24, initialTime: '25:10' });
 
       expect(component.hour).toBe(11);
       expect(component.minute).toBe(22);
     } finally {
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
     }
   });
 });

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
@@ -8,7 +9,6 @@ import { BlockAgendaComponent } from './block-agenda.component';
 import { AuthUserService } from '@app/services/auth-user.service';
 import { UserStore } from '@app/store/user.store';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('BlockAgendaDetailsPageComponent', () => {
   let component: BlockAgendaDetailsPageComponent;
   let fixture: ComponentFixture<BlockAgendaDetailsPageComponent>;
@@ -16,17 +16,17 @@ describe('BlockAgendaDetailsPageComponent', () => {
   let unavailableStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
+    delete: Mock;
   };
 
   let userStoreSpy: {
     professionals: ReturnType<typeof signal>;
     rooms: ReturnType<typeof signal>;
-    loadProfessionals: jasmine.Spy;
-    loadRoomsByProfessionalId: jasmine.Spy;
+    loadProfessionals: Mock;
+    loadRoomsByProfessionalId: Mock;
   };
 
   const id = '123';
@@ -41,16 +41,16 @@ describe('BlockAgendaDetailsPageComponent', () => {
     unavailableStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
+      delete: vi.fn().mockName('delete'),
     };
     userStoreSpy = {
       professionals: signal<any>(undefined),
       rooms: signal<any>(undefined),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
-      loadRoomsByProfessionalId: jasmine.createSpy('loadRoomsByProfessionalId'),
+      loadProfessionals: vi.fn().mockName('loadProfessionals'),
+      loadRoomsByProfessionalId: vi.fn().mockName('loadRoomsByProfessionalId'),
     };
 
     await TestBed.configureTestingModule({
@@ -59,15 +59,27 @@ describe('BlockAgendaDetailsPageComponent', () => {
         provideTranslateService(),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
-        { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
-        { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal({ isRoomAdmin: false }) },
+        },
+        {
+          provide: MatDialog,
+          useValue: {
+            open: vi.fn().mockName('MatDialog.open'),
+          },
+        },
       ],
-    }).overrideTemplate(BlockAgendaComponent, '')
-      .overrideTemplate(BlockAgendaDetailsPageComponent, `
+    })
+      .overrideTemplate(BlockAgendaComponent, '')
+      .overrideTemplate(
+        BlockAgendaDetailsPageComponent,
+        `
         @if (unavailable(); as unavailable) {
           <app-block-agenda [unavailable]="unavailable" [config]="config" />
         }
-      `)
+      `,
+      )
       .compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaDetailsPageComponent);
@@ -91,12 +103,15 @@ describe('BlockAgendaDetailsPageComponent', () => {
     unavailableStoreSpy.selected.set(mockUnavailable);
     fixture.detectChanges();
 
-    const blockAgendaComponent = fixture.debugElement.children[0].componentInstance as BlockAgendaComponent;
+    const blockAgendaComponent = fixture.debugElement.children[0]
+      .componentInstance as BlockAgendaComponent;
 
-    expect(blockAgendaComponent.unavailable()).toEqual(jasmine.objectContaining({
-      id,
-      duration: '00:30',
-    }));
+    expect(blockAgendaComponent.unavailable()).toEqual(
+      expect.objectContaining({
+        id,
+        duration: '00:30',
+      }),
+    );
   });
 
   it('should call update when unavailable is received', () => {
@@ -106,7 +121,7 @@ describe('BlockAgendaDetailsPageComponent', () => {
 
     expect(unavailableStoreSpy.update).toHaveBeenCalledWith(
       id,
-      jasmine.objectContaining({
+      expect.objectContaining({
         duration: '00:30',
       }),
       'unavailable/block-agenda',

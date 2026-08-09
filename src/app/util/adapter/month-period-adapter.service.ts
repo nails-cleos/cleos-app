@@ -1,17 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { DateRange, MatDateRangeSelectionStrategy } from '@angular/material/datepicker';
+import {
+  DateRange,
+  MatDateRangeSelectionStrategy,
+} from '@angular/material/datepicker';
 import { DateAdapter } from '@angular/material/core';
 
 @Injectable()
 export class MonthPeriodAdapter<D> implements MatDateRangeSelectionStrategy<D> {
   private readonly dateAdapter: DateAdapter<D> = inject(DateAdapter);
 
-  constructor() {
-  }
+  constructor() {}
 
-  selectionFinished = (date: D | null): DateRange<D> => this.createPeriodRange(date);
+  selectionFinished = (date: D | null): DateRange<D> =>
+    this.createPeriodRange(date);
 
-  createPreview = (activeDate: D | null): DateRange<D> => this.createPeriodRange(activeDate);
+  createPreview = (activeDate: D | null): DateRange<D> =>
+    this.createPeriodRange(activeDate);
 
   private createPeriodRange = (date: D | null): DateRange<D> => {
     if (date) {

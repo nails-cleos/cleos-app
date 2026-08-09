@@ -8,33 +8,46 @@ import { QuarterSummaryComponent } from './quarter-summary/quarter-summary.compo
 import { DashboardEventComponent } from './events/dashboard-event.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('dashboard'),
-];
+const providers = [provideFeatureTranslations('dashboard')];
 
 const children: Routes = [
   {
-    path: '', component: DashboardComponent, canActivate: [authGuard], data: {
+    path: '',
+    component: DashboardComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.admin, Role.manager, Role.professional],
     },
   },
   {
-    path: 'monthly/summary', component: MonthSummaryComponent, canActivate: [authGuard], data: {
+    path: 'monthly/summary',
+    component: MonthSummaryComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.admin, Role.manager],
     },
   },
   {
-    path: 'year/summary', component: YearSummaryComponent, canActivate: [authGuard], data: {
+    path: 'year/summary',
+    component: YearSummaryComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.admin, Role.manager],
     },
   },
   {
-    path: 'quarter/summary', component: QuarterSummaryComponent, canActivate: [authGuard], data: {
+    path: 'quarter/summary',
+    component: QuarterSummaryComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.admin, Role.manager],
     },
   },
   {
-    path: 'events', component: DashboardEventComponent, canActivate: [authGuard], data: {
+    path: 'events',
+    component: DashboardEventComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.roomAdmin],
     },
   },

@@ -27,7 +27,11 @@
 }
 
 .me-discount-status--used {
-  background: color-mix(in srgb, var(--warn-color) 10%, var(--app-surface-card-bg));
+  background: color-mix(
+    in srgb,
+    var(--warn-color) 10%,
+    var(--app-surface-card-bg)
+  );
 }
 
 .used-icon {

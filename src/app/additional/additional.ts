@@ -35,8 +35,14 @@ export class Additional {
   ): IAdditional {
     return {
       name: fieldChange(additionalForm.name, currentAdditional?.name),
-      description: valueChange(additionalForm.description.value, currentAdditional?.description),
-      duration: fieldChange(additionalForm.duration, currentAdditional?.duration),
+      description: valueChange(
+        additionalForm.description.value,
+        currentAdditional?.description,
+      ),
+      duration: fieldChange(
+        additionalForm.duration,
+        currentAdditional?.duration,
+      ),
       ...(!areEquals(newGroupIds, currentGroupIds) && {
         groupIds: newGroupIds,
       }),

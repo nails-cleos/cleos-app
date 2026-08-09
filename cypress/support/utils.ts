@@ -7,16 +7,34 @@ export const Breakpoints = {
 } as const;
 
 export const devices = [
-  { name: 'iPhone 16 Pro', width: 393, height: 828, breakpoints: Breakpoints.XSmall },
-  { name: 'iPad Air 11', width: 820, height: 1180, breakpoints: Breakpoints.Medium },
-  { name: 'MacBook Pro 16', width: 1536, height: 960, breakpoints: Breakpoints.XLarge },
+  {
+    name: 'iPhone 16 Pro',
+    width: 393,
+    height: 828,
+    breakpoints: Breakpoints.XSmall,
+  },
+  {
+    name: 'iPad Air 11',
+    width: 820,
+    height: 1180,
+    breakpoints: Breakpoints.Medium,
+  },
+  {
+    name: 'MacBook Pro 16',
+    width: 1536,
+    height: 960,
+    breakpoints: Breakpoints.XLarge,
+  },
 ];
 
-type Breakpoint = typeof Breakpoints[keyof typeof Breakpoints];
+type Breakpoint = (typeof Breakpoints)[keyof typeof Breakpoints];
 
 type Page = 'reservation' | 'calendar';
 
-export const breakpointToDays = (page: Page, breakpoint: Breakpoint): number => {
+export const breakpointToDays = (
+  page: Page,
+  breakpoint: Breakpoint,
+): number => {
   const config: Record<Page, Record<string, number> & { default: number }> = {
     reservation: {
       [Breakpoints.XSmall]: 3,
@@ -51,7 +69,7 @@ export const breakpointToButtons = (
     default: [],
   };
 
-  const combined = [...config[breakpoint] ?? config.default, ...others];
+  const combined = [...(config[breakpoint] ?? config.default), ...others];
   return Array.from(new Set(combined));
 };
 

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { ICatalogueAll } from '@app/catalogue/catalogue';
 import { getImage } from '@app/util/file';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -7,7 +12,8 @@ import {
   MatCard,
   MatCardActions,
   MatCardContent,
-  MatCardHeader, MatCardMdImage,
+  MatCardHeader,
+  MatCardMdImage,
   MatCardSubtitle,
   MatCardTitle,
 } from '@angular/material/card';
@@ -18,8 +24,17 @@ import { MainContentService } from '@app/services/main-content.service';
   selector: 'app-catalog',
   templateUrl: './catalog.component.html',
   styleUrls: ['./catalog.component.scss'],
-  imports: [MatIcon, TranslatePipe, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
-    MatCardActions, MatCardMdImage],
+  imports: [
+    MatIcon,
+    TranslatePipe,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardActions,
+    MatCardMdImage,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogComponent {

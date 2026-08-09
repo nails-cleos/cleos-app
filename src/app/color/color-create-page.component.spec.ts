@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ColorCreatePageComponent } from './color-create-page.component';
 import { ColorStore } from '../store/color.store';
@@ -8,8 +9,8 @@ describe('ColorCreatePageComponent', () => {
   let fixture: ComponentFixture<ColorCreatePageComponent>;
 
   let colorStoreSpy: {
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
 
   const mockColor: Partial<IColorAll> = {
@@ -19,16 +20,15 @@ describe('ColorCreatePageComponent', () => {
 
   beforeEach(async () => {
     colorStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [ColorCreatePageComponent],
-      providers: [
-        { provide: ColorStore, useValue: colorStoreSpy },
-      ],
-    }).overrideTemplate(ColorCreatePageComponent, '')
+      providers: [{ provide: ColorStore, useValue: colorStoreSpy }],
+    })
+      .overrideTemplate(ColorCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(ColorCreatePageComponent);
@@ -42,9 +42,11 @@ describe('ColorCreatePageComponent', () => {
   it('should call create when color is received', () => {
     component.submit(mockColor);
 
-    expect(colorStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Test Color',
-      description: 'Test Description',
-    }));
+    expect(colorStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Test Color',
+        description: 'Test Description',
+      }),
+    );
   });
 });

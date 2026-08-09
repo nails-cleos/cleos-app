@@ -1,7 +1,12 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ChartComponent } from './chart.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
 import { IChart } from '@app/dashboard/dashboard';
@@ -16,15 +21,18 @@ describe('ChartComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let navigationServiceSpy: Pick<NavigationService, 'reload'> & {
+    reload: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['reload']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    navigationServiceSpy = {
+      reload: vi.fn().mockName('NavigationService.reload'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
       imports: [ChartComponent],
@@ -53,9 +61,7 @@ describe('ChartComponent', () => {
       labels: ['Jan', 'Feb'],
       options: 'CHART',
       colors: 'COLORS',
-      dataSet: [
-        { label: 'Revenue', data: [10, 20], type: 'bar' },
-      ],
+      dataSet: [{ label: 'Revenue', data: [10, 20], type: 'bar' }],
     };
 
     fixture.componentRef.setInput('error', undefined);
@@ -73,9 +79,7 @@ describe('ChartComponent', () => {
       ...firstSummary,
       title: 'Second chart',
       labels: ['Mar', 'Apr', 'May'],
-      dataSet: [
-        { label: 'Revenue', data: [5, 15, 25], type: 'bar' },
-      ],
+      dataSet: [{ label: 'Revenue', data: [5, 15, 25], type: 'bar' }],
     };
 
     fixture.componentRef.setInput('chartSummary', secondSummary);

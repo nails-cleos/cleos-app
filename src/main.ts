@@ -10,7 +10,10 @@ import { AppComponent } from './app/app.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { TranslateLoaderFactory } from './app/shared/translate-loader.factory';
 import { bootstrapApplication, BrowserModule } from '@angular/platform-browser';
-import { NgcCookieConsentConfig, NgcCookieConsentModule } from 'ngx-cookieconsent';
+import {
+  NgcCookieConsentConfig,
+  NgcCookieConsentModule,
+} from 'ngx-cookieconsent';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { PwaService } from './app/services/pwa.service';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
@@ -21,17 +24,34 @@ import { NavigationService } from './app/services/navigation.service';
 import { TokenService } from './app/services/token.service';
 import { PermissionsService } from './app/services/auth-guard.service';
 import { PaginatorI18n } from './app/util/paginator';
-import { provideTranslateLoader, provideTranslateService, TranslateService } from '@ngx-translate/core';
+import {
+  provideTranslateLoader,
+  provideTranslateService,
+  TranslateService,
+} from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import localeEnGB from '@angular/common/locales/en-GB';
 import localeNl from '@angular/common/locales/nl';
 import localeEs from '@angular/common/locales/es';
-import { provideHttpClient, withInterceptors, withJsonpSupport, withXhr } from '@angular/common/http';
+import {
+  provideHttpClient,
+  withInterceptors,
+  withJsonpSupport,
+  withXhr,
+} from '@angular/common/http';
 import { httpInterceptorProviders } from './app/http-interceptors';
-import { provideRouter, withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router';
+import {
+  provideRouter,
+  withComponentInputBinding,
+  withInMemoryScrolling,
+  withRouterConfig,
+} from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideAppIcons } from './app/util/app-icons.provider';
-import { provideAppCalendar, provideAppDateAdapter } from './app/util/adapter/app-date.provider';
+import {
+  provideAppCalendar,
+  provideAppDateAdapter,
+} from './app/util/adapter/app-date.provider';
 import { DEFAULT_LOCALE } from './app/util/dates';
 import { AuthStore } from './app/store/auth.store';
 import { AuthRedirectEffect } from './app/auth/auth-redirect.effect';
@@ -64,7 +84,7 @@ const cookieConfig: NgcCookieConsentConfig = {
   },
   type: 'info',
   content: {
-    href: `${ environment.appServer }/privacy`,
+    href: `${environment.appServer}/privacy`,
   },
 };
 
@@ -77,7 +97,11 @@ export function initializePwaService(pwaService: PwaService) {
 }
 
 const providers = [
-  provideHttpClient(withXhr(), withInterceptors(httpInterceptorProviders), withJsonpSupport()),
+  provideHttpClient(
+    withXhr(),
+    withInterceptors(httpInterceptorProviders),
+    withJsonpSupport(),
+  ),
   provideRouter(
     routes,
     withRouterConfig({ onSameUrlNavigation: 'reload' }),
@@ -94,12 +118,11 @@ const providers = [
   ),
   provideTranslateService({
     fallbackLang: 'en',
-    loader: provideTranslateLoader(
-      TranslateLoaderFactory.forModule('common'),
-    ),
+    loader: provideTranslateLoader(TranslateLoaderFactory.forModule('common')),
   }),
   {
-    provide: MatPaginatorIntl, deps: [TranslateService],
+    provide: MatPaginatorIntl,
+    deps: [TranslateService],
     useFactory: () => new PaginatorI18n().getPaginatorIntl(),
   },
   PermissionsService,
@@ -133,4 +156,4 @@ const providers = [
 
 bootstrapApplication(AppComponent, {
   providers: [provideZoneChangeDetection(), ...providers],
-}).catch(err => console.error(err));
+}).catch((err) => console.error(err));

@@ -87,7 +87,11 @@ export interface IDataEvent {
 
   updateLength(length: number): void;
 
-  getOverlapEvent(eventStartDay: Date, eventEndDay: Date, professionalId?: string): CalendarEvent[] | undefined;
+  getOverlapEvent(
+    eventStartDay: Date,
+    eventEndDay: Date,
+    professionalId?: string,
+  ): CalendarEvent[] | undefined;
 
   sameDayEvent(recurring: any, event: CalendarEvent): boolean;
 
@@ -128,13 +132,15 @@ export class DataEvent implements IDataEvent {
   }
 
   addEvents = (events: CalendarEvent[]): void => {
-    events.forEach(event => this.addEvent(event));
+    events.forEach((event) => this.addEvent(event));
   };
 
   addEvent = (event?: CalendarEvent): void => {
     if (event) {
-      if (!((this.calendarEnd && event.end && event.end > this.calendarEnd) ||
-        (this.calendarStart && event.start < this.calendarStart))) {
+      if (!(
+        (this.calendarEnd && event.end && event.end > this.calendarEnd) ||
+        (this.calendarStart && event.start < this.calendarStart)
+      )) {
         const overlap = this.getOverlap(event);
         if (!event.meta.isReservation && overlap && overlap?.length > 0) {
           this.validateEvent(event, overlap);
@@ -153,7 +159,7 @@ export class DataEvent implements IDataEvent {
   };
 
   filterEvent = (event: CalendarEvent): void => {
-    this.calendarEvents = this.calendarEvents.filter(ev => ev !== event);
+    this.calendarEvents = this.calendarEvents.filter((ev) => ev !== event);
   };
 
   updateLength = (length: number): void => {
@@ -169,31 +175,49 @@ export class DataEvent implements IDataEvent {
     if (eventEndDay) {
       if (professionalId) {
         overlapEvents = this.calendarEvents.filter(
-          (eventA: CalendarEvent) => ((eventA.meta?.professionalId === professionalId) && (
-            (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-            || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-            || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end)
-          )));
+          (eventA: CalendarEvent) =>
+            eventA.meta?.professionalId === professionalId &&
+            ((eventStartDay > eventA.start &&
+              eventA.end &&
+              eventStartDay < eventA.end) ||
+              (eventEndDay > eventA.start &&
+                eventA.end &&
+                eventEndDay < eventA.end) ||
+              (eventStartDay <= eventA.start &&
+                eventA.end &&
+                eventEndDay >= eventA.end)),
+        );
       } else {
         overlapEvents = this.calendarEvents.filter(
-          (eventA: CalendarEvent) => (eventStartDay > eventA.start && eventA.end && eventStartDay < eventA.end)
-            || (eventEndDay > eventA.start && eventA.end && eventEndDay < eventA.end)
-            || (eventStartDay <= eventA.start && eventA.end && eventEndDay >= eventA.end),
+          (eventA: CalendarEvent) =>
+            (eventStartDay > eventA.start &&
+              eventA.end &&
+              eventStartDay < eventA.end) ||
+            (eventEndDay > eventA.start &&
+              eventA.end &&
+              eventEndDay < eventA.end) ||
+            (eventStartDay <= eventA.start &&
+              eventA.end &&
+              eventEndDay >= eventA.end),
         );
       }
     }
     return overlapEvents;
   };
 
-  sameDayEvent = (recurring: any, event: CalendarEvent): boolean => !this.calendarEvents
-    .find(ce => ce.id === recurring.path && isSameDay(event.start, ce.start));
+  sameDayEvent = (recurring: any, event: CalendarEvent): boolean =>
+    !this.calendarEvents.find(
+      (ce) => ce.id === recurring.path && isSameDay(event.start, ce.start),
+    );
 
   resetEvents(): void {
     this.calendarEvents = [];
   }
 
   sortEvents(): void {
-    this.calendarEvents = this.calendarEvents.slice().sort((a, b) => a.start.getTime() - b.start.getTime());
+    this.calendarEvents = this.calendarEvents
+      .slice()
+      .sort((a, b) => a.start.getTime() - b.start.getTime());
   }
 
   refresh(): void {
@@ -201,12 +225,17 @@ export class DataEvent implements IDataEvent {
   }
 
   createRecurring(): void {
-    this.recurringEvent = new RecurringEvent(this.calendarEnd!, this.calendarStart);
+    this.recurringEvent = new RecurringEvent(
+      this.calendarEnd!,
+      this.calendarStart,
+    );
   }
 
   private eventNotExists = (event: CalendarEvent): boolean =>
     event.id === undefined ||
-    !this.calendarEvents.some(e => e.id === event.id && e.start.getTime() === event.start.getTime());
+    !this.calendarEvents.some(
+      (e) => e.id === event.id && e.start.getTime() === event.start.getTime(),
+    );
 
   private getOverlap = (event: CalendarEvent): CalendarEvent[] | undefined => {
     const end = event.end;
@@ -225,8 +254,10 @@ export class DataEvent implements IDataEvent {
     const start = event.start;
     const end = event.end!;
     let newEvent = undefined;
-    const hasReservationOverlap = overlapEvent.some(value => value.meta.isReservation);
-    overlapEvent.forEach(value => {
+    const hasReservationOverlap = overlapEvent.some(
+      (value) => value.meta.isReservation,
+    );
+    overlapEvent.forEach((value) => {
       if (value.meta.isReservation) {
         newEvent = event;
       } else {
@@ -284,50 +315,100 @@ class RecurringEvent {
     professionalId?: string,
     allDay: boolean = false,
   ) => {
-    this.recurring = [...this.recurring, {
-      id: id,
-      title: title,
-      duration: duration,
-      state: state,
-      path: path,
-      allDay: allDay,
-      professionalId: professionalId,
-      onEachDate: onEachDate,
-      rule: createRule(repeat, start, this.calendarEnd, start.getDate(), getWeekDay(start.getDay())),
-      priority: 1,
-    }];
+    this.recurring = [
+      ...this.recurring,
+      {
+        id: id,
+        title: title,
+        duration: duration,
+        state: state,
+        path: path,
+        allDay: allDay,
+        professionalId: professionalId,
+        onEachDate: onEachDate,
+        rule: createRule(
+          repeat,
+          start,
+          this.calendarEnd,
+          start.getDate(),
+          getWeekDay(start.getDay()),
+        ),
+        priority: 1,
+      },
+    ];
   };
 
   addNotAvailableRecurring = (
-    calendar: IDataEvent, unavailable: string, lunch: string, notWorking: string, sunday: IAvailability,
-    saturday: IAvailability, friday: IAvailability, thursday: IAvailability, wednesday: IAvailability,
-    tuesday: IAvailability, monday: IAvailability, isDark: boolean = false,
+    calendar: IDataEvent,
+    unavailable: string,
+    lunch: string,
+    notWorking: string,
+    sunday: IAvailability,
+    saturday: IAvailability,
+    friday: IAvailability,
+    thursday: IAvailability,
+    wednesday: IAvailability,
+    tuesday: IAvailability,
+    monday: IAvailability,
+    isDark: boolean = false,
     timeZone: string = getCurrentTimeZone(),
   ) => {
-    this.recurring = [...this.recurring, {
-      availabilityList: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
-      rule: new RRule({
-        freq: RRule.WEEKLY,
-        byweekday: [RRule.SU, RRule.MO, RRule.TU, RRule.WE, RRule.TH, RRule.FR, RRule.SA],
-        dtstart: this.calendarStart,
-        until: this.calendarEnd,
-      }),
-      onEachDate: (date: Date, recurring: any) => createRecurringEvent(date, recurring, calendar, notWorking,
-        unavailable, lunch, isDark, timeZone),
-      priority: 999,
-    }];
+    this.recurring = [
+      ...this.recurring,
+      {
+        availabilityList: [
+          monday,
+          tuesday,
+          wednesday,
+          thursday,
+          friday,
+          saturday,
+          sunday,
+        ],
+        rule: new RRule({
+          freq: RRule.WEEKLY,
+          byweekday: [
+            RRule.SU,
+            RRule.MO,
+            RRule.TU,
+            RRule.WE,
+            RRule.TH,
+            RRule.FR,
+            RRule.SA,
+          ],
+          dtstart: this.calendarStart,
+          until: this.calendarEnd,
+        }),
+        onEachDate: (date: Date, recurring: any) =>
+          createRecurringEvent(
+            date,
+            recurring,
+            calendar,
+            notWorking,
+            unavailable,
+            lunch,
+            isDark,
+            timeZone,
+          ),
+        priority: 999,
+      },
+    ];
   };
 
   execute(): void {
     const allEvents: { priority: number; recurring: any; date: Date }[] = [];
 
-    this.recurring.forEach(recurring => {
+    this.recurring.forEach((recurring) => {
       const priority = recurring.priority || 999;
       recurring.rule.all().forEach((date: Date) => {
         allEvents.push({ priority, recurring, date });
       });
     });
-    allEvents.sort((a, b) => a.priority - b.priority || a.date.getTime() - b.date.getTime())
+    allEvents
+      .sort(
+        (a, b) =>
+          a.priority - b.priority || a.date.getTime() - b.date.getTime(),
+      )
       .forEach(({ date, recurring }) => recurring.onEachDate(date, recurring));
   }
 }
@@ -365,15 +446,16 @@ export const calendarEvent = (
   id: string,
   meta: IMeta = new Meta(),
   draggable: boolean = false,
-): CalendarEvent => ({
-  id,
-  start,
-  end,
-  title,
-  draggable,
-  color: createEventColor(color, isDarkMode),
-  meta,
-} as unknown as CalendarEvent);
+): CalendarEvent =>
+  ({
+    id,
+    start,
+    end,
+    title,
+    draggable,
+    color: createEventColor(color, isDarkMode),
+    meta,
+  }) as unknown as CalendarEvent;
 
 export const allDayEvent = (
   title: string,
@@ -382,14 +464,15 @@ export const allDayEvent = (
   isDarkMode: boolean,
   id?: string,
   meta: IMeta = new Meta(),
-): CalendarEvent => ({
-  id,
-  start,
-  title,
-  color: createEventColor(color, isDarkMode),
-  meta,
-  allDay: true,
-} as unknown as CalendarEvent);
+): CalendarEvent =>
+  ({
+    id,
+    start,
+    title,
+    color: createEventColor(color, isDarkMode),
+    meta,
+    allDay: true,
+  }) as unknown as CalendarEvent;
 
 export const monthEvent = (
   title: string,
@@ -401,16 +484,17 @@ export const monthEvent = (
   isDarkMode: boolean,
   allDay: boolean = false,
   draggable: boolean = false,
-): CalendarEvent | undefined => ({
-  id,
-  start,
-  title,
-  end,
-  color: createEventColor(color, isDarkMode),
-  meta,
-  draggable,
-  allDay,
-} as unknown as CalendarEvent);
+): CalendarEvent | undefined =>
+  ({
+    id,
+    start,
+    title,
+    end,
+    color: createEventColor(color, isDarkMode),
+    meta,
+    draggable,
+    allDay,
+  }) as unknown as CalendarEvent;
 
 const createRecurringEvent = (
   date: Date,
@@ -422,8 +506,18 @@ const createRecurringEvent = (
   isDark: boolean,
   timeZone: string,
 ) => {
-  const availability = recurring.availabilityList.find((a: IAvailability) => a?.day === daysOfWeek[date.getDay()]);
-  const events = createEvent(date, notWorking, unavailable, lunch, isDark, timeZone, availability);
+  const availability = recurring.availabilityList.find(
+    (a: IAvailability) => a?.day === daysOfWeek[date.getDay()],
+  );
+  const events = createEvent(
+    date,
+    notWorking,
+    unavailable,
+    lunch,
+    isDark,
+    timeZone,
+    availability,
+  );
   calendar.addEvents(events);
 };
 
@@ -439,8 +533,14 @@ const createEvent = (
   let events: CalendarEvent[] = [];
   const newDate = dateToUTC(createNewDate(date), timeZone);
   if (!it) {
-    const event = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode), newDate,
-      isDarkMode, createNewDate(date, 23, 59), OUT_OF_WORK_ALL_DAY);
+    const event = calendarEvent(
+      notWorking,
+      findStateColor('DEFAULT', isDarkMode),
+      newDate,
+      isDarkMode,
+      createNewDate(date, 23, 59),
+      OUT_OF_WORK_ALL_DAY,
+    );
     events = [...events, event];
   } else {
     const now = getNowTimeZone();
@@ -451,8 +551,14 @@ const createEvent = (
       const start = getTimeNumber(it.start);
       const endHour = start?.hour;
       const endMinute = start?.minute;
-      const eventBefore = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
-        newDate, isDarkMode, dateToUTC(createNewDate(date, endHour, endMinute), timeZone), OUT_OF_WORK);
+      const eventBefore = calendarEvent(
+        notWorking,
+        findStateColor('DEFAULT', isDarkMode),
+        newDate,
+        isDarkMode,
+        dateToUTC(createNewDate(date, endHour, endMinute), timeZone),
+        OUT_OF_WORK,
+      );
       events = [...events, eventBefore];
     }
     if (it.end) {
@@ -461,16 +567,31 @@ const createEvent = (
       const endMinute = end.minute;
       let startHour = endHour;
       let startMinute = endMinute;
-      if (isToday(date) && (hour > endHour || (hour === endHour && minute > endMinute))) {
+      if (
+        isToday(date) &&
+        (hour > endHour || (hour === endHour && minute > endMinute))
+      ) {
         startHour = hour;
         startMinute = minute;
       }
-      const eventAfter = calendarEvent(notWorking, findStateColor('DEFAULT', isDarkMode),
-        dateToUTC(createNewDate(date, startHour, startMinute), timeZone), isDarkMode,
-        dateToUTC(createNewDate(date, 23, 59), timeZone), OUT_OF_WORK);
+      const eventAfter = calendarEvent(
+        notWorking,
+        findStateColor('DEFAULT', isDarkMode),
+        dateToUTC(createNewDate(date, startHour, startMinute), timeZone),
+        isDarkMode,
+        dateToUTC(createNewDate(date, 23, 59), timeZone),
+        OUT_OF_WORK,
+      );
       events = [...events, eventAfter];
     }
-    const ev = createLunchEvent(it, date, unavailable, lunch, isDarkMode, timeZone);
+    const ev = createLunchEvent(
+      it,
+      date,
+      unavailable,
+      lunch,
+      isDarkMode,
+      timeZone,
+    );
     if (ev) {
       events = [...events, ev];
     }
@@ -505,16 +626,46 @@ const createLunchEvent = (
         hour = 23;
         minute = 59;
       } else {
-        return lunchEvent(hour, lunchStartHour, minute, lunchStartMinute, lunchEndHour, lunchEndMinute, date, lunch,
-          isDarkMode, timeZone);
+        return lunchEvent(
+          hour,
+          lunchStartHour,
+          minute,
+          lunchStartMinute,
+          lunchEndHour,
+          lunchEndMinute,
+          date,
+          lunch,
+          isDarkMode,
+          timeZone,
+        );
       }
       const start = dateToUTC(createDate(timeZone), timeZone);
       const end = dateToUTC(createDate(timeZone, hour, minute), timeZone);
-      return newEvent(unavailable, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
+      return newEvent(
+        unavailable,
+        findStateColor('DEFAULT', isDarkMode),
+        start,
+        isDarkMode,
+        end,
+        LUNCH,
+      );
     } else {
-      const start = dateToUTC(createNewDate(date, lunchStartHour, lunchStartMinute), timeZone);
-      const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-      return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
+      const start = dateToUTC(
+        createNewDate(date, lunchStartHour, lunchStartMinute),
+        timeZone,
+      );
+      const end = dateToUTC(
+        createNewDate(date, lunchEndHour, lunchEndMinute),
+        timeZone,
+      );
+      return newEvent(
+        lunch,
+        findStateColor('DEFAULT', isDarkMode),
+        start,
+        isDarkMode,
+        end,
+        LUNCH,
+      );
     }
   }
 
@@ -535,24 +686,49 @@ const lunchEvent = (
 ): CalendarEvent | undefined => {
   let lunchHour;
   let lunchMinute;
-  if (hour < lunchStartHour || (hour === lunchStartHour && minute < lunchStartMinute)) {
+  if (
+    hour < lunchStartHour ||
+    (hour === lunchStartHour && minute < lunchStartMinute)
+  ) {
     lunchHour = lunchStartHour;
     lunchMinute = lunchStartMinute;
-  } else if ((hour > lunchStartHour || (hour === lunchStartHour && minute > lunchStartMinute))
-    && (hour < lunchEndHour || (hour === lunchEndHour && minute < lunchEndMinute))) {
+  } else if (
+    (hour > lunchStartHour ||
+      (hour === lunchStartHour && minute > lunchStartMinute)) &&
+    (hour < lunchEndHour || (hour === lunchEndHour && minute < lunchEndMinute))
+  ) {
     lunchHour = hour;
     lunchMinute = minute;
   }
   if ((lunchHour || lunchHour === 0) && (lunchMinute || lunchMinute === 0)) {
-    const start = dateToUTC(createNewDate(date, lunchHour, lunchMinute), timeZone);
-    const end = dateToUTC(createNewDate(date, lunchEndHour, lunchEndMinute), timeZone);
-    return newEvent(lunch, findStateColor('DEFAULT', isDarkMode), start, isDarkMode, end, LUNCH);
+    const start = dateToUTC(
+      createNewDate(date, lunchHour, lunchMinute),
+      timeZone,
+    );
+    const end = dateToUTC(
+      createNewDate(date, lunchEndHour, lunchEndMinute),
+      timeZone,
+    );
+    return newEvent(
+      lunch,
+      findStateColor('DEFAULT', isDarkMode),
+      start,
+      isDarkMode,
+      end,
+      LUNCH,
+    );
   }
 
   return undefined;
 };
 
-const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number, weekDay: ByWeekday): RRule => {
+const createRule = (
+  repeat: string,
+  dtstart: Date,
+  until: Date,
+  monthDay: number,
+  weekDay: ByWeekday,
+): RRule => {
   let freq: Frequency | undefined;
   let byweekday: ByWeekday | undefined;
   let bymonthday: number | undefined;
@@ -589,6 +765,5 @@ const createRule = (repeat: string, dtstart: Date, until: Date, monthDay: number
   });
 };
 
-export const createBullet = (
-  name: string,
-): string => `<div class='detail'>\uD83D\uDC85\uD83C\uDFFB&nbsp;${name}</div>`;
+export const createBullet = (name: string): string =>
+  `<div class='detail'>\uD83D\uDC85\uD83C\uDFFB&nbsp;${name}</div>`;

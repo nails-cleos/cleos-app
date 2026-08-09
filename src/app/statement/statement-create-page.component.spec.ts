@@ -1,15 +1,15 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StatementCreatePageComponent } from './statement-create-page.component';
 import { IDocument } from '../document/document';
 import { DocumentStore } from '../store/document.store';
-
 describe('StatementCreatePageComponent', () => {
   let component: StatementCreatePageComponent;
   let fixture: ComponentFixture<StatementCreatePageComponent>;
 
   let documentStoreSpy: {
-    clean: jasmine.Spy;
-    uploadStatement: jasmine.Spy;
+    clean: Mock;
+    uploadStatement: Mock;
   };
 
   const officeId = 'office-id';
@@ -20,16 +20,15 @@ describe('StatementCreatePageComponent', () => {
 
   beforeEach(async () => {
     documentStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      uploadStatement: jasmine.createSpy('uploadStatement'),
+      clean: vi.fn().mockName('clean'),
+      uploadStatement: vi.fn().mockName('uploadStatement'),
     };
 
     await TestBed.configureTestingModule({
       imports: [StatementCreatePageComponent],
-      providers: [
-        { provide: DocumentStore, useValue: documentStoreSpy },
-      ],
-    }).overrideTemplate(StatementCreatePageComponent, '')
+      providers: [{ provide: DocumentStore, useValue: documentStoreSpy }],
+    })
+      .overrideTemplate(StatementCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(StatementCreatePageComponent);
@@ -42,11 +41,17 @@ describe('StatementCreatePageComponent', () => {
 
   it('should call upload when statement is received', () => {
     fixture.detectChanges();
-    const blob = new Blob([JSON.stringify(mockStatement)], { type: 'text/plain' });
+    const blob = new Blob([JSON.stringify(mockStatement)], {
+      type: 'text/plain',
+    });
     const fileName = 'fileName';
 
     component.submit({ officeId, blob, fileName });
 
-    expect(documentStoreSpy.uploadStatement).toHaveBeenCalledWith(officeId, blob, fileName);
+    expect(documentStoreSpy.uploadStatement).toHaveBeenCalledWith(
+      officeId,
+      blob,
+      fileName,
+    );
   });
 });

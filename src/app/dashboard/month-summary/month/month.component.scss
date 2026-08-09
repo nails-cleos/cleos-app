@@ -33,7 +33,8 @@
 
 .month-summary-card__row {
   padding-top: 12px;
-  border-top: 1px solid color-mix(in srgb, var(--app-surface-card-border) 72%, transparent);
+  border-top: 1px solid
+    color-mix(in srgb, var(--app-surface-card-border) 72%, transparent);
 }
 
 .month-summary-card__row:first-child {

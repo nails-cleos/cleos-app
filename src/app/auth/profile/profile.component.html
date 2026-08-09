@@ -4,7 +4,9 @@
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
   @if (user && !user.completed) {
     <section class="app-surface-item profile-status">
-      <span class="profile-status__text">{{ 'COMMON.PROFILE.INCOMPLETE' | translate }}</span>
+      <span class="profile-status__text">{{
+        'COMMON.PROFILE.INCOMPLETE' | translate
+      }}</span>
       <span class="fi fi-gr"></span>
       <span class="fi fi-gr fis"></span>
     </section>
@@ -14,7 +16,9 @@
     <div class="profile-header">
       <div class="app-detail-section-header profile-header__title">
         <div>
-          <span class="app-surface-eyebrow">{{ 'COMMON.PROFILE.FIELD' | translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'COMMON.PROFILE.FIELD' | translate
+          }}</span>
           @if (user) {
             <h2 class="profile-email">{{ user.email }}</h2>
           } @else {
@@ -25,16 +29,27 @@
 
       <div class="profile-avatar-wrap">
         @if (user) {
-          <div [ngClass]="{'profile-background': !image}" class="hoverable">
+          <div [ngClass]="{ 'profile-background': !image }" class="hoverable">
             <label class="pointer-only" for="fileInput">
               @if (image) {
-                <img alt="profile" class="image" src="{{image}}" #resizedImage>
+                <img
+                  alt="profile"
+                  class="image"
+                  src="{{ image }}"
+                  #resizedImage
+                />
               } @else {
                 <div class="initials">{{ initialsSignal() | uppercase }}</div>
               }
               <div class="hover-text">Choose file</div>
               <div class="profile-background"></div>
-              <input (change)="onSelectFile($event.target)" accept="image/*" autocomplete="photo" id="fileInput" type="file">
+              <input
+                (change)="onSelectFile($event.target)"
+                accept="image/*"
+                autocomplete="photo"
+                id="fileInput"
+                type="file"
+              />
               <canvas #canvas></canvas>
             </label>
           </div>
@@ -46,12 +61,24 @@
       </div>
     </div>
 
-    <form (ngSubmit)="update()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()" class="app-crud-form">
+    <form
+      (ngSubmit)="update()"
+      [formGroup]="form"
+      novalidate
+      (keydown.enter)="$event.preventDefault()"
+      class="app-crud-form"
+    >
       @if (user) {
         <div class="app-crud-form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'COMMON.USER.DISPLAY_NAME.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.displayName" autocomplete="given-name" matInput>
+            <mat-label>{{
+              'COMMON.USER.DISPLAY_NAME.FIELD' | translate
+            }}</mat-label>
+            <input
+              [formControl]="getForm.displayName"
+              autocomplete="given-name"
+              matInput
+            />
             @if (errors()['displayName']) {
               <mat-error>{{ errors()['displayName'] }}</mat-error>
             }
@@ -60,41 +87,60 @@
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.USER.LANG.FIELD' | translate }}</mat-label>
             @if (select.value) {
-              <ng-icon [svg]="selectedFlag()" class="icon-margin" matPrefix/>
+              <ng-icon [svg]="selectedFlag()" class="icon-margin" matPrefix />
             }
             <mat-select #select [formControl]="getForm.lang" required>
               @for (lang of flagList; track lang) {
                 <mat-option [value]="lang.value">
-                  <ng-icon [svg]="lang.flag" class="icon-margin"/>
+                  <ng-icon [svg]="lang.flag" class="icon-margin" />
                   {{ 'COMMON.LANG.' + lang.text | translate }}
                 </mat-option>
               }
             </mat-select>
-            <mat-error [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COMMON.USER.LANG.REQUIRED' | translate"
+            ></mat-error>
           </mat-form-field>
 
           <div class="profile-phone-field">
-            <ngx-material-intl-tel-input [includeDialCode]="true"
-                                         [emojiFlags]="true"
-                                         [enablePlaceholder]="true"
-                                         [enableSearch]="true"
-                                         [fieldControl]="getForm.phone"
-                                         [required]="true"
-                                         [preferredCountries]="['nl']"
-                                         fieldControlName="phone"
-                                         [appearance]="'outline'"
-                                         [textLabels]="labels()"
-                                         [autoSelectCountry]="false">
+            <ngx-material-intl-tel-input
+              [includeDialCode]="true"
+              [emojiFlags]="true"
+              [enablePlaceholder]="true"
+              [enableSearch]="true"
+              [fieldControl]="getForm.phone"
+              [required]="true"
+              [preferredCountries]="['nl']"
+              fieldControlName="phone"
+              [appearance]="'outline'"
+              [textLabels]="labels()"
+              [autoSelectCountry]="false"
+            >
             </ngx-material-intl-tel-input>
           </div>
 
           <mat-form-field appearance="outline">
             <mat-label>{{ 'COMMON.USER.DOB.FIELD' | translate }}</mat-label>
-            <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+            <button
+              (click)="picker.open()"
+              mat-icon-button
+              matPrefix
+              type="button"
+            >
               <mat-icon>today</mat-icon>
             </button>
-            <input (focus)="picker.open()" [formControl]="getForm.dob" [matDatepicker]="picker" autocomplete="bday" matInput>
-            <mat-datepicker #picker startView="multi-year" touchUi></mat-datepicker>
+            <input
+              (focus)="picker.open()"
+              [formControl]="getForm.dob"
+              [matDatepicker]="picker"
+              autocomplete="bday"
+              matInput
+            />
+            <mat-datepicker
+              #picker
+              startView="multi-year"
+              touchUi
+            ></mat-datepicker>
             @if (errors()['dob']) {
               <mat-error>{{ errors()['dob'] }}</mat-error>
             }
@@ -107,38 +153,62 @@
                 [control]="getForm.darkColor"
                 [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
                 [previewMode]="'dark'"
-                [previewTitle]="'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate"
-                [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
-                [triggerId]="'darkColorIcon'">
+                [previewTitle]="
+                  'COMMON.PROFESSIONAL.COLOR.DARK.RESERVATION' | translate
+                "
+                [previewText]="
+                  'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate
+                "
+                [triggerId]="'darkColorIcon'"
+              >
               </app-color-picker>
               <app-color-picker
                 [label]="'COMMON.PROFESSIONAL.COLOR.LIGHT.FIELD' | translate"
                 [control]="getForm.lightColor"
                 [invalidText]="'COMMON.PROFESSIONAL.COLOR.INVALID' | translate"
                 [previewMode]="'light'"
-                [previewTitle]="'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate"
-                [previewText]="'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate"
-                [triggerId]="'lightColorIcon'">
+                [previewTitle]="
+                  'COMMON.PROFESSIONAL.COLOR.LIGHT.RESERVATION' | translate
+                "
+                [previewText]="
+                  'COMMON.PROFESSIONAL.COLOR.RESERVATION' | translate
+                "
+                [triggerId]="'lightColorIcon'"
+              >
               </app-color-picker>
             </div>
           }
 
           <div class="app-crud-form-grid__full app-crud-fields">
-            <app-google-map [addressFormGroup]="googleMapForm"
-                            [latitudeMarker]="$safeNavigationMigration(user.address?.location?.y)"
-                            [longitudeMarker]="$safeNavigationMigration(user.address?.location?.x)"
-                            (addressEmitter)="getAddress($event)"
-                            [markInfo]="'<b>' + $safeNavigationMigration(user.address?.name) + '</b>'">
+            <app-google-map
+              [addressFormGroup]="googleMapForm"
+              [latitudeMarker]="
+                $safeNavigationMigration(user.address?.location?.y)
+              "
+              [longitudeMarker]="
+                $safeNavigationMigration(user.address?.location?.x)
+              "
+              (addressEmitter)="getAddress($event)"
+              [markInfo]="
+                '<b>' + $safeNavigationMigration(user.address?.name) + '</b>'
+              "
+            >
             </app-google-map>
           </div>
 
           @if (errors()['location']) {
-            <mat-error class="profile-error-block">{{ errors()['location'] }}</mat-error>
+            <mat-error class="profile-error-block">{{
+              errors()['location']
+            }}</mat-error>
           }
 
           @if (isAdminSignal()) {
             <div class="app-crud-form-grid__full profile-toggle-row">
-              <mat-checkbox (change)="toggleShowCash()" color="primary" [checked]="showCashSignal()">
+              <mat-checkbox
+                (change)="toggleShowCash()"
+                color="primary"
+                [checked]="showCashSignal()"
+              >
                 {{ 'COMMON.PROFILE.SHOW_CASH' | translate }}
               </mat-checkbox>
             </div>

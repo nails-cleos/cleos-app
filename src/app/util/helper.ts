@@ -1,14 +1,31 @@
 import { DiscountType, IDiscount } from '../discount/discount';
 import { IAuthority, IUser, IUserAll } from '../user/user';
-import { GroupService, IGroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
+import {
+  GroupService,
+  IGroupService,
+  IPrice,
+  ITreatmentAll,
+  Price,
+} from '../treatment/treatment';
 import { IPayment, IPaymentOption } from '../interfaces/payment';
 import { IReservationAll } from '../reservation/reservation';
 import { IAdditionalAll } from '../additional/additional';
 import { TranslateService } from '@ngx-translate/core';
-import { IAddress, ILocation, IRoom, IRoomAll, ServiceType } from '../room/room';
+import {
+  IAddress,
+  ILocation,
+  IRoom,
+  IRoomAll,
+  ServiceType,
+} from '../room/room';
 import { IOfficeAll } from '../office/office';
 import { ICurrency, ICurrencyAll } from '../currency/currency';
-import { DEFAULT_LOCALE, getTime, getTimeZone, localeTimeZoneDate } from './dates';
+import {
+  DEFAULT_LOCALE,
+  getTime,
+  getTimeZone,
+  localeTimeZoneDate,
+} from './dates';
 import { DialogComponent } from '../shared/dialog/generic/dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { isSameDay } from 'date-fns';
@@ -24,24 +41,29 @@ import { NavigationService } from '../services/navigation.service';
 
 export const VERIFICATION_EMAIL = 'verification_email';
 
-export const hasRoomAdmin = (authorities?: IAuthority[]): boolean => !!authorities && authorities.length === 1 &&
-  authorities.some(u => (u.authority === Role.roomAdmin));
+export const hasRoomAdmin = (authorities?: IAuthority[]): boolean =>
+  !!authorities &&
+  authorities.length === 1 &&
+  authorities.some((u) => u.authority === Role.roomAdmin);
 
 export const snakeToCamel = (value: string = ''): string =>
   value.toLowerCase().replace(/([-_]\w)/g, (g: string) => g[1].toUpperCase());
 
-export const getDisplayNameInitials = (user?: IUserAll | IUser): string | undefined => {
+export const getDisplayNameInitials = (
+  user?: IUserAll | IUser,
+): string | undefined => {
   if (!user) {
     return undefined;
   }
   const names = user.displayName?.split(' ');
 
-  return names?.length ? names.reduce((p, c) => p + c.charAt(0), '') : undefined;
+  return names?.length
+    ? names.reduce((p, c) => p + c.charAt(0), '')
+    : undefined;
 };
 
-export const getUserImage = (
-  user?: IUser | IUserAll,
-): string | undefined => user?.image ? `data:image/jpeg;base64,${ user.image }` : undefined;
+export const getUserImage = (user?: IUser | IUserAll): string | undefined =>
+  user?.image ? `data:image/jpeg;base64,${user.image}` : undefined;
 
 interface ILocale {
   language: string;
@@ -88,9 +110,13 @@ export const getLocale = (userLang?: string | null): ILocale => {
   return new Locale(language, i18n, flag);
 };
 
-export const round = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
+export const round = (value: number): number =>
+  Math.round((value + Number.EPSILON) * 100) / 100;
 
-export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): IPrice => {
+export const getPrice = (
+  reservation: IReservationAll,
+  payments?: IPayment[],
+): IPrice => {
   const treatment = reservation.treatment;
   let total = treatment.price;
   let priceWithDiscount;
@@ -100,13 +126,15 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
   let extras;
   let additional;
   if (reservation.extras && reservation.extras.length) {
-    extras = reservation.extras.map(a => a.price).reduce((p, c) => p + c);
+    extras = reservation.extras.map((a) => a.price).reduce((p, c) => p + c);
     total += extras;
     priceWithExtras += extras;
   }
 
   if (reservation.additional && reservation.additional.length) {
-    additional = reservation.additional.map(a => a.price).reduce((p, c) => p + c);
+    additional = reservation.additional
+      .map((a) => a.price)
+      .reduce((p, c) => p + c);
     total += additional;
     priceWithAdditional += additional;
   }
@@ -118,13 +146,30 @@ export const getPrice = (reservation: IReservationAll, payments?: IPayment[]): I
     total = total - discount;
   }
 
-  return new Price(treatment.price, discount, extras, additional, total, totalPaid(payments), totalWithoutDiscount,
-    priceWithDiscount, priceWithExtras, priceWithAdditional, 100, reservation.balance);
+  return new Price(
+    treatment.price,
+    discount,
+    extras,
+    additional,
+    total,
+    totalPaid(payments),
+    totalWithoutDiscount,
+    priceWithDiscount,
+    priceWithExtras,
+    priceWithAdditional,
+    100,
+    reservation.balance,
+  );
 };
 
-export const addPayment = (price: IPrice, payments?: IPayment[]): IPrice => price.withTotalPaid(totalPaid(payments));
+export const addPayment = (price: IPrice, payments?: IPayment[]): IPrice =>
+  price.withTotalPaid(totalPaid(payments));
 
-export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): IPrice => {
+export const newPrice = (
+  price: IPrice,
+  amount: number,
+  discount?: IDiscount,
+): IPrice => {
   let total = amount;
   let priceWithDiscount = price.priceWithDiscount;
   const extras = price.extra;
@@ -139,7 +184,9 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
     total += additional;
   }
 
-  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+  const priceDiscount = discount
+    ? getDiscount(discount, total)
+    : price.discount;
 
   const totalWithoutDiscount = total;
   if (priceDiscount) {
@@ -147,16 +194,34 @@ export const newPrice = (price: IPrice, amount: number, discount?: IDiscount): I
     total = total - priceDiscount;
   }
 
-  return new Price(amount, priceDiscount, extras, additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
+  return new Price(
+    amount,
+    priceDiscount,
+    extras,
+    additional,
+    total,
+    price.totalPaid,
+    totalWithoutDiscount,
+    priceWithDiscount,
+    priceWithExtras,
+    priceWithAdditional,
+    price.percentageToPaid,
+    price.balance,
+  );
 };
 
-export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): IPrice => {
+export const newExtra = (
+  price: IPrice,
+  extras: number,
+  discount?: IDiscount,
+): IPrice => {
   let total = price.amount + extras + price.additional;
   let priceWithDiscount = price.priceWithDiscount;
   const priceWithExtras = price.amount + extras;
 
-  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+  const priceDiscount = discount
+    ? getDiscount(discount, total)
+    : price.discount;
 
   const totalWithoutDiscount = total;
   if (priceDiscount) {
@@ -164,51 +229,120 @@ export const newExtra = (price: IPrice, extras: number, discount?: IDiscount): I
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, priceDiscount, extras, price.additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
+  return new Price(
+    price.amount,
+    priceDiscount,
+    extras,
+    price.additional,
+    total,
+    price.totalPaid,
+    totalWithoutDiscount,
+    priceWithDiscount,
+    priceWithExtras,
+    price.priceWithAdditional,
+    price.percentageToPaid,
+    price.balance,
+  );
 };
 
 export const removeDiscount = (price: IPrice): IPrice => {
   const total = price.amount + price.extra + price.additional;
-  return new Price(price.amount, 0, price.extra, price.additional, total, price.totalPaid, total, 0,
-    price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
+  return new Price(
+    price.amount,
+    0,
+    price.extra,
+    price.additional,
+    total,
+    price.totalPaid,
+    total,
+    0,
+    price.priceWithExtras,
+    price.priceWithAdditional,
+    price.percentageToPaid,
+    price.balance,
+  );
 };
 
-export const newDiscount = (price: IPrice, treatmentDiscount: IDiscount): IPrice => {
+export const newDiscount = (
+  price: IPrice,
+  treatmentDiscount: IDiscount,
+): IPrice => {
   const discount = getDiscount(treatmentDiscount, price.amount);
   const totalWithoutDiscount = price.amount + price.extra + price.additional;
   const priceWithDiscount = price.amount - discount;
   const total = totalWithoutDiscount - discount;
 
-  return new Price(price.amount, discount, price.extra, price.additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, price.priceWithExtras, price.priceWithAdditional, price.percentageToPaid, price.balance);
+  return new Price(
+    price.amount,
+    discount,
+    price.extra,
+    price.additional,
+    total,
+    price.totalPaid,
+    totalWithoutDiscount,
+    priceWithDiscount,
+    price.priceWithExtras,
+    price.priceWithAdditional,
+    price.percentageToPaid,
+    price.balance,
+  );
 };
 
-export const newAdditional = (price: IPrice, additionalList: IAdditionalAll[], discount?: IDiscount): IPrice => {
+export const newAdditional = (
+  price: IPrice,
+  additionalList: IAdditionalAll[],
+  discount?: IDiscount,
+): IPrice => {
   let total = price.amount + price.extra;
   let additional;
   let priceWithDiscount = price.priceWithDiscount;
   let priceWithAdditional = price.amount; // Added after
   if (additionalList && additionalList.length) {
-    additional = additionalList.map(a => a.price).reduce((p, c) => p + c);
+    additional = additionalList.map((a) => a.price).reduce((p, c) => p + c);
     total += additional;
     priceWithAdditional += additional;
   }
 
   const totalWithoutDiscount = total;
-  const priceDiscount = discount ? getDiscount(discount, total) : price.discount;
+  const priceDiscount = discount
+    ? getDiscount(discount, total)
+    : price.discount;
   if (priceDiscount) {
     priceWithDiscount = price.amount - priceDiscount;
     total = total - priceDiscount;
   }
 
-  return new Price(price.amount, priceDiscount, price.extra, additional, total, price.totalPaid, totalWithoutDiscount,
-    priceWithDiscount, price.priceWithExtras, priceWithAdditional, price.percentageToPaid, price.balance);
+  return new Price(
+    price.amount,
+    priceDiscount,
+    price.extra,
+    additional,
+    total,
+    price.totalPaid,
+    totalWithoutDiscount,
+    priceWithDiscount,
+    price.priceWithExtras,
+    priceWithAdditional,
+    price.percentageToPaid,
+    price.balance,
+  );
 };
 
-export const newPercentage = (price: IPrice, percentage: number): IPrice => new Price(price.amount, price.discount,
-  price.extra, price.additional, price.total, price.totalPaid, price.totalWithoutDiscount, price.priceWithDiscount,
-  price.priceWithExtras, price.priceWithAdditional, percentage, price.balance);
+export const newPercentage = (price: IPrice, percentage: number): IPrice =>
+  new Price(
+    price.amount,
+    price.discount,
+    price.extra,
+    price.additional,
+    price.total,
+    price.totalPaid,
+    price.totalWithoutDiscount,
+    price.priceWithDiscount,
+    price.priceWithExtras,
+    price.priceWithAdditional,
+    percentage,
+    price.balance,
+  );
 
 export const createTreatmentGroupService = (
   groups: Map<string, GroupService>,
@@ -219,13 +353,18 @@ export const createTreatmentGroupService = (
   list.forEach((treatment: ITreatmentAll) => {
     const groupId = treatment.group.id;
     const mapGroup = groups.get(groupId);
-    const keyGroup: IGroupService = mapGroup ? mapGroup :
-      new GroupService(groupId, treatment.group.name, treatment.group.colors);
+    const keyGroup: IGroupService = mapGroup
+      ? mapGroup
+      : new GroupService(groupId, treatment.group.name, treatment.group.colors);
 
-    treatment = Object.assign({}, treatment, { currency, type: ServiceType.treatment });
+    treatment = Object.assign({}, treatment, {
+      currency,
+      type: ServiceType.treatment,
+    });
 
     if (isSelected) {
-      keyGroup.selectedTreatments = keyGroup.selectedTreatments.concat(treatment);
+      keyGroup.selectedTreatments =
+        keyGroup.selectedTreatments.concat(treatment);
     } else {
       keyGroup.treatments = keyGroup.treatments.concat(treatment);
     }
@@ -235,7 +374,9 @@ export const createTreatmentGroupService = (
   return groups;
 };
 
-export const createRoomOffice = (rooms?: IRoomAll[]): Map<string, IOfficeAll> | undefined =>
+export const createRoomOffice = (
+  rooms?: IRoomAll[],
+): Map<string, IOfficeAll> | undefined =>
   rooms?.reduce((oMap: Map<string, IOfficeAll>, room: IRoomAll) => {
     const officeId = room.office?.id;
     if (officeId) {
@@ -255,22 +396,25 @@ export const createRoomOffice = (rooms?: IRoomAll[]): Map<string, IOfficeAll> | 
 export const roomName = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
-  return room.currency && room.office ?
-    `${ room.office.name } - ${ currency }${ gmt }` : '';
+  return room.currency && room.office
+    ? `${room.office.name} - ${currency}${gmt}`
+    : '';
 };
 
 export const roomDetail = (room: IRoom | IRoomAll): string => {
   const gmt = roomGMT(room);
   const currency = roomCurrency(room);
-  return `${ currency }${ gmt }`;
+  return `${currency}${gmt}`;
 };
 
 export const roomCurrency = (room: IRoom | IRoomAll): string =>
-  room.currency ? `${ room.currency.code } (${ currencySymbol(room.currency) })` : '';
+  room.currency
+    ? `${room.currency.code} (${currencySymbol(room.currency)})`
+    : '';
 
 export const roomGMT = (room: IRoom | IRoomAll): string => {
   const tz = getTimeZone(room.timeZone);
-  return tz.gmt ? ` - (${ tz.gmt })` : '';
+  return tz.gmt ? ` - (${tz.gmt})` : '';
 };
 
 export const currencySymbol = (currency?: ICurrency | string): string => {
@@ -305,15 +449,32 @@ export const currencySymbol = (currency?: ICurrency | string): string => {
 };
 
 export const openDialog = (
-  myRoom: IRoomAll, locale: string, translate: TranslateService,
-  dialog: MatDialog, time?: Date): void => {
+  myRoom: IRoomAll,
+  locale: string,
+  translate: Pick<TranslateService, 'instant'>,
+  dialog: Pick<MatDialog, 'open'>,
+  time?: Date,
+): void => {
   const room = roomName(myRoom);
-  createDialog('ROOM_INFO', room, locale, translate, dialog, myRoom.timeZone, time);
+  createDialog(
+    'ROOM_INFO',
+    room,
+    locale,
+    translate,
+    dialog,
+    myRoom.timeZone,
+    time,
+  );
 };
 
 export const createDialog = (
-  key: string, value: string, locale: string, translate: TranslateService,
-  dialog: MatDialog, timeZone?: string, time?: Date,
+  key: string,
+  value: string,
+  locale: string,
+  translate: Pick<TranslateService, 'instant'>,
+  dialog: Pick<MatDialog, 'open'>,
+  timeZone?: string,
+  time?: Date,
 ): void => {
   const localDate = new Date(localeTimeZoneDate('en-US', time));
   const date = new Date(localeTimeZoneDate('en-US', time, timeZone));
@@ -331,27 +492,49 @@ export const createDialog = (
   }
 
   const title = translate.instant('COMMON.TIME_ZONE.TITLE');
-  const content = translate.instant(`COMMON.TIME_ZONE.${ key }`, { localTime, timeZoneTime, value, arg });
+  const content = translate.instant(`COMMON.TIME_ZONE.${key}`, {
+    localTime,
+    timeZoneTime,
+    value,
+    arg,
+  });
   dialog.open(DialogComponent, {
     data: { title, content, hideNoButton: true, hideOkButton: true },
   });
 };
 
 export const isProfessional = (id: string, professionals?: IUser[]): boolean =>
-  professionals ? professionals?.some(professional => professional.id === id) : false;
+  professionals
+    ? professionals?.some((professional) => professional.id === id)
+    : false;
 
-export const totalPaid = (payments: IPayment[] | undefined): number => payments?.filter(
-  (p: IPayment) => p.status && ['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND'].includes(p.status))
-  ?.map((p: IPayment) => p.transactionAmount)
-  .reduce((acc: number, value: number | undefined) => acc + (value ? value : 0), 0) || 0;
+export const totalPaid = (payments: IPayment[] | undefined): number =>
+  payments
+    ?.filter(
+      (p: IPayment) =>
+        p.status &&
+        ['APPROVED', 'APPROVED_REFUND', 'REFUND_FAILURE', 'REFUND'].includes(
+          p.status,
+        ),
+    )
+    ?.map((p: IPayment) => p.transactionAmount)
+    .reduce(
+      (acc: number, value: number | undefined) => acc + (value ? value : 0),
+      0,
+    ) || 0;
 
-export const areEquals = (array1: any[], array2: any[]): boolean => (array1.length === array2.length &&
-  array1.every((element1) => array2.some((element2) =>
-    Object.keys(element1).every((key) => element1[key] === element2[key])),
-  )
-);
+export const areEquals = (array1: any[], array2: any[]): boolean =>
+  array1.length === array2.length &&
+  array1.every((element1) =>
+    array2.some((element2) =>
+      Object.keys(element1).every((key) => element1[key] === element2[key]),
+    ),
+  );
 
-export const allElementsHaveSameKeyFilterValue = (map: Map<any, any>, filter: string[]): boolean => {
+export const allElementsHaveSameKeyFilterValue = (
+  map: Map<any, any>,
+  filter: string[],
+): boolean => {
   let firstValue: string | undefined;
 
   for (const [key] of map.entries()) {
@@ -373,8 +556,11 @@ export const allElementsHaveSameKeyFilterValue = (map: Map<any, any>, filter: st
   return true;
 };
 
-export const titleCase = (text: string) => text.split(' ')
-  .map((l: string) => l[0].toUpperCase() + l.substring(1)).join(' ');
+export const titleCase = (text: string) =>
+  text
+    .split(' ')
+    .map((l: string) => l[0].toUpperCase() + l.substring(1))
+    .join(' ');
 
 export const openCancel = (
   dialog: MatDialog,
@@ -412,17 +598,29 @@ export const customerEditDialog = (
     price,
     currency,
   };
-  executeDialog(dialog, CustomerEditDialogComponent, data, result => {
-    if (result) {
-      navigationService.navigate(['me', 'reservation', reservationId]);
-    }
-  }, true);
+  executeDialog(
+    dialog,
+    CustomerEditDialogComponent,
+    data,
+    (result) => {
+      if (result) {
+        navigationService.navigate(['me', 'reservation', reservationId]);
+      }
+    },
+    true,
+  );
 };
 
 export const executeDialogNoWidth = (
   dialog: MatDialog,
   dialogComponent: any,
-  data: IDialog | IReservationAll | ProfessionalDialogData | PriceDialogData | SelectUserDialogData | null,
+  data:
+    | IDialog
+    | IReservationAll
+    | ProfessionalDialogData
+    | PriceDialogData
+    | SelectUserDialogData
+    | null,
   afterClose: (result: any) => void,
   disableClose: boolean = false,
 ): void => {
@@ -435,8 +633,13 @@ export const executeDialogNoWidth = (
 };
 
 export const executeDialog = (
-  dialog: MatDialog, dialogComponent: any, data: any, afterClose: (result: any) => void,
-  disableClose: boolean = false, width: string = '70vw'): void => {
+  dialog: MatDialog,
+  dialogComponent: any,
+  data: any,
+  afterClose: (result: any) => void,
+  disableClose: boolean = false,
+  width: string = '70vw',
+): void => {
   const dialogRef = dialog.open(dialogComponent, {
     width,
     disableClose,
@@ -455,7 +658,7 @@ const getDiscount = (discount: IDiscount, price: number): number => {
         break;
       }
       case DiscountType.percentage: {
-        value = (price * discount.amount / 100);
+        value = (price * discount.amount) / 100;
       }
     }
   }
@@ -463,7 +666,8 @@ const getDiscount = (discount: IDiscount, price: number): number => {
 };
 
 export const isMobile = (): boolean => {
-  const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+  const regex =
+    /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
   return regex.test(navigator.userAgent);
 };
 
@@ -476,8 +680,11 @@ export enum FrequencyEnum {
 }
 
 export const createAddress = (
-  formattedAddress?: string, location?: { lat: () => number; lng: () => number },
-  address?: IAddress, description?: string): IAddress | undefined => {
+  formattedAddress?: string,
+  location?: { lat: () => number; lng: () => number },
+  address?: IAddress,
+  description?: string,
+): IAddress | undefined => {
   if (location || address) {
     return {
       id: address?.id,
@@ -493,15 +700,18 @@ export const createAddress = (
 };
 
 export const toUrl = (...url: (string | undefined | null)[]): string =>
-  url
-    .filter((part): part is string => !!part?.trim())
-    .join('/');
+  url.filter((part): part is string => !!part?.trim()).join('/');
 
 export const getCurrencyFromRoom = (
   selectedRoom?: ISummaryRoom | 'All',
   primaryRoom?: ISummaryRoom,
 ): ICurrencyAll => {
-  const defaultCurrency: ICurrencyAll = { id: '', name: 'euro', code: 'EUR', icon: 'euro' };
+  const defaultCurrency: ICurrencyAll = {
+    id: '',
+    name: 'euro',
+    code: 'EUR',
+    icon: 'euro',
+  };
   if (selectedRoom === 'All' && primaryRoom) {
     return primaryRoom.currency;
   } else if (selectedRoom !== 'All' && selectedRoom) {

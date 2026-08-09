@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { ErrorComponent } from '@app/shared/error/error.component';
 import { IError } from '@app/interfaces/common';
@@ -16,7 +21,8 @@ import { NavigationService } from '@app/services/navigation.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MiniCardComponent {
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   title = input.required<string>();
   icon = input<string>();

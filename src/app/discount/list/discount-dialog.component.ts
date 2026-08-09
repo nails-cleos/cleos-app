@@ -9,8 +9,17 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  MatAutocomplete,
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { combineLatestWith } from 'rxjs';
 import { IUserAll } from '@app/user/user';
 import { DiscountType, IDiscountAll } from '../discount';
@@ -43,26 +52,47 @@ type DiscountDialogForm = {
   selector: 'app-discount-dialog-component',
   templateUrl: './discount-dialog.component.html',
   styleUrls: ['./discount-dialog.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete,
-    MatAutocompleteTrigger, TranslatePipe, ReactiveFormsModule, MatChipGrid, MatDialogContent, MatDialogTitle,
-    MatChipRow, MatChipInput, MatDialogActions],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatAutocomplete,
+    MatAutocompleteTrigger,
+    TranslatePipe,
+    ReactiveFormsModule,
+    MatChipGrid,
+    MatDialogContent,
+    MatDialogTitle,
+    MatChipRow,
+    MatChipInput,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DiscountDialogComponent {
   private readonly userStore = inject(UserStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly dialogRef = inject(MatDialogRef<DiscountDialogComponent>);
   private readonly data = inject<DiscountDialogData>(MAT_DIALOG_DATA);
   private allCustomersSignal = this.userStore.customers;
 
-  form: FormGroup<DiscountDialogForm> = this.formBuilder.group<DiscountDialogForm>({
-    customers: this.formBuilder.control(undefined),
-  });
+  form: FormGroup<DiscountDialogForm> =
+    this.formBuilder.group<DiscountDialogForm>({
+      customers: this.formBuilder.control(undefined),
+    });
 
   filteredCustomerSignal: Signal<IUserAll[] | undefined> = toSignal(
     this.getForm.customers.valueChanges.pipe(
       startWith('' as string),
-      map((value: any) => !value || typeof value === 'string' ? value : value.name),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.name,
+      ),
       combineLatestWith(toObservable(this.allCustomersSignal)),
       map(([name, customers]) => {
         if (!customers) {
@@ -70,13 +100,15 @@ export class DiscountDialogComponent {
         }
 
         return name ? this.filter(name, customers) : customers.slice();
-      })),
+      }),
+    ),
   );
 
   selectedCustomersSignal = signal<IUserAll[]>([]);
   allCustomersWritableSignal = signal<IUserAll[] | undefined>(undefined);
 
-  customerInput = viewChild.required<ElementRef<HTMLInputElement>>('customerInput');
+  customerInput =
+    viewChild.required<ElementRef<HTMLInputElement>>('customerInput');
 
   title?: string;
 
@@ -117,10 +149,12 @@ export class DiscountDialogComponent {
 
   remove = (customer: IUserAll): void => {
     this.selectedCustomersSignal.update((current) =>
-      current.filter((c) => c.id !== customer.id));
+      current.filter((c) => c.id !== customer.id),
+    );
 
     this.allCustomersWritableSignal.update((current) =>
-      current ? [...current, customer] : [customer]);
+      current ? [...current, customer] : [customer],
+    );
 
     this.getForm.customers.setValue(undefined);
   };
@@ -131,7 +165,8 @@ export class DiscountDialogComponent {
     this.selectedCustomersSignal.update((current) => [...current, customer]);
 
     this.allCustomersWritableSignal.update((current) =>
-      current?.filter((c) => c.id !== customer.id));
+      current?.filter((c) => c.id !== customer.id),
+    );
 
     if (this.customerInput()) {
       this.customerInput().nativeElement.value = '';
@@ -163,5 +198,6 @@ export class DiscountDialogComponent {
 
   private filter = (name: string, allCustomers: IUserAll[]): IUserAll[] =>
     allCustomers.filter((option) =>
-      option.displayName?.toLowerCase().startsWith(name.toLowerCase()));
+      option.displayName?.toLowerCase().startsWith(name.toLowerCase()),
+    );
 }

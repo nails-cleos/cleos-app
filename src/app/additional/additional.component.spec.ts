@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -14,16 +15,22 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
   let fixture: ComponentFixture<AdditionalComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let additionalStoreSpy: {
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
+    clean: Mock;
   };
 
   let treatmentStoreStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllGroups: jasmine.Spy;
+    loadAllGroups: Mock;
   };
 
   const mockGroup = {
@@ -47,16 +54,18 @@ describe('AdditionalComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     additionalStoreSpy = {
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
+      clean: vi.fn().mockName('clean'),
     };
     treatmentStoreStoreSpy = {
       data: signal<any>(undefined),
-      loadAllGroups: jasmine.createSpy('loadAllGroups'),
+      loadAllGroups: vi.fn().mockName('loadAllGroups'),
     };
 
     await TestBed.configureTestingModule({
@@ -69,9 +78,10 @@ describe('AdditionalComponent', () => {
       ],
     }).compileComponents();
 
-    fixture = TestBed
-      .overrideTemplate(AdditionalComponent, '<input #groupInput />')
-      .createComponent(AdditionalComponent);
+    fixture = TestBed.overrideTemplate(
+      AdditionalComponent,
+      '<input #groupInput />',
+    ).createComponent(AdditionalComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('config', config);
@@ -95,7 +105,11 @@ describe('AdditionalComponent', () => {
 
     expect(component.additional()?.id).toBe('1');
     expect(component.groupsSignal().length).toBe(1);
-    expect(component.allGroupsWritableSignal()?.some?.((g: ITreatmentGroupAll) => g.id === 'g2')).toBeTrue();
+    expect(
+      component
+        .allGroupsWritableSignal()
+        ?.some?.((g: ITreatmentGroupAll) => g.id === 'g2'),
+    ).toBe(true);
   });
 
   it('should handle form errors from subErrorsSignal', () => {
@@ -109,13 +123,13 @@ describe('AdditionalComponent', () => {
 
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
     expect(errs['duration']).toBe('Duration required');
-    expect(component.getForm.duration.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.duration.hasError('incorrect')).toBe(true);
   });
 
   it('should not emit submitData when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('');
@@ -128,7 +142,7 @@ describe('AdditionalComponent', () => {
   });
 
   it('should emit submitData when form is valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('New Additional');
@@ -140,19 +154,25 @@ describe('AdditionalComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Additional',
-      description: 'New Description',
-      duration: '00:30',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Additional',
+        description: 'New Description',
+        duration: '00:30',
+      }),
+    );
   });
 
   it('should emit changed fields when editing an existing additional', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('additional', { name: 'Old', description: 'old', duration: 'PT15M' } as any);
+    fixture.componentRef.setInput('additional', {
+      name: 'Old',
+      description: 'old',
+      duration: 'PT15M',
+    } as any);
     fixture.detectChanges();
 
     component.getForm.name.setValue('Updated Additional');
@@ -164,12 +184,14 @@ describe('AdditionalComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'Updated Description',
-      duration: '00:45',
-      name: 'Updated Additional',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'Updated Description',
+        duration: '00:45',
+        name: 'Updated Additional',
+      }),
+    );
   });
 
   it('filteredGroupSignal should return groups when input empty and filter when value set', () => {
@@ -198,23 +220,26 @@ describe('AdditionalComponent', () => {
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
     ]);
-    component.allGroupsWritableSignal.set([
-      { id: 'g3', name: 'G3' } as any,
-    ]);
+    component.allGroupsWritableSignal.set([{ id: 'g3', name: 'G3' } as any]);
     fixture.detectChanges();
 
     component.remove(component.groupsSignal()[1]);
     fixture.detectChanges();
 
     expect(component.groupsSignal().length).toBe(1);
-    expect(component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g2')).toBeTrue();
+    expect(
+      component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g2'),
+    ).toBe(true);
     expect(component.getForm.group.value).toBeUndefined();
   });
 
   it('selectedGroup should add selected group, remove it from allGroupsWritableSignal and clear input', () => {
     const g1 = { id: 'g1', name: 'G1' } as any;
     component.groupsSignal.set([]);
-    component.allGroupsWritableSignal.set([g1, { id: 'g2', name: 'G2' } as any]);
+    component.allGroupsWritableSignal.set([
+      g1,
+      { id: 'g2', name: 'G2' } as any,
+    ]);
 
     const event: any = { option: { value: g1 } };
 
@@ -223,8 +248,10 @@ describe('AdditionalComponent', () => {
     component.selectedGroup(event);
     fixture.detectChanges();
 
-    expect(component.groupsSignal().some((g: any) => g.id === 'g1')).toBeTrue();
-    expect(component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g1')).toBeFalse();
+    expect(component.groupsSignal().some((g: any) => g.id === 'g1')).toBe(true);
+    expect(
+      component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g1'),
+    ).toBe(false);
     expect(component.getForm.group.value).toBeUndefined();
   });
 

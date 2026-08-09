@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,23 +10,46 @@ import { TreatmentService } from '../services/treatment.service';
 
 describe('CatalogueStore', () => {
   let store: InstanceType<typeof CatalogueStore>;
-  let catalogueServiceSpy: jasmine.SpyObj<CatalogueService>;
-  let treatmentServiceSpy: jasmine.SpyObj<TreatmentService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let catalogueServiceSpy: {
+    getAllCatalogues: Mock;
+    getAllCatalogs: Mock;
+    getCatalogue: Mock;
+    createCatalogue: Mock;
+    updateCatalogue: Mock;
+    updateCatalogueOrder: Mock;
+    deleteCatalogue: Mock;
+  };
+  let treatmentServiceSpy: {
+    getAllTreatmentsGroup: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+  };
 
   beforeEach(() => {
-    catalogueServiceSpy = jasmine.createSpyObj<CatalogueService>('CatalogueService', [
-      'getAllCatalogues',
-      'getAllCatalogs',
-      'getCatalogue',
-      'createCatalogue',
-      'updateCatalogue',
-      'updateCatalogueOrder',
-      'deleteCatalogue',
-    ]);
-    treatmentServiceSpy = jasmine.createSpyObj<TreatmentService>('TreatmentService', ['getAllTreatmentsGroup']);
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake((key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
+    catalogueServiceSpy = {
+      getAllCatalogues: vi.fn().mockName('CatalogueService.getAllCatalogues'),
+      getAllCatalogs: vi.fn().mockName('CatalogueService.getAllCatalogs'),
+      getCatalogue: vi.fn().mockName('CatalogueService.getCatalogue'),
+      createCatalogue: vi.fn().mockName('CatalogueService.createCatalogue'),
+      updateCatalogue: vi.fn().mockName('CatalogueService.updateCatalogue'),
+      updateCatalogueOrder: vi
+        .fn()
+        .mockName('CatalogueService.updateCatalogueOrder'),
+      deleteCatalogue: vi.fn().mockName('CatalogueService.deleteCatalogue'),
+    };
+    treatmentServiceSpy = {
+      getAllTreatmentsGroup: vi
+        .fn()
+        .mockName('TreatmentService.getAllTreatmentsGroup'),
+    };
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+    };
+    translateSpy.instant.mockImplementation(
+      (key: string, params?: Record<string, string>) =>
+        `${key}:${params?.['name'] ?? ''}`,
+    );
 
     TestBed.configureTestingModule({
       providers: [
@@ -40,25 +64,35 @@ describe('CatalogueStore', () => {
   });
 
   it('should expose a bulk update response after sort succeeds', () => {
-    const catalogues = [{ id: '1', name: 'A', order: 0 }, { id: '2', name: 'B', order: 1 }] as any;
-    catalogueServiceSpy.updateCatalogueOrder.and.returnValue(of(void 0));
+    const catalogues = [
+      { id: '1', name: 'A', order: 0 },
+      { id: '2', name: 'B', order: 1 },
+    ] as any;
+    catalogueServiceSpy.updateCatalogueOrder.mockReturnValue(of(void 0));
 
     store.sort(catalogues);
 
-    expect(catalogueServiceSpy.updateCatalogueOrder).toHaveBeenCalledWith(catalogues);
+    expect(catalogueServiceSpy.updateCatalogueOrder).toHaveBeenCalledWith(
+      catalogues,
+    );
     expect(store.response()).toEqual({
       message: 'CATALOGUE.UPDATED.ALL.MESSAGE',
     });
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should expose warning toast metadata when delete succeeds', () => {
-    catalogueServiceSpy.deleteCatalogue.and.returnValue(of({} as any));
+    catalogueServiceSpy.deleteCatalogue.mockReturnValue(of({} as any));
 
     store.delete('catalogue-1', 'Summer');
 
-    expect(catalogueServiceSpy.deleteCatalogue).toHaveBeenCalledWith('catalogue-1');
-    expect(translateSpy.instant).toHaveBeenCalledWith('CATALOGUE.DELETED.MESSAGE', { name: 'Summer' });
+    expect(catalogueServiceSpy.deleteCatalogue).toHaveBeenCalledWith(
+      'catalogue-1',
+    );
+    expect(translateSpy.instant).toHaveBeenCalledWith(
+      'CATALOGUE.DELETED.MESSAGE',
+      { name: 'Summer' },
+    );
     expect(store.response()).toEqual({
       message: 'CATALOGUE.DELETED.MESSAGE:Summer',
       reload: true,
@@ -67,20 +101,27 @@ describe('CatalogueStore', () => {
   });
 
   it('should map catalogue service failures into error state', () => {
-    catalogueServiceSpy.getCatalogue.and.returnValue(throwError(() => new HttpErrorResponse({
-      status: 404,
-      error: {
-        message: 'CATALOGUE.NOT_FOUND',
-      },
-    })));
+    catalogueServiceSpy.getCatalogue.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            error: {
+              message: 'CATALOGUE.NOT_FOUND',
+            },
+          }),
+      ),
+    );
 
     store.loadById('missing');
 
     expect(store.response()).toBeUndefined();
-    expect(store.error()).toEqual(jasmine.objectContaining({
-      status: 'NOT_FOUND',
-      message: 'CATALOGUE.NOT_FOUND',
-    }));
-    expect(store.isLoading()).toBeFalse();
+    expect(store.error()).toEqual(
+      expect.objectContaining({
+        status: 'NOT_FOUND',
+        message: 'CATALOGUE.NOT_FOUND',
+      }),
+    );
+    expect(store.isLoading()).toBe(false);
   });
 });

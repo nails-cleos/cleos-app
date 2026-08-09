@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PriceDialogComponent } from './price-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -8,12 +9,20 @@ import { provideTranslateService } from '@ngx-translate/core';
 describe('PriceDialogComponent', () => {
   let component: PriceDialogComponent;
   let fixture: ComponentFixture<PriceDialogComponent>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<PriceDialogComponent>>;
+  let dialogRefSpy: Pick<MatDialogRef<PriceDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
-  const mockData = { name: 'Test', currentPrice: 150, type: ServiceType.treatment };
+  const mockData = {
+    name: 'Test',
+    currentPrice: 150,
+    type: ServiceType.treatment,
+  };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule],
@@ -59,7 +68,10 @@ describe('PriceDialogComponent', () => {
       providers: [
         provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
-        { provide: MAT_DIALOG_DATA, useValue: { name: 'Test', type: ServiceType.additional } },
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: { name: 'Test', type: ServiceType.additional },
+        },
       ],
     }).compileComponents();
 

@@ -1,25 +1,40 @@
 @let reservation = selectedReservationSignal();
-<form (ngSubmit)="complete()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()"
-      class="app-surface-canvas app-surface-shell app-surface-stack">
+<form
+  (ngSubmit)="complete()"
+  [formGroup]="form"
+  novalidate
+  (keydown.enter)="$event.preventDefault()"
+  class="app-surface-canvas app-surface-shell app-surface-stack"
+>
   <section class="app-surface-hero app-detail-panel complete-hero">
     @if (reservation) {
       <div class="app-surface-stack">
-        <span class="app-surface-eyebrow">{{ 'RESERVATION.CUSTOMER.DETAIL' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'RESERVATION.CUSTOMER.DETAIL' | translate
+        }}</span>
         <h1 class="app-detail-title">{{ reservation.customer.displayName }}</h1>
         <div class="app-detail-meta">
           <span class="app-detail-chip">
             <mat-icon>schedule</mat-icon>
-            {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
+            {{
+              startDate
+                | timeDetail
+                | date: 'shortDate' : reservation.room.timeZone : language
+            }}
           </span>
           @if (totalTime(); as totalTime) {
-            <span class="app-detail-chip" [ngClass]="{'complete-chip--invalid': !isValidTime()}">
+            <span
+              class="app-detail-chip"
+              [ngClass]="{ 'complete-chip--invalid': !isValidTime() }"
+            >
               <mat-icon>timelapse</mat-icon>
               {{ totalTime }}
             </span>
           }
           <span class="app-detail-chip">
             <mat-icon>payments</mat-icon>
-            {{ reservation.room.currency | currencySymbol }} {{ price().total | number:'1.2-2' }}
+            {{ reservation.room.currency | currencySymbol }}
+            {{ price().total | number: '1.2-2' }}
           </span>
         </div>
       </div>
@@ -36,26 +51,42 @@
       <div class="app-surface-stack">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+            <span class="app-surface-eyebrow">{{
+              'COMMON.TREATMENT.FIELD' | translate
+            }}</span>
           </div>
         </div>
 
         <div class="app-surface-grid app-surface-grid--auto">
           @if (groups()) {
             <mat-form-field appearance="outline" class="full-field">
-              <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, getForm.group)" [formControl]="getForm.group"
-                     [matAutocomplete]="autoGroup"
-                     matInput required type="text">
-              <mat-autocomplete #autoGroup="matAutocomplete" [displayWith]="displayFnGroup">
+              <mat-label>{{
+                'COMMON.TREATMENT.GROUP.FIELD' | translate
+              }}</mat-label>
+              <input
+                (keydown)="keyDownHandler($event, getForm.group)"
+                [formControl]="getForm.group"
+                [matAutocomplete]="autoGroup"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #autoGroup="matAutocomplete"
+                [displayWith]="displayFnGroup"
+              >
                 @for (group of filteredGroupSignal(); track group) {
                   <mat-option [value]="group">{{ group.name }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.group.hasError('required')) {
-                <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.TREATMENT.GROUP.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.group.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.TREATMENT.GROUP.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           }
@@ -63,36 +94,62 @@
           @if (treatmentList()) {
             <mat-form-field appearance="outline" class="full-field">
               <mat-label>{{ 'COMMON.TREATMENT.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, getForm.treatment)" [formControl]="getForm.treatment"
-                     [matAutocomplete]="autoTreatment" matInput required type="text">
-              <mat-autocomplete #autoTreatment="matAutocomplete" [displayWith]="displayFnTreatment">
+              <input
+                (keydown)="keyDownHandler($event, getForm.treatment)"
+                [formControl]="getForm.treatment"
+                [matAutocomplete]="autoTreatment"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #autoTreatment="matAutocomplete"
+                [displayWith]="displayFnTreatment"
+              >
                 @for (treatment of filteredTreatmentSignal(); track treatment) {
-                  <mat-option [value]="treatment">{{ treatment.name }}</mat-option>
+                  <mat-option [value]="treatment">{{
+                    treatment.name
+                  }}</mat-option>
                 }
               </mat-autocomplete>
               <mat-icon matSuffix>spa</mat-icon>
               @if (getForm.treatment.hasError('required')) {
-                <mat-error [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.TREATMENT.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.treatment.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.TREATMENT.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           }
 
           @if (colors()) {
             <mat-form-field appearance="outline" class="full-field">
-              <mat-label>{{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event, getForm.color)" [formControl]="getForm.color"
-                     [matAutocomplete]="autoColor"
-                     matInput type="text">
-              <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+              <mat-label>{{
+                'COMMON.TREATMENT.COLOR.FIELD' | translate
+              }}</mat-label>
+              <input
+                (keydown)="keyDownHandler($event, getForm.color)"
+                [formControl]="getForm.color"
+                [matAutocomplete]="autoColor"
+                matInput
+                type="text"
+              />
+              <mat-autocomplete
+                #autoColor="matAutocomplete"
+                [displayWith]="displayFnColor"
+              >
                 @for (color of filteredColorSignal(); track color) {
                   <mat-option [value]="color">{{ color.name }}</mat-option>
                 }
               </mat-autocomplete>
               <mat-icon matSuffix>palette</mat-icon>
               @if (getForm.color.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'COMMON.TREATMENT.COLOR.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'COMMON.TREATMENT.COLOR.INVALID' | translate"
+                ></mat-error>
               }
             </mat-form-field>
           }
@@ -100,30 +157,68 @@
 
         <div class="app-surface-grid app-surface-grid--auto">
           <mat-form-field appearance="outline" class="full-field">
-            <mat-label>{{ 'RESERVATION.TIME.START.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.startTime" [format]="24" [timepicker]="tStart" matInput name="start"
-                   readonly required class="complete-time-input"/>
+            <mat-label>{{
+              'RESERVATION.TIME.START.FIELD' | translate
+            }}</mat-label>
+            <input
+              [formControl]="getForm.startTime"
+              [format]="24"
+              [timepicker]="tStart"
+              matInput
+              name="start"
+              readonly
+              required
+              class="complete-time-input"
+            />
             <span matPrefix class="bold complete-time-prefix">
-              {{ startDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
+              {{
+                startDate
+                  | timeDetail
+                  | date: 'shortDate' : reservation.room.timeZone : language
+              }}
             </span>
             <mat-icon (click)="tStart.open()" matSuffix>schedule</mat-icon>
-            <app-timepicker #tStart (timeSet)="timeChange($event, startDate)"></app-timepicker>
+            <app-timepicker
+              #tStart
+              (timeSet)="timeChange($event, startDate)"
+            ></app-timepicker>
             @if (getForm.startTime.hasError('required')) {
-              <mat-error [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'RESERVATION.TIME.START.REQUIRED' | translate"
+              ></mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-field">
-            <mat-label>{{ 'RESERVATION.TIME.END.FIELD' | translate }}</mat-label>
-            <input [formControl]="getForm.endTime" [format]="24" [timepicker]="tEnd" matInput name="end" readonly
-                   required class="complete-time-input"/>
+            <mat-label>{{
+              'RESERVATION.TIME.END.FIELD' | translate
+            }}</mat-label>
+            <input
+              [formControl]="getForm.endTime"
+              [format]="24"
+              [timepicker]="tEnd"
+              matInput
+              name="end"
+              readonly
+              required
+              class="complete-time-input"
+            />
             <span matPrefix class="bold complete-time-prefix">
-              {{ endDate | timeDetail | date:'shortDate':reservation.room.timeZone:language }}
+              {{
+                endDate
+                  | timeDetail
+                  | date: 'shortDate' : reservation.room.timeZone : language
+              }}
             </span>
             <mat-icon (click)="tEnd.open()" matSuffix>schedule</mat-icon>
-            <app-timepicker #tEnd (timeSet)="timeChange($event, endDate)"></app-timepicker>
+            <app-timepicker
+              #tEnd
+              (timeSet)="timeChange($event, endDate)"
+            ></app-timepicker>
             @if (getForm.endTime.hasError('required')) {
-              <mat-error [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'RESERVATION.TIME.END.REQUIRED' | translate"
+              ></mat-error>
             }
           </mat-form-field>
         </div>
@@ -137,7 +232,9 @@
         @if (getForm.group.value && getForm.treatment.value) {
           <div class="app-surface-grid app-surface-grid--auto">
             <div class="app-surface-item">
-              <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              <span class="app-surface-item__label">{{
+                'COMMON.TREATMENT.FIELD' | translate
+              }}</span>
               <div class="app-surface-item__value">
                 {{ getForm.treatment.value.name }}
               </div>
@@ -149,11 +246,13 @@
             </div>
 
             <div class="app-surface-item">
-              <span class="app-surface-item__label"
-                    [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"></span>
+              <span
+                class="app-surface-item__label"
+                [innerHTML]="'RESERVATION.TREATMENT.COMPLETE.PRICE' | translate"
+              ></span>
               <div class="app-detail-summary-value">
                 <mat-icon>euro</mat-icon>
-                <strong>{{ currentPrice.amount | number:'1.2-2' }}</strong>
+                <strong>{{ currentPrice.amount | number: '1.2-2' }}</strong>
               </div>
             </div>
           </div>
@@ -162,13 +261,25 @@
         @let additionalList = additionalListSignal();
         @if (additionalList?.length) {
           <div class="app-surface-item app-surface-item--section">
-            <span class="app-surface-item__label">{{ 'COMMON.ADDITIONAL.FIELD' | translate }}</span>
-            <mat-selection-list #additional (selectionChange)="onChange(additional.selectedOptions.selected)">
+            <span class="app-surface-item__label">{{
+              'COMMON.ADDITIONAL.FIELD' | translate
+            }}</span>
+            <mat-selection-list
+              #additional
+              (selectionChange)="onChange(additional.selectedOptions.selected)"
+            >
               @for (it of additionalList; track it) {
-                <mat-list-option [selected]="isSelected(it)" [value]="it" togglePosition="before">
+                <mat-list-option
+                  [selected]="isSelected(it)"
+                  [value]="it"
+                  togglePosition="before"
+                >
                   <div matListItemTitle>{{ it.name }}</div>
                   <div matListItemLine>
-                    <span>{{ reservation.room.currency | currencySymbol }} {{ it.price | number:'1.2-2' }}</span>
+                    <span
+                      >{{ reservation.room.currency | currencySymbol }}
+                      {{ it.price | number: '1.2-2' }}</span
+                    >
                     &nbsp;&#9202;
                     <span>{{ it.duration | durationTime }}</span>
                   </div>
@@ -178,35 +289,57 @@
           </div>
         }
 
-        <app-form-field-adder [currency]="reservation.room.currency" [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
-                              (changeOutput)="onExtrasChanges($event)" (isValid)="isValid = $event"
-                              [allPaymentOptions]="options()">
+        <app-form-field-adder
+          [currency]="reservation.room.currency"
+          [key]="'RESERVATION.TREATMENT.EXTRAS.TITLE'"
+          (changeOutput)="onExtrasChanges($event)"
+          (isValid)="isValid = $event"
+          [allPaymentOptions]="options()"
+        >
         </app-form-field-adder>
 
-        <app-price-preview [price]="currentPrice" [currencyIcon]="reservation.room.currency.icon"
-                           [isEditing]="false"
-                           [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'"></app-price-preview>
+        <app-price-preview
+          [price]="currentPrice"
+          [currencyIcon]="reservation.room.currency.icon"
+          [isEditing]="false"
+          [label]="'RESERVATION.TREATMENT.COMPLETE.TOTAL'"
+        ></app-price-preview>
 
         @if (!currentPrice.isPaid) {
           <div class="app-crud-view-grid">
-            <mat-checkbox (change)="splitChange()" color="primary" [checked]="split">
+            <mat-checkbox
+              (change)="splitChange()"
+              color="primary"
+              [checked]="split"
+            >
               {{ 'RESERVATION.PAYMENT.SPLIT.CHECKBOX' | translate }}
             </mat-checkbox>
 
             @if (split) {
-              <app-form-field-adder [currency]="reservation.room.currency" [split]="true"
-                                    [toPaid]="currentPrice.toPaid" (isValid)="isValidSplit.set($event)"
-                                    [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'" [allPaymentOptions]="options()"
-                                    (changeOutput)="onSplitChanges($event)"></app-form-field-adder>
+              <app-form-field-adder
+                [currency]="reservation.room.currency"
+                [split]="true"
+                [toPaid]="currentPrice.toPaid"
+                (isValid)="isValidSplit.set($event)"
+                [key]="'RESERVATION.PAYMENT.SPLIT.TITLE'"
+                [allPaymentOptions]="options()"
+                (changeOutput)="onSplitChanges($event)"
+              ></app-form-field-adder>
             } @else {
               <div class="app-surface-grid app-surface-grid--auto">
-                <app-payment-option-select [control]="getForm.type" [options]="options()" [valueMode]="'type'"
-                                           [required]="true">
+                <app-payment-option-select
+                  [control]="getForm.type"
+                  [options]="options()"
+                  [valueMode]="'type'"
+                  [required]="true"
+                >
                 </app-payment-option-select>
                 @if (getForm.type.value === 'TRANSFER') {
                   <mat-form-field appearance="outline" class="full-field">
-                    <mat-label>{{ 'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate }}</mat-label>
-                    <input [formControl]="getForm.transfer" matInput>
+                    <mat-label>{{
+                      'RESERVATION.PAYMENT.TRANSFER.FIELD' | translate
+                    }}</mat-label>
+                    <input [formControl]="getForm.transfer" matInput />
                   </mat-form-field>
                 }
               </div>
@@ -222,8 +355,18 @@
         <mat-icon>keyboard_return</mat-icon>
         {{ 'COMMON.BUTTON.BACK' | translate }}
       </button>
-      <button cdkFocusInitial mat-stroked-button type="submit"
-              [disabled]="getForm.type.invalid || getForm.group.invalid || getForm.treatment.invalid || !isValidSplit() || !isValidTime()">
+      <button
+        cdkFocusInitial
+        mat-stroked-button
+        type="submit"
+        [disabled]="
+          getForm.type.invalid ||
+          getForm.group.invalid ||
+          getForm.treatment.invalid ||
+          !isValidSplit() ||
+          !isValidTime()
+        "
+      >
         <mat-icon>done_all</mat-icon>
         {{ 'COMMON.BUTTON.COMPLETE' | translate }}
       </button>

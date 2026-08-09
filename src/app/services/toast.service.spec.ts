@@ -1,7 +1,8 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
-import { DestroyableInjector, Injector } from '@angular/core';
+import { Injector } from '@angular/core';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { Overlay } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
 
@@ -10,57 +11,97 @@ import { ToastActionType, ToastType } from '../shared/toast/toast.model';
 
 describe('ToastService', () => {
   let service: ToastService;
-  let overlay: jasmine.SpyObj<Overlay>;
-  let injector: jasmine.SpyObj<DestroyableInjector>;
-  let overlayRef: jasmine.SpyObj<OverlayRef>;
+  let overlay: {
+    create: ReturnType<typeof vi.fn>;
+    position: ReturnType<typeof vi.fn>;
+  };
+
+  let injector: {
+    get: ReturnType<typeof vi.fn>;
+  };
+
+  let overlayRef: {
+    attach: ReturnType<typeof vi.fn>;
+    dispose: ReturnType<typeof vi.fn>;
+    updatePositionStrategy: ReturnType<typeof vi.fn>;
+  };
+
   let breakpointState$: Subject<BreakpointState>;
-  let positionStrategy: jasmine.SpyObj<any>;
 
-  beforeEach(() => {
-    const overlayRefSpy = jasmine.createSpyObj('OverlayRef', [
-      'attach',
-      'dispose',
-      'updatePositionStrategy',
-    ]);
-    const positionStrategySpy = jasmine.createSpyObj('PositionStrategy', [
-      'global',
-      'bottom',
-      'top',
-      'centerHorizontally',
-    ]);
+  let positionStrategy: {
+    global: ReturnType<typeof vi.fn>;
+    bottom: ReturnType<typeof vi.fn>;
+    top: ReturnType<typeof vi.fn>;
+    centerHorizontally: ReturnType<typeof vi.fn>;
+  };
 
-    // Chain the position strategy methods
-    positionStrategySpy.global.and.returnValue(positionStrategySpy);
-    positionStrategySpy.bottom.and.returnValue(positionStrategySpy);
-    positionStrategySpy.top.and.returnValue(positionStrategySpy);
-    positionStrategySpy.centerHorizontally.and.returnValue(positionStrategySpy);
+  beforeEach(async () => {
+    overlayRef = {
+      attach: vi.fn().mockName('OverlayRef.attach'),
+      dispose: vi.fn().mockName('OverlayRef.dispose'),
+      updatePositionStrategy: vi
+        .fn()
+        .mockName('OverlayRef.updatePositionStrategy'),
+    };
 
-    const overlaySpy = jasmine.createSpyObj('Overlay', ['create', 'position']);
-    overlaySpy.position.and.returnValue(positionStrategySpy);
-    overlaySpy.create.and.returnValue(overlayRefSpy);
+    positionStrategy = {
+      global: vi.fn().mockName('PositionStrategy.global'),
+      bottom: vi.fn().mockName('PositionStrategy.bottom'),
+      top: vi.fn().mockName('PositionStrategy.top'),
+      centerHorizontally: vi
+        .fn()
+        .mockName('PositionStrategy.centerHorizontally'),
+    };
 
-    const injectorSpy = jasmine.createSpyObj('Injector', ['get']);
+    // chain methods
+    positionStrategy.global.mockReturnValue(positionStrategy);
+    positionStrategy.bottom.mockReturnValue(positionStrategy);
+    positionStrategy.top.mockReturnValue(positionStrategy);
+    positionStrategy.centerHorizontally.mockReturnValue(positionStrategy);
+
+    overlay = {
+      create: vi.fn().mockName('Overlay.create'),
+      position: vi.fn().mockName('Overlay.position'),
+    };
+
+    overlay.position.mockReturnValue(positionStrategy);
+    overlay.create.mockReturnValue(overlayRef);
+
+    injector = {
+      get: vi.fn().mockName('Injector.get'),
+    };
+
     breakpointState$ = new Subject<BreakpointState>();
-    const breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    breakpointObserverSpy.observe.and.returnValue(breakpointState$.asObservable());
 
-    TestBed.configureTestingModule({
+    const breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+
+    breakpointObserverSpy.observe.mockReturnValue(
+      breakpointState$.asObservable(),
+    );
+
+    await TestBed.configureTestingModule({
       providers: [
         ToastService,
-        { provide: Overlay, useValue: overlaySpy },
-        { provide: Injector, useValue: injectorSpy },
-        { provide: BreakpointObserver, useValue: breakpointObserverSpy },
+        {
+          provide: Overlay,
+          useValue: overlay,
+        },
+        {
+          provide: Injector,
+          useValue: injector,
+        },
+        {
+          provide: BreakpointObserver,
+          useValue: breakpointObserverSpy,
+        },
       ],
-    });
+    }).compileComponents();
 
     service = TestBed.inject(ToastService);
-    overlay = TestBed.inject(Overlay) as jasmine.SpyObj<Overlay>;
-    injector = TestBed.inject(Injector) as jasmine.SpyObj<DestroyableInjector>;
-    overlayRef = overlay.create() as jasmine.SpyObj<OverlayRef>;
-    positionStrategy = overlay.position() as jasmine.SpyObj<any>;
 
-    // Mock Injector.create static method
-    spyOn(Injector, 'create').and.returnValue(injector);
+    vi.spyOn(Injector, 'create').mockReturnValue(injector as any);
   });
 
   it('should be created', () => {
@@ -81,14 +122,19 @@ describe('ToastService', () => {
         positionStrategy: positionStrategy,
         hasBackdrop: false,
       });
-      expect(overlayRef.attach).toHaveBeenCalledWith(jasmine.any(ComponentPortal));
+      expect(overlayRef.attach).toHaveBeenCalledWith(
+        expect.any(ComponentPortal),
+      );
       expect(toastRef).toBeDefined();
       expect(toastRef.onAction).toBeDefined();
       expect(toastRef.onDismiss).toBeDefined();
     });
 
     it('should position toast from the bottom on mobile', () => {
-      breakpointState$.next({ matches: true, breakpoints: { '(max-width: 640px)': true } });
+      breakpointState$.next({
+        matches: true,
+        breakpoints: { '(max-width: 640px)': true },
+      });
 
       service.show('Mobile toast');
 
@@ -109,7 +155,8 @@ describe('ToastService', () => {
         parent: injector,
         providers: [
           {
-            provide: 'TOAST_DATA', useValue: jasmine.objectContaining({
+            provide: 'TOAST_DATA',
+            useValue: expect.objectContaining({
               message,
               type,
               duration,
@@ -117,8 +164,8 @@ describe('ToastService', () => {
               action,
             }),
           },
-          { provide: 'TOAST_DISMISS', useValue: jasmine.any(Subject) },
-          { provide: 'TOAST_ACTION', useValue: jasmine.any(Subject) },
+          { provide: 'TOAST_DISMISS', useValue: expect.any(Subject) },
+          { provide: 'TOAST_ACTION', useValue: expect.any(Subject) },
         ],
       });
     });
@@ -148,26 +195,26 @@ describe('ToastService', () => {
     });
 
     it('should auto-dismiss toast after specified duration', () => {
-      jasmine.clock().install();
+      vi.useFakeTimers();
       const message = 'Auto dismiss test';
       const duration = 1000;
 
-      spyOn(service, 'dismissSpecific');
+      vi.spyOn(service, 'dismissSpecific').mockReturnValue(undefined);
 
       service.show(message, 'info', duration);
 
-      jasmine.clock().tick(duration);
+      vi.advanceTimersByTime(duration);
 
       expect(service.dismissSpecific).toHaveBeenCalledWith(overlayRef);
-      jasmine.clock().uninstall();
+      vi.useRealTimers();
     });
 
     it('should not auto-dismiss when duration is 0', () => {
       const message = 'No auto dismiss';
       const duration = 0;
 
-      spyOn(service, 'dismissSpecific');
-      spyOn(window, 'setTimeout');
+      vi.spyOn(service, 'dismissSpecific').mockReturnValue(undefined);
+      vi.spyOn(window, 'setTimeout').mockReturnValue(undefined as any);
 
       service.show(message, 'info', duration);
 
@@ -177,20 +224,20 @@ describe('ToastService', () => {
 
   describe('dismissSpecific', () => {
     it('should remove overlay ref and dispose when toast exists', () => {
-      // Add a toast to the internal array
       service.show('Test message');
-      const currentOverlayRef = overlay.create();
 
-      spyOn(service as any, 'repositionToasts');
+      vi.spyOn(service as any, 'repositionToasts').mockReturnValue(undefined);
 
-      service.dismissSpecific(currentOverlayRef);
+      service.dismissSpecific(overlayRef as any);
 
-      expect(currentOverlayRef.dispose).toHaveBeenCalled();
+      expect(overlayRef.dispose).toHaveBeenCalled();
       expect((service as any).repositionToasts).toHaveBeenCalled();
     });
 
     it('should not dispose when overlay ref does not exist', () => {
-      const nonExistentOverlayRef = jasmine.createSpyObj('OverlayRef', ['dispose']);
+      const nonExistentOverlayRef: any = {
+        dispose: vi.fn().mockName('OverlayRef.dispose'),
+      };
 
       service.dismissSpecific(nonExistentOverlayRef);
 
@@ -215,7 +262,10 @@ describe('ToastService', () => {
     it('should reposition active toasts when viewport breakpoint changes', () => {
       service.show('Responsive toast');
 
-      breakpointState$.next({ matches: true, breakpoints: { '(max-width: 640px)': true } });
+      breakpointState$.next({
+        matches: true,
+        breakpoints: { '(max-width: 640px)': true },
+      });
       TestBed.flushEffects();
 
       expect(overlayRef.updatePositionStrategy).toHaveBeenCalled();
@@ -233,19 +283,22 @@ describe('ToastService', () => {
 
       service.show(message, type, duration, { actionType, action });
 
-      expect(Injector.create).toHaveBeenCalledWith(jasmine.objectContaining({
-        providers: jasmine.arrayContaining([
-          {
-            provide: 'TOAST_DATA', useValue: jasmine.objectContaining({
-              message,
-              type,
-              duration,
-              actionType,
-              action,
-            }),
-          },
-        ]),
-      }));
+      expect(Injector.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          providers: expect.arrayContaining([
+            {
+              provide: 'TOAST_DATA',
+              useValue: expect.objectContaining({
+                message,
+                type,
+                duration,
+                actionType,
+                action,
+              }),
+            },
+          ]),
+        }),
+      );
     });
 
     it('should return observables from action and dismiss subjects', () => {
@@ -259,13 +312,13 @@ describe('ToastService', () => {
   describe('edge cases', () => {
     it('should handle toast dismissal through subject', () => {
       service.show('Test message');
-      spyOn(service, 'dismissSpecific');
+      vi.spyOn(service, 'dismissSpecific').mockReturnValue(undefined);
 
       // Simulate toast dismiss by triggering the subject
       (service as any).overlayRefs[0] = overlayRef;
 
       // Manually call the subscribe callback that would be triggered
-      service.dismissSpecific(overlayRef);
+      service.dismissSpecific(overlayRef as any);
 
       expect(service.dismissSpecific).toHaveBeenCalledWith(overlayRef);
     });

@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatIcon } from '@angular/material/icon';
@@ -13,7 +19,9 @@ type ContactKey = 'whatsapp' | 'instagram' | 'facebook' | 'phone' | 'email';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetBookAppointmentComponent {
-  private readonly bottomSheetRef = inject(MatBottomSheetRef<BottomSheetBookAppointmentComponent>);
+  private readonly bottomSheetRef = inject(
+    MatBottomSheetRef<BottomSheetBookAppointmentComponent>,
+  );
   private readonly translateService = inject(TranslateService);
 
   private readonly actionSignal = signal<ContactKey | undefined>(undefined);

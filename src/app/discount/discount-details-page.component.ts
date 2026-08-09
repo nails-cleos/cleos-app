@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { DiscountComponent } from './discount.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscount } from './discount';
@@ -9,9 +16,13 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-discount-details-page',
   template: `
     @if (discount(); as discount) {
-      <app-discount [discount]="discount" [config]="config" (submitData)="submit($event)"/>
+      <app-discount
+        [discount]="discount"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton/>
+      <app-skeleton />
     }
   `,
   imports: [DiscountComponent, SkeletonComponent],

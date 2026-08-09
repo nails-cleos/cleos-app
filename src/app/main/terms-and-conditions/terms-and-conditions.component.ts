@@ -1,4 +1,8 @@
-import { ChangeDetectionStrategy, Component, HostListener } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostListener,
+} from '@angular/core';
 import { LegalPageBase } from '../legal-page-base';
 
 @Component({
@@ -13,7 +17,8 @@ export class TermsAndConditionsComponent extends LegalPageBase {
   constructor() {
     super({
       routeSegment: 'term-and-conditions',
-      unavailableHtml: '<h1>Terms and Conditions</h1><p>Terms and conditions content is unavailable.</p>',
+      unavailableHtml:
+        '<h1>Terms and Conditions</h1><p>Terms and conditions content is unavailable.</p>',
       fileName: 'terms',
     });
   }

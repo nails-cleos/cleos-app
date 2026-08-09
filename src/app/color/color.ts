@@ -21,13 +21,13 @@ export interface IColorAll {
 }
 
 export class Color {
-  static fromForm(
-    colorForm: ColorForm,
-    currentColor?: IColorAll,
-  ): IColor {
+  static fromForm(colorForm: ColorForm, currentColor?: IColorAll): IColor {
     return {
       name: fieldChange(colorForm.name, currentColor?.name),
-      description: fieldChange(colorForm.description, currentColor?.description),
+      description: fieldChange(
+        colorForm.description,
+        currentColor?.description,
+      ),
     };
   }
 }

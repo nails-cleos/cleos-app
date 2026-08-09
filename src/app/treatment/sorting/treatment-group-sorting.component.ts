@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ITreatmentGroupAll } from '../treatment';
 import { TreatmentStore } from '@app/store/treatment.store';
@@ -22,7 +28,10 @@ export class TreatmentGroupSortingComponent {
   itemsSignal = computed(() => {
     const data = this.treatmentStore.data();
     return data?.kind === 'list'
-      ? data.value.map((group: ITreatmentGroupAll) => new ItemSorting(group.id, group.name, group.order))
+      ? data.value.map(
+          (group: ITreatmentGroupAll) =>
+            new ItemSorting(group.id, group.name, group.order),
+        )
       : undefined;
   });
 

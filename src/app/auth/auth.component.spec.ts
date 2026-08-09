@@ -1,4 +1,13 @@
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AuthComponent } from './auth.component';
 import { of, Subject } from 'rxjs';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
@@ -12,11 +21,12 @@ import { AuthStore } from '../store/auth.store';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { provideTranslateService } from '@ngx-translate/core';
-
 describe('AuthComponent', () => {
   let component: AuthComponent;
   let fixture: ComponentFixture<AuthComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let authStoreSpy: {
     isAuthenticated: ReturnType<typeof signal>;
@@ -24,57 +34,84 @@ describe('AuthComponent', () => {
     queryParams: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    authRedirect: jasmine.Spy;
-    login: jasmine.Spy;
-    signupSuccess: jasmine.Spy;
-    setCurrentCode: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    clean: jasmine.Spy;
+    authRedirect: Mock;
+    login: Mock;
+    signupSuccess: Mock;
+    setCurrentCode: Mock;
+    clearResponse: Mock;
+    clean: Mock;
   };
 
   let action$: Subject<void>;
 
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let firebaseServiceSpy: jasmine.SpyObj<FirebaseService>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let activatedRouteSpy: {
+    snapshot: {
+      queryParams: any;
+    };
+    queryParamMap: any;
+  };
+  let firebaseServiceSpy: {
+    signUp: Mock;
+    signIn: Mock;
+    signInWithGoogle: Mock;
+    updateProfile: Mock;
+    sendVerificationEmail: Mock;
+    fetchSignInMethods: Mock;
+    getIdToken: Mock;
+  };
+  let toastServiceSpy: Pick<ToastService, 'show'> & {
+    show: ReturnType<typeof vi.fn>;
+  };
   let cookieService: CookieService;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     authStoreSpy = {
       isAuthenticated: signal(false),
       redirect: signal(false),
       queryParams: signal(undefined),
       error: signal(undefined),
       response: signal(undefined),
-      authRedirect: jasmine.createSpy('authRedirect'),
-      login: jasmine.createSpy('login'),
-      signupSuccess: jasmine.createSpy('signupSuccess'),
-      setCurrentCode: jasmine.createSpy('setCurrentCode'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      clean: jasmine.createSpy('clean'),
+      authRedirect: vi.fn().mockName('authRedirect'),
+      login: vi.fn().mockName('login'),
+      signupSuccess: vi.fn().mockName('signupSuccess'),
+      setCurrentCode: vi.fn().mockName('setCurrentCode'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      clean: vi.fn().mockName('clean'),
     };
     action$ = new Subject<void>();
 
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
+    activatedRouteSpy = {
       snapshot: {
         queryParams: {},
       },
       queryParamMap: of(convertToParamMap({})),
-    });
+    };
 
-    toastServiceSpy.show.and.returnValue({
+    toastServiceSpy.show.mockReturnValue({
       onAction: () => action$.asObservable(),
       onDismiss: () => of(void 0),
     });
 
-    firebaseServiceSpy = jasmine.createSpyObj('FirebaseService', [
-      'signUp', 'signIn', 'signInWithGoogle', 'updateProfile', 'sendVerificationEmail', 'fetchSignInMethods',
-      'getIdToken',
-    ]);
+    firebaseServiceSpy = {
+      signUp: vi.fn().mockName('FirebaseService.signUp'),
+      signIn: vi.fn().mockName('FirebaseService.signIn'),
+      signInWithGoogle: vi.fn().mockName('FirebaseService.signInWithGoogle'),
+      updateProfile: vi.fn().mockName('FirebaseService.updateProfile'),
+      sendVerificationEmail: vi
+        .fn()
+        .mockName('FirebaseService.sendVerificationEmail'),
+      fetchSignInMethods: vi
+        .fn()
+        .mockName('FirebaseService.fetchSignInMethods'),
+      getIdToken: vi.fn().mockName('FirebaseService.getIdToken'),
+    };
 
     (firebaseServiceSpy as any).user = signal(null);
 
@@ -111,11 +148,14 @@ describe('AuthComponent', () => {
     component.getForm.password.setValue('123456');
     component.getForm.displayName.setValue('Test User');
 
-    firebaseServiceSpy.signUp.and.returnValue(Promise.resolve({} as any));
+    firebaseServiceSpy.signUp.mockResolvedValue({} as any);
 
     component.onSubmit();
 
-    expect(firebaseServiceSpy.signUp).toHaveBeenCalledWith('test@example.com', '123456');
+    expect(firebaseServiceSpy.signUp).toHaveBeenCalledWith(
+      'test@example.com',
+      '123456',
+    );
   });
 
   it('should call signIn on submit when displayName is undefined', async () => {
@@ -123,15 +163,18 @@ describe('AuthComponent', () => {
     component.getForm.password.setValue('123456');
     component.getForm.displayName.setValue(undefined);
 
-    firebaseServiceSpy.signIn.and.returnValue(Promise.resolve({} as any));
+    firebaseServiceSpy.signIn.mockResolvedValue({} as any);
 
     component.onSubmit();
 
-    expect(firebaseServiceSpy.signIn).toHaveBeenCalledWith('test@example.com', '123456');
+    expect(firebaseServiceSpy.signIn).toHaveBeenCalledWith(
+      'test@example.com',
+      '123456',
+    );
   });
 
   it('should call signInWithGoogle when loginWithGoogle is invoked', async () => {
-    firebaseServiceSpy.signInWithGoogle.and.returnValue(Promise.resolve({} as any));
+    firebaseServiceSpy.signInWithGoogle.mockResolvedValue({} as any);
 
     component.loginWithGoogle();
 
@@ -139,7 +182,7 @@ describe('AuthComponent', () => {
   });
 
   it('should call fetchSignInMethods and update displayName validators when validateEmail is invoked', async () => {
-    firebaseServiceSpy.fetchSignInMethods.and.returnValue(Promise.resolve([]));
+    firebaseServiceSpy.fetchSignInMethods.mockResolvedValue([]);
 
     const displayNameControl = component.getForm.displayName;
     displayNameControl.setValidators([]);
@@ -147,13 +190,15 @@ describe('AuthComponent', () => {
 
     await component.validateEmail();
 
-    expect(firebaseServiceSpy.fetchSignInMethods).toHaveBeenCalledWith(component.getForm.email.value);
-    expect(displayNameControl.hasValidator(Validators.required)).toBeTrue();
+    expect(firebaseServiceSpy.fetchSignInMethods).toHaveBeenCalledWith(
+      component.getForm.email.value,
+    );
+    expect(displayNameControl.hasValidator(Validators.required)).toBe(true);
     expect(component.statusSignal()).toBe('');
   });
 
   it('should clear displayName validators if fetchSignInMethods returns non-empty', async () => {
-    firebaseServiceSpy.fetchSignInMethods.and.returnValue(Promise.resolve(['password']));
+    firebaseServiceSpy.fetchSignInMethods.mockResolvedValue(['password']);
 
     const displayNameControl = component.getForm.displayName;
     displayNameControl.setValidators([Validators.required]);
@@ -161,86 +206,102 @@ describe('AuthComponent', () => {
 
     await component.validateEmail();
 
-    expect(firebaseServiceSpy.fetchSignInMethods).toHaveBeenCalledWith(component.getForm.email.value);
-    expect(displayNameControl.hasValidator(Validators.required)).toBeFalse();
+    expect(firebaseServiceSpy.fetchSignInMethods).toHaveBeenCalledWith(
+      component.getForm.email.value,
+    );
+    expect(displayNameControl.hasValidator(Validators.required)).toBe(false);
     expect(displayNameControl.value).toBeUndefined();
     expect(component.statusSignal()).toBe('password');
   });
 
-  it('should process user correctly', fakeAsync(() => {
+  it('should process user correctly', async () => {
     const mockUser = { uid: '123', emailVerified: false } as any;
     component.getForm.displayName.setValue('Test User');
 
-    firebaseServiceSpy.updateProfile.and.returnValue(Promise.resolve());
-    firebaseServiceSpy.sendVerificationEmail.and.returnValue(Promise.resolve());
-    firebaseServiceSpy.getIdToken = jasmine.createSpy().and.returnValue(Promise.resolve('id-token'));
+    firebaseServiceSpy.updateProfile.mockResolvedValue(undefined);
+    firebaseServiceSpy.sendVerificationEmail.mockResolvedValue(undefined);
+    firebaseServiceSpy.getIdToken = vi.fn().mockResolvedValue('id-token');
 
     (component as any).processUser(mockUser);
-    flushMicrotasks();
+    await Promise.resolve();
 
-    expect(firebaseServiceSpy.updateProfile).toHaveBeenCalledWith({ displayName: 'Test User' });
+    expect(firebaseServiceSpy.updateProfile).toHaveBeenCalledWith({
+      displayName: 'Test User',
+    });
     expect(firebaseServiceSpy.sendVerificationEmail).toHaveBeenCalled();
     expect(authStoreSpy.signupSuccess).toHaveBeenCalled();
-  }));
+  });
 
-  it('should dispatch login when processing a verified user', fakeAsync(() => {
+  it('should dispatch login when processing a verified user', async () => {
     const mockUser = { uid: '123', emailVerified: true } as any;
-    firebaseServiceSpy.getIdToken = jasmine.createSpy().and.returnValue(Promise.resolve('id-token'));
+    firebaseServiceSpy.getIdToken = vi.fn().mockResolvedValue('id-token');
 
     (component as any).processUser(mockUser);
-    flushMicrotasks();
+    await Promise.resolve();
 
     expect(firebaseServiceSpy.sendVerificationEmail).not.toHaveBeenCalled();
-    expect(authStoreSpy.login).toHaveBeenCalledWith('id-token', undefined, '', {});
-  }));
+    expect(authStoreSpy.login).toHaveBeenCalledWith(
+      'id-token',
+      undefined,
+      '',
+      {},
+    );
+  });
 
-  it('should not dispatch login when verified user has no id token', fakeAsync(() => {
+  it('should not dispatch login when verified user has no id token', async () => {
     const mockUser = { uid: '123', emailVerified: true } as any;
-    firebaseServiceSpy.getIdToken = jasmine.createSpy().and.returnValue(Promise.resolve(null));
+    firebaseServiceSpy.getIdToken = vi.fn().mockResolvedValue(null);
 
     (component as any).processUser(mockUser);
-    flushMicrotasks();
+    await Promise.resolve();
 
     expect(authStoreSpy.login).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should login instead of sending verification email when verification cookie exists', fakeAsync(() => {
+  it('should login instead of sending verification email when verification cookie exists', async () => {
     const mockUser = { uid: '123', emailVerified: false } as any;
     cookieService.set(VERIFICATION_EMAIL, 'sent');
-    firebaseServiceSpy.getIdToken = jasmine.createSpy().and.returnValue(Promise.resolve('id-token'));
+    firebaseServiceSpy.getIdToken = vi.fn().mockResolvedValue('id-token');
 
     (component as any).processUser(mockUser);
-    flushMicrotasks();
+    await Promise.resolve();
 
     expect(firebaseServiceSpy.sendVerificationEmail).not.toHaveBeenCalled();
-    expect(authStoreSpy.login).toHaveBeenCalledWith('id-token', undefined, '', {});
-  }));
+    expect(authStoreSpy.login).toHaveBeenCalledWith(
+      'id-token',
+      undefined,
+      '',
+      {},
+    );
+  });
 
-  it('should map sign up invalid-email errors to the email control', fakeAsync(() => {
+  it('should map sign up invalid-email errors to the email control', async () => {
     component.getForm.email.setValue('test@example.com');
     component.getForm.password.setValue('123456');
     component.getForm.displayName.setValue('Test User');
 
-    firebaseServiceSpy.signUp.and.returnValue(Promise.reject({ code: 'auth/invalid-email' }));
+    firebaseServiceSpy.signUp.mockRejectedValue({ code: 'auth/invalid-email' });
 
     component.onSubmit();
-    flushMicrotasks();
+    await Promise.resolve();
 
-    expect(component.getForm.email.hasError('email')).toBeTrue();
-  }));
+    expect(component.getForm.email.hasError('email')).toBe(true);
+  });
 
-  it('should map sign in wrong-password errors to the password control', fakeAsync(() => {
+  it('should map sign in wrong-password errors to the password control', async () => {
     component.getForm.email.setValue('test@example.com');
     component.getForm.password.setValue('123456');
     component.getForm.displayName.setValue(undefined);
 
-    firebaseServiceSpy.signIn.and.returnValue(Promise.reject({ code: 'auth/wrong-password' }));
+    firebaseServiceSpy.signIn.mockRejectedValue({
+      code: 'auth/wrong-password',
+    });
 
     component.onSubmit();
-    flushMicrotasks();
+    await Promise.resolve();
 
-    expect(component.getForm.password.hasError('wrong')).toBeTrue();
-  }));
+    expect(component.getForm.password.hasError('wrong')).toBe(true);
+  });
 
   it('should clear auth state when the response toast action is used', () => {
     authStoreSpy.response.set({ message: 'OK', toastType: 'success' });

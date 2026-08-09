@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -22,25 +23,37 @@ import { DocumentStore } from '@app/store/document.store';
 import { DocumentTypeEnum } from '@app/document/document';
 import { ExpenseStore } from '@app/store/expense.store';
 import { NavigationService } from '@app/services/navigation.service';
-
 describe('ExpenseListComponent', () => {
   let component: ExpenseListComponent;
   let fixture: ComponentFixture<ExpenseListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let datepickerSpy: jasmine.SpyObj<MatDatepicker<Date>>;
-  let dialogSpy: jasmine.Spy<any>;
-  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
-  let documentStoreSpy: { download: jasmine.Spy };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let datepickerSpy: Pick<MatDatepicker<Date>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
+  let dialogSpy: Mock;
+  let driveAccessServiceSpy: Pick<
+    DriveAccessService,
+    'requestAccessIfNeeded'
+  > & {
+    requestAccessIfNeeded: ReturnType<typeof vi.fn>;
+  };
+  let documentStoreSpy: {
+    download: Mock;
+  };
   let expenseStoreSpy: {
     data: ReturnType<typeof expenseListSignal.asReadonly>;
     response: ReturnType<typeof responseSignal.asReadonly>;
     isLoading: ReturnType<typeof signal<boolean>>;
-    clean: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    clearResponse: Mock;
+    loadPage: Mock;
+    delete: Mock;
   };
   const expenseListSignal = signal<any>(undefined);
   const responseSignal = signal<any>(undefined);
@@ -86,7 +99,12 @@ describe('ExpenseListComponent', () => {
       btw: 21,
       room,
       expenseTotals: [
-        { type: 'expense', gross: 100, btw: 21, description: 'expense total 1' },
+        {
+          type: 'expense',
+          gross: 100,
+          btw: 21,
+          description: 'expense total 1',
+        },
         { type: 'expense', gross: 200, btw: 0, description: 'expense total 2' },
       ],
       totalNet: 79,
@@ -104,7 +122,12 @@ describe('ExpenseListComponent', () => {
       btw: 42,
       room,
       expenseTotals: [
-        { type: 'expense', gross: 100, btw: 21, description: 'expense total 1' },
+        {
+          type: 'expense',
+          gross: 100,
+          btw: 21,
+          description: 'expense total 1',
+        },
         { type: 'expense', gross: 200, btw: 0, description: 'expense total 2' },
       ],
       totalNet: 158,
@@ -122,7 +145,12 @@ describe('ExpenseListComponent', () => {
       btw: 63,
       room,
       expenseTotals: [
-        { type: 'expense', gross: 100, btw: 21, description: 'expense total 1' },
+        {
+          type: 'expense',
+          gross: 100,
+          btw: 21,
+          description: 'expense total 1',
+        },
         { type: 'expense', gross: 200, btw: 0, description: 'expense total 2' },
       ],
       totalNet: 237,
@@ -139,28 +167,37 @@ describe('ExpenseListComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     expenseListSignal.set(mockPagination);
     responseSignal.set(undefined);
     breakpoint$ = new BehaviorSubject(defaultBreakpoint);
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
-    driveAccessServiceSpy = jasmine.createSpyObj<DriveAccessService>('DriveAccessService', ['requestAccessIfNeeded']);
-    documentStoreSpy = { download: jasmine.createSpy('download') };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    datepickerSpy = {
+      close: vi.fn().mockName('MatDatepicker.close'),
+    };
+    driveAccessServiceSpy = {
+      requestAccessIfNeeded: vi
+        .fn()
+        .mockName('DriveAccessService.requestAccessIfNeeded'),
+    };
+    documentStoreSpy = { download: vi.fn().mockName('download') };
     expenseStoreSpy = {
       data: expenseListSignal.asReadonly(),
       response: responseSignal.asReadonly(),
       isLoading: signal(false),
-      clean: jasmine.createSpy('clean'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      loadPage: jasmine.createSpy('loadPage'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      loadPage: vi.fn().mockName('loadPage'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [ExpenseListComponent],
@@ -170,7 +207,10 @@ describe('ExpenseListComponent', () => {
         { provide: ExpenseStore, useValue: expenseStoreSpy },
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
     }).compileComponents();
@@ -183,7 +223,9 @@ describe('ExpenseListComponent', () => {
 
     fixture.detectChanges();
 
-    dialogSpy = spyOn(component['dialog'], 'open');
+    dialogSpy = vi
+      .spyOn(component['dialog'], 'open')
+      .mockReturnValue(undefined as any);
   });
 
   it('should create', () => {
@@ -237,7 +279,12 @@ describe('ExpenseListComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(expenseStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -282,7 +329,12 @@ describe('ExpenseListComponent', () => {
     const item = mockExpenses[0];
     component.edit(item);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['rooms', room.id, 'expenses', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'rooms',
+      room.id,
+      'expenses',
+      item.id,
+    ]);
   });
 
   it('should call delete method without errors', () => {
@@ -290,24 +342,29 @@ describe('ExpenseListComponent', () => {
     fixture.detectChanges();
     const testExpense = mockExpenses[0];
 
-    dialogSpy.and.returnValue({
+    dialogSpy.mockReturnValue({
       afterClosed: () => of(testExpense),
     });
 
     component.delete(testExpense);
 
     expect(dialogSpy).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'EXPENSE.DELETED.TITLE',
           content: 'EXPENSE.DELETED.CONTENT',
           value: testExpense,
           variant: 'warning',
         },
-      }));
+      }),
+    );
 
-    expect(expenseStoreSpy.delete).toHaveBeenCalledWith(room.id, testExpense.id!, testExpense.invoice!);
+    expect(expenseStoreSpy.delete).toHaveBeenCalledWith(
+      room.id,
+      testExpense.id!,
+      testExpense.invoice!,
+    );
   });
 
   it('should call openDialog method without errors', () => {
@@ -316,15 +373,16 @@ describe('ExpenseListComponent', () => {
     component.openDialog(testExpense);
 
     expect(dialogSpy).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'COMMON.TIME_ZONE.TITLE',
           content: 'COMMON.TIME_ZONE.ROOM_INFO',
           hideNoButton: true,
           hideOkButton: true,
         },
-      }));
+      }),
+    );
   });
 
   it('should handle undefined expanded expense', () => {
@@ -382,9 +440,17 @@ describe('ExpenseListComponent', () => {
   });
 
   it('should dispatch documentSelected when edit is called', () => {
-    const item = { id: '1', name: 'Document 1', date: new Date(2024, 2, 1), type: DocumentTypeEnum.expense };
+    const item = {
+      id: '1',
+      name: 'Document 1',
+      date: new Date(2024, 2, 1),
+      type: DocumentTypeEnum.expense,
+    };
     component.download(item);
 
-    expect(documentStoreSpy.download).toHaveBeenCalledWith({ id: item.id, fileName: item.name });
+    expect(documentStoreSpy.download).toHaveBeenCalledWith({
+      id: item.id,
+      fileName: item.name,
+    });
   });
 });

@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, InjectionToken } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  InjectionToken,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Subject } from 'rxjs';

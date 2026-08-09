@@ -10,8 +10,20 @@ import {
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
 import { IExtras } from '../../reservation';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '@app/treatment/treatment';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  IGroupService,
+  IPrice,
+  ITreatment,
+  ITreatmentGroup,
+  Price,
+} from '@app/treatment/treatment';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { requireMatch, valueChange } from '@app/util/validators';
 import { IPaymentOption } from '@app/interfaces/payment';
 import {
@@ -47,13 +59,22 @@ import { PaymentOptionSelectComponent } from '@app/shared/payment-option-select/
 import { PricePreviewComponent } from '@app/shared/price-preview/price-preview.component';
 import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { DatePipe, DecimalPipe, NgClass } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -72,18 +93,46 @@ type ReservationCompleteForm = {
   startTime: FormControl<string>;
   endTime: FormControl<string>;
   color: FormControl<IColorAll | undefined>;
-}
+};
 
 @Component({
   selector: 'app-reservation-complete',
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
-  imports: [TimeDetailPipe, MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule,
-    TranslatePipe, DecimalPipe, NgClass, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix,
-    BackButtonDirective, CurrencySymbolPipe, TimeDetailPipe, CurrencySymbolPipe, DurationTimePipe,
-    FormFieldAdderComponent, PaymentOptionSelectComponent, PricePreviewComponent, BackButtonDirective,
-    TimepickerDirective, TimepickerComponent, MatSelectionList, MatListOption, MatCheckbox, MatSuffix,
-    ReservationDetailSkeletonComponent],
+  imports: [
+    TimeDetailPipe,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    DecimalPipe,
+    NgClass,
+    DatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    MatPrefix,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    TimeDetailPipe,
+    CurrencySymbolPipe,
+    DurationTimePipe,
+    FormFieldAdderComponent,
+    PaymentOptionSelectComponent,
+    PricePreviewComponent,
+    BackButtonDirective,
+    TimepickerDirective,
+    TimepickerComponent,
+    MatSelectionList,
+    MatListOption,
+    MatCheckbox,
+    MatSuffix,
+    ReservationDetailSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReservationCompleteComponent {
@@ -96,11 +145,16 @@ export class ReservationCompleteComponent {
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
   private readonly paymentStore = inject(PaymentStore);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
-  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
+  private readonly treatmentDiscountSignal =
+    this.treatmentStore.treatmentDiscount;
   private readonly paymentResource = this.paymentStore.data;
   private readonly paymentOptionsSignal = this.paymentStore.options;
 
@@ -117,35 +171,42 @@ export class ReservationCompleteComponent {
     }
     return undefined;
   });
-  private readonly isDashboard = computed(() => this.params()?.isDashboard ?? false);
+  private readonly isDashboard = computed(
+    () => this.params()?.isDashboard ?? false,
+  );
 
   readonly language = this.navigationService.language;
 
   startDate: Date = getNowTimeZone();
   endDate: Date = getNowTimeZone();
 
-  form: FormGroup<ReservationCompleteForm> = this.formBuilder.group<ReservationCompleteForm>({
-    group: this.formBuilder.control(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-    treatment: this.formBuilder.control(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-    type: this.formBuilder.control(undefined),
-    transfer: this.formBuilder.control(undefined),
-    startTime: this.formBuilder.control('', {
-      validators: [Validators.required],
-    }),
-    endTime: this.formBuilder.control(getTime(this.endDate, this.language), {
-      validators: [Validators.required],
-    }),
-    color: this.formBuilder.control(undefined, {
-      validators: [requireMatch],
-    }),
-  });
+  form: FormGroup<ReservationCompleteForm> =
+    this.formBuilder.group<ReservationCompleteForm>({
+      group: this.formBuilder.control(undefined, {
+        validators: [Validators.required, requireMatch],
+      }),
+      treatment: this.formBuilder.control(undefined, {
+        validators: [Validators.required, requireMatch],
+      }),
+      type: this.formBuilder.control(undefined),
+      transfer: this.formBuilder.control(undefined),
+      startTime: this.formBuilder.control('', {
+        validators: [Validators.required],
+      }),
+      endTime: this.formBuilder.control(getTime(this.endDate, this.language), {
+        validators: [Validators.required],
+      }),
+      color: this.formBuilder.control(undefined, {
+        validators: [requireMatch],
+      }),
+    });
 
-  private readonly selectGroupSignal = toSignal(this.getForm.group.valueChanges);
-  private readonly selectTreatmentSignal = toSignal(this.getForm.treatment.valueChanges);
+  private readonly selectGroupSignal = toSignal(
+    this.getForm.group.valueChanges,
+  );
+  private readonly selectTreatmentSignal = toSignal(
+    this.getForm.treatment.valueChanges,
+  );
 
   private readonly payments = computed(() => this.paymentResource()?.payments);
   private readonly additionalList = computed(() => this.additionalListSignal());
@@ -155,7 +216,7 @@ export class ReservationCompleteComponent {
   readonly filteredGroupSignal = toSignal(
     this.getForm.group.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.groups)),
       map(([name, groups]) => {
         if (name) {
@@ -171,7 +232,7 @@ export class ReservationCompleteComponent {
   readonly filteredTreatmentSignal = toSignal(
     this.getForm.treatment.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.treatmentList)),
       map(([name, treatmentList]) => {
         if (name) {
@@ -187,7 +248,7 @@ export class ReservationCompleteComponent {
   readonly filteredColorSignal = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.colors)),
       map(([name, colorList]) => {
         if (name) {
@@ -199,9 +260,11 @@ export class ReservationCompleteComponent {
     ),
   );
 
-  private readonly paymentOptions = computed(() => this.paymentOptionsSignal().filter(
-    option => option.enabled && option.show,
-  ));
+  private readonly paymentOptions = computed(() =>
+    this.paymentOptionsSignal().filter(
+      (option) => option.enabled && option.show,
+    ),
+  );
   options = signal<IPaymentOption[]>([]);
   price: WritableSignal<IPrice> = signal(new Price());
   totalTime = signal('');
@@ -223,18 +286,34 @@ export class ReservationCompleteComponent {
     effect(() => {
       const reservation = this.selectedReservationSignal();
       if (reservation) {
-        this.startDate = newDateTimestamp(reservation.startedTimestamp, reservation.room.timeZone);
+        this.startDate = newDateTimestamp(
+          reservation.startedTimestamp,
+          reservation.room.timeZone,
+        );
         this.getForm.startTime.setValue(getTime(this.startDate, this.language));
-        const endDate = newDateTimestamp(reservation.timestamp, reservation.room.timeZone);
-        this.endDate.setFullYear(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+        const endDate = newDateTimestamp(
+          reservation.timestamp,
+          reservation.room.timeZone,
+        );
+        this.endDate.setFullYear(
+          endDate.getFullYear(),
+          endDate.getMonth(),
+          endDate.getDate(),
+        );
         this.price.set(getPrice(reservation, this.payments()));
         this.getForm.treatment.setValue(reservation.treatment);
-        const additionalSelected = reservation.additional?.map(ad => Object.assign({}, ad, { id: ad.key }));
+        const additionalSelected = reservation.additional?.map((ad) =>
+          Object.assign({}, ad, { id: ad.key }),
+        );
         if (additionalSelected) {
           this.additionalSelected.set(additionalSelected);
         }
         const options = this.paymentOptions();
-        this.options.set(options.filter(option => reservation.room.paymentTypes?.includes(option.type)));
+        this.options.set(
+          options.filter((option) =>
+            reservation.room.paymentTypes?.includes(option.type),
+          ),
+        );
         this.setAppointmentDuration();
       }
     });
@@ -280,26 +359,40 @@ export class ReservationCompleteComponent {
         return;
       }
       const reservation = this.selectedReservationSignal();
-      this.price.update(price => newPrice(price, treatment.price, reservation?.treatment?.discountCustomer));
+      this.price.update((price) =>
+        newPrice(
+          price,
+          treatment.price,
+          reservation?.treatment?.discountCustomer,
+        ),
+      );
     });
 
     effect(() => {
       const additionalList = this.additionalList();
       const additionalSelected = this.additionalSelected();
       if (additionalSelected?.length && additionalList?.length) {
-        const selectIds = additionalSelected?.map(value => value.id);
-        const newList = additionalList.filter(al => selectIds.includes(al.id));
+        const selectIds = additionalSelected?.map((value) => value.id);
+        const newList = additionalList.filter((al) =>
+          selectIds.includes(al.id),
+        );
         if (newList.length !== additionalSelected.length) {
           this.additionalSelected.set(newList);
           const reservation = this.selectedReservationSignal();
-          this.price.update(price => newAdditional(price, newList, reservation?.treatment?.discountCustomer));
+          this.price.update((price) =>
+            newAdditional(
+              price,
+              newList,
+              reservation?.treatment?.discountCustomer,
+            ),
+          );
         }
       }
     });
 
     effect(() => {
       const payments = this.payments();
-      this.price.update(price => addPayment(price, payments));
+      this.price.update((price) => addPayment(price, payments));
     });
 
     effect(() => {
@@ -308,12 +401,20 @@ export class ReservationCompleteComponent {
         const reservation = this.selectedReservationSignal();
         if (treatmentDiscount.treatments && reservation) {
           const treatmentId = reservation.treatment.key;
-          this.groups.set(Array.from(
-            createTreatmentGroupService(
-              new Map<string, IGroupService>(), treatmentDiscount.treatments, reservation.room.currency.code,
-            ).values(),
-          ));
-          this.getForm.group.setValue(this.groups()?.find(group => getList(group.treatments, treatmentId)));
+          this.groups.set(
+            Array.from(
+              createTreatmentGroupService(
+                new Map<string, IGroupService>(),
+                treatmentDiscount.treatments,
+                reservation.room.currency.code,
+              ).values(),
+            ),
+          );
+          this.getForm.group.setValue(
+            this.groups()?.find((group) =>
+              getList(group.treatments, treatmentId),
+            ),
+          );
         }
       }
     });
@@ -345,7 +446,7 @@ export class ReservationCompleteComponent {
         data: { title, content, value: this.selectedReservationSignal() },
       });
 
-      dialogRef.afterClosed().subscribe(event => {
+      dialogRef.afterClosed().subscribe((event) => {
         if (event) {
           this.completeReservation();
         }
@@ -356,11 +457,14 @@ export class ReservationCompleteComponent {
     return;
   }
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
+  displayFnGroup = (group: ITreatmentGroup): string =>
+    group ? `${group.name}` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
+  displayFnTreatment = (treatment: ITreatment): string =>
+    treatment ? `${treatment.name}` : '';
 
-  displayFnColor = (color?: IColorAll): string => color ? `${ color.name }` : '';
+  displayFnColor = (color?: IColorAll): string =>
+    color ? `${color.name}` : '';
 
   keyDownHandler = (event: KeyboardEvent, form: FormControl): void => {
     if (event.code === 'Backspace') {
@@ -369,12 +473,18 @@ export class ReservationCompleteComponent {
   };
 
   onChange = (options: MatListOption[]): void => {
-    this.additionalSelected.set(options.map(o => o.value));
-    this.price.update(price => newAdditional(price, this.additionalSelected(),
-      this.selectedReservationSignal()?.treatment?.discountCustomer));
+    this.additionalSelected.set(options.map((o) => o.value));
+    this.price.update((price) =>
+      newAdditional(
+        price,
+        this.additionalSelected(),
+        this.selectedReservationSignal()?.treatment?.discountCustomer,
+      ),
+    );
   };
 
-  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected().filter(el => el.id === it.id).length > 0;
+  isSelected = (it: IAdditionalAll): boolean =>
+    this.additionalSelected().filter((el) => el.id === it.id).length > 0;
 
   timeChange = ($event: string, date: Date): void => {
     const time = getTimeNumber($event);
@@ -386,10 +496,15 @@ export class ReservationCompleteComponent {
     this.currentExtraData = extras;
     let extrasTotal = 0;
     if (extras.length) {
-      extrasTotal = extras.map(a => a.price).reduce((p, c) => p + c);
+      extrasTotal = extras.map((a) => a.price).reduce((p, c) => p + c);
     }
-    this.price.update(
-      price => newExtra(price, extrasTotal, this.selectedReservationSignal()?.treatment?.discountCustomer));
+    this.price.update((price) =>
+      newExtra(
+        price,
+        extrasTotal,
+        this.selectedReservationSignal()?.treatment?.discountCustomer,
+      ),
+    );
   };
 
   onSplitChanges = (split: IExtras[]): void => {
@@ -403,7 +518,10 @@ export class ReservationCompleteComponent {
       return;
     }
 
-    const totalSplit = this.currentSplitData?.map(t => t.price).reduce((acc, value) => acc + value, 0) || 0;
+    const totalSplit =
+      this.currentSplitData
+        ?.map((t) => t.price)
+        .reduce((acc, value) => acc + value, 0) || 0;
     this.isValidSplit.set(totalSplit === this.price().toPaid);
     if (!this.currentSplitData?.length) {
       this.isValidSplit.set(false);
@@ -412,18 +530,38 @@ export class ReservationCompleteComponent {
 
   private setAppointmentDuration = (): void => {
     if (this.startDate && this.endDate) {
-      this.totalTime.set(getDiffTime(newDateTimestamp(this.endDate), newDateTimestamp(this.startDate)));
+      this.totalTime.set(
+        getDiffTime(
+          newDateTimestamp(this.endDate),
+          newDateTimestamp(this.startDate),
+        ),
+      );
     }
   };
 
-  private filterGroup = (name: string, groups?: IGroupService[]): IGroupService[] | undefined => groups?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterGroup = (
+    name: string,
+    groups?: IGroupService[],
+  ): IGroupService[] | undefined =>
+    groups?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
-  private filterTreatment = (name: string, treatments?: IService[]): IService[] | undefined => treatments?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterTreatment = (
+    name: string,
+    treatments?: IService[],
+  ): IService[] | undefined =>
+    treatments?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
-  private filterColor = (name: string, colors?: IColorAll[]): IColorAll[] | undefined => colors?.filter(
-    option => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterColor = (
+    name: string,
+    colors?: IColorAll[],
+  ): IColorAll[] | undefined =>
+    colors?.filter(
+      (option) => option?.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
   private completeReservation = (): void => {
     const reservation = this.selectedReservationSignal();
@@ -440,9 +578,14 @@ export class ReservationCompleteComponent {
     this.reservationStore.complete(
       reservation.id,
       {
-        treatmentId: valueChange(this.getForm.treatment.value?.key, reservation?.treatment.key),
+        treatmentId: valueChange(
+          this.getForm.treatment.value?.key,
+          reservation?.treatment.key,
+        ),
         paymentType: splitData ? undefined : this.getForm.type.value,
-        additionalIds: this.additionalSelected().map(additional => additional.id),
+        additionalIds: this.additionalSelected().map(
+          (additional) => additional.id,
+        ),
         transfer: this.getForm.transfer.value,
         color: this.getForm.color.value?.id,
         startDateTime: this.startDate.toLocaleString(DEFAULT_LOCALE),

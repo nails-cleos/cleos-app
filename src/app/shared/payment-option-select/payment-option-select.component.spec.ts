@@ -4,6 +4,7 @@ import { PaymentOptionSelectComponent } from './payment-option-select.component'
 import { IPaymentOption } from '@app/interfaces/payment';
 import { provideAppIcons } from '@app/util/app-icons.provider';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PaymentOptionSelectComponent', () => {
   let component: PaymentOptionSelectComponent;
@@ -68,7 +69,10 @@ describe('PaymentOptionSelectComponent', () => {
     fixture.componentRef.setInput('allowedValues', ['TRANSFER', 'MOLLIE']);
     fixture.detectChanges();
 
-    expect(component.filteredOptions().map(option => option.type)).toEqual(['TRANSFER', 'MOLLIE']);
+    expect(component.filteredOptions().map((option) => option.type)).toEqual([
+      'TRANSFER',
+      'MOLLIE',
+    ]);
   });
 
   it('should resolve selected option from control value when valueMode is type', () => {

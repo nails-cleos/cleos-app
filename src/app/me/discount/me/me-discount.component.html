@@ -4,58 +4,94 @@
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
       @if (isLoading()) {
-        <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+        <app-table-skeleton
+          [columns]="tableColumns"
+          [showPaginator]="true"
+        ></app-table-skeleton>
       } @else if (dataSourceSignal(); as dataSource) {
-        <table [dataSource]="dataSource" mat-table matSort matSortActive="discountCustomer.name"
-               matSortDirection="asc" matSortDisableClear>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          matSortActive="discountCustomer.name"
+          matSortDirection="asc"
+          matSortDisableClear
+        >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let userDiscount; let i = index;" mat-cell>
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            <td *matCellDef="let userDiscount; let i = index" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="discountCustomer.name">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.COLUMN.NAME' | translate }}
+            </th>
             <td *matCellDef="let userDiscount" mat-cell>
               <div>{{ userDiscount.discountCustomer.name }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="discountCustomer.amount">
-            <th *matHeaderCellDef mat-header-cell
-                mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.COLUMN.AMOUNT' | translate }}
             </th>
             <td *matCellDef="let userDiscount" mat-cell>
               <div class="me-discount-amount">
                 @if (userDiscount.discountCustomer.type === 'PERCENTAGE') {
-                  <span>{{ userDiscount.discountCustomer.amount | number:'1.2-2' }}</span>
+                  <span>{{
+                    userDiscount.discountCustomer.amount | number: '1.2-2'
+                  }}</span>
                   <mat-icon class="icon-text" matSuffix>percent</mat-icon>
                 } @else {
                   <span>{{ userDiscount.symbol }}</span>
-                  <strong>{{ userDiscount.discountCustomer.amount | number:'1.2-2' }}</strong>
+                  <strong>{{
+                    userDiscount.discountCustomer.amount | number: '1.2-2'
+                  }}</strong>
                 }
               </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="used">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-                mat-sort-header>{{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'ME.DISCOUNT.LIST.COLUMN.USED' | translate }}
             </th>
-            <td *matCellDef="let userDiscount" class="app-surface-hide-mobile" mat-cell>
-              <span class="me-discount-status" [class.me-discount-status--used]="userDiscount.used">
-                <mat-icon [ngClass]="userDiscount.used ? 'used-icon' : 'unused-icon'">redeem</mat-icon>
+            <td
+              *matCellDef="let userDiscount"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <span
+                class="me-discount-status"
+                [class.me-discount-status--used]="userDiscount.used"
+              >
+                <mat-icon
+                  [ngClass]="userDiscount.used ? 'used-icon' : 'unused-icon'"
+                  >redeem</mat-icon
+                >
               </span>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
             <td *matCellDef="let userDiscount" mat-cell>
               @if (!userDiscount.used) {
-                <button (click)="useDiscount(userDiscount)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}" matTooltipPosition="left">
+                <button
+                  (click)="useDiscount(userDiscount)"
+                  mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.BOOK' | translate }}"
+                  matTooltipPosition="left"
+                >
                   <mat-icon color="primary">book_online</mat-icon>
                 </button>
               }
@@ -63,19 +99,30 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="app-table-no-content bold"
-                mat-footer-cell>
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="app-table-no-content bold"
+              mat-footer-cell
+            >
               {{ 'ME.DISCOUNT.LIST.ERROR.NO_CONTENT' | translate }}
             </td>
           </ng-container>
 
-          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
+          <tr *matRowDef="let row; columns: displayedColumns" mat-row></tr>
         </table>
         @if (resultsLength) {
-          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
         }
       }
     </div>

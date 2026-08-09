@@ -1,8 +1,17 @@
+import { beforeEach, describe, expect, it } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GoogleMapComponent } from './google-map.component';
-import { provideHttpClient, withJsonpSupport, withXhr } from '@angular/common/http';
-import { AuthUserService, IAuthUser, initialAuthUser } from '@app/services/auth-user.service';
+import {
+  provideHttpClient,
+  withJsonpSupport,
+  withXhr,
+} from '@angular/common/http';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { signal } from '@angular/core';
 
 describe('GoogleMapComponent', () => {
@@ -11,13 +20,12 @@ describe('GoogleMapComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   beforeEach(async () => {
-
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser'], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
       imports: [GoogleMapComponent],

@@ -1,13 +1,18 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { of } from 'rxjs';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '../services/auth-user.service';
 import { GeocodeService, MapStatus } from '../services/geocode.service';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
 import { GoogleMapComponent } from '../shared/google-map/google-map.component';
-import { GoogleMapStubComponent } from '../shared/google-map/google-map-stub.component';
+import { GoogleMapStubComponent } from '../util/stub/google-map-stub.component';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal, WritableSignal } from '@angular/core';
@@ -16,7 +21,6 @@ import { ICommon } from '../interfaces/common';
 import { UserStore } from '../store/user.store';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
-
 describe('UserComponent', () => {
   let component: UserComponent;
   let fixture: ComponentFixture<UserComponent>;
@@ -25,9 +29,11 @@ describe('UserComponent', () => {
   let subErrorsSignal: WritableSignal<any>;
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let geocodeServiceSpy: jasmine.SpyObj<GeocodeService>;
+  let userStoreSpy: {
+    loadOverview: Mock;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let geocodeServiceSpy: Pick<GeocodeService, 'createMap'>;
   const config: ICommon = {
     title: 'USER.TITLE',
     button: { icon: 'save', label: 'COMMON.BUTTON.SAVE' },
@@ -37,22 +43,24 @@ describe('UserComponent', () => {
     navigationParamsSignal = signal(undefined);
     subErrorsSignal = signal(undefined);
 
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['loadOverview']);
+    userStoreSpy = {
+      loadOverview: vi.fn().mockName('UserStore.loadOverview'),
+    };
     Object.assign(userStoreSpy, {
       userNavigationParams: navigationParamsSignal.asReadonly(),
       subErrors: subErrorsSignal.asReadonly(),
     });
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    geocodeServiceSpy = jasmine.createSpyObj('GeocodeService', ['getCoordinates'], {
+    };
+    geocodeServiceSpy = {
       createMap: () => of(MapStatus.ready),
-    });
+    };
 
-    const navigationServiceSpy = jasmine.createSpyObj(
-      'NavigationService',
-      ['back', 'reload'],
-    );
+    const navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      reload: vi.fn().mockName('NavigationService.reload'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [UserComponent],
@@ -101,12 +109,14 @@ describe('UserComponent', () => {
     fixture.detectChanges();
 
     expect(component.getForm.displayName.value).toBe(mockUser.displayName);
-    expect(component.getForm.addressForm.controls.address.value).toBe(mockUser.address.name);
+    expect(component.getForm.addressForm.controls.address.value).toBe(
+      mockUser.address.name,
+    );
     expect(component.getForm.lang.value).toEqual(mockUser.locale);
   });
 
   it('update() should emit updated user payload', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
     const mockUser = {
       id: 'userId',
@@ -137,11 +147,11 @@ describe('UserComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
+    expect(component.form.valid).toBe(true);
     expect(emitSpy).toHaveBeenCalledWith({
-      user: jasmine.objectContaining({
+      user: expect.objectContaining({
         displayName: 'New user',
-        phone: '+31 23 456 7890',
+        phone: '+31234567890',
         locale: 'es',
       }),
       role: Role.customer,
@@ -156,30 +166,39 @@ describe('UserComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.getForm.displayName.errors).toEqual(jasmine.objectContaining({ incorrect: true }));
-    expect(component.getForm.phone.errors).toEqual(jasmine.objectContaining({ incorrect: true }));
+    expect(component.getForm.displayName.errors).toEqual(
+      expect.objectContaining({ incorrect: true }),
+    );
+    expect(component.getForm.phone.errors).toEqual(
+      expect.objectContaining({ incorrect: true }),
+    );
 
-    expect(component.errors()).toEqual(jasmine.objectContaining({
-      displayName: 'Invalid name',
-      phone: 'Bad phone',
-    }));
+    expect(component.errors()).toEqual(
+      expect.objectContaining({
+        displayName: 'Invalid name',
+        phone: 'Bad phone',
+      }),
+    );
   });
 
   it('should accept user input without emitting submit data', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
-    fixture.componentRef.setInput('user', { id: '123', displayName: 'User 123' } as any);
+    fixture.componentRef.setInput('user', {
+      id: '123',
+      displayName: 'User 123',
+    } as any);
     fixture.detectChanges();
 
     expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should not emit when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
-    (component.getForm.email).setValue('invalid-email');
+    component.getForm.email.setValue('invalid-email');
     fixture.detectChanges();
 
     component.submit();
@@ -188,7 +207,7 @@ describe('UserComponent', () => {
   });
 
   it('should emit createUser payload when in add mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const roleControl = component.getForm.role;
@@ -209,9 +228,9 @@ describe('UserComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
+    expect(component.form.valid).toBe(true);
     expect(emitSpy).toHaveBeenCalledWith({
-      user: jasmine.objectContaining({
+      user: expect.objectContaining({
         displayName: 'New name',
         email: 'email@test.com',
         phone: '+31 23 456 7890',

@@ -5,8 +5,14 @@
     <ng-container matColumnDef="header">
       <th mat-header-cell *matHeaderCellDef colspan="4">
         <div class="header-container">
-          <button class="align-start" mat-fab type="button" color="accent" (click)="addNewRow()"
-                  [disabled]="form.invalid">
+          <button
+            class="align-start"
+            mat-fab
+            type="button"
+            color="accent"
+            (click)="addNewRow()"
+            [disabled]="form.invalid"
+          >
             <mat-icon>forms_add_on</mat-icon>
           </button>
           <div class="center-text bold">{{ key() | translate }}</div>
@@ -17,13 +23,30 @@
 
     <!-- Description Column -->
     <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.LABEL' | translate }}</th>
-      <td mat-cell *matCellDef="let element; let i = index" [formGroup]="getFormGroup(i)">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.LABEL' | translate }}
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element; let i = index"
+        [formGroup]="getFormGroup(i)"
+      >
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.LABEL' | translate }}</mat-label>
-          <input matInput formControlName="description" required (blur)="updateExtra(i)">
+          <mat-label>{{
+            'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.LABEL' | translate
+          }}</mat-label>
+          <input
+            matInput
+            formControlName="description"
+            required
+            (blur)="updateExtra(i)"
+          />
           @if (getFormGroupControls(i).description.hasError('required')) {
-            <mat-error [innerHTML]="'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="
+                'RESERVATION.TREATMENT.EXTRAS.DESCRIPTION.REQUIRED' | translate
+              "
+            ></mat-error>
           }
         </mat-form-field>
       </td>
@@ -32,35 +55,64 @@
 
     <!-- Price Column -->
     <ng-container matColumnDef="price">
-      <th mat-header-cell *matHeaderCellDef>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE.LABEL' | translate }}</th>
-      <td mat-cell *matCellDef="let element; let i = index" [formGroup]="getFormGroup(i)">
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'RESERVATION.TREATMENT.EXTRAS.PRICE.LABEL' | translate }}
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element; let i = index"
+        [formGroup]="getFormGroup(i)"
+      >
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.EXTRAS.PRICE.LABEL' | translate }}</mat-label>
-          <input matInput formControlName="price" required type="number" (blur)="updateExtra(i)">
+          <mat-label>{{
+            'RESERVATION.TREATMENT.EXTRAS.PRICE.LABEL' | translate
+          }}</mat-label>
+          <input
+            matInput
+            formControlName="price"
+            required
+            type="number"
+            (blur)="updateExtra(i)"
+          />
           @if (getFormGroupControls(i).price.hasError('required')) {
-            <mat-error [innerHTML]="'RESERVATION.TREATMENT.EXTRAS.PRICE.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="
+                'RESERVATION.TREATMENT.EXTRAS.PRICE.REQUIRED' | translate
+              "
+            ></mat-error>
           }
         </mat-form-field>
       </td>
-      <td mat-footer-cell *matFooterCellDef class="bold"> {{ total() | currency: currency().code: 'symbol': '1.2-2' }}
+      <td mat-footer-cell *matFooterCellDef class="bold">
+        {{ total() | currency: currency().code : 'symbol' : '1.2-2' }}
       </td>
     </ng-container>
 
     <!-- Type Column -->
     <ng-container matColumnDef="paymentType">
-      <th mat-header-cell *matHeaderCellDef>{{ 'RESERVATION.TREATMENT.EXTRAS.TYPE.LABEL' | translate }}</th>
-      <td mat-cell *matCellDef="let element; let i = index" [formGroup]="getFormGroup(i)">
-        <app-payment-option-select [control]="getPaymentOptionControl(i)"
-                                   [options]="allPaymentOptions()"
-                                   [required]="true"
-                                   [valueMode]="'type'"></app-payment-option-select>
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'RESERVATION.TREATMENT.EXTRAS.TYPE.LABEL' | translate }}
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element; let i = index"
+        [formGroup]="getFormGroup(i)"
+      >
+        <app-payment-option-select
+          [control]="getPaymentOptionControl(i)"
+          [options]="allPaymentOptions()"
+          [required]="true"
+          [valueMode]="'type'"
+        ></app-payment-option-select>
       </td>
       <td mat-footer-cell *matFooterCellDef></td>
     </ng-container>
 
     <!-- Actions Column -->
     <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+      <th mat-header-cell *matHeaderCellDef>
+        {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+      </th>
       <td mat-cell *matCellDef="let element; let i = index">
         <button mat-icon-button color="warn" (click)="deleteRow(i)">
           <mat-icon>delete</mat-icon>
@@ -73,21 +125,38 @@
     <ng-container matColumnDef="disclaimer">
       <td mat-footer-cell *matFooterCellDef colspan="4">
         <p
-          [innerHTML]="'RESERVATION.TREATMENT.EXTRAS.REMAINS' | translate: {toPaid: remainsToBeSplit() | currency: currency().code: 'symbol': '1.2-2'}">
-        </p>
+          [innerHTML]="
+            'RESERVATION.TREATMENT.EXTRAS.REMAINS'
+              | translate
+                : {
+                    toPaid:
+                      remainsToBeSplit()
+                      | currency: currency().code : 'symbol' : '1.2-2',
+                  }
+          "
+        ></p>
       </td>
     </ng-container>
 
     <!-- No content Column -->
     <ng-container matColumnDef="noContent">
-      <td *matFooterCellDef [attr.colspan]="columns.length" class="bold center-text" mat-footer-cell>
+      <td
+        *matFooterCellDef
+        [attr.colspan]="columns.length"
+        class="bold center-text"
+        mat-footer-cell
+      >
         {{ 'RESERVATION.TREATMENT.EXTRAS.NO_CONTENT' | translate }}
       </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="columns"></tr>
-    <tr mat-row *matRowDef="let row; columns: columns;"></tr>
-    <tr mat-footer-row *matFooterRowDef="['noContent']" [hidden]="extras().length > 0"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns"></tr>
+    <tr
+      mat-footer-row
+      *matFooterRowDef="['noContent']"
+      [hidden]="extras().length > 0"
+    ></tr>
     <tr mat-footer-row *matFooterRowDef="columns" class="footer-row"></tr>
     @if (split()) {
       <tr mat-footer-row *matFooterRowDef="['disclaimer']"></tr>

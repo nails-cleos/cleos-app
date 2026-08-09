@@ -13,8 +13,12 @@ export class CardListSkeletonComponent {
   descriptionLines = input(2);
   showMedia = input(true);
 
-  cards = (): number[] => Array.from({ length: this.cardCount() }, (_, index) => index);
-  badges = (): number[] => Array.from({ length: this.badgeCount() }, (_, index) => index);
-  actions = (): number[] => Array.from({ length: this.actionCount() }, (_, index) => index);
-  lines = (): number[] => Array.from({ length: this.descriptionLines() }, (_, index) => index);
+  cards = (): number[] =>
+    Array.from({ length: this.cardCount() }, (_, index) => index);
+  badges = (): number[] =>
+    Array.from({ length: this.badgeCount() }, (_, index) => index);
+  actions = (): number[] =>
+    Array.from({ length: this.actionCount() }, (_, index) => index);
+  lines = (): number[] =>
+    Array.from({ length: this.descriptionLines() }, (_, index) => index);
 }

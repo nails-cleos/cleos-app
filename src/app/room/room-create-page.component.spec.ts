@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RoomCreatePageComponent } from './room-create-page.component';
 import { IRoomAll } from './room';
@@ -11,9 +12,9 @@ describe('RoomCreatePageComponent', () => {
   let roomStoreSpy: {
     currencies: ReturnType<typeof signal<any>>;
     offices: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadInfo: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    loadInfo: Mock;
+    create: Mock;
   };
 
   const mockRoom: Partial<IRoomAll> = {
@@ -24,17 +25,16 @@ describe('RoomCreatePageComponent', () => {
     roomStoreSpy = {
       currencies: signal(undefined),
       offices: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadInfo: jasmine.createSpy('loadInfo'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      loadInfo: vi.fn().mockName('loadInfo'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [RoomCreatePageComponent],
-      providers: [
-        { provide: RoomStore, useValue: roomStoreSpy },
-      ],
-    }).overrideTemplate(RoomCreatePageComponent, '')
+      providers: [{ provide: RoomStore, useValue: roomStoreSpy }],
+    })
+      .overrideTemplate(RoomCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(RoomCreatePageComponent);
@@ -53,8 +53,10 @@ describe('RoomCreatePageComponent', () => {
   it('should call create when room is received', () => {
     component.submit(mockRoom);
 
-    expect(roomStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      timeZone: 'Europe/Amsterdam',
-    }));
+    expect(roomStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeZone: 'Europe/Amsterdam',
+      }),
+    );
   });
 });

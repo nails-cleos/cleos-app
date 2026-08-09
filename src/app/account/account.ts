@@ -50,7 +50,6 @@ export interface ITransaction {
   customerId?: string;
   currencyId?: string;
   gift?: number;
-
 }
 
 export class Transaction {
@@ -61,7 +60,10 @@ export class Transaction {
   ): ITransaction {
     return {
       customerId: customerId,
-      currencyId: valueChange(transactionForm.currency.value, currentAccount?.currency)?.id,
+      currencyId: valueChange(
+        transactionForm.currency.value,
+        currentAccount?.currency,
+      )?.id,
       gift: transactionForm.gift.value,
     };
   }

@@ -1,11 +1,23 @@
-import { computed, effect, EnvironmentInjector, inject, Injectable, Injector } from '@angular/core';
+import {
+  computed,
+  effect,
+  EnvironmentInjector,
+  inject,
+  Injectable,
+  Injector,
+} from '@angular/core';
 import { Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ToastComponent } from '../shared/toast/toast.component';
-import { ToastData, ToastOptions, ToastRef, ToastType } from '../shared/toast/toast.model';
+import {
+  ToastData,
+  ToastOptions,
+  ToastRef,
+  ToastType,
+} from '../shared/toast/toast.model';
 
 const MOBILE_BREAKPOINT = '(max-width: 640px)';
 
@@ -20,12 +32,15 @@ export class ToastService {
 
   private overlayRefs: OverlayRef[] = [];
   private toastDataByOverlayRef = new WeakMap<OverlayRef, ToastData>();
-  private breakpointState = toSignal(this.breakpointObserver.observe(MOBILE_BREAKPOINT), {
-    initialValue: {
-      matches: false,
-      breakpoints: { [MOBILE_BREAKPOINT]: false },
+  private breakpointState = toSignal(
+    this.breakpointObserver.observe(MOBILE_BREAKPOINT),
+    {
+      initialValue: {
+        matches: false,
+        breakpoints: { [MOBILE_BREAKPOINT]: false },
+      },
     },
-  });
+  );
   private isMobileViewport = computed(() => this.breakpointState().matches);
   private desktopTopSpace = 20;
   private mobileBottomSpace = 16;
@@ -35,17 +50,20 @@ export class ToastService {
   constructor() {
     let previousViewport = this.isMobileViewport();
 
-    effect(() => {
-      const currentViewport = this.isMobileViewport();
-      if (currentViewport === previousViewport) {
-        return;
-      }
+    effect(
+      () => {
+        const currentViewport = this.isMobileViewport();
+        if (currentViewport === previousViewport) {
+          return;
+        }
 
-      previousViewport = currentViewport;
-      if (this.overlayRefs.length > 0) {
-        this.repositionToasts();
-      }
-    }, { injector: this.environmentInjector });
+        previousViewport = currentViewport;
+        if (this.overlayRefs.length > 0) {
+          this.repositionToasts();
+        }
+      },
+      { injector: this.environmentInjector },
+    );
   }
 
   /**
@@ -62,7 +80,9 @@ export class ToastService {
     duration: number = 5000,
     options: ToastOptions = { actionType: 'none' },
   ): ToastRef {
-    const positionStrategy = this.createPositionStrategy(this.overlayRefs.length);
+    const positionStrategy = this.createPositionStrategy(
+      this.overlayRefs.length,
+    );
     const toastDismissed = new Subject<void>();
     const toastAction = new Subject<void>();
 
@@ -72,7 +92,7 @@ export class ToastService {
     });
 
     // Check for duplicate
-    const isDuplicate = this.overlayRefs.some(ref => {
+    const isDuplicate = this.overlayRefs.some((ref) => {
       const data = this.toastDataByOverlayRef.get(ref);
       return data?.message === message && data?.type === type;
     });
@@ -84,7 +104,13 @@ export class ToastService {
       };
     }
 
-    const toastData = { message, type, duration, action: options.action, actionType: options.actionType } as ToastData;
+    const toastData = {
+      message,
+      type,
+      duration,
+      action: options.action,
+      actionType: options.actionType,
+    } as ToastData;
     this.toastDataByOverlayRef.set(overlayRef, toastData);
     this.overlayRefs.push(overlayRef);
 
@@ -141,11 +167,12 @@ export class ToastService {
     const strategy = this.overlay.position().global();
 
     if (this.isMobileViewport()) {
-      const bottomOffset = this.mobileBottomSpace + (index * this.mobileSpaceBetween);
+      const bottomOffset =
+        this.mobileBottomSpace + index * this.mobileSpaceBetween;
       return strategy.bottom(`${bottomOffset}px`).centerHorizontally();
     }
 
-    const topOffset = this.desktopTopSpace + (index * this.desktopSpaceBetween);
+    const topOffset = this.desktopTopSpace + index * this.desktopSpaceBetween;
     return strategy.top(`${topOffset}px`).centerHorizontally();
   }
 }

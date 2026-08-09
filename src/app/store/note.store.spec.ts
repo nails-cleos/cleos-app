@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
@@ -8,20 +9,30 @@ import { NoteService } from '../services/note.service';
 
 describe('NoteStore', () => {
   let store: InstanceType<typeof NoteStore>;
-  let noteServiceSpy: jasmine.SpyObj<NoteService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let noteServiceSpy: {
+    getNote: Mock;
+    createNote: Mock;
+    updateNote: Mock;
+    deleteNote: Mock;
+    completeNote: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+  };
 
   beforeEach(() => {
-    noteServiceSpy = jasmine.createSpyObj<NoteService>('NoteService', [
-      'getNote',
-      'createNote',
-      'updateNote',
-      'deleteNote',
-      'completeNote',
-    ]);
+    noteServiceSpy = {
+      getNote: vi.fn().mockName('NoteService.getNote'),
+      createNote: vi.fn().mockName('NoteService.createNote'),
+      updateNote: vi.fn().mockName('NoteService.updateNote'),
+      deleteNote: vi.fn().mockName('NoteService.deleteNote'),
+      completeNote: vi.fn().mockName('NoteService.completeNote'),
+    };
 
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake(
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+    };
+    translateSpy.instant.mockImplementation(
       (key: string, params?: Record<string, string>) =>
         `${key}:${params?.['description'] ?? ''}`,
     );
@@ -39,30 +50,27 @@ describe('NoteStore', () => {
 
   it('should load note by id', () => {
     const note = { id: 'n1' } as any;
-    noteServiceSpy.getNote.and.returnValue(of(note));
+    noteServiceSpy.getNote.mockReturnValue(of(note));
 
     store.loadById('n1');
 
     expect(noteServiceSpy.getNote).toHaveBeenCalledWith('n1');
     expect(store.selected()).toEqual(note);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should create note and set response', () => {
-    noteServiceSpy.createNote.and.returnValue(
+    noteServiceSpy.createNote.mockReturnValue(
       of({ id: '1', name: 'Meeting' } as any),
     );
 
     store.create({ name: 'Meeting' } as any);
 
-    expect(noteServiceSpy.createNote).toHaveBeenCalledWith(
-      jasmine.any(Object),
-    );
+    expect(noteServiceSpy.createNote).toHaveBeenCalledWith(expect.any(Object));
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'NOTE.CREATED.MESSAGE',
-      { description: 'Meeting' },
-    );
+    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.CREATED.MESSAGE', {
+      description: 'Meeting',
+    });
 
     expect(store.response()).toEqual({
       message: 'NOTE.CREATED.MESSAGE:Meeting',
@@ -70,11 +78,11 @@ describe('NoteStore', () => {
       redirect: 'reservation/calendar',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should update note and set response', () => {
-    noteServiceSpy.updateNote.and.returnValue(
+    noteServiceSpy.updateNote.mockReturnValue(
       of({ id: '2', name: 'Updated Note' } as any),
     );
 
@@ -82,13 +90,12 @@ describe('NoteStore', () => {
 
     expect(noteServiceSpy.updateNote).toHaveBeenCalledWith(
       '2',
-      jasmine.any(Object),
+      expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'NOTE.UPDATED.MESSAGE',
-      { description: 'Updated Note' },
-    );
+    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.UPDATED.MESSAGE', {
+      description: 'Updated Note',
+    });
 
     expect(store.response()).toEqual({
       message: 'NOTE.UPDATED.MESSAGE:Updated Note',
@@ -96,31 +103,30 @@ describe('NoteStore', () => {
       redirect: 'reservation/calendar',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should delete note and show warning toast', () => {
-    noteServiceSpy.deleteNote.and.returnValue(of(void 0));
+    noteServiceSpy.deleteNote.mockReturnValue(of(void 0));
 
     store.delete('n1', 'Lunch note');
 
     expect(noteServiceSpy.deleteNote).toHaveBeenCalledWith('n1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'NOTE.UPDATED.MESSAGE',
-      { description: 'Lunch note' },
-    );
+    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.UPDATED.MESSAGE', {
+      description: 'Lunch note',
+    });
 
     expect(store.response()).toEqual({
       message: 'NOTE.UPDATED.MESSAGE:Lunch note',
       toastType: 'warning',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should complete note and set response', () => {
-    noteServiceSpy.completeNote.and.returnValue(
+    noteServiceSpy.completeNote.mockReturnValue(
       of({ id: '3', name: 'Done note' } as any),
     );
 
@@ -139,33 +145,34 @@ describe('NoteStore', () => {
       redirect: 'reservation/calendar',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should map HTTP error into store error state', () => {
-    noteServiceSpy.getNote.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 500,
-          error: { message: 'NOTE.ERROR' },
-        }),
+    noteServiceSpy.getNote.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 500,
+            error: { message: 'NOTE.ERROR' },
+          }),
       ),
     );
 
     store.loadById('missing');
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         status: 'SERVER_ERROR',
         message: 'COMMON.ERROR.TRY_LATER',
       }),
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should reset store on clean()', () => {
-    noteServiceSpy.getNote.and.returnValue(of({ id: '1' } as any));
+    noteServiceSpy.getNote.mockReturnValue(of({ id: '1' } as any));
 
     store.loadById('1');
     store.clean();
@@ -176,7 +183,7 @@ describe('NoteStore', () => {
   });
 
   it('should clear response and error', () => {
-    noteServiceSpy.getNote.and.returnValue(of({ id: '1' } as any));
+    noteServiceSpy.getNote.mockReturnValue(of({ id: '1' } as any));
 
     store.loadById('1');
 

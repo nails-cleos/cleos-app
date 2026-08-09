@@ -1,10 +1,23 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { CurrencyListComponent } from './currency-list.component';
 import { ICurrency } from '../currency';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '@app/interfaces/pagination';
+import {
+  MOBILE_PAGE_SIZE,
+  PAGE_SIZE,
+  Pagination,
+} from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,18 +28,30 @@ import { NavigationService } from '@app/services/navigation.service';
 describe('CurrencyListComponent', () => {
   let component: CurrencyListComponent;
   let fixture: ComponentFixture<CurrencyListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let currencyStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    loadPage: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    delete: jasmine.Spy;
+    loadPage: Mock;
+    clearResponse: Mock;
+    delete: Mock;
   };
 
   const mockCurrencyList: ICurrency[] = [
@@ -45,9 +70,10 @@ describe('CurrencyListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -56,24 +82,30 @@ describe('CurrencyListComponent', () => {
       },
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     currencyStoreSpy = {
       isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
-      loadPage: jasmine.createSpy('loadPage'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      delete: jasmine.createSpy('delete'),
+      loadPage: vi.fn().mockName('loadPage'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
       imports: [CurrencyListComponent],
@@ -146,11 +178,16 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should dispatch getCurrencyPage when paginatorPageIndex changes', () => {
-    currencyStoreSpy.loadPage.calls.reset();
+    currencyStoreSpy.loadPage.mockClear();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(currencyStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -162,11 +199,13 @@ describe('CurrencyListComponent', () => {
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
 
-    component['paginator'] = signal(paginatorMock);
-    currencyStoreSpy.clearResponse.calls.reset();
-    currencyStoreSpy.loadPage.calls.reset();
+    component['paginator'] = signal(paginatorMock) as any;
+    currencyStoreSpy.clearResponse.mockClear();
+    currencyStoreSpy.loadPage.mockClear();
 
     currencyStoreSpy.response.set({ success: true } as any);
 
@@ -185,17 +224,23 @@ describe('CurrencyListComponent', () => {
     const item = mockCurrencyList[0];
     component.edit(item);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['currency', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'currency',
+      item.id,
+    ]);
   });
 
   it('should dispatch deleteCurrency when dialog returns a result', () => {
     const item = mockCurrencyList[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(currencyStoreSpy.delete).toHaveBeenCalledWith({ id: item.id!, code: item.code! });
+    expect(currencyStoreSpy.delete).toHaveBeenCalledWith({
+      id: item.id!,
+      code: item.code!,
+    });
   });
 });

@@ -31,7 +31,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.intercept('POST', '**/api/v1/additional').as('saveAdditional');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');
-      cy.contains('.no-content', 'No additional', { timeout: 15000 }).should('be.visible');
+      cy.contains('.no-content', 'No additional', { timeout: 15000 }).should(
+        'be.visible',
+      );
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/additional/add');
 
@@ -39,7 +41,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
       cy.get('.app-surface-eyebrow').contains('Add additional');
 
       cy.formControlType('name', additionalName);
-      cy.formControlType('description', `${additionalName} Description`, 'textarea');
+      cy.formControlType(
+        'description',
+        `${additionalName} Description`,
+        'textarea',
+      );
 
       cy.get('[data-cy="duration-input"]').click({ force: true });
       cy.setTime(hour, minute);
@@ -49,12 +55,14 @@ devices.forEach(({ name, width, height, breakpoints }) => {
 
       cy.get('button[type="submit"]').click({ force: true });
 
-      cy.wait('@saveAdditional').then(additionalData => {
+      cy.wait('@saveAdditional').then((additionalData) => {
         const body = additionalData.request.body;
         expect(body.name).to.eq(additionalName);
         expect(body.description).to.eq(`${additionalName} Description`);
-        expect(body.groupIds).to.have.deep
-          .members(['9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3', '62f3c0db-7545-4afe-8238-08fac393dcf4']);
+        expect(body.groupIds).to.have.deep.members([
+          '9c44aaf0-82c0-4e09-a8f9-bcc915d23ed3',
+          '62f3c0db-7545-4afe-8238-08fac393dcf4',
+        ]);
         expect(body.duration).to.eq(`${zeroPad(hour)}:${zeroPad(minute)}`);
         cy.url().should('include', '/additional');
       });
@@ -77,48 +85,72 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             body: { name: additionalName },
             alias: 'updateAdditional',
           });
-          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`).as('updateAdditional');
+          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`).as(
+            'updateAdditional',
+          );
 
-          cy.buttonClickOnTable(breakpoints, additional.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
-            breakpointToButtons(breakpoints, ['delete']));
+          cy.buttonClickOnTable(
+            breakpoints,
+            additional.name,
+            'app-table-master-row',
+            'app-table-detail-row',
+            'edit',
+            breakpointToButtons(breakpoints, ['delete']),
+          );
           cy.wait('@getAdditional');
           cy.wait('@getTreatments');
 
           cy.get('.app-surface-eyebrow').contains('Update additional');
           cy.get('.app-crud-title').contains(additional.name);
-          cy.get('[data-cy="name-input"]').should('have.value', additional.name);
-          cy.get('[data-cy="description-textarea"]').should('have.value', additional.description);
-          cy.get('[data-cy="duration-input"]').should('have.value', additional.duration.slice(0, 5));
+          cy.get('[data-cy="name-input"]').should(
+            'have.value',
+            additional.name,
+          );
+          cy.get('[data-cy="description-textarea"]').should(
+            'have.value',
+            additional.description,
+          );
+          cy.get('[data-cy="duration-input"]').should(
+            'have.value',
+            additional.duration.slice(0, 5),
+          );
 
           additional.groups.forEach((group: any) => {
             cy.get('mat-chip-row')
               .contains(group.name)
               .then(($chip) => {
-                cy.wrap($chip)
-                  .scrollIntoView();
+                cy.wrap($chip).scrollIntoView();
 
-                cy.wrap($chip)
-                  .should('be.visible');
+                cy.wrap($chip).should('be.visible');
               });
           });
 
           cy.formControlType('name', additionalName);
-          cy.formControlType('description', `${additionalName} Description`, 'textarea');
+          cy.formControlType(
+            'description',
+            `${additionalName} Description`,
+            'textarea',
+          );
           cy.get('[data-cy="duration-input"]').click({ force: true });
           cy.setTime(hour, minute);
 
           // Remove one treatment group
-          cy.get('mat-chip-row').filter(':contains("GelPolish")').find('mat-icon').contains('cancel').click();
+          cy.get('mat-chip-row')
+            .filter(':contains("GelPolish")')
+            .find('mat-icon')
+            .contains('cancel')
+            .click();
           cy.get('mat-chip-row').contains('GelPolish').should('not.exist');
 
           cy.get('button[type="submit"]').click({ force: true });
 
-          cy.wait('@updateAdditional').then(additionalData => {
+          cy.wait('@updateAdditional').then((additionalData) => {
             const body = additionalData.request.body;
             expect(body.name).to.eq(additionalName);
             expect(body.description).to.eq(`${additionalName} Description`);
             expect(body.duration).to.eq(`${zeroPad(hour)}:${zeroPad(minute)}`);
-            const expectedGroupIds = additional.groups.filter((group: { name: string }) => group.name !== 'GelPolish')
+            const expectedGroupIds = additional.groups
+              .filter((group: { name: string }) => group.name !== 'GelPolish')
               .map((group: { id: string }) => group.id);
             expect(body.groupIds).to.include.deep.members(expectedGroupIds);
           });

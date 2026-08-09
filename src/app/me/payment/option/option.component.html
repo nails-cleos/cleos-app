@@ -4,13 +4,20 @@
       <div class="step-heading">
         <div class="step-heading__index">1</div>
         <div class="app-crud-fields">
-          <span class="step-heading__eyebrow">{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</span>
+          <span class="step-heading__eyebrow">{{
+            'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate
+          }}</span>
           <p>{{ 'ME.PAYMENT.FLOW.STEPS.OPTION' | translate }}</p>
         </div>
       </div>
 
-      <app-bank [firstTime]="first" [form]="form" [options]="options()"
-                [professionalName]="professionalName()" (percentageEmitter)="getPercentage($event)"></app-bank>
+      <app-bank
+        [firstTime]="first"
+        [form]="form"
+        [options]="options()"
+        [professionalName]="professionalName()"
+        (percentageEmitter)="getPercentage($event)"
+      ></app-bank>
     </section>
   } @else {
     <div class="spinner-parent-center">
@@ -23,57 +30,84 @@
   @let currentReservation = reservation();
   @let currentPrice = price();
   @if (currentReservation && currentPrice) {
-    <section class="support-card support-card--price app-surface-section payment-option-step">
+    <section
+      class="support-card support-card--price app-surface-section payment-option-step"
+    >
       <div class="step-heading">
         <div class="step-heading__index">2</div>
         <div class="app-crud-fields">
-          <span class="step-heading__eyebrow">{{ 'ME.RESERVATION.PREVIEW' | translate }}</span>
+          <span class="step-heading__eyebrow">{{
+            'ME.RESERVATION.PREVIEW' | translate
+          }}</span>
           <p>{{ 'ME.PAYMENT.FLOW.STEPS.PREVIEW' | translate }}</p>
         </div>
       </div>
 
       <div class="app-detail-section-header">
         <div>
-          <span class="app-surface-eyebrow">{{ 'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'ME.RESERVATION.FLOW.SUMMARY.BREAKDOWN' | translate
+          }}</span>
         </div>
       </div>
 
       <div class="price-breakdown price-breakdown--expanded">
         <div class="price-row">
           <span>{{ currentReservation.treatment.name }}</span>
-          <strong>{{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.amount | number:'1.2-2' }}</strong>
+          <strong
+            >{{ currentReservation.room.currency | currencySymbol }}
+            {{ currentPrice.amount | number: '1.2-2' }}</strong
+          >
         </div>
 
-        @for (additional of currentReservation.additional; track additional.id) {
+        @for (
+          additional of currentReservation.additional;
+          track additional.id
+        ) {
           <div class="price-row">
             <span>{{ additional.name }}</span>
-            <strong>{{ currentReservation.room.currency | currencySymbol }} {{ additional.price | number:'1.2-2' }}</strong>
+            <strong
+              >{{ currentReservation.room.currency | currencySymbol }}
+              {{ additional.price | number: '1.2-2' }}</strong
+            >
           </div>
         }
 
         @if (currentPrice.discount > 0) {
           <div class="price-row price-row--discount">
-            <span>{{ 'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate }}</span>
-            <strong>- {{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.discount | number:'1.2-2' }}</strong>
+            <span>{{
+              'ME.RESERVATION.TREATMENT.DISCOUNT.FIELD' | translate
+            }}</span>
+            <strong
+              >- {{ currentReservation.room.currency | currencySymbol }}
+              {{ currentPrice.discount | number: '1.2-2' }}</strong
+            >
           </div>
         }
 
         <div class="price-row price-row--total">
           <span>{{ 'ME.RESERVATION.FLOW.SUMMARY.TOTAL' | translate }}</span>
-          <strong>{{ currentReservation.room.currency | currencySymbol }} {{ currentPrice.total | number:'1.2-2' }}</strong>
+          <strong
+            >{{ currentReservation.room.currency | currencySymbol }}
+            {{ currentPrice.total | number: '1.2-2' }}</strong
+          >
         </div>
       </div>
 
       <div class="app-detail-section-header payment-option-preview-card">
         <div>
-          <span class="app-surface-eyebrow">{{ 'ME.PAYMENT.DETAIL' | translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'ME.PAYMENT.DETAIL' | translate
+          }}</span>
         </div>
       </div>
 
-      <app-payment-preview [option]="$safeNavigationMigration(form.get('option')?.value)"
-                           [price]="currentPrice"
-                           [currencyIcon]="currentReservation.room.currency.icon"
-                           [toPaid]="currentPrice.toPaid">
+      <app-payment-preview
+        [option]="$safeNavigationMigration(form.get('option')?.value)"
+        [price]="currentPrice"
+        [currencyIcon]="currentReservation.room.currency.icon"
+        [toPaid]="currentPrice.toPaid"
+      >
       </app-payment-preview>
     </section>
   } @else {
@@ -81,7 +115,9 @@
   }
 </ng-template>
 
-<div class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell">
+<div
+  class="app-surface-canvas app-surface-shell app-surface-stack reservation-flow-shell"
+>
   @switch (currentStepIndex()) {
     @case (0) {
       <div class="step-layout step-layout--single">
@@ -95,7 +131,12 @@
           <mat-icon>keyboard_return</mat-icon>
           <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
         </button>
-        <button (click)="callStepTwo(true)" [disabled]="form.invalid" mat-stroked-button type="button">
+        <button
+          (click)="callStepTwo(true)"
+          [disabled]="form.invalid"
+          mat-stroked-button
+          type="button"
+        >
           <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
           <mat-icon>arrow_forward</mat-icon>
         </button>

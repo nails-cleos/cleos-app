@@ -12,7 +12,11 @@
   min-width: 0;
   height: 40px;
   border-color: var(--app-detail-action-border);
-  background: linear-gradient(180deg, var(--app-detail-action-bg-top), var(--app-detail-action-bg-bottom));
+  background: linear-gradient(
+    180deg,
+    var(--app-detail-action-bg-top),
+    var(--app-detail-action-bg-bottom)
+  );
   color: var(--app-detail-action-text);
   box-shadow: none;
 }
@@ -49,7 +53,11 @@
 .fab-trigger:hover,
 .menu-item:hover {
   border-color: var(--app-detail-action-border-hover);
-  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+  background: linear-gradient(
+    180deg,
+    var(--app-detail-action-hover-top),
+    var(--app-detail-action-hover-bottom)
+  );
 }
 
 .menu-item-enter {

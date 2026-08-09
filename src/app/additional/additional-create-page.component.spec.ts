@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalStore } from '../store/additional.store';
@@ -8,7 +9,7 @@ describe('AdditionalCreatePageComponent', () => {
   let fixture: ComponentFixture<AdditionalCreatePageComponent>;
 
   let additionalStoreSpy: {
-    create: jasmine.Spy;
+    create: Mock;
   };
 
   const mockAdditional: Partial<IAdditionalAll> = {
@@ -19,15 +20,14 @@ describe('AdditionalCreatePageComponent', () => {
 
   beforeEach(async () => {
     additionalStoreSpy = {
-      create: jasmine.createSpy('create'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [AdditionalCreatePageComponent],
-      providers: [
-        { provide: AdditionalStore, useValue: additionalStoreSpy },
-      ],
-    }).overrideTemplate(AdditionalCreatePageComponent, '')
+      providers: [{ provide: AdditionalStore, useValue: additionalStoreSpy }],
+    })
+      .overrideTemplate(AdditionalCreatePageComponent, '')
       .compileComponents();
 
     fixture = TestBed.createComponent(AdditionalCreatePageComponent);
@@ -41,10 +41,12 @@ describe('AdditionalCreatePageComponent', () => {
   it('should call create when additional is received', () => {
     component.submit(mockAdditional);
 
-    expect(additionalStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Test Additional',
-      description: 'Test Description',
-      duration: '00:30',
-    }));
+    expect(additionalStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Test Additional',
+        description: 'Test Description',
+        duration: '00:30',
+      }),
+    );
   });
 });

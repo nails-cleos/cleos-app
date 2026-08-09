@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { ExpenseComponent } from './expense.component';
 import { ExpenseStore } from '@app/store/expense.store';
 import { IExpense } from './expense';
@@ -9,9 +16,14 @@ import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
   selector: 'app-expense-details-page',
   template: `
     @if (expense(); as expense) {
-      <app-expense [roomId]="id()" [expense]="expense" [config]="config" (submitData)="submit($event)"/>
+      <app-expense
+        [roomId]="id()"
+        [expense]="expense"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton [lines]="0" [boxes]="3"/>
+      <app-skeleton [lines]="0" [boxes]="3" />
     }
   `,
   imports: [ExpenseComponent, SkeletonComponent],
@@ -36,7 +48,12 @@ export class ExpenseDetailsPageComponent {
     });
   }
 
-  submit(data: { expense: IExpense, file?: File }) {
-    this.expenseStore.update(this.expenseId(), this.id(), data.expense, data.file);
+  submit(data: { expense: IExpense; file?: File }) {
+    this.expenseStore.update(
+      this.expenseId(),
+      this.id(),
+      data.expense,
+      data.file,
+    );
   }
 }

@@ -1,16 +1,47 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Catalogue, CatalogueForm, ICatalogue, ICatalogueAll } from './catalogue';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  Catalogue,
+  CatalogueForm,
+  ICatalogue,
+  ICatalogueAll,
+} from './catalogue';
 import { requireMatch } from '../util/validators';
 import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { map, startWith } from 'rxjs/operators';
 import { SortByPipe } from '../pipes/sort-by.pipe';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError } from '../interfaces/common';
-import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  FileDropComponent,
+  UploadFile,
+} from '../shared/file-drop/file-drop.component';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatOption } from '@angular/material/core';
 import { MatCheckbox } from '@angular/material/checkbox';
@@ -25,9 +56,26 @@ import { TreatmentStore } from '../store/treatment.store';
   selector: 'app-catalogue',
   templateUrl: './catalogue.component.html',
   styleUrls: ['./catalogue.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, TranslatePipe, MatAutocomplete, MatError,
-    MatAutocompleteTrigger, SortByPipe, FileDropComponent, ReactiveFormsModule, MatHint, MatCheckbox,
-    BackButtonDirective, MatButton, MatIcon, SkeletonComponent, SkeletonComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    TranslatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    SortByPipe,
+    FileDropComponent,
+    ReactiveFormsModule,
+    MatHint,
+    MatCheckbox,
+    BackButtonDirective,
+    MatButton,
+    MatIcon,
+    SkeletonComponent,
+    SkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CatalogueComponent {
@@ -41,7 +89,9 @@ export class CatalogueComponent {
 
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly treatmentStore = inject(TreatmentStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly allGroupsSignal = computed(() => {
     const data = this.treatmentStore.data();
     return data?.kind === 'list' ? data.value : undefined;
@@ -65,7 +115,9 @@ export class CatalogueComponent {
   filteredGroupSignal = toSignal(
     this.getForm.group.valueChanges.pipe(
       startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.code,
+      ),
       combineLatestWith(toObservable(this.allGroupsSignal)),
       map(([name, groups]) => {
         if (name) {
@@ -109,14 +161,18 @@ export class CatalogueComponent {
           name: catalogue.name,
           size: 0,
           progress: 100,
-          image: `data:${ catalogue.contentType };base64,${ catalogue.blob }`,
+          image: `data:${catalogue.contentType};base64,${catalogue.blob}`,
         });
         this.getForm.group.setValue(catalogue.group);
       }
     });
 
     effect(() => {
-      this.getForm.group.setValidators(this.selectedHome() ? [Validators.required, requireMatch] : [requireMatch]);
+      this.getForm.group.setValidators(
+        this.selectedHome()
+          ? [Validators.required, requireMatch]
+          : [requireMatch],
+      );
       this.getForm.group.updateValueAndValidity({ emitEvent: false });
     });
   }
@@ -147,7 +203,8 @@ export class CatalogueComponent {
     this.image.set(image);
   }
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
+  displayFnGroup = (group: ITreatmentGroup): string =>
+    group ? `${group.name}` : '';
 
   keyDownGroup = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
@@ -158,7 +215,8 @@ export class CatalogueComponent {
   private filterGroup = (
     name: string,
     groups: ITreatmentGroupAll[],
-  ): ITreatmentGroupAll[] | undefined => groups?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
-  );
+  ): ITreatmentGroupAll[] | undefined =>
+    groups?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

@@ -1,7 +1,11 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { BottomSheetReferralComponent, BottomSheetReferralData } from './bottom-sheet-referral.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  BottomSheetReferralComponent,
+  BottomSheetReferralData,
+} from './bottom-sheet-referral.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('BottomSheetReferralComponent', () => {
   let component: BottomSheetReferralComponent;
@@ -34,32 +38,42 @@ describe('BottomSheetReferralComponent', () => {
     expect(component.referralMax).toBe(mockData.referralMax!);
   });
 
-  it('should gradually increase referrals and referralsUsed up to their limits', fakeAsync(() => {
-    const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
+  it('should gradually increase referrals and referralsUsed up to their limits', () => {
+    vi.useFakeTimers();
+    try {
+      const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
 
-    component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
+      component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
 
-    for (let i = 1; i <= data.referralsUsed; i++) {
-      tick(500);
-      expect(component.referrals).toBeLessThanOrEqual(data.referrals);
-      expect(component.referralsUsed).toBeLessThanOrEqual(data.referralsUsed);
+      for (let i = 1; i <= data.referralsUsed; i++) {
+        vi.advanceTimersByTime(500);
+        expect(component.referrals).toBeLessThanOrEqual(data.referrals);
+        expect(component.referralsUsed).toBeLessThanOrEqual(data.referralsUsed);
+      }
+
+      expect(component.referrals).toBe(data.referrals);
+      expect(component.referralsUsed).toBe(data.referralsUsed);
+    } finally {
+      vi.useRealTimers();
     }
+  });
 
-    expect(component.referrals).toBe(data.referrals);
-    expect(component.referralsUsed).toBe(data.referralsUsed);
-  }));
+  it('should call delay recursively until max count reached', () => {
+    vi.useFakeTimers();
+    try {
+      const delaySpy = vi.spyOn(component as any, 'delay');
 
-  it('should call delay recursively until max count reached', fakeAsync(() => {
-    const delaySpy = spyOn(component as any, 'delay').and.callThrough();
+      const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
+      component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
 
-    const data = { referralMax: 10, referrals: 3, referralsUsed: 5 };
-    component['delay'](data, 0, Math.max(data.referrals, data.referralsUsed));
+      vi.advanceTimersByTime(5_000);
 
-    tick(5000);
-
-    expect(delaySpy).toHaveBeenCalled();
-    expect(delaySpy.calls.count()).toBeGreaterThan(1);
-    expect(component.referrals).toBe(data.referrals);
-    expect(component.referralsUsed).toBe(data.referralsUsed);
-  }));
+      expect(delaySpy).toHaveBeenCalled();
+      expect(vi.mocked(delaySpy).mock.calls.length).toBeGreaterThan(1);
+      expect(component.referrals).toBe(data.referrals);
+      expect(component.referralsUsed).toBe(data.referralsUsed);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

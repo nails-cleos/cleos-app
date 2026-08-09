@@ -6,11 +6,30 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { DEFAULT_LOCALE, getTime, getTimeNumber, newDateTimestamp } from '@app/util/dates';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import {
+  DEFAULT_LOCALE,
+  getTime,
+  getTimeNumber,
+  newDateTimestamp,
+} from '@app/util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import {
+  MatFormField,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
@@ -21,30 +40,51 @@ type TrackingForm = {
   startedTime: FormControl<string>;
   completedDate: FormControl<Date | undefined>;
   completedTime: FormControl<string>;
-}
+};
 
 type TrackingDialogData = {
-  startedTimestamp: string | Date | number,
-  completedTimestamp: string | Date | number,
-}
+  startedTimestamp: string | Date | number;
+  completedTimestamp: string | Date | number;
+};
 
 @Component({
   selector: 'app-update-tracking-dialog',
   templateUrl: './update-tracking-dialog.component.html',
   styleUrl: './update-tracking-dialog.component.scss',
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatIcon,
-    MatButton, TranslatePipe, MatPrefix, ReactiveFormsModule, MatDialogTitle, MatDialogContent, TimepickerComponent,
-    TimepickerDirective, MatDialogActions],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatPrefix,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    TimepickerComponent,
+    TimepickerDirective,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdateTrackingDialogComponent {
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly dialogRef: MatDialogRef<UpdateTrackingDialogComponent> = inject(
-    MatDialogRef<UpdateTrackingDialogComponent>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly dialogRef: MatDialogRef<UpdateTrackingDialogComponent> =
+    inject(MatDialogRef<UpdateTrackingDialogComponent>);
   private readonly data = inject<TrackingDialogData>(MAT_DIALOG_DATA);
 
-  private readonly startedDateTime = newDateTimestamp(this.data.startedTimestamp);
-  private readonly completedDateTime = newDateTimestamp(this.data.completedTimestamp);
+  private readonly startedDateTime = newDateTimestamp(
+    this.data.startedTimestamp,
+  );
+  private readonly completedDateTime = newDateTimestamp(
+    this.data.completedTimestamp,
+  );
 
   form: FormGroup<TrackingForm> = this.formBuilder.group<TrackingForm>({
     startedDate: this.formBuilder.control(this.startedDateTime),
@@ -64,11 +104,18 @@ export class UpdateTrackingDialogComponent {
   doAction(): void {
     let started;
     let completed;
-    if (this.startedDateTime.getTime() !== this.getForm.startedDate.value?.getTime()) {
+    if (
+      this.startedDateTime.getTime() !==
+      this.getForm.startedDate.value?.getTime()
+    ) {
       started = this.getForm.startedDate.value?.toLocaleString(DEFAULT_LOCALE);
     }
-    if (this.completedDateTime.getTime() !== this.getForm.completedDate.value?.getTime()) {
-      completed = this.getForm.completedDate.value?.toLocaleString(DEFAULT_LOCALE);
+    if (
+      this.completedDateTime.getTime() !==
+      this.getForm.completedDate.value?.getTime()
+    ) {
+      completed =
+        this.getForm.completedDate.value?.toLocaleString(DEFAULT_LOCALE);
     }
     if (started || completed) {
       return this.dialogRef.close({ started, completed });

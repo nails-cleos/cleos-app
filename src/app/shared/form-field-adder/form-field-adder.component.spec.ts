@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormFieldAdderComponent } from './form-field-adder.component';
 import { IPaymentOption } from '@app/interfaces/payment';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('FormFieldAdderComponent', () => {
   let component: FormFieldAdderComponent;
@@ -94,8 +95,8 @@ describe('FormFieldAdderComponent', () => {
   });
 
   it('should emit onChange and isValid', () => {
-    spyOn(component.changeOutput, 'emit');
-    spyOn(component.isValid, 'emit');
+    vi.spyOn(component.changeOutput, 'emit').mockReturnValue(undefined);
+    vi.spyOn(component.isValid, 'emit').mockReturnValue(undefined);
 
     component.addNewRow();
     fixture.detectChanges();
@@ -107,7 +108,9 @@ describe('FormFieldAdderComponent', () => {
     component.updateExtra(0);
     fixture.detectChanges();
 
-    expect(component.changeOutput.emit).toHaveBeenCalledWith(component.extras());
+    expect(component.changeOutput.emit).toHaveBeenCalledWith(
+      component.extras(),
+    );
     expect(component.isValid.emit).toHaveBeenCalledWith(true);
   });
 
@@ -137,11 +140,13 @@ describe('FormFieldAdderComponent', () => {
     component.getPaymentOptionControl(0).setValue('TRANSFER');
 
     expect(component.getPaymentOptionControl(0).value).toBe('TRANSFER');
-    expect(component.getFormGroupControls(0).paymentOption?.value).toBe(paymentOptions[1].type);
+    expect(component.getFormGroupControls(0).paymentOption?.value).toBe(
+      paymentOptions[1].type,
+    );
   });
 
   it('should emit invalid split state when total does not match toPaid', () => {
-    spyOn(component.isValid, 'emit');
+    vi.spyOn(component.isValid, 'emit').mockReturnValue(undefined);
     fixture.componentRef.setInput('split', true);
     fixture.detectChanges();
 

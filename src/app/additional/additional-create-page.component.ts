@@ -6,7 +6,8 @@ import { ICommon } from '../interfaces/common';
 
 @Component({
   selector: 'app-additional-create-page',
-  template: '<app-additional [config]="config" (submitData)="submit($event)" />',
+  template:
+    '<app-additional [config]="config" (submitData)="submit($event)" />',
   imports: [AdditionalComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

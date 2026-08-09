@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SelectProfessionalDialogComponent } from './select-professional-dialog.component';
@@ -8,7 +9,12 @@ describe('SelectProfessionalDialogComponent', () => {
   let component: SelectProfessionalDialogComponent;
   let fixture: ComponentFixture<SelectProfessionalDialogComponent>;
 
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectProfessionalDialogComponent>>;
+  let dialogRefSpy: Pick<
+    MatDialogRef<SelectProfessionalDialogComponent>,
+    'close'
+  > & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockProfessionals: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -21,7 +27,9 @@ describe('SelectProfessionalDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
       imports: [SelectProfessionalDialogComponent],
@@ -29,7 +37,7 @@ describe('SelectProfessionalDialogComponent', () => {
         provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
-          useFactory: () => (mockProfessionalDialogData),
+          useFactory: () => mockProfessionalDialogData,
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
       ],
@@ -59,7 +67,9 @@ describe('SelectProfessionalDialogComponent', () => {
 
     component.doAction();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledWith({ professional: mockProfessionals[0] });
+    expect(dialogRefSpy.close).toHaveBeenCalledWith({
+      professional: mockProfessionals[0],
+    });
   });
 
   it('should close dialog on cancel', () => {

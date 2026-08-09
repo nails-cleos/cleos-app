@@ -3,6 +3,7 @@ import { DateAdapter as MaterialDateAdapter } from '@angular/material/core';
 import { DateAdapter as CalendarDateAdapter } from 'angular-calendar';
 import { provideAppCalendar, provideAppDateAdapter } from './app-date.provider';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('app-date.provider', () => {
   beforeEach(() => {
@@ -20,6 +21,8 @@ describe('app-date.provider', () => {
     const calendarAdapter = TestBed.inject(CalendarDateAdapter);
 
     expect(typeof materialAdapter.setLocale).toBe('function');
-    expect(calendarAdapter).not.toBe(materialAdapter as unknown as CalendarDateAdapter);
+    expect(calendarAdapter).not.toBe(
+      materialAdapter as unknown as CalendarDateAdapter,
+    );
   });
 });

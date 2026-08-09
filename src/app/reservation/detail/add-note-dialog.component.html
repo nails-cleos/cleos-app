@@ -1,31 +1,62 @@
-<form (ngSubmit)="doAction()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+<form
+  (ngSubmit)="doAction()"
+  [formGroup]="form"
+  novalidate
+  (keydown.enter)="$event.preventDefault()"
+>
   <div class="app-surface-dialog-shell">
     <div class="app-surface-dialog-header">
       <div class="app-surface-dialog-title-wrap">
         <div class="app-surface-dialog-badge" aria-hidden="true">
           <mat-icon>note_add</mat-icon>
         </div>
-        <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.NOTE.ADD' | translate }}</h1>
+        <h1 mat-dialog-title class="app-surface-dialog-title">
+          {{ 'RESERVATION.NOTE.ADD' | translate }}
+        </h1>
       </div>
     </div>
 
     <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
-    <div mat-dialog-content class="app-surface-dialog-content note-dialog-content">
-      <p class="app-surface-dialog-copy note-dialog-message">{{ 'RESERVATION.NOTE.MESSAGE' | translate }}</p>
+    <div
+      mat-dialog-content
+      class="app-surface-dialog-content note-dialog-content"
+    >
+      <p class="app-surface-dialog-copy note-dialog-message">
+        {{ 'RESERVATION.NOTE.MESSAGE' | translate }}
+      </p>
 
       @if (!data.isCustomer) {
         <mat-form-field appearance="outline" class="note-dialog-field">
           <mat-label>{{ 'RESERVATION.NOTE.FIELD' | translate }}</mat-label>
-          <textarea #message class="note-dialog-textarea" [formControl]="getForm.note" matInput [maxlength]="256" rows="5"></textarea>
+          <textarea
+            #message
+            class="note-dialog-textarea"
+            [formControl]="getForm.note"
+            matInput
+            [maxlength]="256"
+            rows="5"
+          ></textarea>
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
         </mat-form-field>
       }
 
       <mat-form-field appearance="outline" class="note-dialog-field">
-        <mat-label>{{ 'RESERVATION.NOTE.' + (data.isCustomer ? 'FIELD' : 'CUSTOMER') | translate }}</mat-label>
-        <textarea #customerMessage class="note-dialog-textarea" [formControl]="getForm.customerNote" matInput [maxlength]="256" rows="5"></textarea>
-        <mat-hint align="end">{{ customerMessage.value.length }} / 256</mat-hint>
+        <mat-label>{{
+          'RESERVATION.NOTE.' + (data.isCustomer ? 'FIELD' : 'CUSTOMER')
+            | translate
+        }}</mat-label>
+        <textarea
+          #customerMessage
+          class="note-dialog-textarea"
+          [formControl]="getForm.customerNote"
+          matInput
+          [maxlength]="256"
+          rows="5"
+        ></textarea>
+        <mat-hint align="end"
+          >{{ customerMessage.value.length }} / 256</mat-hint
+        >
       </mat-form-field>
     </div>
 
@@ -33,8 +64,16 @@
 
     <div mat-dialog-actions class="app-surface-dialog-actions">
       <div class="app-surface-dialog-spacer"></div>
-      <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-      <button [disabled]="form.invalid || form.pristine" cdkFocusInitial color="primary" mat-flat-button type="submit">
+      <button (click)="onNoClick()" mat-stroked-button type="button">
+        {{ 'COMMON.BUTTON.CANCEL' | translate }}
+      </button>
+      <button
+        [disabled]="form.invalid || form.pristine"
+        cdkFocusInitial
+        color="primary"
+        mat-flat-button
+        type="submit"
+      >
         {{ 'COMMON.BUTTON.SAVE' | translate }}
       </button>
     </div>

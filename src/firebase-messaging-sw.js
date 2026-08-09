@@ -1,8 +1,8 @@
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
 import {
   getMessaging,
   isSupported,
-  onBackgroundMessage
+  onBackgroundMessage,
 } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-sw.js';
 
 const app = initializeApp({
@@ -13,28 +13,30 @@ const app = initializeApp({
   messagingSenderId: '174727853234',
   appId: '1:174727853234:web:6cf02667f8d913be34c5ab',
   measurementId: 'G-X9XEEDVFN4',
-  databaseURL: 'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/'
+  databaseURL:
+    'https://nails-cleos-default-rtdb.europe-west1.firebasedatabase.app/',
 });
 
-isSupported().then(isSupported => {
-
+isSupported().then((isSupported) => {
   if (isSupported) {
-
     const messaging = getMessaging(app);
 
-    self.addEventListener('notificationclick', event => {
+    self.addEventListener('notificationclick', (event) => {
       event.notification.close();
 
       event.waitUntil(
-        clients.matchAll({
-          type: "window",
-        }).then((clientList) => {
-          const redirect = event.notification.actions[0].action;
-          for (const client of clientList) {
-            if (client.url === redirect && "focus" in client) return client.focus();
-          }
-          if (clients.openWindow) return clients.openWindow(redirect);
-        }),
+        clients
+          .matchAll({
+            type: 'window',
+          })
+          .then((clientList) => {
+            const redirect = event.notification.actions[0].action;
+            for (const client of clientList) {
+              if (client.url === redirect && 'focus' in client)
+                return client.focus();
+            }
+            if (clients.openWindow) return clients.openWindow(redirect);
+          }),
       );
     });
 
@@ -51,13 +53,16 @@ isSupported().then(isSupported => {
           {
             title: payload.data.actionTitle,
             action: payload.data.action,
-            icon: payload.notification.icon
-          }
+            icon: payload.notification.icon,
+          },
         ],
-        vibrate: [200, 100, 200, 100, 200, 100, 200]
-      }
+        vibrate: [200, 100, 200, 100, 200, 100, 200],
+      };
 
-      self.registration.showNotification(notificationTitle, notificationOptions);
+      self.registration.showNotification(
+        notificationTitle,
+        notificationOptions,
+      );
     });
   }
 });

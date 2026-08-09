@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
@@ -12,7 +13,12 @@ import { IApiResponse } from '../interfaces/common';
 
 describe('UserService', () => {
   let service: UserService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockUser: IUserAll = {
     id: 'user-123',
@@ -124,12 +130,14 @@ describe('UserService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        UserService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [UserService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(UserService);
   });
@@ -140,68 +148,82 @@ describe('UserService', () => {
 
   describe('getUsersPage', () => {
     it('should get paginated users with all parameters', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.getUsersPage(0, 'displayName', 'asc', 10, 'test').subscribe(result => {
-        expect(result).toEqual(mockPagination);
-      });
+      service
+        .getUsersPage(0, 'displayName', 'asc', 10, 'test')
+        .subscribe((result) => {
+          expect(result).toEqual(mockPagination);
+        });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/pages', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/users/pages',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
 
     it('should get paginated users without filter', () => {
-      httpSpy.get.and.returnValue(of(mockPagination));
+      httpSpy.get.mockReturnValue(of(mockPagination));
 
-      service.getUsersPage(1, 'email', 'desc', 20).subscribe(result => {
+      service.getUsersPage(1, 'email', 'desc', 20).subscribe((result) => {
         expect(result).toEqual(mockPagination);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/pages', jasmine.objectContaining({
-        params: jasmine.any(Object),
-      }));
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/users/pages',
+        expect.objectContaining({
+          params: expect.any(Object),
+        }),
+      );
     });
   });
 
   describe('saveUser', () => {
     it('should create customer when role is customer', () => {
-      spyOn(service, 'createCustomer').and.returnValue(of(mockApiResponse));
+      vi.spyOn(service, 'createCustomer').mockReturnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, undefined, Role.customer).subscribe(result => {
-        expect(result.response).toEqual(mockApiResponse);
-        expect(result.key).toBe('USER.CUSTOMER');
-      });
+      service
+        .saveUser(mockUser, undefined, Role.customer)
+        .subscribe((result) => {
+          expect(result.response).toEqual(mockApiResponse);
+          expect(result.key).toBe('USER.CUSTOMER');
+        });
 
       expect(service.createCustomer).toHaveBeenCalledWith(mockUser);
     });
 
     it('should add manager when role is manager', () => {
-      spyOn(service, 'addManager').and.returnValue(of(mockApiResponse));
+      vi.spyOn(service, 'addManager').mockReturnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, undefined, Role.manager).subscribe(result => {
-        expect(result.response).toEqual(mockApiResponse);
-        expect(result.key).toBe('USER.MANAGER');
-      });
+      service
+        .saveUser(mockUser, undefined, Role.manager)
+        .subscribe((result) => {
+          expect(result.response).toEqual(mockApiResponse);
+          expect(result.key).toBe('USER.MANAGER');
+        });
 
       expect(service.addManager).toHaveBeenCalledWith(mockUser);
     });
 
     it('should add professional when role is professional', () => {
-      spyOn(service, 'addProfessional').and.returnValue(of(mockApiResponse));
+      vi.spyOn(service, 'addProfessional').mockReturnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, undefined, Role.professional).subscribe(result => {
-        expect(result.response).toEqual(mockApiResponse);
-        expect(result.key).toBe('USER.PROFESSIONAL');
-      });
+      service
+        .saveUser(mockUser, undefined, Role.professional)
+        .subscribe((result) => {
+          expect(result.response).toEqual(mockApiResponse);
+          expect(result.key).toBe('USER.PROFESSIONAL');
+        });
 
       expect(service.addProfessional).toHaveBeenCalledWith(mockUser);
     });
 
     it('should update user when no role specified', () => {
-      spyOn(service, 'updateUser').and.returnValue(of(mockApiResponse));
+      vi.spyOn(service, 'updateUser').mockReturnValue(of(mockApiResponse));
 
-      service.saveUser(mockUser, mockUser.id).subscribe(result => {
+      service.saveUser(mockUser, mockUser.id).subscribe((result) => {
         expect(result.response).toEqual(mockApiResponse);
         expect(result.key).toBe('USER.UPDATED.MESSAGE');
       });
@@ -212,33 +234,37 @@ describe('UserService', () => {
 
   describe('getUser', () => {
     it('should get user by id', () => {
-      httpSpy.get.and.returnValue(of(mockUser));
+      httpSpy.get.mockReturnValue(of(mockUser));
 
-      service.getUser('user-123').subscribe(result => {
+      service.getUser('user-123').subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/user-123', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/user-123', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getMyUser', () => {
     it('should get current user', () => {
-      httpSpy.get.and.returnValue(of(mockUser));
+      httpSpy.get.mockReturnValue(of(mockUser));
 
-      service.getMyUser().subscribe(result => {
+      service.getMyUser().subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/me', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/users/me', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('updateUser', () => {
     it('should update user', () => {
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateUser(mockUser.id, mockUser).subscribe(result => {
+      service.updateUser(mockUser.id, mockUser).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -248,9 +274,9 @@ describe('UserService', () => {
 
   describe('updateMyUser', () => {
     it('should update current user and return token', () => {
-      httpSpy.patch.and.returnValue(of(mockToken));
+      httpSpy.patch.mockReturnValue(of(mockToken));
 
-      service.updateMyUser(mockUser).subscribe(result => {
+      service.updateMyUser(mockUser).subscribe((result) => {
         expect(result).toEqual(mockToken);
       });
 
@@ -260,18 +286,19 @@ describe('UserService', () => {
 
   describe('updateMyPhoto', () => {
     it('should update user photo with FormData', () => {
-      const mockDataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
-      httpSpy.patch.and.returnValue(of(mockToken));
+      const mockDataUrl =
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
+      httpSpy.patch.mockReturnValue(of(mockToken));
 
-      service.updateMyPhoto(mockDataUrl).subscribe(result => {
+      service.updateMyPhoto(mockDataUrl).subscribe((result) => {
         expect(result).toEqual(mockToken);
       });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/users/me/photo',
-        jasmine.any(FormData),
-        jasmine.objectContaining({
-          headers: jasmine.any(Object),
+        expect.any(FormData),
+        expect.objectContaining({
+          headers: expect.any(Object),
         }),
       );
     });
@@ -279,9 +306,9 @@ describe('UserService', () => {
 
   describe('createCustomer', () => {
     it('should create customer', () => {
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.createCustomer(mockUser).subscribe(result => {
+      service.createCustomer(mockUser).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -291,31 +318,36 @@ describe('UserService', () => {
 
   describe('getCustomerOverview', () => {
     it('should get customer overview by id', () => {
-      httpSpy.get.and.returnValue(of(mockOverview));
+      httpSpy.get.mockReturnValue(of(mockOverview));
 
-      service.getCustomerOverview('customer-123').subscribe(result => {
+      service.getCustomerOverview('customer-123').subscribe((result) => {
         expect(result).toEqual(mockOverview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/reservations', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/customers/customer-123/reservations',
+        { ...skipLoadingOverlay() },
+      );
     });
 
     it('should get current customer overview when id is null', () => {
-      httpSpy.get.and.returnValue(of(mockOverview));
+      httpSpy.get.mockReturnValue(of(mockOverview));
 
-      service.getCustomerOverview('me').subscribe(result => {
+      service.getCustomerOverview('me').subscribe((result) => {
         expect(result).toEqual(mockOverview);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/me/reservations', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/me/reservations', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('addProfessional', () => {
     it('should add professional', () => {
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.addProfessional(mockUser).subscribe(result => {
+      service.addProfessional(mockUser).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
@@ -325,19 +357,22 @@ describe('UserService', () => {
 
   describe('addManager', () => {
     it('should add manager', () => {
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.addManager(mockUser).subscribe(result => {
+      service.addManager(mockUser).subscribe((result) => {
         expect(result).toEqual(mockApiResponse);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/offices/managers', mockUser);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/offices/managers',
+        mockUser,
+      );
     });
   });
 
   describe('deleteUser', () => {
     it('should delete user', () => {
-      httpSpy.delete.and.returnValue(of(mockUser));
+      httpSpy.delete.mockReturnValue(of(mockUser));
 
       service.deleteUser('user-123');
 
@@ -351,9 +386,9 @@ describe('UserService', () => {
         id: mockUser.id!,
         name: mockUser.displayName,
       };
-      httpSpy.patch.and.returnValue(of(response));
+      httpSpy.patch.mockReturnValue(of(response));
 
-      service.restore('user-123', mockUser).subscribe(result => {
+      service.restore('user-123', mockUser).subscribe((result) => {
         expect(result).toEqual(response);
       });
 
@@ -363,126 +398,153 @@ describe('UserService', () => {
 
   describe('resendToken', () => {
     it('should resend token', () => {
-      httpSpy.post.and.returnValue(of(undefined));
+      httpSpy.post.mockReturnValue(of(undefined));
 
       service.resendToken('user-123').subscribe();
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/users/user-123/token', null);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/users/user-123/token',
+        null,
+      );
     });
   });
 
   describe('getProfessionals', () => {
     it('should get all professionals', () => {
       const professionals = [mockUser];
-      httpSpy.get.and.returnValue(of(professionals));
+      httpSpy.get.mockReturnValue(of(professionals));
 
-      service.getProfessionals().subscribe(result => {
+      service.getProfessionals().subscribe((result) => {
         expect(result).toEqual(professionals);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getManagers', () => {
     it('should get all managers', () => {
       const managers = [mockUser];
-      httpSpy.get.and.returnValue(of(managers));
+      httpSpy.get.mockReturnValue(of(managers));
 
-      service.getManagers().subscribe(result => {
+      service.getManagers().subscribe((result) => {
         expect(result).toEqual(managers);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/managers', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/offices/managers', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getCustomers', () => {
     it('should get all customers', () => {
       const customers = [mockUser];
-      httpSpy.get.and.returnValue(of(customers));
+      httpSpy.get.mockReturnValue(of(customers));
 
-      service.getCustomers().subscribe(result => {
+      service.getCustomers().subscribe((result) => {
         expect(result).toEqual(customers);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getCustomerInformation', () => {
     it('should get customer information', () => {
-      httpSpy.get.and.returnValue(of(mockCustomerInfo));
+      httpSpy.get.mockReturnValue(of(mockCustomerInfo));
 
-      service.getCustomerInformation('customer-123').subscribe(result => {
+      service.getCustomerInformation('customer-123').subscribe((result) => {
         expect(result).toEqual(mockCustomerInfo);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/customers/customer-123/info', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/customers/customer-123/info',
+        { ...skipLoadingOverlay() },
+      );
     });
   });
 
   describe('setRole', () => {
     it('should set admin role', () => {
-      httpSpy.post.and.returnValue(of(mockUser));
+      httpSpy.post.mockReturnValue(of(mockUser));
 
-      service.setRole('user-123', Role.admin).subscribe(result => {
+      service.setRole('user-123', Role.admin).subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/users/user-123/roles/admin', null);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/users/user-123/roles/admin',
+        null,
+      );
     });
 
     it('should set manager role', () => {
-      httpSpy.post.and.returnValue(of(mockUser));
+      httpSpy.post.mockReturnValue(of(mockUser));
 
-      service.setRole('user-123', Role.manager).subscribe(result => {
+      service.setRole('user-123', Role.manager).subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/users/user-123/roles/manager', null);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/users/user-123/roles/manager',
+        null,
+      );
     });
 
     it('should set professional role', () => {
-      httpSpy.post.and.returnValue(of(mockUser));
+      httpSpy.post.mockReturnValue(of(mockUser));
 
-      service.setRole('user-123', Role.professional).subscribe(result => {
+      service.setRole('user-123', Role.professional).subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/users/user-123/roles/professional', null);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/users/user-123/roles/professional',
+        null,
+      );
     });
 
     it('should set customer role by default', () => {
-      httpSpy.post.and.returnValue(of(mockUser));
+      httpSpy.post.mockReturnValue(of(mockUser));
 
-      service.setRole('user-123', Role.customer).subscribe(result => {
+      service.setRole('user-123', Role.customer).subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
-      expect(httpSpy.post).toHaveBeenCalledWith('v1/users/user-123/roles/customer', null);
+      expect(httpSpy.post).toHaveBeenCalledWith(
+        'v1/users/user-123/roles/customer',
+        null,
+      );
     });
   });
 
   describe('getAllRoomsByProfessionalId', () => {
     it('should get all rooms for professional', () => {
       const rooms = [mockRoom];
-      httpSpy.get.and.returnValue(of(rooms));
+      httpSpy.get.mockReturnValue(of(rooms));
 
-      service.getAllRoomsByProfessionalId('prof-123').subscribe(result => {
+      service.getAllRoomsByProfessionalId('prof-123').subscribe((result) => {
         expect(result).toEqual(rooms);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/professionals/prof-123/rooms', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        'v1/professionals/prof-123/rooms',
+        { ...skipLoadingOverlay() },
+      );
     });
   });
 
   describe('getAllDisableUsers', () => {
     it('should get all disabled users', () => {
       const users = [mockUser];
-      httpSpy.get.and.returnValue(of(users));
+      httpSpy.get.mockReturnValue(of(users));
 
-      service.getAllDisableUsers().subscribe(result => {
+      service.getAllDisableUsers().subscribe((result) => {
         expect(result).toEqual(users);
       });
 
@@ -492,9 +554,9 @@ describe('UserService', () => {
 
   describe('mergeUsers', () => {
     it('should merge users', () => {
-      httpSpy.post.and.returnValue(of(mockUser));
+      httpSpy.post.mockReturnValue(of(mockUser));
 
-      service.mergeUsers('old-user-123', 'new-user-456').subscribe(result => {
+      service.mergeUsers('old-user-123', 'new-user-456').subscribe((result) => {
         expect(result).toEqual(mockUser);
       });
 
@@ -508,10 +570,10 @@ describe('UserService', () => {
   describe('error handling', () => {
     it('should handle HTTP errors gracefully', () => {
       const errorResponse = new Error('Network error');
-      httpSpy.get.and.returnValue(throwError(() => errorResponse));
+      httpSpy.get.mockReturnValue(throwError(() => errorResponse));
 
       service.getUser('user-123').subscribe({
-        next: () => fail('Should have failed'),
+        next: () => expect.fail('Should have failed'),
         error: (error) => {
           expect(error).toEqual(errorResponse);
         },

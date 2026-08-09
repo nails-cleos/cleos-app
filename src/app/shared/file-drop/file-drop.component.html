@@ -1,18 +1,32 @@
-<input #fileInput (change)="fileBrowseHandler($event.target)" [multiple]="false" hidden id="fileInput" type="file"
-       [accept]="accept()">
+<input
+  #fileInput
+  (change)="fileBrowseHandler($event.target)"
+  [multiple]="false"
+  hidden
+  id="fileInput"
+  type="file"
+  [accept]="accept()"
+/>
 
 @if (!file() && !(isImage() && file()?.image)) {
-  <div (fileDropped)="onFileDropped($event)" appDragDrop
-       class="container app-surface-hide-mobile">
+  <div
+    (fileDropped)="onFileDropped($event)"
+    appDragDrop
+    class="container app-surface-hide-mobile"
+  >
     @if (isImage()) {
       <canvas #canvas></canvas>
     }
-    <img class="file-drop-icon" src="assets/file-drop.svg" alt="Upload">
+    <img class="file-drop-icon" src="assets/file-drop.svg" alt="Upload" />
 
     <h3 class="file-text">{{ 'COMMON.FILE.DRAG_DROP' | translate }}</h3>
     <h3 class="file-text">{{ 'COMMON.FILE.OR' | translate }}</h3>
-    <button (click)="openFileBrowser()" mat-stroked-button class="app-surface-filter-action app-detail-action-button"
-            type="button">
+    <button
+      (click)="openFileBrowser()"
+      mat-stroked-button
+      class="app-surface-filter-action app-detail-action-button"
+      type="button"
+    >
       <mat-icon>upload_file</mat-icon>
       <span>{{ 'COMMON.FILE.CHOOSE' | translate }}</span>
     </button>
@@ -20,9 +34,12 @@
 }
 
 <div class="app-surface-hide-desktop">
-  <button (click)="openFileBrowser()" mat-stroked-button
-          class="app-detail-action-button app-detail-action-button--mobile"
-          type="button">
+  <button
+    (click)="openFileBrowser()"
+    mat-stroked-button
+    class="app-detail-action-button app-detail-action-button--mobile"
+    type="button"
+  >
     <mat-icon>upload_file</mat-icon>
     <span>{{ 'COMMON.FILE.CHOOSE' | translate }}</span>
   </button>
@@ -38,11 +55,16 @@
         <mat-icon class="icon-display" mat-card-avatar>image</mat-icon>
       }
       <mat-card-title-group>
-        <mat-card-title class="file-drop-card__title" [attr.title]="fileName() || currentFile.name">
+        <mat-card-title
+          class="file-drop-card__title"
+          [attr.title]="fileName() || currentFile.name"
+        >
           {{ fileName() || currentFile.name }}
         </mat-card-title>
         @if (currentFile.size) {
-          <mat-card-subtitle> {{ formatBytes(currentFile.size, 0) }}</mat-card-subtitle>
+          <mat-card-subtitle>
+            {{ formatBytes(currentFile.size, 0) }}</mat-card-subtitle
+          >
         }
       </mat-card-title-group>
       <div class="app-surface-spacer"></div>
@@ -51,7 +73,10 @@
       </button>
     </mat-card-header>
     <mat-card-content>
-      <mat-progress-bar [value]="currentFile.progress" [mode]="'determinate'"></mat-progress-bar>
+      <mat-progress-bar
+        [value]="currentFile.progress"
+        [mode]="'determinate'"
+      ></mat-progress-bar>
       @if (animate()) {
         <div>
           <div class="app-surface-spacer"></div>
@@ -64,7 +89,11 @@
 @if (file()?.image) {
   <div class="divider">
     <div class="container">
-      <img [alt]="$safeNavigationMigration(file()?.name)" [src]="$safeNavigationMigration(file()?.image)" mat-card-image>
+      <img
+        [alt]="$safeNavigationMigration(file()?.name)"
+        [src]="$safeNavigationMigration(file()?.image)"
+        mat-card-image
+      />
     </div>
   </div>
 }

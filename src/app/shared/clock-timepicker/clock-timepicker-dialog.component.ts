@@ -1,4 +1,3 @@
-
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -33,7 +32,9 @@ export type ClockTimepickerDialogData = {
   styleUrls: ['./clock-timepicker-dialog.component.scss'],
 })
 export class ClockTimepickerDialogComponent {
-  private readonly dialogRef = inject(MatDialogRef<ClockTimepickerDialogComponent>);
+  private readonly dialogRef = inject(
+    MatDialogRef<ClockTimepickerDialogComponent>,
+  );
   private readonly data = inject<ClockTimepickerDialogData>(MAT_DIALOG_DATA);
 
   readonly format: TimepickerFormat = this.data.format;
@@ -159,7 +160,8 @@ export class ClockTimepickerDialogComponent {
   };
 
   private refreshDial = (): void => {
-    this.dialOptions = this.view === 'hour' ? this.buildHourDial() : this.buildMinuteDial();
+    this.dialOptions =
+      this.view === 'hour' ? this.buildHourDial() : this.buildMinuteDial();
   };
 
   private buildHourDial = (): DialOption[] => {
@@ -168,22 +170,26 @@ export class ClockTimepickerDialogComponent {
       const innerHours = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
       return [
-        ...outerHours.map((hour, index) => this.createDialOption(
-          hour,
-          this.pad(hour),
-          index * 30,
-          40,
-          this.hour === hour,
-          !this.hasSelectableMinute(hour),
-        )),
-        ...innerHours.map((hour, index) => this.createDialOption(
-          hour,
-          this.pad(hour),
-          index * 30,
-          28,
-          this.hour === hour,
-          !this.hasSelectableMinute(hour),
-        )),
+        ...outerHours.map((hour, index) =>
+          this.createDialOption(
+            hour,
+            this.pad(hour),
+            index * 30,
+            40,
+            this.hour === hour,
+            !this.hasSelectableMinute(hour),
+          ),
+        ),
+        ...innerHours.map((hour, index) =>
+          this.createDialOption(
+            hour,
+            this.pad(hour),
+            index * 30,
+            28,
+            this.hour === hour,
+            !this.hasSelectableMinute(hour),
+          ),
+        ),
       ];
     }
 
@@ -204,15 +210,17 @@ export class ClockTimepickerDialogComponent {
   private buildMinuteDial = (): DialOption[] => {
     const options: DialOption[] = [];
     for (let minute = 0; minute < 60; minute += this.minutesGap) {
-      options.push(this.createDialOption(
-        minute,
-        this.pad(minute),
-        minute * 6,
-        40,
-        this.minute === minute,
-        !this.isSelectable(this.hour, minute),
-        minute % 15 === 0 ? this.pad(minute) : '',
-      ));
+      options.push(
+        this.createDialOption(
+          minute,
+          this.pad(minute),
+          minute * 6,
+          40,
+          this.minute === minute,
+          !this.isSelectable(this.hour, minute),
+          minute % 15 === 0 ? this.pad(minute) : '',
+        ),
+      );
     }
     return options;
   };
@@ -229,8 +237,8 @@ export class ClockTimepickerDialogComponent {
     value,
     label,
     displayLabel,
-    left: 50 + (Math.sin(this.toRadians(angle)) * radius),
-    top: 50 - (Math.cos(this.toRadians(angle)) * radius),
+    left: 50 + Math.sin(this.toRadians(angle)) * radius,
+    top: 50 - Math.cos(this.toRadians(angle)) * radius,
     active,
     disabled,
   });
@@ -242,9 +250,12 @@ export class ClockTimepickerDialogComponent {
     return Math.min(Math.floor(value), 30);
   };
 
-  private nearestValidTime = (hour: number, minute: number): { hour: number, minute: number } => {
+  private nearestValidTime = (
+    hour: number,
+    minute: number,
+  ): { hour: number; minute: number } => {
     const roundedMinute = this.roundToGap(minute);
-    const target = (hour * 60) + roundedMinute;
+    const target = hour * 60 + roundedMinute;
 
     let resultHour = hour;
     let resultMinute = roundedMinute;
@@ -253,14 +264,14 @@ export class ClockTimepickerDialogComponent {
       return { hour: resultHour, minute: resultMinute };
     }
 
-    let nearest: { hour: number, minute: number, diff: number } | undefined;
+    let nearest: { hour: number; minute: number; diff: number } | undefined;
 
     for (let h = 0; h < 24; h++) {
       for (let m = 0; m < 60; m += this.minutesGap) {
         if (!this.isSelectable(h, m)) {
           continue;
         }
-        const diff = Math.abs(((h * 60) + m) - target);
+        const diff = Math.abs(h * 60 + m - target);
         if (!nearest || diff < nearest.diff) {
           nearest = { hour: h, minute: m, diff };
         }
@@ -275,8 +286,11 @@ export class ClockTimepickerDialogComponent {
     return { hour: resultHour, minute: resultMinute };
   };
 
-  private nearestMinuteForHour = (hour: number, targetMinute: number): number | undefined => {
-    let nearest: { minute: number, diff: number } | undefined;
+  private nearestMinuteForHour = (
+    hour: number,
+    targetMinute: number,
+  ): number | undefined => {
+    let nearest: { minute: number; diff: number } | undefined;
 
     for (let minute = 0; minute < 60; minute += this.minutesGap) {
       if (!this.isSelectable(hour, minute)) {
@@ -291,29 +305,39 @@ export class ClockTimepickerDialogComponent {
     return nearest?.minute;
   };
 
-  private hasSelectableMinute = (hour: number): boolean => this.nearestMinuteForHour(hour, this.minute) !== undefined;
+  private hasSelectableMinute = (hour: number): boolean =>
+    this.nearestMinuteForHour(hour, this.minute) !== undefined;
 
   private isSelectable = (hour: number, minute: number): boolean => {
-    const total = (hour * 60) + minute;
+    const total = hour * 60 + minute;
     if (this.min !== undefined && total < this.min) {
       return false;
     }
     return !(this.max !== undefined && total > this.max);
   };
 
-  private parseTime = (value?: string): { hour: number, minute: number } | undefined => {
+  private parseTime = (
+    value?: string,
+  ): { hour: number; minute: number } | undefined => {
     if (!value) {
       return undefined;
     }
 
-    const match = value.trim().match(/^(\d{1,2}):(\d{2})(?:\s*([aApP]\.?[mM]\.?))?$/);
+    const match = value
+      .trim()
+      .match(/^(\d{1,2}):(\d{2})(?:\s*([aApP]\.?[mM]\.?))?$/);
     if (!match) {
       return undefined;
     }
 
     let hour = Number(match[1]);
     const minute = Number(match[2]);
-    if (Number.isNaN(hour) || Number.isNaN(minute) || minute < 0 || minute > 59) {
+    if (
+      Number.isNaN(hour) ||
+      Number.isNaN(minute) ||
+      minute < 0 ||
+      minute > 59
+    ) {
       return undefined;
     }
 
@@ -339,7 +363,7 @@ export class ClockTimepickerDialogComponent {
     if (!parsed) {
       return undefined;
     }
-    return (parsed.hour * 60) + parsed.minute;
+    return parsed.hour * 60 + parsed.minute;
   };
 
   private formatTime = (): string => {
@@ -355,7 +379,7 @@ export class ClockTimepickerDialogComponent {
     return snapped >= 60 ? 0 : snapped;
   };
 
-  private nowTime = (): { hour: number, minute: number } => {
+  private nowTime = (): { hour: number; minute: number } => {
     const now = new Date();
     return { hour: now.getHours(), minute: now.getMinutes() };
   };

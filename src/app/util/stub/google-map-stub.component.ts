@@ -1,6 +1,11 @@
-import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { GoogleMapForm } from './google-map.component';
+import { GoogleMapForm } from '@app/shared/google-map/google-map.component';
 import PlaceResult = google.maps.places.PlaceResult;
 
 export type GoogleMapFormStub = {

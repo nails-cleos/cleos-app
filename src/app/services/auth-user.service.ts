@@ -50,7 +50,9 @@ export const initialAuthUser: IAuthUser = {
   providedIn: 'root',
 })
 export class AuthUserService {
-  private cookieConsentService: NgcCookieConsentService = inject(NgcCookieConsentService);
+  private cookieConsentService: NgcCookieConsentService = inject(
+    NgcCookieConsentService,
+  );
   private _authUser = signal<IAuthUser>(initialAuthUser);
   authUser = this._authUser.asReadonly();
 
@@ -58,10 +60,16 @@ export class AuthUserService {
     let authUser = initialAuthUser;
 
     if (user) {
-      const isProfessional = user.authorities.some(u => u.authority === Role.professional);
-      const isCustomer = user.authorities.some(u => u.authority === Role.customer);
-      const isAdmin = user.authorities.some(u => u.authority === Role.admin);
-      const isManager = user.authorities.some(u => u.authority === Role.manager);
+      const isProfessional = user.authorities.some(
+        (u) => u.authority === Role.professional,
+      );
+      const isCustomer = user.authorities.some(
+        (u) => u.authority === Role.customer,
+      );
+      const isAdmin = user.authorities.some((u) => u.authority === Role.admin);
+      const isManager = user.authorities.some(
+        (u) => u.authority === Role.manager,
+      );
       const isRoomAdmin = hasRoomAdmin(user.authorities);
 
       authUser = {
@@ -103,7 +111,9 @@ export class AuthUserService {
 
   cookieConsent = (translate: TranslateService): void => {
     const data = translate.instant('COOKIE');
-    const content = this.cookieConsentService.getConfig().content || {} as NgcContentOptions;
+    const content =
+      this.cookieConsentService.getConfig().content ||
+      ({} as NgcContentOptions);
     content.header = data.HEADER;
     content.message = data.MESSAGE;
     content.dismiss = data.DISMISS;

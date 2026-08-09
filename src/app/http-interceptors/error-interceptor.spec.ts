@@ -1,5 +1,10 @@
-import { fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
-import { HttpErrorResponse, HttpHandlerFn, HttpRequest } from '@angular/common/http';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import {
+  HttpErrorResponse,
+  HttpHandlerFn,
+  HttpRequest,
+} from '@angular/common/http';
 import { firstValueFrom, throwError } from 'rxjs';
 
 import { AuthUserService } from '../services/auth-user.service';
@@ -9,11 +14,11 @@ import { AuthStore } from '../store/auth.store';
 describe('errorInterceptor', () => {
   let isAuthenticated = false;
   let authUserServiceMock: {
-    authUser: jasmine.Spy<() => { isAuthenticated: boolean }>;
+    authUser: Mock;
   };
 
   let authStoreSpy: {
-    reLogin: jasmine.Spy;
+    reLogin: Mock;
   };
 
   const runWithError = async (error: unknown): Promise<unknown> => {
@@ -21,7 +26,9 @@ describe('errorInterceptor', () => {
     const next: HttpHandlerFn = () => throwError(() => error);
 
     try {
-      await firstValueFrom(TestBed.runInInjectionContext(() => errorInterceptor(req, next)));
+      await firstValueFrom(
+        TestBed.runInInjectionContext(() => errorInterceptor(req, next)),
+      );
       return undefined;
     } catch (err) {
       return err;
@@ -30,54 +37,73 @@ describe('errorInterceptor', () => {
 
   beforeEach(() => {
     authStoreSpy = {
-      reLogin: jasmine.createSpy('reLogin'),
+      reLogin: vi.fn().mockName('reLogin'),
     };
     isAuthenticated = false;
     authUserServiceMock = {
-      authUser: jasmine.createSpy('authUser').and.callFake(() => ({ isAuthenticated })),
+      authUser: vi
+        .fn()
+        .mockName('authUser')
+        .mockImplementation(() => ({ isAuthenticated })),
     };
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: AuthUserService, useValue: authUserServiceMock as unknown as AuthUserService },
+        {
+          provide: AuthUserService,
+          useValue: authUserServiceMock as unknown as AuthUserService,
+        },
         { provide: AuthStore, useValue: authStoreSpy },
       ],
     });
   });
 
-  it('should map network error status 0 to a normalized message payload', fakeAsync(() => {
-    const error = { status: 0, statusText: 'Offline', error: { message: 'Network unavailable' } };
-    const req = new HttpRequest('GET', '/v1/test');
-    const next: HttpHandlerFn = () => throwError(() => error);
-    let result: unknown;
-    let completed = false;
+  it('should map network error status 0 to a normalized message payload', async () => {
+    vi.useFakeTimers();
+    try {
+      const error = {
+        status: 0,
+        statusText: 'Offline',
+        error: { message: 'Network unavailable' },
+      };
+      const req = new HttpRequest('GET', '/v1/test');
+      const next: HttpHandlerFn = () => throwError(() => error);
+      let result: unknown;
+      let completed = false;
 
-    TestBed.runInInjectionContext(() => errorInterceptor(req, next)).subscribe({
-      next: () => fail('Expected interceptor to error'),
-      error: err => {
-        result = err;
-        completed = true;
-      },
-    });
+      TestBed.runInInjectionContext(() =>
+        errorInterceptor(req, next),
+      ).subscribe({
+        next: () => expect.fail('Expected interceptor to error'),
+        error: (err) => {
+          result = err;
+          completed = true;
+        },
+      });
 
-    tick(9001);
-    flushMicrotasks();
+      await vi.runAllTimersAsync();
 
-    expect(result).toEqual({
-      status: 0,
-      statusText: 'Offline',
-      error: {
-        message: 'COMMON.ERROR.TRY_LATER',
-        status: 'SERVER_ERROR',
-      },
-    });
-    expect(completed).toBeTrue();
-    expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
-  }));
+      expect(result).toEqual({
+        status: 0,
+        statusText: 'Offline',
+        error: {
+          message: 'COMMON.ERROR.TRY_LATER',
+          status: 'SERVER_ERROR',
+        },
+      });
+      expect(completed).toBe(true);
+      expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 
   it('should dispatch reLogin on 401 when user is authenticated', async () => {
     isAuthenticated = true;
-    const error = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
+    const error = new HttpErrorResponse({
+      status: 401,
+      statusText: 'Unauthorized',
+    });
     const result = await runWithError(error);
 
     expect(authStoreSpy.reLogin).toHaveBeenCalled();
@@ -86,7 +112,10 @@ describe('errorInterceptor', () => {
 
   it('should not dispatch reLogin on 401 when user is not authenticated', async () => {
     isAuthenticated = false;
-    const error = new HttpErrorResponse({ status: 401, statusText: 'Unauthorized' });
+    const error = new HttpErrorResponse({
+      status: 401,
+      statusText: 'Unauthorized',
+    });
     const result = await runWithError(error);
 
     expect(authStoreSpy.reLogin).not.toHaveBeenCalled();
@@ -94,7 +123,10 @@ describe('errorInterceptor', () => {
   });
 
   it('should pass through non-network errors unchanged', async () => {
-    const error = new HttpErrorResponse({ status: 400, statusText: 'Bad Request' });
+    const error = new HttpErrorResponse({
+      status: 400,
+      statusText: 'Bad Request',
+    });
     const result = await runWithError(error);
 
     expect(authStoreSpy.reLogin).not.toHaveBeenCalled();

@@ -1,4 +1,9 @@
-import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import type { TimepickerDirective } from './timepicker.directive';
 
 @Component({

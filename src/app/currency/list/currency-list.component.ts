@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from '@app/util/mat-table-state';
@@ -38,54 +45,96 @@ import {
   MatListSubheaderCssMatStyler,
 } from '@angular/material/list';
 import { CurrencyStore } from '@app/store/currency.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-currency-list',
   templateUrl: './currency-list.component.html',
   styleUrls: ['./currency-list.component.scss'],
-  imports: [MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
-    TranslatePipe, RouterLink, MatTable, MatSort, MatColumnDef, MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell,
-    MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell, MatHeaderRowDef, MatHeaderRow,
-    MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatListItemTitle, TableSkeletonComponent],
+  imports: [
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatListSubheaderCssMatStyler,
+    MatIconButton,
+    TranslatePipe,
+    RouterLink,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatListItemIcon,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    MatListItemTitle,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyListComponent {
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly currencyStore = inject(CurrencyStore);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'code', 'asc');
+  private tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'code',
+    'asc',
+  );
 
   private readonly currencyListSignal = computed(() => {
     const data = this.currencyStore.data();
     return data?.kind === 'pagination' ? data.value : undefined;
   });
   private responseSignal = this.currencyStore.response;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = this.currencyStore.isLoading;
   dataSourceSignal = computed(() => this.currencyListSignal()?.content);
-  resultsLengthSignal = computed(() => this.currencyListSignal()?.totalElements || 0);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  resultsLengthSignal = computed(
+    () => this.currencyListSignal()?.totalElements || 0,
+  );
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
 
   tableColumns: TableSkeletonColumn[] = [
     { key: 'position' },
@@ -136,12 +185,18 @@ export class CurrencyListComponent {
 
   delete = (currency: ICurrency): void => {
     const title = this.translateService.instant('CURRENCY.DELETED.TITLE');
-    const content = this.translateService.instant('CURRENCY.DELETED.CONTENT', { code: currency.code });
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: currency, variant: 'warning' },
-      result => {
+    const content = this.translateService.instant('CURRENCY.DELETED.CONTENT', {
+      code: currency.code,
+    });
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: currency, variant: 'warning' },
+      (result) => {
         if (result) {
           this.currencyStore.delete({ id: result.id, code: result.code });
         }
-      });
+      },
+    );
   };
 }

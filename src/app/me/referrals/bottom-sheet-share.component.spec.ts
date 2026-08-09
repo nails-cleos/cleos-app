@@ -1,11 +1,15 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BottomSheetShareComponent, BottomSheetShareData } from './bottom-sheet-share.component';
+import {
+  BottomSheetShareComponent,
+  BottomSheetShareData,
+} from './bottom-sheet-share.component';
 import { MAT_BOTTOM_SHEET_DATA } from '@angular/material/bottom-sheet';
 import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { provideHttpClient, withXhr } from '@angular/common/http';
 import { provideAppIcons } from '@app/util/app-icons.provider';
 import { DEFAULT_LOCALE } from '@app/util/dates';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('BottomSheetShareComponent', () => {
   let component: BottomSheetShareComponent;
@@ -46,10 +50,13 @@ describe('BottomSheetShareComponent', () => {
   it('should initialize url, image, code, and message', () => {
     const expectedUrl = environment.appServer;
     expect(component['url']).toBe(expectedUrl);
-    expect(component.image).toBe(`${expectedUrl}/assets/icons/icon-512x512.png`);
+    expect(component.image).toBe(
+      `${expectedUrl}/assets/icons/icon-512x512.png`,
+    );
     expect(component.code).toBe(`${expectedUrl}/auth?code=${mockData.code}`);
 
-    expect(component.message)
-      .toContain(`Use my referral link: http://localhost:4300/auth?code=ABC123 (code: ${mockData.code})`);
+    expect(component.message).toContain(
+      `Use my referral link: http://localhost:4300/auth?code=ABC123 (code: ${mockData.code})`,
+    );
   });
 });

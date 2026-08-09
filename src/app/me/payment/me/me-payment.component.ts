@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { IPaymentOption, PaymentPercentage } from '@app/interfaces/payment';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -26,18 +34,35 @@ import { PaymentStore } from '@app/store/payment.store';
   selector: 'app-me-payment',
   templateUrl: './me-payment.component.html',
   styleUrls: ['./me-payment.component.scss'],
-  imports: [MatIcon, MatIconButton, MatButton, ReactiveFormsModule,
-    TranslatePipe, DecimalPipe, RouterLink, BankComponent, BackButtonDirective, CurrencySymbolPipe, MatCard,
-    MatCardHeader, MatCardTitle, MatCardSubtitle,
-    MatCardContent, MatCardActions],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    DecimalPipe,
+    RouterLink,
+    BankComponent,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MatCardActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MePaymentComponent {
   id = input<string>();
 
   private readonly paymentStore = inject(PaymentStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly firebaseService = inject(FirebaseService);
 
   private paymentOptionsSignal = this.paymentStore.options;
@@ -49,8 +74,10 @@ export class MePaymentComponent {
   });
 
   options = signal<IPaymentOption[] | undefined>(undefined);
-  private readonly paymentOptions = computed(
-    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  private readonly paymentOptions = computed(() =>
+    this.paymentOptionsSignal().filter(
+      (option) => option.enabled && option.enabledCustomer,
+    ),
   );
 
   readonly language = this.navigationService.language;
@@ -63,7 +90,7 @@ export class MePaymentComponent {
       if (id) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Customer missing payment ${ id }`,
+          firebase_screen: `Customer missing payment ${id}`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MePaymentComponent',
         });
@@ -76,8 +103,11 @@ export class MePaymentComponent {
       if (payment) {
         const options = this.paymentOptions();
         const types = payment?.reservation?.room?.paymentTypes.filter(
-          p => !['cash', 'transfer'].includes(p.toLowerCase()));
-        this.options.set(options.filter(option => types?.includes(option.type)));
+          (p) => !['cash', 'transfer'].includes(p.toLowerCase()),
+        );
+        this.options.set(
+          options.filter((option) => types?.includes(option.type)),
+        );
       }
     });
   }

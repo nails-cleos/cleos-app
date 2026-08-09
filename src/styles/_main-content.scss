@@ -102,7 +102,7 @@ app-main-content {
     position: relative;
     top: -8px;
     color: #000;
-    content: "___";
+    content: '___';
   }
 
   .carousel-caption p:before {
@@ -489,7 +489,11 @@ app-main-content {
     transition: transform 220ms ease;
 
     mat-icon {
-      transition: transform 260ms ease, color 260ms ease, background-color 260ms ease, border-color 260ms ease;
+      transition:
+        transform 260ms ease,
+        color 260ms ease,
+        background-color 260ms ease,
+        border-color 260ms ease;
     }
 
     &:hover {
@@ -498,8 +502,14 @@ app-main-content {
       mat-icon {
         transform: scale(1.08);
         color: var(--experience-hover-color, var(--accent-lighter-color));
-        border-color: var(--experience-hover-border-color, color-mix(in srgb, var(--accent-color) 72%, white 28%));
-        background: var(--experience-hover-background, rgba(255, 255, 255, 0.14));
+        border-color: var(
+          --experience-hover-border-color,
+          color-mix(in srgb, var(--accent-color) 72%, white 28%)
+        );
+        background: var(
+          --experience-hover-background,
+          rgba(255, 255, 255, 0.14)
+        );
       }
     }
   }

@@ -1,19 +1,24 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from './services/auth-user.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from './services/auth-user.service';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from './util/dates';
 import { NavigationService } from './services/navigation.service';
 import { BehaviorSubject } from 'rxjs';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
   let component: AppComponent;
   let navigationServiceSpy: {
     urlLanguage$: BehaviorSubject<any>;
-    resetConfig: jasmine.Spy;
+    resetConfig: Mock;
   };
 
   let urlLanguage$: BehaviorSubject<string>;
@@ -24,7 +29,7 @@ describe('AppComponent', () => {
     urlLanguage$ = new BehaviorSubject(DEFAULT_LOCALE);
     navigationServiceSpy = {
       urlLanguage$: urlLanguage$,
-      resetConfig: jasmine.createSpy('resetConfig'),
+      resetConfig: vi.fn().mockName('resetConfig'),
     };
 
     const authUserServiceMock = {
@@ -50,9 +55,17 @@ describe('AppComponent', () => {
   });
 
   it('should dispatch setLanguage when authUser emits', () => {
-    authUserSignal.update(prev => ({ ...prev, locale: 'es', theme: 'dark-theme', isAuthenticated: true }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      locale: 'es',
+      theme: 'dark-theme',
+      isAuthenticated: true,
+    }));
     fixture.detectChanges();
 
-    expect(navigationServiceSpy.resetConfig).toHaveBeenCalledWith('es', 'dark-theme');
+    expect(navigationServiceSpy.resetConfig).toHaveBeenCalledWith(
+      'es',
+      'dark-theme',
+    );
   });
 });

@@ -1,10 +1,19 @@
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
+import { describe, it, beforeEach, expect } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CustomEventTitleFormatter', () => {
   let formatter: CustomEventTitleFormatter;
 
   beforeEach(() => {
-    formatter = new CustomEventTitleFormatter();
+    TestBed.configureTestingModule({
+      providers: [provideTranslateService()],
+    });
+
+    formatter = TestBed.runInInjectionContext(
+      () => new CustomEventTitleFormatter(),
+    );
   });
 
   it('should return ALL_DAY label in month view when no end time', () => {
@@ -87,6 +96,8 @@ describe('CustomEventTitleFormatter', () => {
 
     const result = formatter.day(event);
 
-    expect(result).toContain('(19:00 - 20:00 GMT+09:00) <b>12:00 - 13:00</b>&nbsp; My event');
+    expect(result).toContain(
+      '(19:00 - 20:00 GMT+09:00) <b>12:00 - 13:00</b>&nbsp; My event',
+    );
   });
 });

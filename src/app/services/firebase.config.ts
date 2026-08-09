@@ -1,6 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, onIdTokenChanged } from 'firebase/auth';
-import { connectDatabaseEmulator, getDatabase, ref, update } from 'firebase/database';
+import {
+  connectDatabaseEmulator,
+  getDatabase,
+  ref,
+  update,
+} from 'firebase/database';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { getAnalytics, logEvent } from 'firebase/analytics';

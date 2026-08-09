@@ -4,7 +4,7 @@ export interface Pagination<T> {
   content: Array<T>;
   totalElements: number;
   totalPages: number;
-   
+
   number: number; // Page number
   last?: boolean;
 }
@@ -16,7 +16,7 @@ export class EmptyPagination<T> implements Pagination<T> {
   content: Array<T> = [];
   totalElements: number = 0;
   totalPages: number = 0;
-   
+
   number: number = 0; // Page number
   last: boolean = true;
 }

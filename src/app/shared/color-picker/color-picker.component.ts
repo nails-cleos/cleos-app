@@ -1,9 +1,26 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  signal,
+} from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { lightenDarkenColor } from '@app/util/color';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+} from '@angular/material/card';
 import { MatSuffix } from '@angular/material/form-field';
 
 type PreviewMode = 'dark' | 'light';
@@ -12,8 +29,19 @@ type PreviewMode = 'dark' | 'light';
   selector: 'app-color-picker',
   templateUrl: './color-picker.component.html',
   styleUrls: ['./color-picker.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIconButton, ReactiveFormsModule, MatError, MatCard, MatCardHeader,
-    MatCardSubtitle, MatCardContent, MatSuffix],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIconButton,
+    ReactiveFormsModule,
+    MatError,
+    MatCard,
+    MatCardHeader,
+    MatCardSubtitle,
+    MatCardContent,
+    MatSuffix,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ColorPickerComponent {
@@ -28,19 +56,29 @@ export class ColorPickerComponent {
 
   controlValue = signal<string>('');
   previewColor = computed(() => this.normalizeColor(this.controlValue()));
-  previewCardBackground = computed(() => this.previewMode() === 'dark' ? '#363636' : '#fafafa');
-  previewTitleColor = computed(() => this.previewMode() === 'dark' ? '#fafafa' : '#363636');
-  previewTextColor = computed(() => this.previewMode() === 'dark' ? '#000' : '#fff');
-  previewBorderColor = computed(() => this.previewMode() === 'dark' ?
-    lightenDarkenColor(this.previewColor(), 20) :
-    lightenDarkenColor(this.previewColor(), -20));
+  previewCardBackground = computed(() =>
+    this.previewMode() === 'dark' ? '#363636' : '#fafafa',
+  );
+  previewTitleColor = computed(() =>
+    this.previewMode() === 'dark' ? '#fafafa' : '#363636',
+  );
+  previewTextColor = computed(() =>
+    this.previewMode() === 'dark' ? '#000' : '#fff',
+  );
+  previewBorderColor = computed(() =>
+    this.previewMode() === 'dark'
+      ? lightenDarkenColor(this.previewColor(), 20)
+      : lightenDarkenColor(this.previewColor(), -20),
+  );
 
   constructor() {
     effect((onCleanup) => {
       const control = this.control();
       this.controlValue.set(control.value);
 
-      const subscription = control.valueChanges.subscribe(value => this.controlValue.set(value));
+      const subscription = control.valueChanges.subscribe((value) =>
+        this.controlValue.set(value),
+      );
       onCleanup(() => subscription.unsubscribe());
     });
   }

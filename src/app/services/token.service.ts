@@ -1,4 +1,11 @@
-import { computed, DestroyRef, effect, inject, Injectable, signal } from '@angular/core';
+import {
+  computed,
+  DestroyRef,
+  effect,
+  inject,
+  Injectable,
+  signal,
+} from '@angular/core';
 import { Subscription, timer } from 'rxjs';
 
 import { IUserAll } from '../user/user';
@@ -33,7 +40,7 @@ export class TokenService {
         return;
       }
 
-      fbUser.getIdToken().then(token => {
+      fbUser.getIdToken().then((token) => {
         this.tokenSignal.set(token);
       });
     });
@@ -71,7 +78,8 @@ export class TokenService {
           const newToken = await this.firebaseService.getIdToken(true);
           this.tokenSignal.set(newToken);
         }
-      });
+      },
+    );
 
     this.destroyRef.onDestroy(() => this.stopRefreshTimer());
   }

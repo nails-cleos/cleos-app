@@ -1,8 +1,14 @@
-import { OverlayContainer } from '@angular/cdk/overlay';
-import { CookieService } from 'ngx-cookie-service';
-import { ThemeService } from 'ng2-charts';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { eventState, findStateColor, getStateOrder, getThemeName, isDarkMode, resetTheme, THEME } from './theme';
+import {
+  eventState,
+  findStateColor,
+  getStateOrder,
+  getThemeName,
+  isDarkMode,
+  resetTheme,
+  THEME,
+} from './theme';
 
 describe('Theme Utils', () => {
   describe('findStateColor', () => {
@@ -24,12 +30,12 @@ describe('Theme Utils', () => {
 
   describe('isDarkMode', () => {
     it('should return true if theme is dark-theme', () => {
-      expect(isDarkMode('dark-theme')).toBeTrue();
+      expect(isDarkMode('dark-theme')).toBe(true);
     });
 
     it('should return false if theme is light-theme or undefined', () => {
-      expect(isDarkMode('light-theme')).toBeFalse();
-      expect(isDarkMode(undefined)).toBeFalse();
+      expect(isDarkMode('light-theme')).toBe(false);
+      expect(isDarkMode(undefined)).toBe(false);
     });
   });
 
@@ -58,62 +64,111 @@ describe('Theme Utils', () => {
       const lightStates = eventState(false);
       const darkStates = eventState(true);
 
-      expect(lightStates.find(s => s.name === 'PAID')?.color).toBe('#87ceeb');
-      expect(darkStates.find(s => s.name === 'PAID')?.color).toBe('#04589a');
+      expect(lightStates.find((s) => s.name === 'PAID')?.color).toBe('#87ceeb');
+      expect(darkStates.find((s) => s.name === 'PAID')?.color).toBe('#04589a');
     });
 
     it('should always include DEFAULT state', () => {
-      expect(eventState().some(s => s.name === 'DEFAULT')).toBeTrue();
+      expect(eventState().some((s) => s.name === 'DEFAULT')).toBe(true);
     });
   });
 
   describe('resetTheme', () => {
-    let overlayContainerSpy: jasmine.SpyObj<OverlayContainer>;
-    let cookieServiceSpy: jasmine.SpyObj<CookieService>;
-    let themeServiceSpy: jasmine.SpyObj<ThemeService>;
+    const overlayContainerElement = document.createElement('div');
+
+    const overlayContainerSpy = {
+      getContainerElement: vi.fn(() => overlayContainerElement),
+    };
+
+    const cookieServiceSpy = {
+      get: vi.fn(() => 'light-theme'),
+      set: vi.fn(),
+    };
+
+    const themeServiceSpy = {
+      setColorschemesOptions: vi.fn(),
+    };
+
     let body: HTMLBodyElement;
 
     beforeEach(() => {
       body = document.getElementsByTagName('body')[0];
 
-      overlayContainerSpy = jasmine.createSpyObj('OverlayContainer', ['getContainerElement']);
-      overlayContainerSpy.getContainerElement.and.returnValue(document.createElement('div'));
+      body.className = '';
 
-      cookieServiceSpy = jasmine.createSpyObj('CookieService', ['get', 'set']);
-      cookieServiceSpy.get.and.returnValue('light-theme');
+      overlayContainerElement.className = '';
 
-      themeServiceSpy = jasmine.createSpyObj('ThemeService', ['setColorschemesOptions']);
+      overlayContainerSpy.getContainerElement.mockReturnValue(
+        overlayContainerElement,
+      );
+
+      cookieServiceSpy.get.mockReturnValue('light-theme');
+
+      vi.clearAllMocks();
     });
 
     it('should remove old class, add new theme class and set cookie', () => {
       body.classList.add('old-theme');
 
-      const result = resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'dark-theme', 'old-theme');
+      const result = resetTheme(
+        overlayContainerSpy,
+        cookieServiceSpy,
+        themeServiceSpy,
+        'dark-theme',
+        'old-theme',
+      );
 
-      expect(body.classList.contains('old-theme')).toBeFalse();
-      expect(body.classList.contains('dark-theme')).toBeTrue();
-      expect(overlayContainerSpy.getContainerElement().classList.contains('dark-theme')).toBeTrue();
+      expect(body.classList.contains('old-theme')).toBe(false);
+      expect(body.classList.contains('dark-theme')).toBe(true);
+
+      expect(overlayContainerElement.classList.contains('dark-theme')).toBe(
+        true,
+      );
+
       expect(cookieServiceSpy.set).toHaveBeenCalledWith(THEME, 'dark-theme');
+
       expect(result).toBe('dark-theme');
     });
 
     it('should use cookie theme if no theme is provided', () => {
-      cookieServiceSpy.get.and.returnValue('light-theme');
-      const result = resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, undefined, undefined);
+      cookieServiceSpy.get.mockReturnValue('light-theme');
+      const result = resetTheme(
+        overlayContainerSpy,
+        cookieServiceSpy,
+        themeServiceSpy,
+        undefined,
+        undefined,
+      );
 
       expect(result).toBe('light-theme');
     });
 
     it('should call themeService.setColorschemesOptions with overrides', () => {
-      resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'dark-theme', undefined);
-      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
-        plugins: jasmine.any(Object),
-      }));
+      resetTheme(
+        overlayContainerSpy,
+        cookieServiceSpy,
+        themeServiceSpy,
+        'dark-theme',
+        undefined,
+      );
+      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          plugins: expect.any(Object),
+        }),
+      );
 
-      resetTheme(overlayContainerSpy, cookieServiceSpy, themeServiceSpy, 'light-theme', undefined);
-      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(jasmine.objectContaining({
-        scales: undefined,
-      }));
+      resetTheme(
+        overlayContainerSpy,
+        cookieServiceSpy,
+        themeServiceSpy,
+        'light-theme',
+        undefined,
+      );
+      expect(themeServiceSpy.setColorschemesOptions).toHaveBeenCalledWith(
+        expect.objectContaining({
+          scales: undefined,
+        }),
+      );
     });
   });
 });

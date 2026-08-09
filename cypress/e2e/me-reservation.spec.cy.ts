@@ -3,7 +3,7 @@ import { devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height }) => {
-  describe(`Me reservation flow  with ${ name }`, () => {
+  describe(`Me reservation flow  with ${name}`, () => {
     const email = 'Kdvek@jevfm';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
     const roomId = 'c18629ee-40c8-4bf4-b182-b2fea79dd881';
@@ -50,7 +50,9 @@ devices.forEach(({ name, width, height }) => {
       cy.wait('@loadUpcoming');
       cy.wait('@getRooms');
 
-      cy.contains('mat-form-field', 'Office').find('input').should('have.value', 'Nails Cleos');
+      cy.contains('mat-form-field', 'Office')
+        .find('input')
+        .should('have.value', 'Nails Cleos');
 
       cy.get('button[name="toStepTwo"]').click({ force: true });
 
@@ -70,7 +72,10 @@ devices.forEach(({ name, width, height }) => {
 
       cy.get('[data-cy="date-picker"]').should('have.value', formattedDate);
       cy.get('[data-cy="group-input"]').should('have.value', 'Biab Treatment ');
-      cy.get('[data-cy="treatment-input"]').should('have.value', 'Biab + Single Color ');
+      cy.get('[data-cy="treatment-input"]').should(
+        'have.value',
+        'Biab + Single Color ',
+      );
 
       cy.get('button[name="toStepThree"]').click({ force: true });
 
@@ -96,7 +101,9 @@ devices.forEach(({ name, width, height }) => {
         expect(request.body.roomId).to.eq(roomId);
         expect(request.body.professionalId).to.eq(professionalId);
         expect(request.body.treatmentId).to.eq(treatmentId);
-        expect(request.body.additionalIds).to.deep.eq(['397bce4b-27ba-459f-801a-dcceea330b8d']);
+        expect(request.body.additionalIds).to.deep.eq([
+          '397bce4b-27ba-459f-801a-dcceea330b8d',
+        ]);
         expect(request.body.phone).to.eq('+31 6 25250787');
         expect(request.body.payment).to.eq(undefined);
       });
@@ -108,7 +115,7 @@ devices.forEach(({ name, width, height }) => {
     });
   });
 
-  describe(`Me reservation with ${ name }`, () => {
+  describe(`Me reservation with ${name}`, () => {
     const email = 'Kdvek@jevfm';
     const reservationId = '7de89ece-c39c-4f9f-99fe-fb6133315cab';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
@@ -145,19 +152,36 @@ devices.forEach(({ name, width, height }) => {
     });
 
     it('should render customer upcoming reservation and reservation list', () => {
-      cy.wait('@loadAllByCustomer').its('response.statusCode').should('eq', 200);
+      cy.wait('@loadAllByCustomer')
+        .its('response.statusCode')
+        .should('eq', 200);
 
-      cy.get('.upcoming-section').should('exist').within(() => {
-        cy.contains('.app-surface-eyebrow', '7de89ece-c39c-4f9f-99fe-fb6133315cab').should('exist');
-        cy.contains('.app-surface-item__value', 'Nails Cleos').should('exist');
-        cy.contains('.app-surface-item__value', 'Mock address').should('exist');
-        cy.contains('.price-row', 'Biab + Single Color').should('contain.text', '€ 85.00');
-        cy.contains('.price-row', 'Biab Removal').should('contain.text', '€ 5.00');
-        cy.contains('.price-row', 'Powder').should('contain.text', '€ 15.00');
-        cy.get('.price-row--total').should('contain.text', '€ 105.00');
-        cy.contains('button', 'Edit').should('exist');
-        cy.contains('button', 'View').should('exist');
-      });
+      cy.get('.upcoming-section')
+        .should('exist')
+        .within(() => {
+          cy.contains(
+            '.app-surface-eyebrow',
+            '7de89ece-c39c-4f9f-99fe-fb6133315cab',
+          ).should('exist');
+          cy.contains('.app-surface-item__value', 'Nails Cleos').should(
+            'exist',
+          );
+          cy.contains('.app-surface-item__value', 'Mock address').should(
+            'exist',
+          );
+          cy.contains('.price-row', 'Biab + Single Color').should(
+            'contain.text',
+            '€ 85.00',
+          );
+          cy.contains('.price-row', 'Biab Removal').should(
+            'contain.text',
+            '€ 5.00',
+          );
+          cy.contains('.price-row', 'Powder').should('contain.text', '€ 15.00');
+          cy.get('.price-row--total').should('contain.text', '€ 105.00');
+          cy.contains('button', 'Edit').should('exist');
+          cy.contains('button', 'View').should('exist');
+        });
 
       cy.get('table').within(() => {
         cy.contains('td', 'Biab + Single Color').should('exist');
@@ -169,17 +193,24 @@ devices.forEach(({ name, width, height }) => {
     it('should open reservation detail from customer reservation view', () => {
       cy.wait('@loadAllByCustomer');
 
-      cy.get('.upcoming-section').contains('button', 'View').click({ force: true });
+      cy.get('.upcoming-section')
+        .contains('button', 'View')
+        .click({ force: true });
 
       cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
       cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
       cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
 
-      cy.url().should('include', '/reservation/7de89ece-c39c-4f9f-99fe-fb6133315cab');
+      cy.url().should(
+        'include',
+        '/reservation/7de89ece-c39c-4f9f-99fe-fb6133315cab',
+      );
       cy.get('.detail-shell').should('exist');
       cy.contains('.app-detail-title', 'Customer 1').should('exist');
       cy.contains('.app-detail-chip', 'Approved').should('exist');
-      cy.contains('.app-surface-item__value', 'Biab + Single Color').should('exist');
+      cy.contains('.app-surface-item__value', 'Biab + Single Color').should(
+        'exist',
+      );
       cy.contains('.app-surface-item__value', 'Nails Cleos').should('exist');
     });
   });

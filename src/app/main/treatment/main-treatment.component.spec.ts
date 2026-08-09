@@ -1,7 +1,11 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MainTreatmentComponent } from './main-treatment.component';
-import { IBiabTreatmentTranslations, IMainTreatmentContent } from '@app/util/MainTreatment';
+import {
+  IBiabTreatmentTranslations,
+  IMainTreatmentContent,
+} from '@app/util/MainTreatment';
 import { TranslateLoaderFactory } from '@app/shared/translate-loader.factory';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
@@ -11,12 +15,14 @@ describe('MainTreatmentComponent', () => {
   let component: MainTreatmentComponent;
   let fixture: ComponentFixture<MainTreatmentComponent>;
   let navigationServiceSpy: {
-    navigate: jasmine.Spy;
+    navigate: Mock;
     language: string;
     language$: ReturnType<typeof signal>;
   };
 
-  const createTranslations = (overrides: Partial<IBiabTreatmentTranslations> = {}): IBiabTreatmentTranslations => {
+  const createTranslations = (
+    overrides: Partial<IBiabTreatmentTranslations> = {},
+  ): IBiabTreatmentTranslations => {
     const defaults: IBiabTreatmentTranslations = {
       heroTitle: 'heroTitle',
       introLead: 'introLead',
@@ -69,16 +75,66 @@ describe('MainTreatmentComponent', () => {
           acrylic: 'comparisonTable.columns.acrylic',
         },
         rows: [
-          { label: 'row1', biab: 'row1-biab', regularGels: 'row1-regularGels', acrylic: 'row1-acrylic' },
-          { label: 'row2', biab: 'row2-biab', regularGels: 'row2-regularGels', acrylic: 'row2-acrylic' },
-          { label: 'row3', biab: 'row3-biab', regularGels: 'row3-regularGels', acrylic: 'row3-acrylic' },
-          { label: 'row4', biab: 'row4-biab', regularGels: 'row4-regularGels', acrylic: 'row4-acrylic' },
-          { label: 'row5', biab: 'row5-biab', regularGels: 'row5-regularGels', acrylic: 'row5-acrylic' },
-          { label: 'row6', biab: 'row6-biab', regularGels: 'row6-regularGels', acrylic: 'row6-acrylic' },
-          { label: 'row7', biab: 'row7-biab', regularGels: 'row7-regularGels', acrylic: 'row7-acrylic' },
-          { label: 'row8', biab: 'row8-biab', regularGels: 'row8-regularGels', acrylic: 'row8-acrylic' },
-          { label: 'row9', biab: 'row9-biab', regularGels: 'row9-regularGels', acrylic: 'row9-acrylic' },
-          { label: 'row10', biab: 'row10-biab', regularGels: 'row10-regularGels', acrylic: 'row10-acrylic' },
+          {
+            label: 'row1',
+            biab: 'row1-biab',
+            regularGels: 'row1-regularGels',
+            acrylic: 'row1-acrylic',
+          },
+          {
+            label: 'row2',
+            biab: 'row2-biab',
+            regularGels: 'row2-regularGels',
+            acrylic: 'row2-acrylic',
+          },
+          {
+            label: 'row3',
+            biab: 'row3-biab',
+            regularGels: 'row3-regularGels',
+            acrylic: 'row3-acrylic',
+          },
+          {
+            label: 'row4',
+            biab: 'row4-biab',
+            regularGels: 'row4-regularGels',
+            acrylic: 'row4-acrylic',
+          },
+          {
+            label: 'row5',
+            biab: 'row5-biab',
+            regularGels: 'row5-regularGels',
+            acrylic: 'row5-acrylic',
+          },
+          {
+            label: 'row6',
+            biab: 'row6-biab',
+            regularGels: 'row6-regularGels',
+            acrylic: 'row6-acrylic',
+          },
+          {
+            label: 'row7',
+            biab: 'row7-biab',
+            regularGels: 'row7-regularGels',
+            acrylic: 'row7-acrylic',
+          },
+          {
+            label: 'row8',
+            biab: 'row8-biab',
+            regularGels: 'row8-regularGels',
+            acrylic: 'row8-acrylic',
+          },
+          {
+            label: 'row9',
+            biab: 'row9-biab',
+            regularGels: 'row9-regularGels',
+            acrylic: 'row9-acrylic',
+          },
+          {
+            label: 'row10',
+            biab: 'row10-biab',
+            regularGels: 'row10-regularGels',
+            acrylic: 'row10-acrylic',
+          },
         ],
       },
     };
@@ -86,9 +142,9 @@ describe('MainTreatmentComponent', () => {
     return { ...defaults, ...overrides };
   };
 
-  const createTreatments = (): IMainTreatmentContent[] => ([
+  const createTreatments = (): IMainTreatmentContent[] => [
     { id: 'biab-treatment', translations: createTranslations() },
-  ]);
+  ];
 
   const createComponent = (): void => {
     fixture = TestBed.createComponent(MainTreatmentComponent);
@@ -101,12 +157,14 @@ describe('MainTreatmentComponent', () => {
     navigationServiceSpy = {
       language: DEFAULT_LOCALE,
       language$: signal(DEFAULT_LOCALE),
-      navigate: jasmine.createSpy('navigate'),
+      navigate: vi.fn().mockName('navigate'),
     };
 
-    spyOn(TranslateLoaderFactory, 'loadJson').and.returnValue(of({
-      treatments: [],
-    }) as any);
+    vi.spyOn(TranslateLoaderFactory, 'loadJson').mockReturnValue(
+      of({
+        treatments: [],
+      }) as any,
+    );
 
     await TestBed.configureTestingModule({
       imports: [MainTreatmentComponent],
@@ -120,13 +178,18 @@ describe('MainTreatmentComponent', () => {
     createComponent();
 
     expect(component).toBeTruthy();
-    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', DEFAULT_LOCALE);
+    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith(
+      'treatment/main',
+      DEFAULT_LOCALE,
+    );
   });
 
   it('should return sections when treatment id exists in translations', () => {
-    (TranslateLoaderFactory.loadJson as jasmine.Spy).and.returnValue(of({
-      treatments: createTreatments(),
-    }) as any);
+    (TranslateLoaderFactory.loadJson as Mock).mockReturnValue(
+      of({
+        treatments: createTreatments(),
+      }) as any,
+    );
 
     createComponent();
     fixture.detectChanges();
@@ -137,17 +200,22 @@ describe('MainTreatmentComponent', () => {
 
   it('should request localized treatment content when language changes', () => {
     createComponent();
-    (TranslateLoaderFactory.loadJson as jasmine.Spy).calls.reset();
+    (TranslateLoaderFactory.loadJson as Mock).mockClear();
     navigationServiceSpy.language$.set('nl');
     fixture.detectChanges();
 
-    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith('treatment/main', 'nl');
+    expect(TranslateLoaderFactory.loadJson).toHaveBeenCalledWith(
+      'treatment/main',
+      'nl',
+    );
   });
 
   it('should return undefined sections when treatment id is unknown', () => {
-    (TranslateLoaderFactory.loadJson as jasmine.Spy).and.returnValue(of({
-      treatments: createTreatments(),
-    }) as any);
+    (TranslateLoaderFactory.loadJson as Mock).mockReturnValue(
+      of({
+        treatments: createTreatments(),
+      }) as any,
+    );
 
     createComponent();
     fixture.componentRef.setInput('id', 'unknown');

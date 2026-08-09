@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
 import { createMatTableState } from '@app/util/mat-table-state';
@@ -6,7 +13,11 @@ import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
-import { getCurrentTimeZone, isSameTimeZone, newDateTimestamp } from '@app/util/dates';
+import {
+  getCurrentTimeZone,
+  isSameTimeZone,
+  newDateTimestamp,
+} from '@app/util/dates';
 import { IUnavailable, IUnavailableAll } from '../unavailable';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { createDialog, executeDialogNoWidth } from '@app/util/helper';
@@ -31,58 +42,107 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatList, MatListItem, MatListItemIcon, MatListSubheaderCssMatStyler } from '@angular/material/list';
+import {
+  MatList,
+  MatListItem,
+  MatListItemIcon,
+  MatListSubheaderCssMatStyler,
+} from '@angular/material/list';
 import { MatPrefix } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
 import { UnavailableStore } from '@app/store/unavailable.store';
-import { TableSkeletonColumn, TableSkeletonComponent } from '@app/shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-unavailable-list',
   templateUrl: './unavailable-list.component.html',
   styleUrls: ['./unavailable-list.component.scss'],
-  imports: [TimeDetailPipe, MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler, MatIconButton,
-    TranslatePipe, RouterLink, DatePipe, MatTable, MatSort, MatColumnDef, MatHeaderCellDef,
-    MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef, MatFooterCell,
-    MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator, MatPrefix,
-    TimeDetailPipe, DurationTimePipe, TableSkeletonComponent],
+  imports: [
+    TimeDetailPipe,
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatListSubheaderCssMatStyler,
+    MatIconButton,
+    TranslatePipe,
+    RouterLink,
+    DatePipe,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatListItemIcon,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    MatPrefix,
+    TimeDetailPipe,
+    DurationTimePipe,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnavailableListComponent {
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly translate: TranslateService = inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'timestamp', 'desc');
+  private tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'timestamp',
+    'desc',
+  );
 
   private unavailableListSignal = this.unavailableStore.data;
   private responseSignal = this.unavailableStore.response;
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = this.unavailableStore.isLoading;
   dataSourceSignal = computed(() => this.unavailableListSignal()?.content);
-  resultsLengthSignal = computed(() => this.unavailableListSignal()?.totalElements || 0);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  resultsLengthSignal = computed(
+    () => this.unavailableListSignal()?.totalElements || 0,
+  );
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
 
   tableColumns: TableSkeletonColumn[] = [
     { key: 'position' },
@@ -132,33 +192,55 @@ export class UnavailableListComponent {
   }
 
   edit = (selected: IUnavailableAll): void => {
-    const path = selected.type === 'BLOCK_AGENDA'
-      ? ['unavailable', 'block-agenda', selected.id]
-      : ['unavailable', selected.id];
+    const path =
+      selected.type === 'BLOCK_AGENDA'
+        ? ['unavailable', 'block-agenda', selected.id]
+        : ['unavailable', selected.id];
 
     void this.navigationService.navigate(path);
   };
 
   delete = (unavailable: IUnavailableAll): void => {
     const title = this.translate.instant('UNAVAILABLE.DELETED.TITLE');
-    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT',
-      { date: newDateTimestamp(unavailable.timestamp) });
+    const content = this.translate.instant('UNAVAILABLE.DELETED.CONTENT', {
+      date: newDateTimestamp(unavailable.timestamp),
+    });
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
-      result => {
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: unavailable, variant: 'warning' },
+      (result) => {
         if (result) {
-          this.unavailableStore.delete(result.id, result.timestamp, result.timeZone);
+          this.unavailableStore.delete(
+            result.id,
+            result.timestamp,
+            result.timeZone,
+          );
         }
-      });
+      },
+    );
   };
 
   showTimeZone = (unavailable: IUnavailableAll): boolean =>
-    !isSameTimeZone(unavailable.timeZone || unavailable.professional.timeZone || getCurrentTimeZone());
+    !isSameTimeZone(
+      unavailable.timeZone ||
+        unavailable.professional.timeZone ||
+        getCurrentTimeZone(),
+    );
 
   openDialog = (unavailable: IUnavailableAll): void => {
     const time = newDateTimestamp(unavailable.timestamp);
     const name = unavailable.professional.displayName;
     const timeZone = unavailable.timeZone || unavailable.professional.timeZone;
-    createDialog('PROFESSIONAL_INFO', name, this.language, this.translate, this.dialog, timeZone, time);
+    createDialog(
+      'PROFESSIONAL_INFO',
+      name,
+      this.language,
+      this.translate,
+      this.dialog,
+      timeZone,
+      time,
+    );
   };
 }

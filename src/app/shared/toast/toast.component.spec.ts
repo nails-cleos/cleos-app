@@ -1,7 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
-import { ToastComponent } from './toast.component';
+import {
+  TOAST_ACTION,
+  TOAST_DATA,
+  TOAST_DISMISS,
+  ToastComponent,
+} from './toast.component';
 import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('ToastComponent', () => {
   let component: ToastComponent;
@@ -13,15 +19,20 @@ describe('ToastComponent', () => {
     dismiss$ = new Subject<void>();
     action$ = new Subject<void>();
 
-    const mockToastData = { type: 'success', message: 'Test toast', duration: 5000, actionType: 'none' };
+    const mockToastData = {
+      type: 'success',
+      message: 'Test toast',
+      duration: 5000,
+      actionType: 'none',
+    };
 
     TestBed.configureTestingModule({
       imports: [ToastComponent],
       providers: [
         provideTranslateService(),
-        { provide: 'TOAST_DATA', useValue: mockToastData },
-        { provide: 'TOAST_DISMISS', useValue: dismiss$ },
-        { provide: 'TOAST_ACTION', useValue: action$ },
+        { provide: TOAST_DATA, useValue: mockToastData },
+        { provide: TOAST_DISMISS, useValue: dismiss$ },
+        { provide: TOAST_ACTION, useValue: action$ },
       ],
     }).compileComponents();
 
@@ -51,28 +62,34 @@ describe('ToastComponent', () => {
     expect(component.getIcon()).toBe('info');
   });
 
-  it('should emit action$ and dismiss$ on onAction()', (done) => {
+  it('should emit action$ and dismiss$ on onAction()', async () => {
     let actionEmitted = false;
     let dismissEmitted = false;
 
-    action$.subscribe(() => actionEmitted = true);
-    dismiss$.subscribe(() => dismissEmitted = true, undefined, () => {
-      // Complete callback
-      expect(actionEmitted).toBeTrue();
-      expect(dismissEmitted).toBeTrue();
-      done();
-    });
+    action$.subscribe(() => (actionEmitted = true));
+    dismiss$.subscribe(
+      () => (dismissEmitted = true),
+      undefined,
+      () => {
+        // Complete callback
+        expect(actionEmitted).toBe(true);
+        expect(dismissEmitted).toBe(true);
+      },
+    );
 
     component.onAction();
   });
 
-  it('should emit only dismiss$ on onDismiss()', (done) => {
+  it('should emit only dismiss$ on onDismiss()', async () => {
     let dismissEmitted = false;
 
-    dismiss$.subscribe(() => dismissEmitted = true, undefined, () => {
-      expect(dismissEmitted).toBeTrue();
-      done();
-    });
+    dismiss$.subscribe(
+      () => (dismissEmitted = true),
+      undefined,
+      () => {
+        expect(dismissEmitted).toBe(true);
+      },
+    );
 
     component.onDismiss();
   });

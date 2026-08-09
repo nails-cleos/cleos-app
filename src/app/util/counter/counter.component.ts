@@ -27,11 +27,14 @@ export class CounterComponent {
       setInterval(() => {
         const now = getNowTimeZone();
         this.refreshViewDate.emit(now);
-        const hours = `0${ now.getHours() }`.slice(-2);
-        const minutes = `0${ now.getMinutes() }`.slice(-2);
-        const seconds = `0${ now.getSeconds() }`.slice(-2);
-        this.renderer.setProperty(this.myCounter?.nativeElement, 'textContent',
-          `${ hours }:${ minutes }:${ seconds }`);
+        const hours = `0${now.getHours()}`.slice(-2);
+        const minutes = `0${now.getMinutes()}`.slice(-2);
+        const seconds = `0${now.getSeconds()}`.slice(-2);
+        this.renderer.setProperty(
+          this.myCounter?.nativeElement,
+          'textContent',
+          `${hours}:${minutes}:${seconds}`,
+        );
       }, 1000);
     });
   }
