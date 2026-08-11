@@ -43,7 +43,7 @@
     "@angular/material-date-fns-adapter": "^22.1.1",
     "@angular/platform-browser": "^22.1.0",
     "@angular/platform-browser-dynamic": "^22.1.0",
-    "@angular/router": "^22.1.0",
+    "@angular/router": "^22.1.1",
     "@angular/service-worker": "^22.1.0",
     "@aws-crypto/sha256-browser": "^5.2.0",
     "@aws-sdk/client-s3": "^3.1105.0",
