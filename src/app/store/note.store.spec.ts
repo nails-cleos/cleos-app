@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { NoteStore } from './note.store';
@@ -16,9 +15,6 @@ describe('NoteStore', () => {
     deleteNote: Mock;
     completeNote: Mock;
   };
-  let translateSpy: {
-    instant: Mock;
-  };
 
   beforeEach(() => {
     noteServiceSpy = {
@@ -29,19 +25,10 @@ describe('NoteStore', () => {
       completeNote: vi.fn().mockName('NoteService.completeNote'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['description'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         NoteStore,
         { provide: NoteService, useValue: noteServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -68,12 +55,9 @@ describe('NoteStore', () => {
 
     expect(noteServiceSpy.createNote).toHaveBeenCalledWith(expect.any(Object));
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.CREATED.MESSAGE', {
-      description: 'Meeting',
-    });
-
     expect(store.response()).toEqual({
-      message: 'NOTE.CREATED.MESSAGE:Meeting',
+      messageKey: 'NOTE.CREATED.MESSAGE',
+      messageParams: { description: 'Meeting' },
       path: 'notes/1',
       redirect: 'reservation/calendar',
     });
@@ -93,12 +77,9 @@ describe('NoteStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.UPDATED.MESSAGE', {
-      description: 'Updated Note',
-    });
-
     expect(store.response()).toEqual({
-      message: 'NOTE.UPDATED.MESSAGE:Updated Note',
+      messageKey: 'NOTE.UPDATED.MESSAGE',
+      messageParams: { description: 'Updated Note' },
       path: 'notes/2',
       redirect: 'reservation/calendar',
     });
@@ -113,12 +94,9 @@ describe('NoteStore', () => {
 
     expect(noteServiceSpy.deleteNote).toHaveBeenCalledWith('n1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('NOTE.UPDATED.MESSAGE', {
-      description: 'Lunch note',
-    });
-
     expect(store.response()).toEqual({
-      message: 'NOTE.UPDATED.MESSAGE:Lunch note',
+      messageKey: 'NOTE.DELETED.MESSAGE',
+      messageParams: { description: 'Lunch note' },
       toastType: 'warning',
     });
 
@@ -134,13 +112,9 @@ describe('NoteStore', () => {
 
     expect(noteServiceSpy.completeNote).toHaveBeenCalledWith('3');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'NOTE.COMPLETED.MESSAGE',
-      { description: 'Done note' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'NOTE.COMPLETED.MESSAGE:Done note',
+      messageKey: 'NOTE.COMPLETED.MESSAGE',
+      messageParams: { description: 'Done note' },
       path: 'notes/3',
       redirect: 'reservation/calendar',
     });

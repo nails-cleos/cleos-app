@@ -7,6 +7,7 @@ import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('OfficeDetailsPageComponent', () => {
   let component: OfficeDetailsPageComponent;
@@ -18,6 +19,7 @@ describe('OfficeDetailsPageComponent', () => {
   let officeStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
+    isLoading: ReturnType<typeof signal>;
     clean: Mock;
     loadById: Mock;
     update: Mock;
@@ -36,8 +38,9 @@ describe('OfficeDetailsPageComponent', () => {
       language: DEFAULT_LOCALE,
     };
     officeStoreSpy = {
-      selected: signal<any>(undefined),
-      subErrors: signal<any>(undefined),
+      selected: signal(undefined),
+      subErrors: signal(undefined),
+      isLoading: signal(false),
       clean: vi.fn().mockName('clean'),
       loadById: vi.fn().mockName('loadById'),
       update: vi.fn().mockName('update'),
@@ -46,20 +49,11 @@ describe('OfficeDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OfficeDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
       ],
-    })
-      .overrideTemplate(OfficeComponent, '')
-      .overrideTemplate(
-        OfficeDetailsPageComponent,
-        `
-        @if (office(); as office) {
-          <app-office [office]="office" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(OfficeDetailsPageComponent);
 

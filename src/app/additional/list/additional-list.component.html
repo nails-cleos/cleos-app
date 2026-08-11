@@ -9,8 +9,8 @@
           [dataSource]="dataSource"
           mat-table
           matSort
-          matSortActive="order"
-          matSortDirection="asc"
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
           matSortDisableClear
           multiTemplateDataRows
         >

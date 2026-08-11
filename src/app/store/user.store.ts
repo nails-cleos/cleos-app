@@ -98,7 +98,7 @@ export const UserStore = signalStore(
         patchCrudError(store, err);
 
       const requestSuccess = (
-        key: string,
+        messageKey: string,
         displayName?: string,
         path?: string,
         role?: Role | string,
@@ -106,7 +106,8 @@ export const UserStore = signalStore(
         reload: boolean = false,
         redirect?: string,
       ): IResponseSuccess => ({
-        message: translateService.instant(key, { role, displayName }),
+        messageKey,
+        messageParams: { role, displayName },
         path,
         reload,
         toastType,
@@ -288,7 +289,7 @@ export const UserStore = signalStore(
           action: 'ADD' | 'REMOVE',
         ): void {
           setRoleSubscription?.unsubscribe();
-          cleanCrudUpdate(store);
+          patchState(store, { response: undefined, isLoading: true });
 
           setRoleSubscription = userService.setRole(id, role).subscribe({
             next: () =>
@@ -298,6 +299,8 @@ export const UserStore = signalStore(
                   displayName,
                   `users/${id}`,
                   translateService.instant(`COMMON.ROLES.${role}`),
+                  'success',
+                  true,
                 ),
                 isLoading: false,
               }),
@@ -315,15 +318,23 @@ export const UserStore = signalStore(
 
           updateMyUserSubscription = userService.updateMyUser(user).subscribe({
             next: (response) => {
-              patchState(store, {
-                response: {
-                  message:
-                    message ||
-                    translateService.instant('COMMON.PROFILE.UPDATED.MESSAGE', {
+              const responseData = message
+                ? {
+                    message,
+                    messageParams: {
                       displayName: response.user.displayName,
-                    }),
-                  toastType: 'success',
-                },
+                    },
+                    toastType: 'success' as const,
+                  }
+                : {
+                    messageKey: 'COMMON.PROFILE.UPDATED.MESSAGE',
+                    messageParams: {
+                      displayName: response.user.displayName,
+                    },
+                    toastType: 'success' as const,
+                  };
+              patchState(store, {
+                response: responseData,
                 isLoading: false,
               });
               dispatchLoginSuccess(response, redirectUrl, user.locale);
@@ -342,7 +353,7 @@ export const UserStore = signalStore(
               next: (response) => {
                 patchState(store, {
                   response: {
-                    message: 'COMMON.PROFILE.UPDATED.PHOTO',
+                    messageKey: 'COMMON.PROFILE.UPDATED.PHOTO',
                     toastType: 'success',
                   },
                   isLoading: false,

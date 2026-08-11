@@ -11,7 +11,12 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { ComponentPortal } from '@angular/cdk/portal';
 import { EMPTY, Subject } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ToastComponent } from '../shared/toast/toast.component';
+import {
+  TOAST_ACTION,
+  TOAST_DATA,
+  TOAST_DISMISS,
+  ToastComponent,
+} from '../shared/toast/toast.component';
 import {
   ToastData,
   ToastOptions,
@@ -117,9 +122,9 @@ export class ToastService {
     const injector = Injector.create({
       parent: this.injector,
       providers: [
-        { provide: 'TOAST_DATA', useValue: toastData },
-        { provide: 'TOAST_DISMISS', useValue: toastDismissed },
-        { provide: 'TOAST_ACTION', useValue: toastAction },
+        { provide: TOAST_DATA, useValue: toastData },
+        { provide: TOAST_DISMISS, useValue: toastDismissed },
+        { provide: TOAST_ACTION, useValue: toastAction },
       ],
     });
 

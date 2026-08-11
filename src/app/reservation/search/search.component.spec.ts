@@ -24,6 +24,7 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { NavigationService } from '@app/services/navigation.service';
 import { UserStore } from '@app/store/user.store';
 import { ReservationStore } from '@app/store/reservation.store';
+
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;

@@ -6,7 +6,6 @@ import { AdditionalStore } from '../store/additional.store';
 import { IAdditionalAll } from './additional';
 import { AdditionalComponent } from './additional.component';
 import { TreatmentStore } from '../store/treatment.store';
-import { DateAdapter } from '@angular/material/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { provideTranslateService } from '@ngx-translate/core';
@@ -64,19 +63,8 @@ describe('AdditionalDetailsPageComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
-        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(AdditionalComponent, '<input #groupInput />')
-      .overrideTemplate(
-        AdditionalDetailsPageComponent,
-        `
-        @if (additional(); as additional) {
-          <app-additional [additional]="additional" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalDetailsPageComponent);
 

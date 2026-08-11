@@ -5,6 +5,9 @@ import { ColorDetailsPageComponent } from './color-details-page.component';
 import { ColorStore } from '../store/color.store';
 import { IColorAll } from './color';
 import { ColorComponent } from './color.component';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 
 describe('ColorDetailsPageComponent', () => {
   let component: ColorDetailsPageComponent;
@@ -37,18 +40,13 @@ describe('ColorDetailsPageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ColorDetailsPageComponent],
-      providers: [{ provide: ColorStore, useValue: colorStoreSpy }],
-    })
-      .overrideTemplate(ColorComponent, '')
-      .overrideTemplate(
-        ColorDetailsPageComponent,
-        `
-        @if (color(); as color) {
-          <app-color [color]="color" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        { provide: ColorStore, useValue: colorStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ColorDetailsPageComponent);
 

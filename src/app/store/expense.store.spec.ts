@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { ExpenseStore } from './expense.store';
@@ -18,10 +17,6 @@ describe('ExpenseStore', () => {
     deleteExpense: Mock;
   };
 
-  let translateSpy: {
-    instant: Mock;
-  };
-
   beforeEach(() => {
     expenseServiceSpy = {
       getExpensesPage: vi.fn().mockName('ExpenseService.getExpensesPage'),
@@ -32,19 +27,10 @@ describe('ExpenseStore', () => {
       deleteExpense: vi.fn().mockName('ExpenseService.deleteExpense'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['invoice'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         ExpenseStore,
         { provide: ExpenseService, useValue: expenseServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -116,12 +102,9 @@ describe('ExpenseStore', () => {
       file,
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('EXPENSE.CREATED', {
-      invoice: 'Invoice-1',
-    });
-
     expect(store.response()).toEqual({
-      message: 'EXPENSE.CREATED:Invoice-1',
+      messageKey: 'EXPENSE.CREATED',
+      messageParams: { invoice: 'Invoice-1' },
       path: 'rooms/room-1/expenses/1',
     });
 
@@ -144,13 +127,9 @@ describe('ExpenseStore', () => {
       file,
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'EXPENSE.UPDATED.MESSAGE',
-      { invoice: 'Updated-Inv' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'EXPENSE.UPDATED.MESSAGE:Updated-Inv',
+      messageKey: 'EXPENSE.UPDATED.MESSAGE',
+      messageParams: { invoice: 'Updated-Inv' },
       path: 'rooms/room-1/expenses/2',
     });
 
@@ -167,13 +146,9 @@ describe('ExpenseStore', () => {
       'e1',
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'EXPENSE.DELETED.MESSAGE',
-      { invoice: 'INV-001' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'EXPENSE.DELETED.MESSAGE:INV-001',
+      messageKey: 'EXPENSE.DELETED.MESSAGE',
+      messageParams: { invoice: 'INV-001' },
       reload: true,
       toastType: 'warning',
     });

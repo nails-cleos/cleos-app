@@ -26,6 +26,7 @@ describe('UserListComponent', () => {
 
   let userStoreSpy: {
     clean: Mock;
+    clearResponse: Mock;
     loadPage: Mock;
     selectAndNavigate: Mock;
     delete: Mock;
@@ -85,6 +86,7 @@ describe('UserListComponent', () => {
     userStoreSpy = {
       loadPage: vi.fn().mockName('UserStore.loadPage'),
       clean: vi.fn().mockName('UserStore.clean'),
+      clearResponse: vi.fn().mockName('UserStore.clearResponse'),
       selectAndNavigate: vi.fn().mockName('UserStore.selectAndNavigate'),
       delete: vi.fn().mockName('UserStore.delete'),
       restore: vi.fn().mockName('UserStore.restore'),
@@ -209,7 +211,7 @@ describe('UserListComponent', () => {
     responseSignal.set({ success: true });
     fixture.detectChanges();
 
-    expect(userStoreSpy.clean).toHaveBeenCalled();
+    expect(userStoreSpy.clearResponse).toHaveBeenCalled();
   });
 
   it('should select and navigate when edit is called', () => {

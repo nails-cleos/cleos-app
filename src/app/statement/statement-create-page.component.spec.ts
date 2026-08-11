@@ -3,6 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StatementCreatePageComponent } from './statement-create-page.component';
 import { IDocument } from '../document/document';
 import { DocumentStore } from '../store/document.store';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 describe('StatementCreatePageComponent', () => {
   let component: StatementCreatePageComponent;
   let fixture: ComponentFixture<StatementCreatePageComponent>;
@@ -24,12 +28,22 @@ describe('StatementCreatePageComponent', () => {
       uploadStatement: vi.fn().mockName('uploadStatement'),
     };
 
+    const cookieConsentService = {
+      getConfig: vi.fn().mockName('NgcCookieConsentService.getConfig'),
+      destroy: vi.fn().mockName('NgcCookieConsentService.destroy'),
+      init: vi.fn().mockName('NgcCookieConsentService.init'),
+    };
+
     await TestBed.configureTestingModule({
       imports: [StatementCreatePageComponent],
-      providers: [{ provide: DocumentStore, useValue: documentStoreSpy }],
-    })
-      .overrideTemplate(StatementCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        { provide: DocumentStore, useValue: documentStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
+        { provide: NgcCookieConsentService, useValue: cookieConsentService },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(StatementCreatePageComponent);
     component = fixture.componentInstance;

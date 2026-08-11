@@ -13,8 +13,8 @@
           [dataSource]="dataSource"
           mat-table
           matSort
-          matSortActive="name"
-          matSortDirection="asc"
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
           matSortDisableClear
           multiTemplateDataRows
         >

@@ -8,6 +8,11 @@ import { EMPTY, Subject } from 'rxjs';
 
 import { ToastService } from './toast.service';
 import { ToastActionType, ToastType } from '../shared/toast/toast.model';
+import {
+  TOAST_ACTION,
+  TOAST_DATA,
+  TOAST_DISMISS,
+} from '@app/shared/toast/toast.component';
 
 describe('ToastService', () => {
   let service: ToastService;
@@ -155,7 +160,7 @@ describe('ToastService', () => {
         parent: injector,
         providers: [
           {
-            provide: 'TOAST_DATA',
+            provide: TOAST_DATA,
             useValue: expect.objectContaining({
               message,
               type,
@@ -164,8 +169,8 @@ describe('ToastService', () => {
               action,
             }),
           },
-          { provide: 'TOAST_DISMISS', useValue: expect.any(Subject) },
-          { provide: 'TOAST_ACTION', useValue: expect.any(Subject) },
+          { provide: TOAST_DISMISS, useValue: expect.any(Subject) },
+          { provide: TOAST_ACTION, useValue: expect.any(Subject) },
         ],
       });
     });
@@ -287,7 +292,7 @@ describe('ToastService', () => {
         expect.objectContaining({
           providers: expect.arrayContaining([
             {
-              provide: 'TOAST_DATA',
+              provide: TOAST_DATA,
               useValue: expect.objectContaining({
                 message,
                 type,

@@ -4,6 +4,9 @@ import { RoomCreatePageComponent } from './room-create-page.component';
 import { IRoomAll } from './room';
 import { RoomStore } from '../store/room.store';
 import { signal } from '@angular/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('RoomCreatePageComponent', () => {
   let component: RoomCreatePageComponent;
@@ -32,10 +35,13 @@ describe('RoomCreatePageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [RoomCreatePageComponent],
-      providers: [{ provide: RoomStore, useValue: roomStoreSpy }],
-    })
-      .overrideTemplate(RoomCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        provideNativeDateAdapter(),
+        { provide: RoomStore, useValue: roomStoreSpy },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RoomCreatePageComponent);
     component = fixture.componentInstance;
@@ -47,7 +53,7 @@ describe('RoomCreatePageComponent', () => {
 
   it('should clean, load room info, and load payment options on init', () => {
     expect(roomStoreSpy.clean).toHaveBeenCalled();
-    expect(roomStoreSpy.loadInfo).not.toHaveBeenCalled();
+    expect(roomStoreSpy.loadInfo).toHaveBeenCalled();
   });
 
   it('should call create when room is received', () => {

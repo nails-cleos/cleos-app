@@ -131,7 +131,7 @@ export class UserListComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(
+  readonly tableState = createMatTableState(
     this.paginator,
     this.sort,
     'displayName',
@@ -208,7 +208,7 @@ export class UserListComponent {
       });
     });
     this.tableState.resetOn(this.userStore.response, () =>
-      this.userStore.clean(),
+      this.userStore.clearResponse(),
     );
   }
 

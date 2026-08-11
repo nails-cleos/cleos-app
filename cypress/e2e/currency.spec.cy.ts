@@ -1,12 +1,10 @@
-import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Currency with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -27,7 +25,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name },
         alias: 'saveCurrency',
       });
-      cy.intercept('POST', '**/api/v1/currency').as('saveCurrency');
       cy.openMenu(breakpoints, ['Admin settings', 'Currency']);
       cy.wait('@getCurrencyList');
       cy.contains('.no-content', 'No currency', { timeout: 15000 }).should(
@@ -74,9 +71,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           body: { name },
           alias: 'updateCurrency',
         });
-        cy.intercept('PATCH', `**/api/v1/currency/${currency.id}`).as(
-          'updateCurrency',
-        );
 
         cy.buttonClickOnTable(
           breakpoints,

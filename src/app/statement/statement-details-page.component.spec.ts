@@ -7,6 +7,9 @@ import { StatementComponent } from './statement.component';
 import { IDocument } from '../document/document';
 import { OfficeStore } from '../store/office.store';
 import { DriveAccessService } from '../services/drive-access.service';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 describe('StatementDetailsPageComponent', () => {
   let component: StatementDetailsPageComponent;
   let fixture: ComponentFixture<StatementDetailsPageComponent>;
@@ -67,21 +70,14 @@ describe('StatementDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [StatementDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(StatementComponent, '')
-      .overrideTemplate(
-        StatementDetailsPageComponent,
-        `
-        @if (statement(); as statement) {
-          <app-statement [statement]="statement" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(StatementDetailsPageComponent);
 

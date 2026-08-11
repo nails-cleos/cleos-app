@@ -9,6 +9,8 @@ import { BlockAgendaComponent } from './block-agenda.component';
 import { AuthUserService } from '@app/services/auth-user.service';
 import { UserStore } from '@app/store/user.store';
 import { provideTranslateService } from '@ngx-translate/core';
+import { DateAdapter } from '@angular/material/core';
+import { provideRouter } from '@angular/router';
 describe('BlockAgendaDetailsPageComponent', () => {
   let component: BlockAgendaDetailsPageComponent;
   let fixture: ComponentFixture<BlockAgendaDetailsPageComponent>;
@@ -57,6 +59,7 @@ describe('BlockAgendaDetailsPageComponent', () => {
       imports: [BlockAgendaDetailsPageComponent],
       providers: [
         provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         {
@@ -69,18 +72,9 @@ describe('BlockAgendaDetailsPageComponent', () => {
             open: vi.fn().mockName('MatDialog.open'),
           },
         },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(BlockAgendaComponent, '')
-      .overrideTemplate(
-        BlockAgendaDetailsPageComponent,
-        `
-        @if (unavailable(); as unavailable) {
-          <app-block-agenda [unavailable]="unavailable" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaDetailsPageComponent);
     fixture.componentRef.setInput('id', id);

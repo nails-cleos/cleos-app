@@ -1,4 +1,3 @@
-import '../support/commands';
 import { Role } from '@app/interfaces/token';
 import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '@app/util/dates';
 import { devices } from '../support/utils';

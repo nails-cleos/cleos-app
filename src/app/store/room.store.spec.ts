@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { RoomService } from '../services/room.service';
 import { RoomStore } from './room.store';
@@ -24,10 +23,6 @@ describe('RoomStore', () => {
     updateServices: Mock;
     getAllCustomersInfo: Mock;
   };
-  let translateSpy: {
-    instant: Mock;
-    getCurrentLang: Mock;
-  };
 
   beforeEach(() => {
     navigationServiceSpy = {
@@ -45,22 +40,12 @@ describe('RoomStore', () => {
       updateServices: vi.fn().mockName('RoomService.updateServices'),
       getAllCustomersInfo: vi.fn().mockName('RoomService.getAllCustomersInfo'),
     };
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-      getCurrentLang: vi.fn().mockName('TranslateService.getCurrentLang'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
-    translateSpy.getCurrentLang.mockReturnValue(DEFAULT_LOCALE);
 
     TestBed.configureTestingModule({
       providers: [
         RoomStore,
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomService, useValue: roomServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -116,21 +101,30 @@ describe('RoomStore', () => {
 
     store.create({} as any);
     expect(store.response()).toEqual({
-      message: 'ROOM.CREATED:Room 1',
+      messageKey: 'ROOM.CREATED',
+      messageParams: {
+        name: 'Room 1',
+      },
       path: 'rooms/room-1',
       redirect: 'rooms',
     });
 
     store.update('room-1', {} as any);
     expect(store.response()).toEqual({
-      message: 'ROOM.UPDATED.MESSAGE:Room Updated',
+      messageKey: 'ROOM.UPDATED.MESSAGE',
+      messageParams: {
+        name: 'Room Updated',
+      },
       path: 'rooms/room-1',
       redirect: 'rooms',
     });
 
     store.delete({ id: 'room-1', address: { name: 'Main' } } as any);
     expect(store.response()).toEqual({
-      message: 'ROOM.DELETED.MESSAGE:',
+      messageKey: 'ROOM.DELETED.MESSAGE',
+      messageParams: {
+        name: '',
+      },
       reload: true,
       toastType: 'warning',
     });

@@ -1,14 +1,18 @@
 import { FilterByPipe } from './filterBy.pipe';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('FilterByPipe', () => {
-  const pipe = new FilterByPipe();
-
   const items = [
     { id: 1, name: 'Alice' },
     { id: 2, name: 'Bob' },
     { id: 3, name: 'Alice' },
   ];
+
+  let pipe: FilterByPipe;
+
+  beforeEach(() => {
+    pipe = new FilterByPipe();
+  });
 
   it('should filter by a single primitive value', () => {
     const result = pipe.transform(items, 'Alice', 'name');

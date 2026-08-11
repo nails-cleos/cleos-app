@@ -27,6 +27,9 @@ import { IReservation, IReservationAll } from '../reservation/reservation';
 import { ITreatmentAll } from '../treatment/treatment';
 import { IAdditionalAll } from '../additional/additional';
 import { fromZonedTime, toZonedTime } from 'date-fns-tz';
+import timezonesModule, {
+  type TimeZone as TimezonesListTimeZone,
+} from 'timezones-list';
 
 export const DEFAULT_LOCALE = 'en-GB';
 
@@ -35,6 +38,11 @@ export const LOCALE_MAP: Record<string, string> = {
   es: 'es-ES',
   nl: 'nl-NL',
 };
+
+export const TIMEZONES: TimezonesListTimeZone[] =
+  'default' in timezonesModule
+    ? (timezonesModule.default as TimezonesListTimeZone[])
+    : (timezonesModule as TimezonesListTimeZone[]);
 
 export interface IDuration {
   hour: number;

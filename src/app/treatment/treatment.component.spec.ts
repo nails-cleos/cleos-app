@@ -8,6 +8,9 @@ import { TreatmentStore } from '../store/treatment.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { provideRouter } from '@angular/router';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
@@ -58,16 +61,15 @@ describe('TreatmentComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TreatmentComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.overrideTemplate(
-      TreatmentComponent,
-      '<input #colorInput /> <input #nameInput />',
-    ).createComponent(TreatmentComponent);
+    fixture = TestBed.createComponent(TreatmentComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('config', config);
@@ -217,28 +219,52 @@ describe('TreatmentComponent', () => {
   });
 
   it('selectedColor should add selected color, remove it from allColorsWritableSignal and clear input', () => {
-    const g1 = { id: 'g1', name: 'G1' } as any;
+    const g1 = {
+      id: 'g1',
+      name: 'G1',
+      treatments: [],
+      selectedTreatments: [],
+    };
+
     colorStoreSpy.data.set({
       kind: 'list',
-      value: [g1, { id: 'g2', name: 'G2' } as any],
+      value: [
+        g1,
+        {
+          id: 'g2',
+          name: 'G2',
+          treatments: [],
+          selectedTreatments: [],
+        },
+      ],
     });
+
+    fixture.detectChanges();
+
     component.colorsSignal.set([]);
     component.allColorsWritableSignal.set([
       g1,
-      { id: 'g2', name: 'G2' } as any,
+      { id: 'g2', name: 'G2', treatments: [], selectedTreatments: [] },
     ]);
 
-    const event: any = { option: { value: g1 } };
-    component.colorInput()!.nativeElement.value = 'something';
+    const input = component.colorInput()?.nativeElement as HTMLInputElement;
+
+    input.value = 'something';
+
+    const event = {
+      option: { value: g1 },
+    } as MatAutocompleteSelectedEvent;
 
     component.selectedColor(event);
-    fixture.detectChanges();
 
-    expect(component.colorsSignal().some((g: any) => g.id === 'g1')).toBe(true);
+    expect(component.colorsSignal()).toContain(g1);
+
     expect(
-      component.allColorsWritableSignal()?.some((g: any) => g.id === 'g1'),
+      component.allColorsWritableSignal()?.some((g) => g.id === 'g1'),
     ).toBe(false);
+
     expect(component.getForm.color.value).toBeUndefined();
+    expect(input.value).toBe('');
   });
 
   it('should not show selected colors in filteredColorSignal', () => {

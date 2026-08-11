@@ -110,7 +110,7 @@ export class DiscountListComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(
+  readonly tableState = createMatTableState(
     this.paginator,
     this.sort,
     'name',

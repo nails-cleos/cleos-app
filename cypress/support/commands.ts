@@ -1,152 +1,164 @@
 /* eslint-disable camelcase */
 import { DEFAULT_LOCALE } from '@app/util/dates';
+import { MockApiOptions } from './types';
+import type { Method } from 'cypress/types/net-stubbing';
 
-declare namespace Cypress {
-  interface Chainable {
-    randomUUID(): Chainable<string>;
+declare global {
+  namespace Cypress {
+    interface Chainable {
+      logout(): Chainable<void>;
 
-    logout(): Chainable<any>;
+      checkAppDialog(
+        title: string,
+        message: string,
+        buttonClick: string,
+      ): Chainable<void>;
 
-    checkAppDialog(
-      title: string,
-      message: string,
-      buttonClick: string,
-    ): Chainable<any>;
+      checkMatList(
+        title?: string,
+        icon?: string,
+        ...details: string[]
+      ): Chainable<void>;
 
-    checkMatList(
-      title?: string,
-      icon?: string,
-      ...details: string[]
-    ): Chainable<any>;
+      openMenu(breakpoint: string, menus: string[]): Chainable<void>;
 
-    openMenu(breakpoint: string, menus: string[]): Chainable<any>;
+      buttonClickOnTable(
+        breakpoint: string,
+        column: string,
+        rowClass: string,
+        rowExpandedClass: string,
+        button: string,
+        otherButtons?: string[],
+      ): Chainable<void>;
 
-    buttonClickOnTable(
-      breakpoint: string,
-      column: string,
-      rowClass: string,
-      rowExpandedClass: string,
-      button: string,
-      otherButtons?: string[],
-    ): Chainable<any>;
+      selectOption(id: string, option: string): Chainable<void>;
 
-    selectOption(id: string, option: string): Chainable<any>;
+      selectChip(chipName: string): Chainable<void>;
 
-    selectChip(chipName: string): Chainable<any>;
+      formControlType(
+        formControlName: string,
+        value: any,
+        type?: string,
+      ): Chainable<void>;
 
-    formControlType(
-      formControlName: string,
-      value: any,
-      type?: string,
-    ): Chainable<any>;
+      setTime(hour: number | string, minute?: number | string): Chainable<void>;
 
-    setTime(hour: number | string, minute?: number | string): Chainable<any>;
+      mockAuthentication(email: string, role: string): Chainable<void>;
 
-    mockAuthentication(email: string, role: string): Chainable<any>;
+      mockLogin(
+        email: string,
+        displayName: string,
+        role: string,
+        emailVerified?: boolean,
+      ): Chainable<void>;
 
-    mockLogin(
-      email: string,
-      displayName: string,
-      role: string,
-      emailVerified?: boolean,
-    ): Chainable<any>;
+      mockFirebaseAppCheck(): Chainable<void>;
 
-    mockFirebaseAppCheck(): Chainable<any>;
+      mockCreateAuthUri(
+        registered: boolean,
+        methods: string[],
+      ): Chainable<void>;
 
-    mockCreateAuthUri(registered: boolean, methods: string[]): Chainable<any>;
+      mockFetchSignInMethodsForEmail(methods: string[]): Chainable<void>;
 
-    mockFetchSignInMethodsForEmail(methods: string[]): Chainable<any>;
+      mockFirebase(email: string, emailVerified?: boolean): Chainable<void>;
 
-    mockFirebase(email: string, emailVerified?: boolean): Chainable<any>;
+      mockNotifications(): Chainable<void>;
 
-    mockNotifications(): Chainable<any>;
+      mockCatalogues(): Chainable<void>;
 
-    mockCatalogues(): Chainable<any>;
+      mockCustomerReservations(): Chainable<void>;
 
-    mockCustomerReservations(): Chainable<any>;
+      mockMeReservations(
+        reservationId: string,
+        reservationDate: Date,
+        customerId: string,
+        roomId: string,
+        professionalId: string,
+        treatmentId: string,
+        additionalIds: string[],
+      ): Chainable<void>;
 
-    mockMeReservations(
-      reservationId: string,
-      reservationDate: Date,
-      customerId: string,
-      roomId: string,
-      professionalId: string,
-      treatmentId: string,
-      additionalIds: string[],
-    ): Chainable<any>;
+      mockMeReservationFlow(
+        reservationId: string,
+        reservationDate: Date,
+        customerId: string,
+        roomId: string,
+        professionalId: string,
+        treatmentId: string,
+        groupId: string,
+      ): Chainable<void>;
 
-    mockMeReservationFlow(
-      reservationId: string,
-      reservationDate: Date,
-      customerId: string,
-      roomId: string,
-      professionalId: string,
-      treatmentId: string,
-      groupId: string,
-    ): Chainable<any>;
+      mockAdminDashboard(date: Date, displayName: string): Chainable<void>;
 
-    mockAdminDashboard(date: Date, displayName: string): Chainable<any>;
+      mockRoomAdminDashboard(date: Date, displayName: string): Chainable<void>;
 
-    mockRoomAdminDashboard(date: Date, displayName: string): Chainable<any>;
+      mockCustomersData(
+        customerId: string,
+        treatmentId: string,
+      ): Chainable<void>;
 
-    mockCustomersData(customerId: string, treatmentId: string): Chainable<any>;
+      mockRoomData(customerId: string): Chainable<void>;
 
-    mockRoomData(customerId: string): Chainable<any>;
+      mockSearch(
+        customerId: string,
+        roomId: string,
+        groupId: string,
+        professionalId: string,
+        date: Date,
+        days: number,
+      ): Chainable<void>;
 
-    mockSearch(
-      customerId: string,
-      roomId: string,
-      groupId: string,
-      professionalId: string,
-      date: Date,
-      days: number,
-    ): Chainable<any>;
+      mockCreateReservation(
+        reservationId: string,
+        customerId: string,
+        date: Date,
+        professionalId: string,
+        roomId: string,
+        treatmentId: string,
+        additionalList?: string[],
+      ): Chainable<void>;
 
-    mockCreateReservation(
-      reservationId: string,
-      customerId: string,
-      date: Date,
-      professionalId: string,
-      roomId: string,
-      treatmentId: string,
-      additionalList?: string[],
-    ): Chainable<any>;
+      mockUsers(total?: number, displayName?: string): Chainable<void>;
 
-    mockUsers(total?: number, displayName?: string): Chainable<any>;
+      mockUser(id: string, selectedUser?: any): Chainable<void>;
 
-    mockUser(id: string, selectedUser?: any): Chainable<any>;
+      mockTreatments(
+        page: boolean,
+        total?: number,
+        id?: string,
+      ): Chainable<void>;
 
-    mockTreatments(page: boolean, total?: number, id?: string): Chainable<any>;
+      mockAdditionalList(total?: number, id?: string): Chainable<void>;
 
-    mockAdditionalList(total?: number, id?: string): Chainable<any>;
+      mockDiscounts(total?: number, id?: string): Chainable<void>;
 
-    mockDiscounts(total?: number, id?: string): Chainable<any>;
+      mockColors(page: boolean, total?: number, id?: string): Chainable<void>;
 
-    mockColors(page: boolean, total?: number, id?: string): Chainable<any>;
+      mockCurrencyList(
+        page: boolean,
+        total?: number,
+        id?: string,
+      ): Chainable<void>;
 
-    mockCurrencyList(
-      page: boolean,
-      total?: number,
-      id?: string,
-    ): Chainable<any>;
+      mockTreatment(id: string, selectedTreatment?: any): Chainable<void>;
 
-    mockTreatment(id: string, selectedTreatment?: any): Chainable<any>;
+      mockAdditional(id: string, selectedAdditional?: any): Chainable<void>;
 
-    mockAdditional(id: string, selectedAdditional?: any): Chainable<any>;
+      mockDiscount(id: string, selectedDiscount?: any): Chainable<void>;
 
-    mockDiscount(id: string, selectedAdditional?: any): Chainable<any>;
+      mockColor(id: string, selectedColor?: any): Chainable<void>;
 
-    mockApi(
-      method: HttpMethod,
-      url: string,
-      options: MockApiOptions,
-    ): Chainable<any>;
+      mockCurrency(id: string, selectedCurrency?: any): Chainable<void>;
 
-    mockColor(id: string, selectedColor?: any): Chainable<any>;
+      mockPaymentOptions(): Chainable<void>;
 
-    mockCurrency(id: string, selectedCurrency?: any): Chainable<any>;
-
-    mockPaymentOptions(): Chainable<any>;
+      mockApi(
+        method: Method,
+        url: string,
+        options: MockApiOptions,
+      ): Chainable<void>;
+    }
   }
 }
 
@@ -172,16 +184,6 @@ const clickVisibleMenuItem = (selector: string, label: string) => {
       cy.wrap($menu).click({ force: true });
     });
 };
-
-Cypress.Commands.add('randomUUID', () =>
-  cy.wrap(
-    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0,
-        v = c === 'x' ? r : (r & 0x3) | 0x8;
-      return v.toString(16);
-    }),
-  ),
-);
 
 Cypress.Commands.add('logout', () => {
   cy.window({ log: false }).then((win) => {
@@ -372,12 +374,11 @@ Cypress.Commands.add(
       .within(() => {
         cy.contains('.clock-face__number', hourLabel).click({ force: true });
         cy.contains('.clock-face__number', minuteLabel).click({ force: true });
-        cy.contains('.timepicker__actions button', /^ok$/i).click({
+        cy.contains('.timepicker__actions button', /^\s*OK\s*$/i).click({
           force: true,
         });
       });
-
-    cy.wait(50);
+    cy.get('.clock-timepicker-panel').should('not.exist');
   },
 );
 
@@ -1680,16 +1681,9 @@ Cypress.Commands.add('mockPaymentOptions', () => {
   }).as('getPaymentOptions');
 });
 
-type HttpMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE';
-
-interface MockApiOptions {
-  alias: string;
-  body?: any;
-}
-
 Cypress.Commands.add(
   'mockApi',
-  (method: HttpMethod, url: string, options: MockApiOptions) => {
+  (method: Method, url: string, options: MockApiOptions) => {
     const { body, alias } = options;
 
     cy.intercept(method, url, (req) => {

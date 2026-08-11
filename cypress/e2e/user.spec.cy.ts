@@ -1,4 +1,3 @@
-import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
@@ -51,9 +50,8 @@ const setColorInput = (dataCy: string, value: string) => {
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Users with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -70,7 +68,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           body: { name: value.displayName },
           alias: 'saveUser',
         });
-        cy.intercept('POST', `**/api/v1/${value.url}`).as('saveUser');
 
         cy.mockUsers(0);
         cy.openMenu(breakpoints, ['App settings', 'Users']);
@@ -133,7 +130,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             body: { name: value.displayName },
             alias: 'updateUser',
           });
-          cy.intercept('PATCH', `**/api/v1/users/${user.id}`).as('updateUser');
           cy.mockUser(user.id, user);
 
           cy.buttonClickOnTable(
@@ -185,15 +181,22 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.get('td[data-mat-row="1"][data-mat-col="1"]')
             .find('button')
             .click({ force: true });
-          cy.wait(50);
+
+          cy.get('td[data-mat-row="1"][data-mat-col="1"]')
+            .find('button')
+            .should('be.visible');
           cy.get('td[data-mat-row="1"][data-mat-col="1"]')
             .find('button')
             .click({ force: true });
-          cy.wait(50);
+
+          cy.get('td[data-mat-row="1"][data-mat-col="1"]')
+            .find('button')
+            .should('be.visible');
           cy.get('td[data-mat-row="1"][data-mat-col="1"]')
             .find('button')
             .click({ force: true });
-          cy.wait(50);
+
+          cy.get('[data-cy="dob-picker"]').should('not.have.value', '');
 
           cy.get('button[type="submit"]').click({ force: true });
 

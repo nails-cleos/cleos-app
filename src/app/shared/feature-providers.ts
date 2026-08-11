@@ -4,36 +4,31 @@ import {
   makeEnvironmentProviders,
   provideEnvironmentInitializer,
 } from '@angular/core';
-import {
-  provideChildTranslateService,
-  provideMissingTranslationHandler,
-  provideTranslateLoader,
-  TranslateService,
-} from '@ngx-translate/core';
-import {
-  MissingTranslateHandler,
-  TranslateLoaderFactory,
-} from './translate-loader.factory';
+import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
+import { TranslateLoaderFactory } from './translate-loader.factory';
 
 export const provideFeatureTranslations = (scope: string) =>
   makeEnvironmentProviders([
-    provideChildTranslateService({
-      loader: provideTranslateLoader(TranslateLoaderFactory.forModule(scope)),
-      missingTranslationHandler: provideMissingTranslationHandler(
-        MissingTranslateHandler,
-      ),
-    }),
     provideEnvironmentInitializer(() => {
       const navigationService = inject(NavigationService);
       const translateService = inject(TranslateService);
 
-      effect(() => {
+      effect((onCleanup) => {
         const lang = navigationService.language$();
 
-        if (lang) {
-          translateService.use(lang);
+        if (!lang) {
+          return;
         }
+
+        const subscription = TranslateLoaderFactory.loadJson(
+          scope,
+          lang,
+        ).subscribe((translations) => {
+          translateService.setTranslation(lang, translations, true);
+        });
+
+        onCleanup(() => subscription.unsubscribe());
       });
     }),
   ]);

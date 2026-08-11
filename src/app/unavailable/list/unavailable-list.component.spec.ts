@@ -143,6 +143,9 @@ describe('UnavailableListComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     translateService = TestBed.inject(TranslateService);
@@ -163,9 +166,7 @@ describe('UnavailableListComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    breakpoint$.complete();
-  });
+  afterEach(() => breakpoint$.complete());
 
   it('should create', () => {
     expect(component).toBeTruthy();

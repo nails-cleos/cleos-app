@@ -129,6 +129,9 @@ export class FirebaseService {
   }
 
   logEvent(name: string, params?: Record<string, any>): void {
-    this.sdk.logEvent(this.sdk.analytics, name, params);
+    const analytics = this.sdk.analytics;
+    if (analytics) {
+      this.sdk.logEvent(analytics, name, params);
+    }
   }
 }

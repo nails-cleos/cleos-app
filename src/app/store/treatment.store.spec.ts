@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 import { ColorService } from '../services/color.service';
 import { TreatmentService } from '../services/treatment.service';
@@ -22,9 +21,6 @@ describe('TreatmentStore', () => {
   };
   let colorServiceSpy: {
     getAllColors: Mock;
-  };
-  let translateSpy: {
-    instant: Mock;
   };
 
   beforeEach(() => {
@@ -52,20 +48,12 @@ describe('TreatmentStore', () => {
     colorServiceSpy = {
       getAllColors: vi.fn().mockName('ColorService.getAllColors'),
     };
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
 
     TestBed.configureTestingModule({
       providers: [
         TreatmentStore,
         { provide: TreatmentService, useValue: treatmentServiceSpy },
         { provide: ColorService, useValue: colorServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -123,27 +111,34 @@ describe('TreatmentStore', () => {
 
     store.create({ name: 'Hands' } as any);
     expect(store.response()).toEqual({
-      message: 'TREATMENT.CREATED:Hands',
+      messageKey: 'TREATMENT.CREATED',
+      messageParams: { name: 'Hands' },
       path: 'treatments/group-1/view',
       redirect: 'treatments',
     });
 
     store.update('group-1', { name: 'Feet' } as any);
     expect(store.response()).toEqual({
-      message: 'TREATMENT.UPDATED.MESSAGE:Feet',
+      messageKey: 'TREATMENT.UPDATED.MESSAGE',
+      messageParams: { name: 'Feet' },
       path: 'treatments/group-1/view',
       redirect: 'treatments',
     });
 
     store.sortTreatments([{ key: 'treatment-1', order: 1 }]);
-    expect(store.response()).toEqual({ message: 'TREATMENT.SORTED.MESSAGE:' });
+    expect(store.response()).toEqual({
+      messageKey: 'TREATMENT.SORTED.MESSAGE',
+    });
 
     store.sortGroups([{ key: 'group-1', order: 1 }]);
-    expect(store.response()).toEqual({ message: 'TREATMENT.SORTED.MESSAGE:' });
+    expect(store.response()).toEqual({
+      messageKey: 'TREATMENT.SORTED.MESSAGE',
+    });
 
     store.delete('group-1', 'Hands');
     expect(store.response()).toEqual({
-      message: 'TREATMENT.DELETED.MESSAGE:Hands',
+      messageKey: 'TREATMENT.DELETED.MESSAGE',
+      messageParams: { name: 'Hands' },
       reload: true,
       toastType: 'warning',
     });

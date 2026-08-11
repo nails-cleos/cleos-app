@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ICatalogueAll } from './catalogue';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('CatalogueCreatePageComponent', () => {
   let component: CatalogueCreatePageComponent;
@@ -33,10 +36,13 @@ describe('CatalogueCreatePageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [CatalogueCreatePageComponent],
-      providers: [{ provide: CatalogueStore, useValue: catalogueStoreSpy }],
-    })
-      .overrideTemplate(CatalogueCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        { provide: CatalogueStore, useValue: catalogueStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueCreatePageComponent);
     component = fixture.componentInstance;

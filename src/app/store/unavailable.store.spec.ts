@@ -2,7 +2,6 @@ import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { UnavailableStore } from './unavailable.store';
@@ -17,9 +16,6 @@ describe('UnavailableStore', () => {
     createBlockAgenda: Mock;
     updateUnavailable: Mock;
     deleteUnavailable: Mock;
-  };
-  let translateSpy: {
-    instant: Mock;
   };
 
   beforeEach(() => {
@@ -42,19 +38,10 @@ describe('UnavailableStore', () => {
         .mockName('UnavailableService.deleteUnavailable'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, any>) =>
-        `${key}:${params?.['date'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         UnavailableStore,
         { provide: UnavailableService, useValue: serviceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -105,7 +92,8 @@ describe('UnavailableStore', () => {
     expect(serviceSpy.createUnavailable).toHaveBeenCalled();
 
     expect(store.response()).toEqual({
-      message: `UNAVAILABLE.CREATED:${date}`,
+      messageKey: 'UNAVAILABLE.CREATED',
+      messageParams: { date },
       path: 'dashboard/events',
       redirect: 'unavailable',
     });
@@ -122,7 +110,8 @@ describe('UnavailableStore', () => {
     store.create({} as any, false);
 
     expect(store.response()).toEqual({
-      message: `UNAVAILABLE.CREATED:${date}`,
+      messageKey: 'UNAVAILABLE.CREATED',
+      messageParams: { date },
       path: 'unavailable/2',
       redirect: 'unavailable',
     });
@@ -137,7 +126,8 @@ describe('UnavailableStore', () => {
     store.createBlockAgenda({} as any, false);
 
     expect(store.response()).toEqual({
-      message: `UNAVAILABLE.CREATED:${date}`,
+      messageKey: 'UNAVAILABLE.CREATED',
+      messageParams: { date },
       path: 'unavailable/block-agenda/3',
       redirect: 'unavailable',
     });
@@ -152,7 +142,8 @@ describe('UnavailableStore', () => {
     store.update('u1', {} as any, 'unavailable');
 
     expect(store.response()).toEqual({
-      message: `UNAVAILABLE.UPDATED.MESSAGE:${date}`,
+      messageKey: 'UNAVAILABLE.UPDATED.MESSAGE',
+      messageParams: { date },
       path: 'unavailable/u1',
       redirect: 'unavailable',
     });
@@ -169,7 +160,8 @@ describe('UnavailableStore', () => {
     expect(serviceSpy.deleteUnavailable).toHaveBeenCalledWith('u1');
 
     expect(store.response()).toEqual({
-      message: `UNAVAILABLE.DELETED.MESSAGE:${date}`,
+      messageKey: 'UNAVAILABLE.DELETED.MESSAGE',
+      messageParams: { date },
       reload: true,
       toastType: 'warning',
     });

@@ -22,7 +22,6 @@ import {
 import { Pagination } from '../interfaces/pagination';
 import { HttpErrorResponse } from '@angular/common/http';
 import { newDateTimestamp } from '../util/dates';
-import { TranslateService } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { IReview } from '../me/reservation/list/review';
 import { Role } from '../interfaces/token';
@@ -110,7 +109,6 @@ export const ReservationStore = signalStore(
       reservationService = inject(ReservationService),
       navigationService = inject(NavigationService),
       dashboardStore = inject(DashboardStore),
-      translateService = inject(TranslateService),
     ) => {
       let loadPageSubscription: Subscription | undefined;
       let loadAllFilteredSubscription: Subscription | undefined;
@@ -161,7 +159,8 @@ export const ReservationStore = signalStore(
 
       const navigate = (
         role: Role,
-        message: string,
+        messageKey: string,
+        messageParams?: Record<string, unknown>,
         id?: string,
         paymentLink?: string,
         deleted: boolean = false,
@@ -169,7 +168,7 @@ export const ReservationStore = signalStore(
       ) => {
         const path = id ? `reservation/${id}` : undefined;
         patchState(store, {
-          response: { message, toastType, path },
+          response: { messageKey, messageParams, toastType, path },
           isLoading: false,
         });
         let navigation: string[] = [];
@@ -192,16 +191,15 @@ export const ReservationStore = signalStore(
 
       const stateSuccess = (
         id: string,
-        key: string,
+        messageKey: string,
         isDashboard: boolean = false,
         paymentLink?: string,
         state?: States,
         date?: Date,
       ) => {
-        const message = translateService.instant(key);
         const currentSelected = store.selected();
         patchState(store, {
-          response: { message },
+          response: { messageKey },
           isLoading: false,
           ...(state &&
             currentSelected && {
@@ -454,16 +452,19 @@ export const ReservationStore = signalStore(
             .subscribe({
               next: (responses) => {
                 responses.forEach((response) => {
-                  const message = translateService.instant(
+                  const messageParams = {
+                    date: newDateTimestamp(
+                      response.timestamp,
+                      response.timeZone,
+                    ),
+                  };
+                  navigate(
+                    role,
                     'COMMON.RESERVATION.CREATED',
-                    {
-                      date: newDateTimestamp(
-                        response.timestamp,
-                        response.timeZone,
-                      ),
-                    },
+                    messageParams,
+                    response.id,
+                    response.paymentLink,
                   );
-                  navigate(role, message, response.id, response.paymentLink);
                 });
               },
 
@@ -479,16 +480,16 @@ export const ReservationStore = signalStore(
             .updateReservationById(id, reservation)
             .subscribe({
               next: (response) => {
-                const message = translateService.instant(
+                const messageParams = {
+                  date: newDateTimestamp(response.timestamp, response.timeZone),
+                };
+                navigate(
+                  role,
                   'COMMON.RESERVATION.UPDATED.MESSAGE',
-                  {
-                    date: newDateTimestamp(
-                      response.timestamp,
-                      response.timeZone,
-                    ),
-                  },
+                  messageParams,
+                  response.id,
+                  response.paymentLink,
                 );
-                navigate(role, message, response.id, response.paymentLink);
               },
 
               error: patchError,
@@ -569,13 +570,10 @@ export const ReservationStore = signalStore(
             .deleteReservation(id)
             .subscribe({
               next: () => {
-                const message = translateService.instant(
-                  'RESERVATION.DELETED.MESSAGE',
-                  { date: newDateTimestamp(timestamp, timeZone) },
-                );
                 navigate(
                   Role.professional,
-                  message,
+                  'RESERVATION.DELETED.MESSAGE',
+                  { date: newDateTimestamp(timestamp, timeZone) },
                   id,
                   undefined,
                   true,
@@ -594,11 +592,7 @@ export const ReservationStore = signalStore(
           createReviewSubscription = reservationService
             .createReview(review)
             .subscribe({
-              next: () =>
-                navigate(
-                  Role.customer,
-                  translateService.instant('ME.REVIEW.CREATED'),
-                ),
+              next: () => navigate(Role.customer, 'ME.REVIEW.CREATED'),
               error: patchError,
             });
         },
@@ -629,13 +623,10 @@ export const ReservationStore = signalStore(
             .updateReservationNote(id, note, customerNote)
             .subscribe({
               next: (response) => {
-                const message = translateService.instant(
-                  'COMMON.RESERVATION.UPDATED.MESSAGE',
-                  { date: newDateTimestamp(timestamp, timeZone) },
-                );
                 navigate(
                   role,
-                  message,
+                  'COMMON.RESERVATION.UPDATED.MESSAGE',
+                  { date: newDateTimestamp(timestamp, timeZone) },
                   response.id,
                   response.paymentLink || paymentLink,
                 );
@@ -666,7 +657,8 @@ export const ReservationStore = signalStore(
             .updateReservationDiscount(id, discountId)
             .subscribe({
               next: (response) => {
-                const message = translateService.instant(
+                navigate(
+                  Role.professional,
                   'COMMON.RESERVATION.UPDATED.MESSAGE',
                   {
                     date: newDateTimestamp(
@@ -674,10 +666,6 @@ export const ReservationStore = signalStore(
                       response.timeZone,
                     ),
                   },
-                );
-                navigate(
-                  Role.professional,
-                  message,
                   response.id,
                   response.paymentLink,
                 );
@@ -699,7 +687,8 @@ export const ReservationStore = signalStore(
             .updateReservationTimestamp(id, start)
             .subscribe({
               next: (response) => {
-                const message = translateService.instant(
+                navigate(
+                  role,
                   'COMMON.RESERVATION.UPDATED.MESSAGE',
                   {
                     date: newDateTimestamp(
@@ -707,8 +696,9 @@ export const ReservationStore = signalStore(
                       timeZone ?? response.timeZone,
                     ),
                   },
+                  response.id,
+                  response.paymentLink,
                 );
-                navigate(role, message, response.id, response.paymentLink);
               },
               error: patchError,
             });

@@ -6,6 +6,9 @@ import { ICatalogueAll } from './catalogue';
 import { signal } from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
 import { TreatmentStore } from '../store/treatment.store';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('CatalogueDetailsPageComponent', () => {
   let component: CatalogueDetailsPageComponent;
@@ -54,20 +57,13 @@ describe('CatalogueDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CatalogueDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(CatalogueComponent, '')
-      .overrideTemplate(
-        CatalogueDetailsPageComponent,
-        `
-        @if (catalogue(); as catalogue) {
-          <app-catalogue [undoImage]="true" [catalogue]="catalogue" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueDetailsPageComponent);
     fixture.componentRef.setInput('id', id);

@@ -11,6 +11,8 @@ import { AdditionalComponent } from './additional.component';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { TreatmentStore } from '../store/treatment.store';
 import { provideTranslateService } from '@ngx-translate/core';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { provideRouter } from '@angular/router';
 
 describe('AdditionalComponent', () => {
   let component: AdditionalComponent;
@@ -72,16 +74,14 @@ describe('AdditionalComponent', () => {
       imports: [AdditionalComponent],
       providers: [
         provideTranslateService(),
+        provideRouter([]),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreStoreSpy },
       ],
     }).compileComponents();
 
-    fixture = TestBed.overrideTemplate(
-      AdditionalComponent,
-      '<input #groupInput />',
-    ).createComponent(AdditionalComponent);
+    fixture = TestBed.createComponent(AdditionalComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('config', config);
@@ -220,39 +220,68 @@ describe('AdditionalComponent', () => {
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
     ]);
+
     component.allGroupsWritableSignal.set([{ id: 'g3', name: 'G3' } as any]);
-    fixture.detectChanges();
 
     component.remove(component.groupsSignal()[1]);
-    fixture.detectChanges();
 
-    expect(component.groupsSignal().length).toBe(1);
-    expect(
-      component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g2'),
-    ).toBe(true);
+    expect(component.groupsSignal()).toEqual([{ id: 'g1', name: 'G1' }]);
+
+    expect(component.allGroupsWritableSignal()).toEqual([
+      { id: 'g3', name: 'G3' },
+      { id: 'g2', name: 'G2' },
+    ]);
+
     expect(component.getForm.group.value).toBeUndefined();
   });
 
   it('selectedGroup should add selected group, remove it from allGroupsWritableSignal and clear input', () => {
-    const g1 = { id: 'g1', name: 'G1' } as any;
+    const g1 = {
+      id: 'g1',
+      name: 'G1',
+      treatments: [],
+      selectedTreatments: [],
+    };
+
+    treatmentStoreStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        g1,
+        {
+          id: 'g2',
+          name: 'G2',
+          treatments: [],
+          selectedTreatments: [],
+        },
+      ],
+    });
+
+    fixture.detectChanges();
+
     component.groupsSignal.set([]);
     component.allGroupsWritableSignal.set([
       g1,
-      { id: 'g2', name: 'G2' } as any,
+      { id: 'g2', name: 'G2', treatments: [], selectedTreatments: [] },
     ]);
 
-    const event: any = { option: { value: g1 } };
+    const input = component.groupInput().nativeElement as HTMLInputElement;
 
-    component.groupInput().nativeElement.value = 'something';
+    input.value = 'something';
+
+    const event = {
+      option: { value: g1 },
+    } as MatAutocompleteSelectedEvent;
 
     component.selectedGroup(event);
-    fixture.detectChanges();
 
-    expect(component.groupsSignal().some((g: any) => g.id === 'g1')).toBe(true);
+    expect(component.groupsSignal()).toContain(g1);
+
     expect(
-      component.allGroupsWritableSignal()?.some?.((g: any) => g.id === 'g1'),
+      component.allGroupsWritableSignal()?.some((g) => g.id === 'g1'),
     ).toBe(false);
+
     expect(component.getForm.group.value).toBeUndefined();
+    expect(input.value).toBe('');
   });
 
   it('sortGroups should sort alphabetically ignoring case', () => {

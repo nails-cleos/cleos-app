@@ -7,6 +7,7 @@ import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountDetailsPageComponent', () => {
   let component: DiscountDetailsPageComponent;
@@ -47,20 +48,11 @@ describe('DiscountDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DiscountDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
       ],
-    })
-      .overrideTemplate(DiscountComponent, '')
-      .overrideTemplate(
-        DiscountDetailsPageComponent,
-        `
-        @if (discount(); as discount) {
-          <app-discount [discount]="discount" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountDetailsPageComponent);
 

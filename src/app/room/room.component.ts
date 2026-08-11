@@ -36,12 +36,13 @@ import { ICurrencyAll } from '../currency/currency';
 import { IOfficeAll } from '../office/office';
 import { MatListOption, MatSelectionList } from '@angular/material/list';
 import { IPaymentOption } from '../interfaces/payment';
-import timezones, { TimeZone } from 'timezones-list';
+import { TimeZone } from 'timezones-list';
 import {
   createDate,
   createDateFromString,
   getCurrentTimeZone,
   getTimeZone,
+  TIMEZONES,
 } from '../util/dates';
 import {
   MatAutocomplete,
@@ -163,6 +164,7 @@ export class RoomComponent {
   private professionalsSignal = this.roomStore.professionals;
   private subErrorsSignal = this.roomStore.subErrors;
   private paymentOptionsSignal = this.paymentStore.options;
+  private readonly timezones = TIMEZONES;
 
   errors = signal<Record<string, unknown>>({});
 
@@ -185,7 +187,7 @@ export class RoomComponent {
       validators: [Validators.required, requireMatch],
     }),
     timeZone: this.formBuilder.control(
-      timezones.find(
+      this.timezones.find(
         (timeZone) =>
           timeZone.label
             .toLowerCase()
@@ -286,19 +288,17 @@ export class RoomComponent {
       map((value) => (typeof value === 'string' ? value : value?.label)),
       map((name) =>
         name
-          ? this.filterTimeZone(name, timezones)
-          : timezones
-            ? timezones.slice()
-            : timezones,
+          ? this.filterTimeZone(name, this.timezones)
+          : this.timezones.slice(),
       ),
     ),
   );
 
-  paymentOptions = computed(() =>
-    this.paymentOptionsSignal().filter(
+  paymentOptions = computed(() => {
+    return this.paymentOptionsSignal().filter(
       (option) => option.enabled && option.show,
-    ),
-  );
+    );
+  });
 
   private availabilities: IAvailability[] = [];
   private paymentTypes: string[] = [];
@@ -324,7 +324,7 @@ export class RoomComponent {
     effect(() => {
       const selected = this.room();
       if (selected) {
-        const timeZone = timezones.find(
+        const timeZone = this.timezones.find(
           (timeZone) =>
             timeZone.label
               .toLowerCase()

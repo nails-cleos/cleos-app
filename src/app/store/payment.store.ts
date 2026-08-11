@@ -149,7 +149,7 @@ export const PaymentStore = signalStore(
               next: () =>
                 patchState(store, {
                   response: {
-                    message: translateService.instant('PAYMENT.RECREATE'),
+                    messageKey: 'PAYMENT.RECREATE',
                   },
                   isLoading: false,
                 }),
@@ -176,29 +176,40 @@ export const PaymentStore = signalStore(
               next: (response) => {
                 const path = response.paths?.join('/');
                 let subErrors;
-                let message;
+                let messageKey;
+                let messageParams;
                 let toastType: ToastType = 'success';
                 switch (response.status) {
                   case 'approved':
-                    message = translateService.instant(
-                      'COMMON.PAYMENT.SUCCESS',
-                    );
+                    messageKey = 'COMMON.PAYMENT.SUCCESS';
                     break;
                   case 'pending':
-                    message = translateService.instant(
-                      'COMMON.PAYMENT.PENDING',
-                    );
+                    messageKey = 'COMMON.PAYMENT.PENDING';
                     break;
                   default:
-                    message = translateService.instant('ME.PAYMENT.ERROR', {
+                    messageKey = 'ME.PAYMENT.ERROR';
+                    messageParams = {
                       reason: response.message,
-                    });
-                    subErrors = [{ message }];
+                    };
+                    subErrors = [
+                      {
+                        message: translateService.instant(
+                          messageKey,
+                          messageParams,
+                        ),
+                      },
+                    ];
                     toastType = 'error';
                     break;
                 }
                 patchState(store, {
-                  response: { message, path, toastType, redirect: path },
+                  response: {
+                    messageKey,
+                    messageParams,
+                    path,
+                    toastType,
+                    redirect: path,
+                  },
                   subErrors,
                   isLoading: false,
                 });
@@ -226,31 +237,36 @@ export const PaymentStore = signalStore(
             .subscribe({
               next: (response) => {
                 let subErrors;
-                let message;
+                let messageKey;
+                let messageParams;
                 let toastType: ToastType = 'success';
                 let reload = false;
                 switch (response.status) {
                   case 'approved':
-                    message = translateService.instant(
-                      'COMMON.PAYMENT.SUCCESS',
-                    );
+                    messageKey = 'COMMON.PAYMENT.SUCCESS';
                     reload = true;
                     break;
                   case 'pending':
-                    message = translateService.instant(
-                      'COMMON.PAYMENT.PENDING',
-                    );
+                    messageKey = 'COMMON.PAYMENT.PENDING';
                     break;
                   default:
-                    message = translateService.instant('COMMON.PAYMENT.ERROR', {
+                    messageKey = 'COMMON.PAYMENT.ERROR';
+                    messageParams = {
                       reason: response.message,
-                    });
-                    subErrors = [{ message }];
+                    };
+                    subErrors = [
+                      {
+                        message: translateService.instant(
+                          messageKey,
+                          messageParams,
+                        ),
+                      },
+                    ];
                     toastType = 'error';
                     break;
                 }
                 patchState(store, {
-                  response: { message, toastType, reload },
+                  response: { messageKey, messageParams, toastType, reload },
                   subErrors,
                   isLoading: false,
                 });
@@ -284,7 +300,7 @@ export const PaymentStore = signalStore(
               next: () =>
                 patchState(store, {
                   response: {
-                    message: translateService.instant('COMMON.PAYMENT.SUCCESS'),
+                    messageKey: 'COMMON.PAYMENT.SUCCESS',
                     reload: true,
                   },
                   isLoading: false,
@@ -302,7 +318,7 @@ export const PaymentStore = signalStore(
 
         getOptions(): void {
           optionsSubscription?.unsubscribe();
-          patchState(store, { options: undefined, isLoading: true });
+          patchState(store, { options: [], isLoading: true });
 
           optionsSubscription = paymentService.getPaymentOptions().subscribe({
             next: (options) => patchState(store, { options, isLoading: false }),

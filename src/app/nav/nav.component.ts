@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   effect,
@@ -7,7 +8,6 @@ import {
   inject,
   signal,
   untracked,
-  ChangeDetectionStrategy,
 } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
@@ -274,14 +274,16 @@ export class NavComponent {
         URL.revokeObjectURL(url);
       }
 
-      if (response.message) {
+      const message = response.messageKey
+        ? this.translateService.instant(
+            response.messageKey,
+            response.messageParams,
+          )
+        : response.message;
+
+      if (message) {
         const options = this.getToastOptions(response);
-        this.toastService.show(
-          response.message,
-          response.toastType,
-          5000,
-          options,
-        );
+        this.toastService.show(message, response.toastType, 5000, options);
         if (response.reload) {
           this.navigationService.reload();
         }

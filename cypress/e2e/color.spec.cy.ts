@@ -1,12 +1,10 @@
-import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Color with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -25,7 +23,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name: colorName },
         alias: 'saveColor',
       });
-      cy.intercept('POST', '**/api/v1/colors').as('saveColor');
       cy.openMenu(breakpoints, ['App settings', 'Color']);
       cy.wait('@getColors');
       cy.contains('.no-content', 'No Color', { timeout: 15000 }).should(
@@ -64,7 +61,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           body: { name: colorName },
           alias: 'updateColor',
         });
-        cy.intercept('PATCH', `**/api/v1/colors/${color.id}`).as('updateColor');
 
         cy.buttonClickOnTable(
           breakpoints,

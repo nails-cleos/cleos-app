@@ -36,8 +36,8 @@
           [dataSource]="dataSource"
           mat-table
           matSort
-          matSortActive="displayName"
-          matSortDirection="asc"
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
           matSortDisableClear
           multiTemplateDataRows
         >
@@ -318,7 +318,7 @@
               mat-footer-cell
             >
               {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{
-                getForm.filter
+                getForm.filter.value
               }}'
             </td>
           </ng-container>

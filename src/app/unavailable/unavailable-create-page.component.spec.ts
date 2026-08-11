@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { UnavailableCreatePageComponent } from './unavailable-create-page.component';
 import { UnavailableStore } from '../store/unavailable.store';
 import { IUnavailableAll } from './unavailable';
 import { AuthUserService } from '../services/auth-user.service';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+
 describe('UnavailableCreatePageComponent', () => {
   let component: UnavailableCreatePageComponent;
   let fixture: ComponentFixture<UnavailableCreatePageComponent>;
@@ -13,9 +16,6 @@ describe('UnavailableCreatePageComponent', () => {
   let unavailableStoreSpy: {
     clean: Mock;
     create: Mock;
-  };
-  let routerSpy: Pick<Router, 'navigate' | 'currentNavigation'> & {
-    navigate: ReturnType<typeof vi.fn>;
   };
 
   const mockUnavailable: Partial<IUnavailableAll> = {
@@ -28,24 +28,20 @@ describe('UnavailableCreatePageComponent', () => {
       clean: vi.fn().mockName('clean'),
       create: vi.fn().mockName('create'),
     };
-    routerSpy = {
-      navigate: vi.fn().mockName('Router.navigate'),
-      currentNavigation: signal<any>(undefined),
-    };
 
     await TestBed.configureTestingModule({
       imports: [UnavailableCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
-        { provide: Router, useValue: routerSpy },
         {
           provide: AuthUserService,
           useValue: { authUser: signal({ isRoomAdmin: false }) },
         },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(UnavailableCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UnavailableCreatePageComponent);
     component = fixture.componentInstance;

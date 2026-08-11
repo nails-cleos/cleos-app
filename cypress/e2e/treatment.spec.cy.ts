@@ -1,4 +1,3 @@
-import '../support/commands';
 import {
   breakpointToButtons,
   convertSecondsToTime,
@@ -15,9 +14,8 @@ const getAddTreatmentInput = () =>
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Treatments with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -44,7 +42,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name: treatmentGroupName },
         alias: 'saveTreatment',
       });
-      cy.intercept('POST', '**/api/v1/treatments').as('saveTreatment');
       cy.openMenu(breakpoints, ['Treatments', 'Treatments']);
       cy.wait('@getTreatments');
       cy.contains('.no-content', 'No treatments', { timeout: 15000 }).should(
@@ -218,7 +215,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         };
         getAddTreatmentInput();
         cy.get('#add-treatment').clear({ force: true });
-        cy.get('#add-treatment').type(treatment.name, { force: true });
+        cy.get('#add-treatment').type(newTreatment.name, { force: true });
         cy.get('button[aria-label="Add treatment"]').click({ force: true });
 
         cy.get('mat-tab-body[aria-hidden="false"]')

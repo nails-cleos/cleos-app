@@ -139,7 +139,7 @@ export class TreatmentComponent {
   filteredColorSignal: Signal<IColorAll[] | undefined> = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
-      map((value: any) =>
+      map((value) =>
         !value || typeof value === 'string' ? value : value.name,
       ),
       combineLatestWith(toObservable(this.allColorsWritableSignal)),
@@ -332,7 +332,7 @@ export class TreatmentComponent {
   };
 
   sortColors = (data?: IColorAll[]): IColorAll[] | undefined =>
-    data?.sort((a: any, b: any) => {
+    [...(data ?? [])]?.sort((a, b) => {
       const aName = a.name.toUpperCase();
       const bName = b.name.toUpperCase();
       return aName > bName ? 1 : bName > aName ? -1 : 0;

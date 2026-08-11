@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { DiscountStore } from './discount.store';
@@ -21,10 +20,6 @@ describe('DiscountStore', () => {
     sendDiscounts: Mock;
   };
 
-  let translateSpy: {
-    instant: Mock;
-  };
-
   beforeEach(() => {
     discountServiceSpy = {
       getDiscountsPage: vi.fn().mockName('DiscountService.getDiscountsPage'),
@@ -42,19 +37,10 @@ describe('DiscountStore', () => {
       sendDiscounts: vi.fn().mockName('DiscountService.sendDiscounts'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         DiscountStore,
         { provide: DiscountService, useValue: discountServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -160,12 +146,9 @@ describe('DiscountStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('DISCOUNT.CREATED', {
-      name: 'Promo',
-    });
-
     expect(store.response()).toEqual({
-      message: 'DISCOUNT.CREATED:Promo',
+      messageKey: 'DISCOUNT.CREATED',
+      messageParams: { name: 'Promo' },
       path: 'discounts/1',
       redirect: 'discounts',
     });
@@ -185,13 +168,9 @@ describe('DiscountStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'DISCOUNT.UPDATED.MESSAGE',
-      { name: 'Updated' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'DISCOUNT.UPDATED.MESSAGE:Updated',
+      messageKey: 'DISCOUNT.UPDATED.MESSAGE',
+      messageParams: { name: 'Updated' },
       path: 'discounts/2',
       redirect: 'discounts',
     });
@@ -204,13 +183,9 @@ describe('DiscountStore', () => {
 
     expect(discountServiceSpy.deleteDiscount).toHaveBeenCalledWith('d1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'DISCOUNT.DELETED.MESSAGE',
-      { name: 'Black Friday' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'DISCOUNT.DELETED.MESSAGE:Black Friday',
+      messageKey: 'DISCOUNT.DELETED.MESSAGE',
+      messageParams: { name: 'Black Friday' },
       reload: true,
       toastType: 'warning',
     });
@@ -230,12 +205,11 @@ describe('DiscountStore', () => {
       'c2',
     ]);
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('DISCOUNT.SEND', {
-      name: 'Promo',
-    });
-
     expect(store.response()).toEqual({
-      message: 'DISCOUNT.SEND:Promo',
+      messageKey: 'DISCOUNT.SEND',
+      messageParams: {
+        name: 'Promo',
+      },
     });
 
     expect(store.isLoading()).toBe(false);

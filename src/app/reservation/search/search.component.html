@@ -92,8 +92,8 @@
           [dataSource]="dataSource"
           mat-table
           matSort
-          matSortActive="timestamp"
-          matSortDirection="desc"
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
           matSortDisableClear
           multiTemplateDataRows
         >

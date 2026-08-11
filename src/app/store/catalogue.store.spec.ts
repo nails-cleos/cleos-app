@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { CatalogueStore } from './catalogue.store';
@@ -22,9 +21,6 @@ describe('CatalogueStore', () => {
   let treatmentServiceSpy: {
     getAllTreatmentsGroup: Mock;
   };
-  let translateSpy: {
-    instant: Mock;
-  };
 
   beforeEach(() => {
     catalogueServiceSpy = {
@@ -43,20 +39,12 @@ describe('CatalogueStore', () => {
         .fn()
         .mockName('TreatmentService.getAllTreatmentsGroup'),
     };
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
 
     TestBed.configureTestingModule({
       providers: [
         CatalogueStore,
         { provide: CatalogueService, useValue: catalogueServiceSpy },
         { provide: TreatmentService, useValue: treatmentServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -89,12 +77,9 @@ describe('CatalogueStore', () => {
     expect(catalogueServiceSpy.deleteCatalogue).toHaveBeenCalledWith(
       'catalogue-1',
     );
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'CATALOGUE.DELETED.MESSAGE',
-      { name: 'Summer' },
-    );
     expect(store.response()).toEqual({
-      message: 'CATALOGUE.DELETED.MESSAGE:Summer',
+      messageKey: 'CATALOGUE.DELETED.MESSAGE',
+      messageParams: { name: 'Summer' },
       reload: true,
       toastType: 'warning',
     });

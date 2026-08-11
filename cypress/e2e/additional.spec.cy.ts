@@ -1,12 +1,10 @@
-import '../support/commands';
 import { breakpointToButtons, devices, zeroPad } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Additional with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -28,7 +26,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name: additionalName },
         alias: 'saveAdditional',
       });
-      cy.intercept('POST', '**/api/v1/additional').as('saveAdditional');
       cy.openMenu(breakpoints, ['Additional', 'Additional']);
       cy.wait('@getAdditionalList');
       cy.contains('.no-content', 'No additional', { timeout: 15000 }).should(
@@ -85,9 +82,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             body: { name: additionalName },
             alias: 'updateAdditional',
           });
-          cy.intercept('PATCH', `**/api/v1/additional/${additional.id}`).as(
-            'updateAdditional',
-          );
 
           cy.buttonClickOnTable(
             breakpoints,

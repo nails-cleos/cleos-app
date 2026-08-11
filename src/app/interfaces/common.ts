@@ -40,15 +40,28 @@ interface IResponseWithMessage extends IBaseResponseMeta {
   message: string;
   blob?: undefined;
   fileName?: undefined;
+  messageKey?: string;
+  messageParams?: Record<string, unknown>;
+}
+
+interface IResponseWithMessageKey extends IBaseResponseMeta {
+  messageKey: string;
+  messageParams?: Record<string, unknown>;
+  message?: undefined;
+  blob?: undefined;
+  fileName?: undefined;
 }
 
 interface IResponseWithFile extends IBaseResponseMeta {
   blob: Blob;
   fileName: string;
   message?: undefined;
+  messageKey?: string;
+  messageParams?: Record<string, unknown>;
 }
 
-export type IResponseSuccess = IResponseWithMessage | IResponseWithFile;
+export type IResponseSuccess =
+  IResponseWithMessage | IResponseWithFile | IResponseWithMessageKey;
 
 export class PageRequest {
   page: number;

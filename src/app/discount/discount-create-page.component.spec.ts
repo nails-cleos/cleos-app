@@ -4,6 +4,9 @@ import { DiscountCreatePageComponent } from './discount-create-page.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { CurrencyStore } from '../store/currency.store';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 
 describe('DiscountCreatePageComponent', () => {
   let component: DiscountCreatePageComponent;
@@ -35,12 +38,13 @@ describe('DiscountCreatePageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DiscountCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: CurrencyStore, useValue: currencyStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(DiscountCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountCreatePageComponent);
     component = fixture.componentInstance;

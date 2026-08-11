@@ -13,8 +13,8 @@
           [dataSource]="dataSource"
           mat-table
           matSort
-          matSortActive="discountCustomer.name"
-          matSortDirection="asc"
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
           matSortDisableClear
         >
           <ng-container matColumnDef="position">

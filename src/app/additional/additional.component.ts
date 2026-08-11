@@ -254,10 +254,11 @@ export class AdditionalComponent {
     this.getForm.group.setValue(undefined);
   };
 
-  sortGroups = (data: any): ITreatmentGroupAll[] =>
-    data.sort((a: any, b: any) => {
+  sortGroups = (data: ITreatmentGroupAll[] | undefined): ITreatmentGroupAll[] =>
+    [...(data ?? [])].sort((a, b) => {
       const aName = a.name.toUpperCase();
       const bName = b.name.toUpperCase();
+
       return aName > bName ? 1 : bName > aName ? -1 : 0;
     });
 

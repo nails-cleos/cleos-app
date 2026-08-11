@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { OfficeStore } from './office.store';
@@ -17,9 +16,6 @@ describe('OfficeStore', () => {
     updateOffice: Mock;
     deleteOffice: Mock;
   };
-  let translateSpy: {
-    instant: Mock;
-  };
 
   beforeEach(() => {
     officeServiceSpy = {
@@ -31,19 +27,10 @@ describe('OfficeStore', () => {
       deleteOffice: vi.fn().mockName('OfficeService.deleteOffice'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         OfficeStore,
         { provide: OfficeService, useValue: officeServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -114,12 +101,9 @@ describe('OfficeStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('OFFICE.CREATED', {
-      name: 'HQ',
-    });
-
     expect(store.response()).toEqual({
-      message: 'OFFICE.CREATED:HQ',
+      messageKey: 'OFFICE.CREATED',
+      messageParams: { name: 'HQ' },
       path: 'offices/1',
       redirect: 'offices',
     });
@@ -139,13 +123,9 @@ describe('OfficeStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'OFFICE.UPDATED.MESSAGE',
-      { name: 'Updated Office' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'OFFICE.UPDATED.MESSAGE:Updated Office',
+      messageKey: 'OFFICE.UPDATED.MESSAGE',
+      messageParams: { name: 'Updated Office' },
       path: 'offices/2',
       redirect: 'offices',
     });
@@ -160,13 +140,11 @@ describe('OfficeStore', () => {
 
     expect(officeServiceSpy.deleteOffice).toHaveBeenCalledWith('o1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'OFFICE.DELETED.MESSAGE',
-      { name: 'Main Office' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'OFFICE.DELETED.MESSAGE:Main Office',
+      messageKey: 'OFFICE.DELETED.MESSAGE',
+      messageParams: {
+        name: 'Main Office',
+      },
       redirect: 'offices',
       reload: true,
       toastType: 'warning',

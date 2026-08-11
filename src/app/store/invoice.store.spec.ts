@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { InvoiceStore } from './invoice.store';
@@ -14,29 +13,16 @@ describe('InvoiceStore', () => {
     uploadInvoices: Mock;
   };
 
-  let translateSpy: {
-    instant: Mock;
-  };
-
   beforeEach(() => {
     invoiceServiceSpy = {
       getOfficeToInvoice: vi.fn().mockName('InvoiceService.getOfficeToInvoice'),
       uploadInvoices: vi.fn().mockName('InvoiceService.uploadInvoices'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['fileName'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         InvoiceStore,
         { provide: InvoiceService, useValue: invoiceServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -76,13 +62,9 @@ describe('InvoiceStore', () => {
       'file.txt',
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'INVOICE.UPLOAD_SUCCESS',
-      { fileName: 'file.txt' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'INVOICE.UPLOAD_SUCCESS:file.txt',
+      messageKey: 'INVOICE.UPLOAD_SUCCESS',
+      messageParams: { fileName: 'file.txt' },
       blob,
       fileName: 'file.txt',
     } as any);
@@ -98,7 +80,8 @@ describe('InvoiceStore', () => {
     expect(invoiceServiceSpy.uploadInvoices).not.toHaveBeenCalled();
 
     expect(store.response()).toEqual({
-      message: 'INVOICE.UPLOAD_SUCCESS:file.txt',
+      messageKey: 'INVOICE.UPLOAD_SUCCESS',
+      messageParams: { fileName: 'file.txt' },
       blob,
       fileName: 'file.txt',
     } as any);

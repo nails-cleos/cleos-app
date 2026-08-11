@@ -64,7 +64,7 @@ describe('PaymentStore', () => {
       store.adjust([]);
 
       expect(store.response()).toEqual({
-        message: 'COMMON.PAYMENT.SUCCESS:',
+        messageKey: 'COMMON.PAYMENT.SUCCESS',
         reload: true,
       });
 
@@ -138,7 +138,7 @@ describe('PaymentStore', () => {
 
     expect(store.isLoading()).toBe(false);
     expect(store.response()).toEqual({
-      message: 'PAYMENT.RECREATE:',
+      messageKey: 'PAYMENT.RECREATE',
     });
   });
 
@@ -159,7 +159,7 @@ describe('PaymentStore', () => {
     store.adjust([{} as any]);
 
     expect(store.response()).toEqual({
-      message: 'COMMON.PAYMENT.SUCCESS:',
+      messageKey: 'COMMON.PAYMENT.SUCCESS',
       reload: true,
     });
     expect(store.isLoading()).toBe(false);
@@ -186,7 +186,7 @@ describe('PaymentStore', () => {
 
     store.create('1', 'reservation', 'ok', {} as any);
 
-    expect(store.response()?.message).toBe('COMMON.PAYMENT.SUCCESS:');
+    expect(store.response()?.messageKey).toBe('COMMON.PAYMENT.SUCCESS');
     expect(store.response()?.redirect).toBe('a/b');
   });
 

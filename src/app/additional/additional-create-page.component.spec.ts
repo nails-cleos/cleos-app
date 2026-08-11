@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AdditionalCreatePageComponent } from './additional-create-page.component';
 import { AdditionalStore } from '../store/additional.store';
 import { IAdditionalAll } from './additional';
+import { provideTranslateService } from '@ngx-translate/core';
+import { DateAdapter } from '@angular/material/core';
+import { provideRouter } from '@angular/router';
 
 describe('AdditionalCreatePageComponent', () => {
   let component: AdditionalCreatePageComponent;
@@ -25,10 +28,13 @@ describe('AdditionalCreatePageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [AdditionalCreatePageComponent],
-      providers: [{ provide: AdditionalStore, useValue: additionalStoreSpy }],
-    })
-      .overrideTemplate(AdditionalCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        { provide: AdditionalStore, useValue: additionalStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalCreatePageComponent);
     component = fixture.componentInstance;

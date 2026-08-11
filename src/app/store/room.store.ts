@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import {
   IApiResponse,
   IResponseSuccess,
@@ -60,7 +59,6 @@ export const RoomStore = signalStore(
     (
       store,
       roomService = inject(RoomService),
-      translateService = inject(TranslateService),
       navigationService = inject(NavigationService),
     ) => {
       let loadPageSubscription: Subscription | undefined;
@@ -91,10 +89,12 @@ export const RoomStore = signalStore(
         patchCrudError(store, err);
 
       const createSaveResponse = (
-        message: string,
+        messageKey: string,
+        messageParams: Record<string, unknown>,
         response: IApiResponse,
       ): IResponseSuccess => ({
-        message,
+        messageKey,
+        messageParams,
         path: `rooms/${response.id}`,
         redirect: 'rooms',
       });
@@ -183,9 +183,8 @@ export const RoomStore = signalStore(
             next: (response: IApiResponse) =>
               patchState(store, {
                 response: createSaveResponse(
-                  translateService.instant('ROOM.CREATED', {
-                    name: response.name,
-                  }),
+                  'ROOM.CREATED',
+                  { name: response.name },
                   response,
                 ),
                 isLoading: false,
@@ -202,9 +201,8 @@ export const RoomStore = signalStore(
             next: (response: IApiResponse) =>
               patchState(store, {
                 response: createSaveResponse(
-                  translateService.instant('ROOM.UPDATED.MESSAGE', {
-                    name: response.name,
-                  }),
+                  'ROOM.UPDATED.MESSAGE',
+                  { name: response.name },
                   response,
                 ),
                 isLoading: false,
@@ -221,9 +219,10 @@ export const RoomStore = signalStore(
             next: () =>
               patchState(store, {
                 response: {
-                  message: translateService.instant('ROOM.DELETED.MESSAGE', {
+                  messageKey: 'ROOM.DELETED.MESSAGE',
+                  messageParams: {
                     name: roomName(room),
-                  }),
+                  },
                   reload: true,
                   toastType: 'warning',
                 },

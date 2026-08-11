@@ -1,11 +1,9 @@
-import '../support/commands';
 import { breakpointToDays, devices, zeroPad } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   const days = breakpointToDays('reservation', breakpoints);
   describe(`Reservation with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
     const email = 'nails.cleos@gmail.com';
     const customerId = '1c27715c-21a3-4255-97ac-9263d9f177e7';
     const customerName = 'Customer 1';
@@ -27,6 +25,7 @@ devices.forEach(({ name, width, height, breakpoints }) => {
     const diffToWednesday = (3 - day + 7) % 7 || 7;
     reservationDate.setDate(reservationDate.getDate() + diffToWednesday);
     beforeEach(() => {
+      cy.viewport(width, height);
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
       cy.mockCatalogues();
@@ -129,7 +128,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         'Yes',
       );
 
-      cy.wait(500);
       calendarExpectations(reservationTime)[days].forEach((events, dayIndex) =>
         validateCalendar(dayIndex, events),
       );
@@ -212,49 +210,48 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
 
       reservationDate.setHours(hour, minute, 0, 0);
-      cy.randomUUID().then((reservationId) => {
-        cy.mockCreateReservation(
-          reservationId,
-          customerId,
-          reservationDate,
-          professionalId,
-          roomId,
-          treatmentId,
-          [
-            '397bce4b-27ba-459f-801a-dcceea330b8d',
-            '557c6520-035a-4b0a-9bd4-f2f1dce27f6d',
-          ],
+      const reservationId = crypto.randomUUID();
+      cy.mockCreateReservation(
+        reservationId,
+        customerId,
+        reservationDate,
+        professionalId,
+        roomId,
+        treatmentId,
+        [
+          '397bce4b-27ba-459f-801a-dcceea330b8d',
+          '557c6520-035a-4b0a-9bd4-f2f1dce27f6d',
+        ],
+      );
+
+      cy.get('button[name="create"]').click({ force: true });
+
+      cy.wait('@createReservation').then((reservationData) => {
+        expect(reservationData.response?.statusCode).to.eq(201);
+        const body = reservationData.request.body;
+        expect(body.customerId).to.eq(customerId);
+        expect(body.start).to.eq(
+          reservationDate.toLocaleString(DEFAULT_LOCALE),
         );
-
-        cy.get('button[name="create"]').click({ force: true });
-
-        cy.wait('@createReservation').then((reservationData) => {
-          expect(reservationData.response?.statusCode).to.eq(201);
-          const body = reservationData.request.body;
-          expect(body.customerId).to.eq(customerId);
-          expect(body.start).to.eq(
-            reservationDate.toLocaleString(DEFAULT_LOCALE),
-          );
-          expect(body.timeZone).to.eq('Europe/Amsterdam');
-          expect(body.additionalIds).to.have.members([
-            '557c6520-035a-4b0a-9bd4-f2f1dce27f6d',
-            '397bce4b-27ba-459f-801a-dcceea330b8d',
-          ]);
-          expect(body.canCustomerChange).to.eq(false);
-          expect([null, undefined]).to.include(body.reference);
-          expect([null, undefined]).to.include(body.note);
-          expect([null, undefined]).to.include(body.payment);
-          expect(body.treatmentId).to.eq(treatmentId);
-          expect(body.roomId).to.eq(roomId);
-          expect(body.professionalId).to.eq(professionalId);
-          expect([null, undefined]).to.include(body.discountId);
-        });
-
-        cy.url().should('include', `reservation/${reservationId}`);
-        cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
-        cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
-        cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
+        expect(body.timeZone).to.eq('Europe/Amsterdam');
+        expect(body.additionalIds).to.have.members([
+          '557c6520-035a-4b0a-9bd4-f2f1dce27f6d',
+          '397bce4b-27ba-459f-801a-dcceea330b8d',
+        ]);
+        expect(body.canCustomerChange).to.eq(false);
+        expect([null, undefined]).to.include(body.reference);
+        expect([null, undefined]).to.include(body.note);
+        expect([null, undefined]).to.include(body.payment);
+        expect(body.treatmentId).to.eq(treatmentId);
+        expect(body.roomId).to.eq(roomId);
+        expect(body.professionalId).to.eq(professionalId);
+        expect([null, undefined]).to.include(body.discountId);
       });
+
+      cy.url().should('include', `reservation/${reservationId}`);
+      cy.wait('@getReservation').its('response.statusCode').should('eq', 200);
+      cy.wait('@getPayments').its('response.statusCode').should('eq', 204);
+      cy.wait('@getHistory').its('response.statusCode').should('eq', 204);
     });
 
     afterEach(() => cy.logout());
@@ -305,16 +302,12 @@ const validateCalendar = (
   day: number,
   events: { text: string; length: number }[],
 ) => {
-  cy.get('mwl-calendar-week-view')
-    .find('.cal-day-column')
-    .eq(day)
-    .find('mwl-calendar-week-view-event')
-    .then((eventsList) => {
-      events.forEach((event) =>
-        cy
-          .wrap(eventsList)
-          .filter(`:contains("${event.text}")`)
-          .should('have.length', event.length),
-      );
-    });
+  events.forEach((event) => {
+    cy.get('mwl-calendar-week-view')
+      .find('.cal-day-column')
+      .eq(day)
+      .find('mwl-calendar-week-view-event')
+      .filter(`:contains("${event.text}")`)
+      .should('have.length', event.length);
+  });
 };

@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
 import { ICurrency, ICurrencyAll } from '../currency/currency';
 import { CurrencyService } from '../services/currency.service';
@@ -21,7 +20,6 @@ export const CurrencyStore = signalStore(
     { id: string; code: string }
   >(() => {
     const currencyService = inject(CurrencyService);
-    const translateService = inject(TranslateService);
 
     return {
       loadPage: ({ page, sort, direction, size }) =>
@@ -32,21 +30,26 @@ export const CurrencyStore = signalStore(
       update: (id, currency) => currencyService.updateCurrency(id, currency),
       delete: ({ id }) => currencyService.deleteCurrency(id),
       createResponse: (response) => ({
-        message: translateService.instant('CURRENCY.CREATED', {
+        messageKey: 'CURRENCY.CREATED',
+        messageParams: {
           code: response.name,
-        }),
+        },
         path: `currency/${response.id}`,
         redirect: 'currency',
       }),
       updateResponse: (response) => ({
-        message: translateService.instant('CURRENCY.UPDATED.MESSAGE', {
+        messageKey: 'CURRENCY.UPDATED.MESSAGE',
+        messageParams: {
           code: response.name,
-        }),
+        },
         path: `currency/${response.id}`,
         redirect: 'currency',
       }),
       deleteResponse: ({ code }) => ({
-        message: translateService.instant('CURRENCY.DELETED.MESSAGE', { code }),
+        messageKey: 'CURRENCY.DELETED.MESSAGE',
+        messageParams: {
+          code: code,
+        },
         reload: true,
         toastType: 'warning',
         redirect: 'currency',

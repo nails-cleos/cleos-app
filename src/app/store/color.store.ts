@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { signalStore } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
 import { IColor, IColorAll } from '../color/color';
 import { ColorService } from '../services/color.service';
@@ -21,7 +20,6 @@ export const ColorStore = signalStore(
     { id: string; name: string }
   >(() => {
     const colorService = inject(ColorService);
-    const translateService = inject(TranslateService);
 
     return {
       loadPage: ({ page, sort, direction, size }) =>
@@ -34,21 +32,26 @@ export const ColorStore = signalStore(
       update: (id, color) => colorService.updateColor(id, color),
       delete: ({ id }) => colorService.deleteColor(id),
       createResponse: (response) => ({
-        message: translateService.instant('COLOR.CREATED', {
+        messageKey: 'COLOR.CREATED',
+        messageParams: {
           name: response.name,
-        }),
+        },
         path: `colors/${response.id}`,
         redirect: 'colors',
       }),
       updateResponse: (response) => ({
-        message: translateService.instant('COLOR.UPDATED.MESSAGE', {
+        messageKey: 'COLOR.UPDATED.MESSAGE',
+        messageParams: {
           name: response.name,
-        }),
+        },
         path: `colors/${response.id}`,
         redirect: 'colors',
       }),
       deleteResponse: ({ name }) => ({
-        message: translateService.instant('COLOR.DELETED.MESSAGE', { name }),
+        messageKey: 'COLOR.DELETED.MESSAGE',
+        messageParams: {
+          name: name,
+        },
         reload: true,
         toastType: 'warning',
       }),

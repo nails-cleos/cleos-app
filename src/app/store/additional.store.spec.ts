@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AdditionalStore } from './additional.store';
@@ -18,9 +17,6 @@ describe('AdditionalStore', () => {
     updateAdditional: Mock;
     sortAdditional: Mock;
     deleteAdditional: Mock;
-  };
-  let translateSpy: {
-    instant: Mock;
   };
 
   beforeEach(() => {
@@ -41,19 +37,10 @@ describe('AdditionalStore', () => {
       deleteAdditional: vi.fn().mockName('AdditionalService.deleteAdditional'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         AdditionalStore,
         { provide: AdditionalService, useValue: additionalServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -141,12 +128,9 @@ describe('AdditionalStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('ADDITIONAL.CREATED', {
-      name: 'Extra',
-    });
-
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.CREATED:Extra',
+      messageKey: 'ADDITIONAL.CREATED',
+      messageParams: { name: 'Extra' },
       path: 'additional/1',
       redirect: 'additional',
     });
@@ -166,13 +150,9 @@ describe('AdditionalStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'ADDITIONAL.UPDATED.MESSAGE',
-      { name: 'Updated' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.UPDATED.MESSAGE:Updated',
+      messageKey: 'ADDITIONAL.UPDATED.MESSAGE',
+      messageParams: { name: 'Updated' },
       path: 'additional/2',
       redirect: 'additional',
     });
@@ -203,13 +183,9 @@ describe('AdditionalStore', () => {
 
     expect(additionalServiceSpy.deleteAdditional).toHaveBeenCalledWith('1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'ADDITIONAL.DELETED.MESSAGE',
-      { name: 'Item A' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.DELETED.MESSAGE:Item A',
+      messageKey: 'ADDITIONAL.DELETED.MESSAGE',
+      messageParams: { name: 'Item A' },
       reload: true,
       toastType: 'warning',
     });

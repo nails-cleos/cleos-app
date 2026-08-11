@@ -6,7 +6,6 @@ import { of, throwError } from 'rxjs';
 import { DocumentStore } from './document.store';
 import { DocumentService } from '../services/document.service';
 import { DocumentTypeEnum, IDocument } from '../document/document';
-import { TranslateService } from '@ngx-translate/core';
 
 describe('DocumentStore', () => {
   let documentStore: InstanceType<typeof DocumentStore>;
@@ -17,9 +16,6 @@ describe('DocumentStore', () => {
     deleteDocument: Mock;
     documentDownloadZip: Mock;
     uploadStatement: Mock;
-  };
-  let translateSpy: {
-    instant: Mock;
   };
 
   beforeEach(() => {
@@ -33,19 +29,11 @@ describe('DocumentStore', () => {
         .mockName('DocumentService.documentDownloadZip'),
       uploadStatement: vi.fn().mockName('DocumentService.uploadStatement'),
     };
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['fileName'] ?? ''}`,
-    );
 
     TestBed.configureTestingModule({
       providers: [
         DocumentStore,
         { provide: DocumentService, useValue: documentServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -186,12 +174,10 @@ describe('DocumentStore', () => {
       'statement.csv',
       undefined,
     );
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'DOCUMENT.UPLOAD_SUCCESS',
-      { fileName: 'statement.csv' },
-    );
+
     expect(documentStore.response()).toEqual({
-      message: 'DOCUMENT.UPLOAD_SUCCESS:statement.csv',
+      messageKey: 'DOCUMENT.UPLOAD_SUCCESS',
+      messageParams: { fileName: 'statement.csv' },
       redirect: 'statements',
     });
     expect(documentStore.isLoading()).toBe(false);
@@ -236,13 +222,9 @@ describe('DocumentStore', () => {
 
     expect(documentServiceSpy.deleteDocument).toHaveBeenCalledWith('1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'DOCUMENT.DELETED.MESSAGE',
-      { name: 'Item A' },
-    );
-
     expect(documentStore.response()).toEqual({
-      message: 'DOCUMENT.DELETED.MESSAGE:',
+      messageKey: 'DOCUMENT.DELETED.MESSAGE',
+      messageParams: { name: 'Item A' },
       reload: true,
       toastType: 'warning',
     });

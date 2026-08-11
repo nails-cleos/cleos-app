@@ -6,6 +6,10 @@ import { UserStore } from '../store/user.store';
 import { IUserAll } from './user';
 import { UserComponent } from './user.component';
 import { provideTranslateService } from '@ngx-translate/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideRouter } from '@angular/router';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
+
 describe('UserDetailsPageComponent', () => {
   let component: UserDetailsPageComponent;
   let fixture: ComponentFixture<UserDetailsPageComponent>;
@@ -36,23 +40,22 @@ describe('UserDetailsPageComponent', () => {
       userNavigationParams: vi.fn().mockName('userNavigationParams'),
     };
 
+    const cookieConsentService = {
+      getConfig: vi.fn().mockName('NgcCookieConsentService.getConfig'),
+      destroy: vi.fn().mockName('NgcCookieConsentService.destroy'),
+      init: vi.fn().mockName('NgcCookieConsentService.init'),
+    };
+
     await TestBed.configureTestingModule({
       imports: [UserDetailsPageComponent],
       providers: [
         provideTranslateService(),
+        provideRouter([]),
+        provideNativeDateAdapter(),
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
-    })
-      .overrideTemplate(UserComponent, '')
-      .overrideTemplate(
-        UserDetailsPageComponent,
-        `
-        @if (user(); as user) {
-          <app-user [user]="user" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UserDetailsPageComponent);
 

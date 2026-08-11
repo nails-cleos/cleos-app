@@ -92,7 +92,7 @@ export class MeDiscountComponent {
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(
+  readonly tableState = createMatTableState(
     this.paginator,
     this.sort,
     'discountCustomer.name',

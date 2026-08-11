@@ -11,6 +11,7 @@ import { UserStore } from './user.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { AuthStore } from './auth.store';
 import { NavigationService } from '../services/navigation.service';
+
 describe('UserStore', () => {
   let store: InstanceType<typeof UserStore>;
   let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
@@ -174,7 +175,8 @@ describe('UserStore', () => {
     store.save({ displayName: 'New User' }, undefined, Role.customer);
     expect(store.response()).toEqual(
       expect.objectContaining({
-        message: 'USER.CUSTOMER:New User',
+        messageKey: 'USER.CUSTOMER',
+        messageParams: { displayName: 'New User' },
         path: 'users/user-2',
         redirect: 'users',
       }),
@@ -183,40 +185,66 @@ describe('UserStore', () => {
     store.setRole('user-1', 'User One', Role.admin, 'ADD');
     expect(store.response()).toEqual(
       expect.objectContaining({
-        message: 'USER.ROLES.ADD:COMMON.ROLES.ROLE_ADMIN',
+        messageKey: 'USER.ROLES.ADD',
+        messageParams: {
+          displayName: 'User One',
+          role: 'COMMON.ROLES.ROLE_ADMIN',
+        },
         path: 'users/user-1',
+        redirect: undefined,
+        reload: true,
+        toastType: 'success',
       }),
     );
 
     store.delete('user-1', 'User One');
     expect(store.response()).toEqual(
       expect.objectContaining({
-        message: 'USER.DELETED.MESSAGE:User One',
+        messageKey: 'USER.DELETED.MESSAGE',
+        messageParams: { displayName: 'User One', role: undefined },
         toastType: 'warning',
         reload: true,
       }),
     );
 
     store.restore('user-1', { deleted: false });
-    expect(store.response()).toEqual(
-      expect.objectContaining({
-        message: 'USER.RESTORE.MESSAGE:User One',
-      }),
-    );
+    expect(store.response()).toEqual({
+      messageKey: 'USER.RESTORE.MESSAGE',
+      messageParams: {
+        displayName: 'User One',
+        role: undefined,
+      },
+      path: undefined,
+      redirect: undefined,
+      reload: false,
+      toastType: 'success',
+    });
 
     store.resendToken('user-1');
-    expect(store.response()).toEqual(
-      expect.objectContaining({
-        message: 'USER.ACTIVATION_RESEND.MESSAGE',
-      }),
-    );
+    expect(store.response()).toEqual({
+      messageKey: 'USER.ACTIVATION_RESEND.MESSAGE',
+      messageParams: {
+        displayName: undefined,
+        role: undefined,
+      },
+      path: undefined,
+      redirect: undefined,
+      reload: false,
+      toastType: 'success',
+    });
 
     store.mergeUsers('old-user', 'new-user');
-    expect(store.response()).toEqual(
-      expect.objectContaining({
-        message: 'USER.MERGE.SUCCESS',
-      }),
-    );
+    expect(store.response()).toEqual({
+      messageKey: 'USER.MERGE.SUCCESS',
+      messageParams: {
+        displayName: undefined,
+        role: undefined,
+      },
+      path: undefined,
+      redirect: undefined,
+      reload: false,
+      toastType: 'success',
+    });
     expect(store.isLoading()).toBe(false);
   });
 
@@ -229,6 +257,9 @@ describe('UserStore', () => {
     expect(userServiceSpy.updateMyUser).toHaveBeenCalledWith(updatedUser);
     expect(store.response()).toEqual({
       message: 'PROFILE.UPDATED',
+      messageParams: {
+        displayName: 'User One',
+      },
       toastType: 'success',
     });
     expect(authStoreSpy.loginSuccess).toHaveBeenCalledWith(token, {
@@ -247,7 +278,7 @@ describe('UserStore', () => {
       'data:image/jpeg;base64,AAA',
     );
     expect(store.response()).toEqual({
-      message: 'COMMON.PROFILE.UPDATED.PHOTO',
+      messageKey: 'COMMON.PROFILE.UPDATED.PHOTO',
       toastType: 'success',
     });
     expect(authStoreSpy.loginSuccess).toHaveBeenCalledWith(token, {

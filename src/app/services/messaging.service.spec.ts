@@ -1,4 +1,12 @@
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { signal, WritableSignal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
@@ -66,6 +74,10 @@ describe('MessagingService', () => {
     service = TestBed.inject(MessagingService);
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
@@ -111,9 +123,9 @@ describe('MessagingService', () => {
         requestPermission,
       });
 
-      vi.stubGlobal('navigator', {
-        ...navigator,
-        serviceWorker: {
+      Object.defineProperty(navigator, 'serviceWorker', {
+        configurable: true,
+        value: {
           register,
         },
       });

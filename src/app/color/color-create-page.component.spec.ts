@@ -3,6 +3,9 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ColorCreatePageComponent } from './color-create-page.component';
 import { ColorStore } from '../store/color.store';
 import { IColorAll } from './color';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 
 describe('ColorCreatePageComponent', () => {
   let component: ColorCreatePageComponent;
@@ -26,10 +29,13 @@ describe('ColorCreatePageComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [ColorCreatePageComponent],
-      providers: [{ provide: ColorStore, useValue: colorStoreSpy }],
-    })
-      .overrideTemplate(ColorCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        { provide: ColorStore, useValue: colorStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ColorCreatePageComponent);
     component = fixture.componentInstance;

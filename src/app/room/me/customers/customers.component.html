@@ -13,9 +13,9 @@
           mat-table
           multiTemplateDataRows
           matSort
-          matSortActive="days"
+          [matSortActive]="tableState.sortActive()"
           matSortDisableClear
-          matSortDirection="asc"
+          [matSortDirection]="tableState.sortDirection()"
         >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>

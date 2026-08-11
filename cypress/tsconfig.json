@@ -2,6 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "types": ["cypress", "node"],
+    "skipLibCheck": true,
     "rootDir": "..",
     "baseUrl": "..",
     "paths": {

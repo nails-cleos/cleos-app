@@ -11,6 +11,9 @@ import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { UserStore } from '../store/user.store';
 import { provideTranslateService } from '@ngx-translate/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideRouter } from '@angular/router';
+
 describe('NoteDetailsPageComponent', () => {
   let component: NoteDetailsPageComponent;
   let fixture: ComponentFixture<NoteDetailsPageComponent>;
@@ -74,21 +77,13 @@ describe('NoteDetailsPageComponent', () => {
       imports: [NoteDetailsPageComponent],
       providers: [
         provideTranslateService(),
+        provideRouter([]),
+        provideNativeDateAdapter(),
         { provide: NoteStore, useValue: noteStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
-    })
-      .overrideTemplate(NoteComponent, '')
-      .overrideTemplate(
-        NoteDetailsPageComponent,
-        `
-        @if (note(); as note) {
-          <app-note [note]="note" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NoteDetailsPageComponent);
 

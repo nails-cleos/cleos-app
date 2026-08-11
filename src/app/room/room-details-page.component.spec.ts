@@ -71,14 +71,6 @@ describe('RoomDetailsPageComponent', () => {
         remove: { imports: [RoomComponent] },
         add: { imports: [RoomComponentStub] },
       })
-      .overrideTemplate(
-        RoomDetailsPageComponent,
-        `
-        @if (room(); as room) {
-          <app-room [room]="room" [config]="config" />
-        }
-      `,
-      )
       .compileComponents();
 
     fixture = TestBed.createComponent(RoomDetailsPageComponent);

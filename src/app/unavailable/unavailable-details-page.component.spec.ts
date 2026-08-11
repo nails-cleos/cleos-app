@@ -9,6 +9,8 @@ import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';
 import { UserStore } from '../store/user.store';
 import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 describe('UnavailableDetailsPageComponent', () => {
   let component: UnavailableDetailsPageComponent;
   let fixture: ComponentFixture<UnavailableDetailsPageComponent>;
@@ -58,6 +60,7 @@ describe('UnavailableDetailsPageComponent', () => {
       imports: [UnavailableDetailsPageComponent],
       providers: [
         provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
         {
@@ -70,18 +73,9 @@ describe('UnavailableDetailsPageComponent', () => {
             open: vi.fn().mockName('MatDialog.open'),
           },
         },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(UnavailableComponent, '')
-      .overrideTemplate(
-        UnavailableDetailsPageComponent,
-        `
-        @if (unavailable(); as unavailable) {
-          <app-unavailable [unavailable]="unavailable" [config]="config" />
-        }
-      `,
-      )
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UnavailableDetailsPageComponent);
     fixture.componentRef.setInput('id', id);

@@ -4,6 +4,9 @@ import { OfficeCreatePageComponent } from './office-create-page.component';
 import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
 import { UserStore } from '../store/user.store';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 describe('OfficeCreatePageComponent', () => {
   let component: OfficeCreatePageComponent;
   let fixture: ComponentFixture<OfficeCreatePageComponent>;
@@ -33,12 +36,13 @@ describe('OfficeCreatePageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [OfficeCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(OfficeCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(OfficeCreatePageComponent);
     component = fixture.componentInstance;

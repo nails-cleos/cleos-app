@@ -1,12 +1,10 @@
-import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Discount with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -26,7 +24,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name: discountName },
         alias: 'saveDiscounts',
       });
-      cy.intercept('POST', '**/api/v1/discounts').as('saveDiscounts');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
       cy.contains('.no-content', 'No discounts', { timeout: 15000 }).should(

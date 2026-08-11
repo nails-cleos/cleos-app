@@ -5,6 +5,11 @@ import { NoteStore } from '../store/note.store';
 import { INoteAll } from './note';
 import { IUserAll } from '../user/user';
 import { FrequencyEnum } from '../util/helper';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
+
 describe('NoteCreatePageComponent', () => {
   let component: NoteCreatePageComponent;
   let fixture: ComponentFixture<NoteCreatePageComponent>;
@@ -38,12 +43,22 @@ describe('NoteCreatePageComponent', () => {
       setNavigationParams: vi.fn().mockName('setNavigationParams'),
     };
 
+    const cookieConsentService = {
+      getConfig: vi.fn().mockName('NgcCookieConsentService.getConfig'),
+      destroy: vi.fn().mockName('NgcCookieConsentService.destroy'),
+      init: vi.fn().mockName('NgcCookieConsentService.init'),
+    };
+
     await TestBed.configureTestingModule({
       imports: [NoteCreatePageComponent],
-      providers: [{ provide: NoteStore, useValue: noteStoreSpy }],
-    })
-      .overrideTemplate(NoteCreatePageComponent, '')
-      .compileComponents();
+      providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        provideNativeDateAdapter(),
+        { provide: NoteStore, useValue: noteStoreSpy },
+        { provide: NgcCookieConsentService, useValue: cookieConsentService },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NoteCreatePageComponent);
     component = fixture.componentInstance;

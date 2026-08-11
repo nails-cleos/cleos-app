@@ -5,6 +5,9 @@ import { BlockAgendaCreatePageComponent } from './block-agenda-create-page.compo
 import { UnavailableStore } from '@app/store/unavailable.store';
 import { IUnavailableAll } from '../unavailable';
 import { AuthUserService } from '@app/services/auth-user.service';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 describe('BlockAgendaCreatePageComponent', () => {
   let component: BlockAgendaCreatePageComponent;
   let fixture: ComponentFixture<BlockAgendaCreatePageComponent>;
@@ -12,6 +15,7 @@ describe('BlockAgendaCreatePageComponent', () => {
   let unavailableStoreSpy: {
     clean: Mock;
     createBlockAgenda: Mock;
+    subErrors: Mock;
   };
 
   const mockUnavailable: Partial<IUnavailableAll> = {
@@ -22,20 +26,22 @@ describe('BlockAgendaCreatePageComponent', () => {
     unavailableStoreSpy = {
       clean: vi.fn().mockName('clean'),
       createBlockAgenda: vi.fn().mockName('createBlockAgenda'),
+      subErrors: vi.fn().mockName('subErrors'),
     };
 
     await TestBed.configureTestingModule({
       imports: [BlockAgendaCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         {
           provide: AuthUserService,
           useValue: { authUser: signal({ isRoomAdmin: false }) },
         },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    })
-      .overrideTemplate(BlockAgendaCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaCreatePageComponent);
     component = fixture.componentInstance;

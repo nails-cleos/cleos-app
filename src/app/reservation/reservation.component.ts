@@ -594,11 +594,11 @@ export class ReservationComponent {
     () => this.authUserSignal()?.isDarkMode ?? false,
   );
   private skip = signal(false);
+  private customerId = signal<string | undefined>(undefined);
   private roomId = signal<string | undefined>(undefined);
   private professionalId = signal(this.selectProfessionalSignal()?.id);
   private treatmentId = signal<string | undefined>(undefined);
   private reservationId?: string;
-  private customerId?: string;
   private additionalIds?: string[];
   private steps: IStep[];
   private dismiss = false;
@@ -664,7 +664,7 @@ export class ReservationComponent {
       const params = this.params();
       this.skip.set(params?.skip ?? false);
       this.roomId.set(params?.roomId);
-      this.customerId = params?.customerId;
+      this.customerId.set(params?.customerId);
       this.isDashboard = params?.isDashboard ?? false;
       this.treatmentId.set(params?.treatmentId);
       this.groupId = params?.groupId;
@@ -705,6 +705,16 @@ export class ReservationComponent {
 
           return value;
         });
+      }
+    });
+
+    effect(() => {
+      const customers = this.customersSignal();
+      const customerId = this.customerId();
+      if (customers?.length && customerId) {
+        this.getCustomerForm.customer.setValue(
+          customers.find((c) => c.id === customerId),
+        );
       }
     });
 
@@ -761,7 +771,7 @@ export class ReservationComponent {
     effect(() => {
       const skip = this.skip();
       const roomId = this.roomId();
-      const customerId = this.customerId;
+      const customerId = this.customerId();
       if (skip) {
         this.roomStore.loadAll(customerId);
         this.getAdditionalList(roomId, this.groupId);
@@ -783,10 +793,10 @@ export class ReservationComponent {
 
     effect(() => {
       const customer = this.selectCustomerSignal();
-      this.customerId = customer?.id;
       if (!customer) {
         return;
       }
+      this.customerId.set(customer.id);
       if (this.hydratingEdit) {
         return;
       }
@@ -1440,7 +1450,7 @@ export class ReservationComponent {
       return;
     }
     this.isPreview = false;
-    this.getRoomList(this.customerId);
+    this.getRoomList(this.customerId());
     this.cleanEvent();
     if (goNext) {
       this.completeAndGoToNextStep(0);
@@ -1452,7 +1462,7 @@ export class ReservationComponent {
       return;
     }
     this.isPreview = false;
-    this.getTreatmentList(this.roomId(), this.customerId);
+    this.getTreatmentList(this.roomId(), this.customerId());
     this.cleanEvent();
     if (goNext) {
       this.completeAndGoToNextStep(1);
@@ -2254,7 +2264,7 @@ export class ReservationComponent {
       reservation.timestamp,
       reservation.room.timeZone,
     );
-    this.customerId = reservation.customer.id;
+    this.customerId.set(reservation.customer.id);
     this.groupId = reservation.treatment.groupId;
     this.professionalId.set(reservation.professional.id);
     this.roomId.set(reservation.room.id);

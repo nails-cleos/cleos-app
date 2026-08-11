@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AccountStore } from './account.store';
@@ -16,9 +15,6 @@ describe('AccountStore', () => {
     getTransaction: Mock;
     createTransaction: Mock;
     updateAccount: Mock;
-  };
-  let translateSpy: {
-    instant: Mock;
   };
 
   beforeEach(() => {
@@ -35,19 +31,10 @@ describe('AccountStore', () => {
       updateAccount: vi.fn().mockName('AccountService.updateAccount'),
     };
 
-    translateSpy = {
-      instant: vi.fn().mockName('TranslateService.instant'),
-    };
-    translateSpy.instant.mockImplementation(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['id'] ?? ''}`,
-    );
-
     TestBed.configureTestingModule({
       providers: [
         AccountStore,
         { provide: AccountService, useValue: accountServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -127,12 +114,9 @@ describe('AccountStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('ACCOUNT.MONEY_ADDED', {
-      id: 'acc-1',
-    });
-
     expect(store.response()).toEqual({
-      message: 'ACCOUNT.MONEY_ADDED:acc-1',
+      messageKey: 'ACCOUNT.MONEY_ADDED',
+      messageParams: { id: 'acc-1' },
       path: 'accounts/acc-1/transactions/tx-1',
     });
 
@@ -164,12 +148,9 @@ describe('AccountStore', () => {
       expect.any(Object),
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith('ACCOUNT.UPDATED', {
-      id: 'acc-99',
-    });
-
     expect(store.response()).toEqual({
-      message: 'ACCOUNT.UPDATED:acc-99',
+      messageKey: 'ACCOUNT.UPDATED',
+      messageParams: { id: 'acc-99' },
       path: 'accounts/customers/cust-1',
     });
 
