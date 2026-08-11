@@ -1,19 +1,22 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UpcomingComponent } from './upcoming.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IUpcomingAll } from '../../../reservation/reservation';
-import { Price } from '../../../treatment/treatment';
-import { ServiceType } from '../../../room/room';
-import { Role } from '../../../interfaces/token';
-import { ICurrencyAll } from '../../../currency/currency';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { IUpcomingAll } from '@app/reservation/reservation';
+import { Price } from '@app/treatment/treatment';
+import { ServiceType } from '@app/room/room';
+import { Role } from '@app/interfaces/token';
+import { ICurrencyAll } from '@app/currency/currency';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('UpcomingComponent', () => {
   let component: UpcomingComponent;
   let fixture: ComponentFixture<UpcomingComponent>;
-  let dialogSpy: jasmine.Spy<any>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let dialogSpy: Mock;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   const currency: ICurrencyAll = {
     id: '1',
@@ -63,14 +66,16 @@ describe('UpcomingComponent', () => {
         name: 'Additional 1',
         price: 10,
         type: ServiceType.additional,
-      }, {
+      },
+      {
         duration: 'PT30M',
         key: 'key 2',
         id: '2',
         name: 'Additional 2',
         price: 20,
         type: ServiceType.additional,
-      }],
+      },
+    ],
     customer: {
       id: 'c1',
       displayName: 'Customer 1',
@@ -99,13 +104,15 @@ describe('UpcomingComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
 
     await TestBed.configureTestingModule({
-      imports: [UpcomingComponent, TranslateModule.forRoot()],
+      imports: [UpcomingComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -117,7 +124,9 @@ describe('UpcomingComponent', () => {
     component = fixture.componentInstance;
     fixture.componentRef.setInput('small', false);
 
-    dialogSpy = spyOn(component['dialog'], 'open');
+    dialogSpy = vi
+      .spyOn(component['dialog'], 'open')
+      .mockReturnValue(undefined as any);
   });
 
   it('should create', () => {
@@ -134,14 +143,18 @@ describe('UpcomingComponent', () => {
 
   it('should return true for showTimeZone if time zones differ', () => {
     fixture.componentRef.setInput('upcoming', upcoming);
-    expect(component.showTimeZone()).toBeTrue();
+    expect(component.showTimeZone()).toBe(true);
   });
 
   it('should navigate when edit and canEdit is true', () => {
     fixture.componentRef.setInput('upcoming', upcoming);
 
     component.edit();
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['me', 'reservation', '1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'me',
+      'reservation',
+      '1',
+    ]);
   });
 
   it('should handle openDialog call when upcoming is defined', () => {
@@ -154,15 +167,13 @@ describe('UpcomingComponent', () => {
     const reservationDate = new Date();
     fixture.componentRef.setInput('upcoming', upcoming);
     component.openDialog(reservationDate);
-    expect(dialogSpy).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      {
-        data: {
-          title: 'COMMON.TIME_ZONE.TITLE',
-          content: 'COMMON.TIME_ZONE.ROOM_INFO',
-          hideNoButton: true,
-          hideOkButton: true,
-        },
-      });
+    expect(dialogSpy).toHaveBeenCalledWith(expect.any(Function), {
+      data: {
+        title: 'COMMON.TIME_ZONE.TITLE',
+        content: 'COMMON.TIME_ZONE.ROOM_INFO',
+        hideNoButton: true,
+        hideOkButton: true,
+      },
+    });
   });
 });

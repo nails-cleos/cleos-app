@@ -1,8 +1,12 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CurrencyDetailsPageComponent } from './currency-details-page.component';
 import { CurrencyStore } from '../store/currency.store';
 import { ICurrencyAll } from './currency';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('CurrencyDetailsPageComponent', () => {
   let component: CurrencyDetailsPageComponent;
@@ -10,9 +14,9 @@ describe('CurrencyDetailsPageComponent', () => {
 
   let currencyStoreSpy: {
     selected: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -27,18 +31,20 @@ describe('CurrencyDetailsPageComponent', () => {
   beforeEach(async () => {
     currencyStoreSpy = {
       selected: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CurrencyDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: CurrencyStore, useValue: currencyStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(CurrencyDetailsPageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CurrencyDetailsPageComponent);
     fixture.componentRef.setInput('id', id);
@@ -62,10 +68,13 @@ describe('CurrencyDetailsPageComponent', () => {
 
     component.submit(mockCurrency);
 
-    expect(currencyStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Currency',
-      code: 'EUR',
-      icon: 'euro',
-    }));
+    expect(currencyStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Currency',
+        code: 'EUR',
+        icon: 'euro',
+      }),
+    );
   });
 });

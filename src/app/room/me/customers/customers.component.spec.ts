@@ -1,50 +1,72 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CustomersComponent } from './customers.component';
 import { Subject } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 import { IRoomCustomer } from '../../room';
 import { ActivatedRoute } from '@angular/router';
-import { RoomStore } from '../../../store/room.store';
+import { RoomStore } from '@app/store/room.store';
 import { signal } from '@angular/core';
-import { NavigationService } from '../../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CustomersComponent', () => {
   let component: CustomersComponent;
   let fixture: ComponentFixture<CustomersComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let breakpointObserver$: Subject<BreakpointState>;
 
   let roomStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     customers: ReturnType<typeof signal<any>>;
-    loadCustomers: jasmine.Spy;
+    loadCustomers: Mock;
   };
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpointObserver$ = new Subject<BreakpointState>();
 
     roomStoreSpy = {
       isLoading: signal(false),
       customers: signal<IRoomCustomer[]>([]),
-      loadCustomers: jasmine.createSpy('loadCustomers'),
+      loadCustomers: vi.fn().mockName('loadCustomers'),
     };
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpointObserver$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(
+      breakpointObserver$.asObservable(),
+    );
 
     await TestBed.configureTestingModule({
-      imports: [CustomersComponent, TranslateModule.forRoot()],
+      imports: [CustomersComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomStore, useValue: roomStoreSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
     }).compileComponents();
@@ -72,7 +94,13 @@ describe('CustomersComponent', () => {
 
   it('should update datasource when customers change', () => {
     const customersMock: IRoomCustomer[] = [
-      { customerId: '1', customerName: 'Lucas', days: 3, lastTime: new Date().getTime(), reservationId: '123' },
+      {
+        customerId: '1',
+        customerName: 'Lucas',
+        days: 3,
+        lastTime: new Date().getTime(),
+        reservationId: '123',
+      },
     ];
 
     roomStoreSpy.customers.set(customersMock);

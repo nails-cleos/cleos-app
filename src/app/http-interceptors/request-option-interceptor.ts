@@ -10,16 +10,22 @@ export const requestOptionInterceptor = (
 ): Observable<HttpEvent<unknown>> => {
   if (!isExternalUrl(req.url)) {
     if (!req.headers.has('Content-Type') && !req.headers.has('Upload')) {
-      req = req.clone({ headers: req.headers.set('Content-Type', 'application/json') });
+      req = req.clone({
+        headers: req.headers.set('Content-Type', 'application/json'),
+      });
     }
 
     if (!req.headers.has('Accept')) {
-      req = req.clone({ headers: req.headers.set('Accept', 'application/json') });
+      req = req.clone({
+        headers: req.headers.set('Accept', 'application/json'),
+      });
     }
 
     const user = inject(TokenService).user();
     if (user && user.lang) {
-      req = req.clone({ headers: req.headers.set('Accept-Language', user.lang) });
+      req = req.clone({
+        headers: req.headers.set('Accept-Language', user.lang),
+      });
     }
   }
 

@@ -1,7 +1,14 @@
 import { effect, inject } from '@angular/core';
-import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals';
+import {
+  patchState,
+  signalStore,
+  withHooks,
+  withMethods,
+  withState,
+} from '@ngrx/signals';
 import { TranslateService } from '@ngx-translate/core';
 import { createStoreInitialState, StoreState } from './crud-signal-store';
+import { DEFAULT_LOCALE } from '../util/dates';
 
 type I18NStoreState = StoreState & {
   language: string;
@@ -30,26 +37,22 @@ const loadFromStorage = (): Partial<I18NStoreState> | undefined => {
 };
 
 const persist = (language: string): void => {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({ language }),
-  );
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ language }));
 };
 
 export const I18NStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    translateService = inject(TranslateService),
-  ) => ({
+  withMethods((store, translateService = inject(TranslateService)) => ({
     hydrate(): void {
       const data = loadFromStorage();
 
       if (data) {
         patchState(store, data);
       } else {
-        patchState(store, { language: translateService.getCurrentLang() });
+        patchState(store, {
+          language: translateService.getCurrentLang() || DEFAULT_LOCALE,
+        });
       }
     },
 
@@ -73,10 +76,7 @@ export const I18NStore = signalStore(
   })),
 
   withHooks({
-    onInit(
-      store,
-      translateService = inject(TranslateService),
-    ) {
+    onInit(store, translateService = inject(TranslateService)) {
       effect(() => {
         const lang = store.language();
 

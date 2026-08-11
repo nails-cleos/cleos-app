@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { IFabMenu } from '../../reservation';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
@@ -23,7 +31,9 @@ export class FabMenuComponent {
     this.menuOpen = !this.menuOpen;
   }
 
-  @HostListener('document:click', ['$event']) clickOutsideMenu = (event: MouseEvent) => {
+  @HostListener('document:click', ['$event']) clickOutsideMenu = (
+    event: MouseEvent,
+  ) => {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.menuOpen = false;
     }

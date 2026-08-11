@@ -4,13 +4,25 @@
     @if (transaction) {
       <div class="app-detail-section-header">
         <div>
-          <span class="app-surface-eyebrow">{{ 'ACCOUNT.TRANSACTION.DETAIL' | translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'ACCOUNT.TRANSACTION.DETAIL' | translate
+          }}</span>
           <h2 class="transaction-detail-title">{{ transaction.id }}</h2>
         </div>
 
         <div class="app-detail-actions">
-          <button mat-stroked-button type="button"
-                  [routerLink]="['/', language, 'accounts', transaction.account?.id, 'transactions', 'view']">
+          <button
+            mat-stroked-button
+            type="button"
+            [routerLink]="[
+              '/',
+              language,
+              'accounts',
+              $safeNavigationMigration(transaction.account?.id),
+              'transactions',
+              'view',
+            ]"
+          >
             <mat-icon>account_balance</mat-icon>
             <span>{{ 'COMMON.BUTTON.VIEW' | translate }}</span>
           </button>
@@ -19,36 +31,64 @@
 
       <div class="transaction-detail-grid">
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.DATE' | translate }}</span>
-          <strong class="app-surface-item__value">{{ transaction.date | date:'short':undefined:language }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.DATE' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            transaction.date | date: 'short' : undefined : language
+          }}</strong>
         </div>
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</span>
-          <strong class="app-surface-item__value">{{ transaction.amount | number:'1.2-2' }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            transaction.amount | number: '1.2-2'
+          }}</strong>
         </div>
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.AMOUNT_GIFTED' | translate }}</span>
-          <strong class="app-surface-item__value">{{ transaction.amountGifted | number:'1.2-2' }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.AMOUNT_GIFTED' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            transaction.amountGifted | number: '1.2-2'
+          }}</strong>
         </div>
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate }}</span>
-          <strong class="app-surface-item__value">{{ transaction.payment?.paymentId }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.PAYMENT_ID' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            transaction.payment?.paymentId
+          }}</strong>
         </div>
         @if (transaction.payment?.preferenceId) {
           <div class="app-surface-item">
-            <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.PREFERENCE_ID' | translate }}</span>
-            <strong class="app-surface-item__value">{{ transaction.payment?.preferenceId }}</strong>
+            <span class="app-surface-item__label">{{
+              'ACCOUNT.TRANSACTION.PREFERENCE_ID' | translate
+            }}</span>
+            <strong class="app-surface-item__value">{{
+              transaction.payment?.preferenceId
+            }}</strong>
           </div>
         }
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.STATUS' | translate }}</span>
-          <strong
-            class="app-surface-item__value">{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.STATUS' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE')
+              | translate
+          }}</strong>
         </div>
         <div class="app-surface-item">
-          <span class="app-surface-item__label">{{ 'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate }}</span>
-          <strong
-            class="app-surface-item__value">{{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}</strong>
+          <span class="app-surface-item__label">{{
+            'ACCOUNT.TRANSACTION.TYPE.FIELD' | translate
+          }}</span>
+          <strong class="app-surface-item__value">{{
+            'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE')
+              | translate
+          }}</strong>
         </div>
       </div>
     } @else {
@@ -63,7 +103,13 @@
 
     @if (transaction) {
       <div class="app-detail-actions">
-        <button appBackButton [date]="transaction.date" [step]="step" mat-stroked-button type="button">
+        <button
+          appBackButton
+          [date]="transaction.date"
+          [step]="step"
+          mat-stroked-button
+          type="button"
+        >
           <mat-icon>keyboard_return</mat-icon>
           <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
         </button>

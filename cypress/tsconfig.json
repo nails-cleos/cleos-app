@@ -1,12 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "types": [
-      "cypress",
-      "node"
-    ]
+    "types": ["cypress", "node"],
+    "skipLibCheck": true,
+    "rootDir": "..",
+    "baseUrl": "..",
+    "paths": {
+      "@app/*": ["src/app/*"]
+    },
+    "noEmit": true
   },
-  "include": [
-    "**/*.ts"
-  ]
+  "include": ["./**/*.ts", "../src/**/*.ts"],
+  "exclude": ["../node_modules"]
 }

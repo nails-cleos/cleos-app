@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
 import { IError } from '../interfaces/common';
 
-export type ReservationErrorState<TField extends string, TErrors extends Record<string, unknown>> = {
+export type ReservationErrorState<
+  TField extends string,
+  TErrors extends Record<string, unknown>,
+> = {
   errors: TErrors;
   fields: TField[];
   stepIndex?: number;
 };
 
-export type ReservationErrorStateOptions<TField extends string, TErrors extends Record<string, unknown>> = {
+export type ReservationErrorStateOptions<
+  TField extends string,
+  TErrors extends Record<string, unknown>,
+> = {
   allowedFields: readonly TField[];
   createErrors: () => TErrors;
   defaultStepIndex: number;
@@ -18,7 +24,10 @@ export type ReservationErrorStateOptions<TField extends string, TErrors extends 
   providedIn: 'root',
 })
 export class ReservationFormErrorService {
-  createErrorState<TField extends string, TErrors extends Record<string, unknown>>(
+  createErrorState<
+    TField extends string,
+    TErrors extends Record<string, unknown>,
+  >(
     subErrors: IError[],
     options: ReservationErrorStateOptions<TField, TErrors>,
   ): ReservationErrorState<TField, TErrors> {
@@ -26,10 +35,12 @@ export class ReservationFormErrorService {
     const fields = new Set<TField>();
     let stepIndex: number | undefined;
 
-    subErrors.forEach(error => {
+    subErrors.forEach((error) => {
       const field = this.toField(error.field, options.allowedFields);
       if (!stepIndex && stepIndex !== 0) {
-        stepIndex = field ? options.stepByField?.[field] ?? options.defaultStepIndex : options.defaultStepIndex;
+        stepIndex = field
+          ? (options.stepByField?.[field] ?? options.defaultStepIndex)
+          : options.defaultStepIndex;
       }
 
       if (!field) {
@@ -51,6 +62,6 @@ export class ReservationFormErrorService {
     field: string | undefined,
     allowedFields: readonly TField[],
   ): TField | undefined {
-    return allowedFields.find(allowedField => allowedField === field);
+    return allowedFields.find((allowedField) => allowedField === field);
   }
 }

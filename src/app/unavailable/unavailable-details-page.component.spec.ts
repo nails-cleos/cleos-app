@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { UnavailableDetailsPageComponent } from './unavailable-details-page.component';
 import { UnavailableStore } from '../store/unavailable.store';
@@ -8,7 +8,9 @@ import { IUnavailableAll } from './unavailable';
 import { UnavailableComponent } from './unavailable.component';
 import { AuthUserService } from '../services/auth-user.service';
 import { UserStore } from '../store/user.store';
-
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 describe('UnavailableDetailsPageComponent', () => {
   let component: UnavailableDetailsPageComponent;
   let fixture: ComponentFixture<UnavailableDetailsPageComponent>;
@@ -16,17 +18,17 @@ describe('UnavailableDetailsPageComponent', () => {
   let unavailableStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
+    delete: Mock;
   };
 
   let userStoreSpy: {
     professionals: ReturnType<typeof signal>;
     rooms: ReturnType<typeof signal>;
-    loadProfessionals: jasmine.Spy;
-    loadRoomsByProfessionalId: jasmine.Spy;
+    loadProfessionals: Mock;
+    loadRoomsByProfessionalId: Mock;
   };
 
   const id = '123';
@@ -42,33 +44,38 @@ describe('UnavailableDetailsPageComponent', () => {
     unavailableStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
+      delete: vi.fn().mockName('delete'),
     };
     userStoreSpy = {
       professionals: signal<any>(undefined),
       rooms: signal<any>(undefined),
-      loadProfessionals: jasmine.createSpy('loadProfessionals'),
-      loadRoomsByProfessionalId: jasmine.createSpy('loadRoomsByProfessionalId'),
+      loadProfessionals: vi.fn().mockName('loadProfessionals'),
+      loadRoomsByProfessionalId: vi.fn().mockName('loadRoomsByProfessionalId'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [UnavailableDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [UnavailableDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
         { provide: UserStore, useValue: userStoreSpy },
-        { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
-        { provide: MatDialog, useValue: jasmine.createSpyObj('MatDialog', ['open']) },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal({ isRoomAdmin: false }) },
+        },
+        {
+          provide: MatDialog,
+          useValue: {
+            open: vi.fn().mockName('MatDialog.open'),
+          },
+        },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(UnavailableComponent, '')
-      .overrideTemplate(UnavailableDetailsPageComponent, `
-        @if (unavailable(); as unavailable) {
-          <app-unavailable [unavailable]="unavailable" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UnavailableDetailsPageComponent);
     fixture.componentRef.setInput('id', id);
@@ -91,12 +98,15 @@ describe('UnavailableDetailsPageComponent', () => {
     unavailableStoreSpy.selected.set(mockUnavailable);
     fixture.detectChanges();
 
-    const unavailableComponent = fixture.debugElement.children[0].componentInstance as UnavailableComponent;
+    const unavailableComponent = fixture.debugElement.children[0]
+      .componentInstance as UnavailableComponent;
 
-    expect(unavailableComponent.unavailable()).toEqual(jasmine.objectContaining({
-      id,
-      description: 'Test Description',
-    }));
+    expect(unavailableComponent.unavailable()).toEqual(
+      expect.objectContaining({
+        id,
+        description: 'Test Description',
+      }),
+    );
   });
 
   it('should call update when unavailable is received', () => {
@@ -106,7 +116,7 @@ describe('UnavailableDetailsPageComponent', () => {
 
     expect(unavailableStoreSpy.update).toHaveBeenCalledWith(
       id,
-      jasmine.objectContaining({
+      expect.objectContaining({
         description: 'Test Description',
       }),
       'unavailable',

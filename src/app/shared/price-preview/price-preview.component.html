@@ -1,25 +1,36 @@
 @if (price(); as price) {
   @if (!summaryOnly() && (price.total || price.total === 0)) {
-    @let hasDiscount = !!discountId() || price.total !== price.totalWithoutDiscount || price.discount > 0;
+    @let hasDiscount =
+      !!discountId() ||
+      price.total !== price.totalWithoutDiscount ||
+      price.discount > 0;
     <mat-list-item>
-      <mat-icon style="margin-top: 32px" matListItemIcon>{{ currencyIcon() }}</mat-icon>
+      <mat-icon style="margin-top: 32px" matListItemIcon>{{
+        currencyIcon()
+      }}</mat-icon>
       <div matListItemTitle [innerHTML]="label() | translate"></div>
       @if (hasDiscount) {
         @if (!isEditing()) {
           <div matListItemLine>
-            <span [class.strikethrough]="hasDiscount">{{ price.totalWithoutDiscount | number:'1.2-2' }}</span>
-            <span class="raised-button bold discount-enter">{{ price.total | number:'1.2-2' }}</span>
+            <span [class.strikethrough]="hasDiscount">{{
+              price.totalWithoutDiscount | number: '1.2-2'
+            }}</span>
+            <span class="raised-button bold discount-enter">{{
+              price.total | number: '1.2-2'
+            }}</span>
           </div>
         } @else {
           <div matListItemLine>
-            <span>{{ price.total | number:'1.2-2' }}</span>
+            <span>{{ price.total | number: '1.2-2' }}</span>
             @if (discountKey(); as discountKey) {
-              <span class="raised-button bold">{{ discountKey | translate }}</span>
+              <span class="raised-button bold">{{
+                discountKey | translate
+              }}</span>
             }
           </div>
         }
       } @else {
-        <div matListItemLine>{{ price.total | number:'1.2-2' }}</div>
+        <div matListItemLine>{{ price.total | number: '1.2-2' }}</div>
       }
     </mat-list-item>
   }
@@ -28,31 +39,57 @@
     <div class="price-table">
       @if (updatedTotal() !== undefined && updatedTotal() !== null) {
         <div class="row">
-          <span class="label strong">{{ 'COMMON.PAYMENT.OPTIONS.UPDATED_TOTAL' | translate }}</span>
-          <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ currentTotal | number:'1.2-2' }}</span>
+          <span class="label strong">{{
+            'COMMON.PAYMENT.OPTIONS.UPDATED_TOTAL' | translate
+          }}</span>
+          <span class="value"
+            >{{ currentCurrencyIcon | currencySymbol }}
+            {{ currentTotal | number: '1.2-2' }}</span
+          >
         </div>
       }
 
       @if (penalty()) {
         <div class="row">
-          <span class="label strong">{{ 'COMMON.PAYMENT.OPTIONS.PENALTY' | translate }}</span>
-          <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ penalty() | number:'1.2-2' }}</span>
+          <span class="label strong">{{
+            'COMMON.PAYMENT.OPTIONS.PENALTY' | translate
+          }}</span>
+          <span class="value"
+            >{{ currentCurrencyIcon | currencySymbol }}
+            {{ penalty() | number: '1.2-2' }}</span
+          >
         </div>
       }
 
       <div class="row subtract-row">
-        <span class="label">&nbsp; &nbsp;{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span>
-        <span class="value">- {{ currentCurrencyIcon | currencySymbol }} {{ currentPaidTotal | number:'1.2-2' }}</span>
+        <span class="label"
+          >&nbsp; &nbsp;{{ 'COMMON.PAYMENT.OPTIONS.PAID' | translate }}</span
+        >
+        <span class="value"
+          >- {{ currentCurrencyIcon | currencySymbol }}
+          {{ currentPaidTotal | number: '1.2-2' }}</span
+        >
       </div>
 
       @if (accountBalanceUsed > 0) {
         <div class="row subtract-row">
-          <span class="label">&nbsp; &nbsp;{{ 'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate }}</span>
-          <span class="value">- {{ currentCurrencyIcon | currencySymbol }} {{ accountBalanceUsed | number:'1.2-2' }}</span>
+          <span class="label"
+            >&nbsp; &nbsp;{{
+              'COMMON.PAYMENT.OPTIONS.ACCOUNT' | translate
+            }}</span
+          >
+          <span class="value"
+            >- {{ currentCurrencyIcon | currencySymbol }}
+            {{ accountBalanceUsed | number: '1.2-2' }}</span
+          >
         </div>
       }
 
-      <div class="row balance-row" [class.positive]="(toPaid() ?? 0) > 0" [class.negative]="accountCreditAmount > 0">
+      <div
+        class="row balance-row"
+        [class.positive]="(toPaid() ?? 0) > 0"
+        [class.negative]="accountCreditAmount > 0"
+      >
         <span class="label strong">
           @if ((toPaid() ?? 0) > 0) {
             {{ 'COMMON.PAYMENT.OPTIONS.TO_PAY' | translate }}
@@ -62,7 +99,10 @@
             {{ 'COMMON.PAYMENT.OPTIONS.BALANCE' | translate }}
           }
         </span>
-        <span class="value">{{ currentCurrencyIcon | currencySymbol }} {{ resultAmount | number:'1.2-2' }}</span>
+        <span class="value"
+          >{{ currentCurrencyIcon | currencySymbol }}
+          {{ resultAmount | number: '1.2-2' }}</span
+        >
       </div>
     </div>
   }

@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { LoadingOverlayService } from './loading-overlay.service';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('LoadingOverlayService', () => {
   let service: LoadingOverlayService;

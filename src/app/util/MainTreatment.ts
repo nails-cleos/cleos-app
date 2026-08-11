@@ -1,6 +1,16 @@
 export interface ISection {
-  type: 'title' | 'subtitle' | 'subsubtitle' | 'image' | 'image-detail' | 'image-text' | 'detail' | 'list' | 'enum'
-    | 'divider' | 'table';
+  type:
+    | 'title'
+    | 'subtitle'
+    | 'subsubtitle'
+    | 'image'
+    | 'image-detail'
+    | 'image-text'
+    | 'detail'
+    | 'list'
+    | 'enum'
+    | 'divider'
+    | 'table';
   value: string;
   width?: number;
   height?: number;
@@ -75,7 +85,9 @@ export interface IMainTreatmentContentFile {
   treatments: IMainTreatmentContent[];
 }
 
-export const sections = (translations: IBiabTreatmentTranslations): ISection[] => {
+export const sections = (
+  translations: IBiabTreatmentTranslations,
+): ISection[] => {
   return [
     {
       type: 'title',
@@ -321,65 +333,73 @@ export const sections = (translations: IBiabTreatmentTranslations): ISection[] =
   ];
 };
 
-const comparativeTable = (comparisonTable: IBiabTreatmentTranslations['comparisonTable']): ISection[] => {
-  const title = [{
-    type: 'subtitle',
-    value: '',
-    details: [
-      {
+const comparativeTable = (
+  comparisonTable: IBiabTreatmentTranslations['comparisonTable'],
+): ISection[] => {
+  const title = [
+    {
+      type: 'subtitle',
+      value: '',
+      details: [
+        {
+          type: 'detail',
+          value: '',
+          class: 'inner-border table-header',
+        },
+        {
+          type: 'detail',
+          value: comparisonTable.columns.biab,
+          class: 'inner-border center table-header',
+        },
+        {
+          type: 'detail',
+          value: comparisonTable.columns.regularGels,
+          class: 'inner-border center table-header',
+        },
+        {
+          type: 'detail',
+          value: comparisonTable.columns.acrylic,
+          class: 'inner-border center table-header',
+        },
+      ],
+    } as ISection,
+  ];
+
+  const details = comparisonTable.rows.map(
+    (row: IMainTreatmentComparisonRow) =>
+      ({
         type: 'detail',
         value: '',
-        class: 'inner-border table-header',
-      },
-      {
-        type: 'detail',
-        value: comparisonTable.columns.biab,
-        class: 'inner-border center table-header',
-      },
-      {
-        type: 'detail',
-        value: comparisonTable.columns.regularGels,
-        class: 'inner-border center table-header',
-      },
-      {
-        type: 'detail',
-        value: comparisonTable.columns.acrylic,
-        class: 'inner-border center table-header',
-      },
-    ],
-  } as ISection];
-
-  const details = comparisonTable.rows.map((row: IMainTreatmentComparisonRow) => ({
-    type: 'detail',
-    value: '',
-    details: [
-      {
-        type: 'detail',
-        value: row.label,
-        class: 'inner-border bold center table-column-header',
-      },
-      {
-        type: 'detail',
-        value: row.biab,
-        class: 'inner-border center',
-      },
-      {
-        type: 'detail',
-        value: row.regularGels,
-        class: 'inner-border center',
-      },
-      {
-        type: 'detail',
-        value: row.acrylic,
-        class: 'inner-border center',
-      },
-    ],
-  } as ISection));
+        details: [
+          {
+            type: 'detail',
+            value: row.label,
+            class: 'inner-border bold center table-column-header',
+          },
+          {
+            type: 'detail',
+            value: row.biab,
+            class: 'inner-border center',
+          },
+          {
+            type: 'detail',
+            value: row.regularGels,
+            class: 'inner-border center',
+          },
+          {
+            type: 'detail',
+            value: row.acrylic,
+            class: 'inner-border center',
+          },
+        ],
+      }) as ISection,
+  );
 
   return title.concat(details);
 };
 
-const mapDetails = (values: string[]): ISection[] => values.map((value: string) => ({
-  type: 'detail',
-  value,
-}));
+const mapDetails = (values: string[]): ISection[] =>
+  values.map((value: string) => ({
+    type: 'detail',
+    value,
+  }));

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { AdditionalComponent } from './additional.component';
 import { AdditionalStore } from '../store/additional.store';
 import { IAdditional } from './additional';
@@ -10,7 +17,11 @@ import { formatDuration } from '../util/dates';
   selector: 'app-additional-details-page',
   template: `
     @if (additional()) {
-      <app-additional [additional]="additional()" [config]="config" (submitData)="submit($event)" />
+      <app-additional
+        [additional]="additional()"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
       <app-skeleton />
     }

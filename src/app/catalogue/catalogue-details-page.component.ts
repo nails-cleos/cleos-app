@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ICatalogue } from './catalogue';
@@ -9,7 +16,12 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-catalogue-details-page',
   template: `
     @if (catalogue(); as catalogue) {
-      <app-catalogue [undoImage]="true" [catalogue]="catalogue" [config]="config" (submitData)="submit($event)"/>
+      <app-catalogue
+        [undoImage]="true"
+        [catalogue]="catalogue"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
       <app-skeleton />
     }
@@ -34,7 +46,11 @@ export class CatalogueDetailsPageComponent {
     });
   }
 
-  submit(data: { catalogue: ICatalogue, resizedImageDataUrl: string; }) {
-    this.catalogueStore.update(this.id(), data.catalogue, data.resizedImageDataUrl);
+  submit(data: { catalogue: ICatalogue; resizedImageDataUrl: string }) {
+    this.catalogueStore.update(
+      this.id(),
+      data.catalogue,
+      data.resizedImageDataUrl,
+    );
   }
 }

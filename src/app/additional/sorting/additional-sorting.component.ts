@@ -1,13 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import {
   DragDropSortingComponent,
   ISorted,
   ItemSorting,
-} from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+} from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
 import { IAdditionalAll } from '../additional';
 import { TranslatePipe } from '@ngx-translate/core';
-import { AdditionalStore } from '../../store/additional.store';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
+import { AdditionalStore } from '@app/store/additional.store';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
 
 @Component({
   selector: 'app-sorting',
@@ -25,8 +31,16 @@ export class AdditionalSortingComponent {
   });
   private responseSignal = this.additionalStore.response;
 
-  itemsSignal = computed(() => this.additionalListSignal()?.map(
-    (iAdditionalAll: IAdditionalAll) => new ItemSorting(iAdditionalAll.id, iAdditionalAll.name, iAdditionalAll.order)));
+  itemsSignal = computed(() =>
+    this.additionalListSignal()?.map(
+      (iAdditionalAll: IAdditionalAll) =>
+        new ItemSorting(
+          iAdditionalAll.id,
+          iAdditionalAll.name,
+          iAdditionalAll.order,
+        ),
+    ),
+  );
   isLoading = this.additionalStore.isLoading;
 
   constructor() {
@@ -40,5 +54,6 @@ export class AdditionalSortingComponent {
     });
   }
 
-  sorted = (additionalList: ISorted[]): void => this.additionalStore.sort(additionalList);
+  sorted = (additionalList: ISorted[]): void =>
+    this.additionalStore.sort(additionalList);
 }

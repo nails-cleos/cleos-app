@@ -1,41 +1,46 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
-import { TreatmentStore } from '../../store/treatment.store';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentViewComponent } from './treatment-view.component';
-import { NavigationService } from '../../services/navigation.service';
-import { DEFAULT_LOCALE } from '../../util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentViewComponent', () => {
   let component: TreatmentViewComponent;
   let fixture: ComponentFixture<TreatmentViewComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let treatmentStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     selected: ReturnType<typeof signal<any>>;
     history: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    loadHistory: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    loadHistory: Mock;
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     treatmentStoreSpy = {
       isLoading: signal(false),
       selected: signal({ id: '123', name: 'Deep Tissue', treatments: [] }),
       history: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      loadHistory: jasmine.createSpy('loadHistory'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      loadHistory: vi.fn().mockName('loadHistory'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentViewComponent, TranslateModule.forRoot()],
+      imports: [TreatmentViewComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
       ],
@@ -58,26 +63,38 @@ describe('TreatmentViewComponent', () => {
   });
 
   it('should expose the selected treatment', () => {
-    expect(component.treatment()).toEqual(jasmine.objectContaining({ id: '123', name: 'Deep Tissue' }));
+    expect(component.treatment()).toEqual(
+      expect.objectContaining({ id: '123', name: 'Deep Tissue' }),
+    );
   });
 
   it('should navigate to edit on edit()', () => {
     component.edit();
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['treatments', '123', 'edit']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'treatments',
+      '123',
+      'edit',
+    ]);
   });
 
   it('should load treatment history', () => {
     component.getHistory('treatment-1');
 
-    expect(treatmentStoreSpy.loadHistory).toHaveBeenCalledWith('123', 'treatment-1');
+    expect(treatmentStoreSpy.loadHistory).toHaveBeenCalledWith(
+      '123',
+      'treatment-1',
+    );
   });
 
   it('should include history on the selected treatment', () => {
     treatmentStoreSpy.selected.set({
       id: '123',
       name: 'Deep Tissue',
-      treatments: [{ id: 't1', name: 'Treatment 1' }, { id: 't2', name: 'Treatment 2' }],
+      treatments: [
+        { id: 't1', name: 'Treatment 1' },
+        { id: 't2', name: 'Treatment 2' },
+      ],
     });
     treatmentStoreSpy.history.set([{ id: 'history-1' }]);
 
@@ -86,7 +103,7 @@ describe('TreatmentViewComponent', () => {
 
     const treatments = component.treatment()?.treatments as any[];
     expect(treatments[0].showHistory).toBeUndefined();
-    expect(treatments[1].showHistory).toBeTrue();
+    expect(treatments[1].showHistory).toBe(true);
     expect(treatments[1].history).toEqual([{ id: 'history-1' }]);
   });
 });

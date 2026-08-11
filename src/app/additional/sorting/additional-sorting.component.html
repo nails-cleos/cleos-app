@@ -1,6 +1,13 @@
 @if (isLoading()) {
-  <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [showMedia]="false"></app-card-list-skeleton>
+  <app-card-list-skeleton
+    [badgeCount]="0"
+    [actionCount]="0"
+    [showMedia]="false"
+  ></app-card-list-skeleton>
 } @else if (itemsSignal(); as items) {
-  <app-drag-drop-sorting [title]="'ADDITIONAL.DETAIL' | translate" [items]="items"
-                         (sorted)="sorted($event)"></app-drag-drop-sorting>
+  <app-drag-drop-sorting
+    [title]="'ADDITIONAL.DETAIL' | translate"
+    [items]="items"
+    (sorted)="sorted($event)"
+  ></app-drag-drop-sorting>
 }

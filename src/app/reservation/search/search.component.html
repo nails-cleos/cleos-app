@@ -2,7 +2,9 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'COMMON.SEARCH.TITLE' | translate
+        }}</span>
       </div>
     </div>
     <div class="app-surface-filter-grid">
@@ -10,17 +12,35 @@
         <mat-label>{{ 'RESERVATION.STATE.SEARCH' | translate }}</mat-label>
         <mat-chip-grid #chipList aria-label="Status selection">
           @for (state of selectedStatesSignal(); track state) {
-            <mat-chip-row (removed)="remove(state)" [removable]="true" color="primary">
-              {{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate }}
+            <mat-chip-row
+              (removed)="remove(state)"
+              [removable]="true"
+              color="primary"
+            >
+              {{
+                'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate
+              }}
               <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip-row>
           }
-          <input #stateInput [formControl]="getForm.state" [matAutocomplete]="auto" [matChipInputFor]="chipList"
-                 matInput placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}">
+          <input
+            #stateInput
+            [formControl]="getForm.state"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            matInput
+            placeholder="{{ 'RESERVATION.STATE.FIELD' | translate }}"
+          />
         </mat-chip-grid>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="selected($event)"
+        >
           @for (state of filteredStateSignal(); track state) {
-            <mat-option [value]="state">{{ 'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate }}
+            <mat-option [value]="state"
+              >{{
+                'COMMON.STATUS.RESERVATION.' + state.toUpperCase() | translate
+              }}
             </mat-option>
           }
         </mat-autocomplete>
@@ -29,13 +49,24 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.CUSTOMER.SEARCH' | translate }}</mat-label>
           <label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.customer" [matAutocomplete]="autoCustomer"
-                   autocomplete="off" matInput placeholder="{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}"
-                   type="text">
+            <input
+              (keydown)="keyDownHandler($event)"
+              [formControl]="getForm.customer"
+              [matAutocomplete]="autoCustomer"
+              autocomplete="off"
+              matInput
+              placeholder="{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}"
+              type="text"
+            />
           </label>
-          <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
+          <mat-autocomplete
+            #autoCustomer="matAutocomplete"
+            [displayWith]="displayFnUser"
+          >
             @for (customer of filteredCustomerSignal(); track customer.id) {
-              <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+              <mat-option [value]="customer">{{
+                customer.displayName
+              }}</mat-option>
             }
           </mat-autocomplete>
         </mat-form-field>
@@ -49,135 +80,259 @@
   @let pageSize = pageSizeSignal();
   @if (isLoading()) {
     <section class="app-surface-section">
-      <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+      <app-table-skeleton
+        [columns]="tableColumns"
+        [showPaginator]="true"
+      ></app-table-skeleton>
     </section>
   } @else if (dataSourceSignal(); as dataSource) {
     <section class="app-surface-section">
       <div class="app-table-shell">
-      <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
-             matSortDisableClear
-             multiTemplateDataRows>
-        <ng-container matColumnDef="position">
-          <th *matHeaderCellDef mat-header-cell>#</th>
-          <td *matCellDef="let reservation; let i = dataIndex;" mat-cell>
-            <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
-          </td>
-        </ng-container>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
+          matSortDisableClear
+          multiTemplateDataRows
+        >
+          <ng-container matColumnDef="position">
+            <th *matHeaderCellDef mat-header-cell>#</th>
+            <td *matCellDef="let reservation; let i = dataIndex" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="customer">
-          <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}</th>
-          <td *matCellDef="let reservation" mat-cell>
-            <div>{{ reservation.customer?.displayName }}</div>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="customer">
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.RESERVATION.LIST.COLUMN.CUSTOMER' | translate }}
+            </th>
+            <td *matCellDef="let reservation" mat-cell>
+              <div>{{ reservation.customer?.displayName }}</div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="timestamp">
-          <th *matHeaderCellDef mat-header-cell
-              mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
-          </th>
-          <td *matCellDef="let reservation" mat-cell>
-            <div>{{ reservation.timestamp | timeDetail | date:'short':reservation.room.timeZone:language }}</div>
-            @if (showTimeZone(reservation)) {
-              <button (click)="openDialog(reservation)" mat-icon-button type="button">
-                <mat-icon>info_outline</mat-icon>
-              </button>
-            }
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="state">
-          <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-              mat-sort-header>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
-          </th>
-          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            <mat-icon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>&nbsp;
-            <div>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</div>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="treatment">
-          <th *matHeaderCellDef class="app-surface-hide-mobile"
-              mat-header-cell>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
-          </th>
-          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            <div>{{ reservation.treatment.name }}</div>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="actions">
-          <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-          <td *matCellDef="let reservation" class="app-surface-hide-mobile" mat-cell>
-            <div>
-              @if (!reservation.deleted) {
-                <button [routerLink]="['/', language, 'reservation', reservation.id]" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
-                  <mat-icon color="primary">visibility</mat-icon>
+          <ng-container matColumnDef="timestamp">
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.RESERVATION.LIST.COLUMN.START' | translate }}
+            </th>
+            <td *matCellDef="let reservation" mat-cell>
+              <div>
+                {{
+                  reservation.timestamp
+                    | timeDetail
+                    | date: 'short' : reservation.room.timeZone : language
+                }}
+              </div>
+              @if (showTimeZone(reservation)) {
+                <button
+                  (click)="openDialog(reservation)"
+                  mat-icon-button
+                  type="button"
+                >
+                  <mat-icon>info_outline</mat-icon>
                 </button>
               }
-              @if (reservation.deadLine) {
-                <button (click)="cancel(reservation)" class="app-surface-hide-mobile" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}" matTooltipPosition="right">
-                  <mat-icon color="warn">close</mat-icon>
-                </button>
-              }
-            </div>
-          </td>
-        </ng-container>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="expandedDetail">
-          <td *matCellDef="let reservation" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop">
-            <div [class.detail-expanded]="reservation === expandedReservation"
-                 class="detail app-surface-hide-desktop">
-              <mat-list>
-                <mat-list-item role="list">
-                  <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}</div>
-                  <mat-icon matListItemIcon matPrefix>{{ reservation.state | reservationIcon }}</mat-icon>
-                  @if (reservation.state) {
-                    <span>{{ 'COMMON.STATUS.RESERVATION.' + reservation.state | translate }}</span>
-                  }
-                </mat-list-item>
-                <mat-list-item role="list">
-                  <div matListItemTitle>{{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}</div>
-                  <div matListItemLine>{{ reservation.treatment?.name }}</div>
-                </mat-list-item>
-                <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
-                <mat-list-item role="list">
-                  @if (!reservation.deleted) {
-                    <button [routerLink]="['/',language, 'reservation', reservation.id]" color="primary"
-                            mat-icon-button>
-                      <mat-icon matListItemIcon>visibility</mat-icon>
-                    </button>
-                  }
-                  @if (reservation.deadLine) {
-                    <button (click)="cancel(reservation)" color="warn" mat-icon-button>
-                      <mat-icon matListItemIcon>close</mat-icon>
-                    </button>
-                  }
-                </mat-list-item>
-              </mat-list>
-            </div>
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="state">
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
+            </th>
+            <td
+              *matCellDef="let reservation"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <mat-icon matPrefix>{{
+                reservation.state | reservationIcon
+              }}</mat-icon
+              >&nbsp;
+              <div>
+                {{
+                  'COMMON.STATUS.RESERVATION.' + reservation.state | translate
+                }}
+              </div>
+            </td>
+          </ng-container>
 
-        <ng-container matColumnDef="noContent">
-          <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-            {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
-          </td>
-        </ng-container>
+          <ng-container matColumnDef="treatment">
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate }}
+            </th>
+            <td
+              *matCellDef="let reservation"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <div>{{ reservation.treatment.name }}</div>
+            </td>
+          </ng-container>
 
-        <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-        <tr (click)="expandedReservation = expandedReservation === reservation ? null : reservation"
-            *matRowDef="let reservation; columns: displayedColumns;"
-            [ngClass]="{'deadLine': reservation.deadLine, 'cancelled': reservation.state === 'CANCELLED'}"
-            class="row" mat-row></tr>
-        <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
+          <ng-container matColumnDef="actions">
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
+            <td
+              *matCellDef="let reservation"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <div>
+                @if (!reservation.deleted) {
+                  <button
+                    [routerLink]="[
+                      '/',
+                      language,
+                      'reservation',
+                      reservation.id,
+                    ]"
+                    mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}"
+                    matTooltipPosition="left"
+                  >
+                    <mat-icon color="primary">visibility</mat-icon>
+                  </button>
+                }
+                @if (reservation.deadLine) {
+                  <button
+                    (click)="cancel(reservation)"
+                    class="app-surface-hide-mobile"
+                    mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.CANCEL' | translate }}"
+                    matTooltipPosition="right"
+                  >
+                    <mat-icon color="warn">close</mat-icon>
+                  </button>
+                }
+              </div>
+            </td>
+          </ng-container>
 
-        <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <ng-container matColumnDef="expandedDetail">
+            <td
+              *matCellDef="let reservation"
+              [attr.colspan]="displayedColumns.length"
+              class="app-surface-hide-desktop"
+            >
+              <div
+                [class.detail-expanded]="reservation === expandedReservation"
+                class="detail app-surface-hide-desktop"
+              >
+                <mat-list>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>
+                      {{ 'COMMON.RESERVATION.LIST.COLUMN.STATE' | translate }}
+                    </div>
+                    <mat-icon matListItemIcon matPrefix>{{
+                      reservation.state | reservationIcon
+                    }}</mat-icon>
+                    @if (reservation.state) {
+                      <span>{{
+                        'COMMON.STATUS.RESERVATION.' + reservation.state
+                          | translate
+                      }}</span>
+                    }
+                  </mat-list-item>
+                  <mat-list-item role="list">
+                    <div matListItemTitle>
+                      {{
+                        'COMMON.RESERVATION.LIST.COLUMN.TREATMENT' | translate
+                      }}
+                    </div>
+                    <div matListItemLine>{{ reservation.treatment?.name }}</div>
+                  </mat-list-item>
+                  <div mat-subheader>
+                    {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                  </div>
+                  <mat-list-item role="list">
+                    @if (!reservation.deleted) {
+                      <button
+                        [routerLink]="[
+                          '/',
+                          language,
+                          'reservation',
+                          reservation.id,
+                        ]"
+                        color="primary"
+                        mat-icon-button
+                      >
+                        <mat-icon matListItemIcon>visibility</mat-icon>
+                      </button>
+                    }
+                    @if (reservation.deadLine) {
+                      <button
+                        (click)="cancel(reservation)"
+                        color="warn"
+                        mat-icon-button
+                      >
+                        <mat-icon matListItemIcon>close</mat-icon>
+                      </button>
+                    }
+                  </mat-list-item>
+                </mat-list>
+              </div>
+            </td>
+          </ng-container>
 
-      </table>
-      @if (resultsLength) {
-        <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
-      }
+          <ng-container matColumnDef="noContent">
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
+              {{ 'COMMON.RESERVATION.LIST.ERROR.NO_CONTENT' | translate }}
+            </td>
+          </ng-container>
+
+          <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
+          <tr
+            (click)="
+              expandedReservation =
+                expandedReservation === reservation ? null : reservation
+            "
+            *matRowDef="let reservation; columns: displayedColumns"
+            [ngClass]="{
+              deadLine: reservation.deadLine,
+              cancelled: reservation.state === 'CANCELLED',
+            }"
+            class="row"
+            mat-row
+          ></tr>
+          <tr
+            *matRowDef="let row; columns: ['expandedDetail']"
+            class="detail-row"
+            mat-row
+          ></tr>
+
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
+        </table>
+        @if (resultsLength) {
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
+        }
       </div>
     </section>
   }

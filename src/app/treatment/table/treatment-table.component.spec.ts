@@ -1,24 +1,29 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TreatmentTableComponent } from './treatment-table.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { ITreatmentAll } from '../treatment';
-import { ServiceType } from '../../room/room';
-import { convertDuration, DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { ServiceType } from '@app/room/room';
+import { convertDuration, DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentTableComponent', () => {
   let component: TreatmentTableComponent;
   let fixture: ComponentFixture<TreatmentTableComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     await TestBed.configureTestingModule({
-      imports: [TreatmentTableComponent, TranslateModule.forRoot()],
+      imports: [TreatmentTableComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -80,15 +85,17 @@ describe('TreatmentTableComponent', () => {
   });
 
   it('should handle treatment with undefined duration', () => {
-    const treatments = [{
-      id: '3',
-      key: 'key3',
-      name: 'Key 3',
-      order: 5,
-      group: { id: '1', name: 'Group 1' },
-      price: 10,
-      type: ServiceType.treatment,
-    } as ITreatmentAll];
+    const treatments = [
+      {
+        id: '3',
+        key: 'key3',
+        name: 'Key 3',
+        order: 5,
+        group: { id: '1', name: 'Group 1' },
+        price: 10,
+        type: ServiceType.treatment,
+      } as ITreatmentAll,
+    ];
 
     fixture.componentRef.setInput('treatment', treatments);
 

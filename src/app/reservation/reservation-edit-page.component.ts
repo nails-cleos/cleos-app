@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { ReservationComponent } from './reservation.component';
 import { IReservation } from './reservation';
 import { Role } from '../interfaces/token';
@@ -9,7 +16,8 @@ import { ReservationStore } from '../store/reservation.store';
 
 @Component({
   selector: 'app-reservation-edit-page',
-  template: '<app-reservation [reservation]="reservation()" [isEditing]="true" [isAdmin]="isAdmin()" (submitData)="submit($event)" />',
+  template:
+    '<app-reservation [reservation]="reservation()" [isEditing]="true" [isAdmin]="isAdmin()" (submitData)="submit($event)" />',
   imports: [ReservationComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

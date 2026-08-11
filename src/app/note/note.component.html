@@ -1,5 +1,10 @@
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+  <form
+    (ngSubmit)="submit()"
+    [formGroup]="form"
+    novalidate
+    (keydown.enter)="$event.preventDefault()"
+  >
     <section class="app-surface-hero app-detail-panel note-hero">
       <div class="app-detail-section-header">
         <div>
@@ -22,17 +27,35 @@
           @if (allProfessionalsSignal()) {
             <mat-form-field appearance="outline">
               <mat-label>{{ 'NOTE.PROFESSIONAL.FIELD' | translate }}</mat-label>
-              <input (keydown)="keyDownHandler($event)" [formControl]="getForm.professional" [matAutocomplete]="auto"
-                     matInput required type="text">
-              <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-                @for (professional of filteredProfessionalSignal(); track professional.id) {
-                  <mat-option [value]="professional">{{ professional.displayName }}</mat-option>
+              <input
+                (keydown)="keyDownHandler($event)"
+                [formControl]="getForm.professional"
+                [matAutocomplete]="auto"
+                matInput
+                required
+                type="text"
+              />
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                [displayWith]="displayFn"
+              >
+                @for (
+                  professional of filteredProfessionalSignal();
+                  track professional.id
+                ) {
+                  <mat-option [value]="professional">{{
+                    professional.displayName
+                  }}</mat-option>
                 }
               </mat-autocomplete>
               @if (getForm.professional.hasError('required')) {
-                <mat-error [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'NOTE.PROFESSIONAL.REQUIRED' | translate"
+                ></mat-error>
               } @else if (getForm.professional.hasError('requireMatch')) {
-                <mat-error [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate"></mat-error>
+                <mat-error
+                  [innerHTML]="'NOTE.PROFESSIONAL.INVALID' | translate"
+                ></mat-error>
               } @else if (errors()['professional']) {
                 <mat-error>{{ errors()['professional'] }}</mat-error>
               }
@@ -45,11 +68,19 @@
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
           <mat-label>{{ 'NOTE.DESCRIPTION.FIELD' | translate }}</mat-label>
           <label>
-            <textarea #message [formControl]="getForm.description" matInput maxlength="256" required></textarea>
+            <textarea
+              #message
+              [formControl]="getForm.description"
+              matInput
+              maxlength="256"
+              required
+            ></textarea>
           </label>
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
           @if (getForm.description.hasError('required')) {
-            <mat-error [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'NOTE.DESCRIPTION.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['description']) {
             <mat-error>{{ errors()['description'] }}</mat-error>
           }
@@ -57,13 +88,26 @@
 
         <mat-form-field appearance="outline" color="primary">
           <mat-label>{{ 'NOTE.DATE.FIELD' | translate }}</mat-label>
-          <button (click)="picker.open()" mat-icon-button matPrefix type="button">
+          <button
+            (click)="picker.open()"
+            mat-icon-button
+            matPrefix
+            type="button"
+          >
             <mat-icon>today</mat-icon>
           </button>
-          <input (focus)="picker.open()" [formControl]="getForm.date" [matDatepicker]="picker" matInput required>
+          <input
+            (focus)="picker.open()"
+            [formControl]="getForm.date"
+            [matDatepicker]="picker"
+            matInput
+            required
+          />
           <mat-datepicker #picker touchUi></mat-datepicker>
           @if (getForm.date.hasError('required')) {
-            <mat-error [innerHTML]="'NOTE.DATE.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'NOTE.DATE.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['date']) {
             <mat-error>{{ errors()['date'] }}</mat-error>
           }
@@ -73,11 +117,15 @@
           <mat-label>{{ 'NOTE.REPEAT.FIELD' | translate }}</mat-label>
           <mat-select [formControl]="getForm.repeat" required>
             @for (t of repeats | keyvalue; track t) {
-              <mat-option [value]="t.value">{{ 'COMMON.REPEAT.' + t.value | translate }}</mat-option>
+              <mat-option [value]="t.value">{{
+                'COMMON.REPEAT.' + t.value | translate
+              }}</mat-option>
             }
           </mat-select>
           @if (getForm.repeat.hasError('required')) {
-            <mat-error [innerHTML]="'NOTE.REPEAT.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'NOTE.REPEAT.REQUIRED' | translate"
+            ></mat-error>
           }
         </mat-form-field>
       </div>

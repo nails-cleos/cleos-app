@@ -1,9 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 import { IMonthSummary, IQuarterSummary } from '../../dashboard';
-import { ICurrencyAll } from '../../../currency/currency';
-import { dateMonthYear, monthTitle } from '../../../util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { dateMonthYear, monthTitle } from '@app/util/dates';
 import { MonthComponent } from '../../month-summary/month/month.component';
-import { NavigationService } from '../../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 type YearMonthRow = {
   month: number;
@@ -24,7 +30,8 @@ type YearQuarterRow = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YearComponent {
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   year = input.required<number>();
   measure = input.required<'long' | 'short'>();
@@ -34,22 +41,30 @@ export class YearComponent {
 
   private readonly language = this.navigationService.language;
 
-  readonly quarterRows = computed<YearQuarterRow[]>(() => (this.quarterSummaries() ?? []).map((quarter) => ({
-    quarter: quarter.quarter,
-    months: quarter.monthSummaries.map((month) => ({
-      month: month.month,
-      label: monthTitle(dateMonthYear(month.month - 1, this.year()), this.language, this.measure()),
-      summary: month,
+  readonly quarterRows = computed<YearQuarterRow[]>(() =>
+    (this.quarterSummaries() ?? []).map((quarter) => ({
+      quarter: quarter.quarter,
+      months: quarter.monthSummaries.map((month) => ({
+        month: month.month,
+        label: monthTitle(
+          dateMonthYear(month.month - 1, this.year()),
+          this.language,
+          this.measure(),
+        ),
+        summary: month,
+      })),
     })),
-  })));
+  );
 
   goToQuarter = (quarter: number): void => {
-    this.navigationService.navigate(['dashboard', 'quarter', 'summary'],
-      { state: { year: this.year(), quarter } });
+    this.navigationService.navigate(['dashboard', 'quarter', 'summary'], {
+      state: { year: this.year(), quarter },
+    });
   };
 
   goToMonth = (month: number): void => {
-    this.navigationService.navigate(['dashboard', 'monthly', 'summary'],
-      { state: { date: `${month}-${this.year()}` } });
+    this.navigationService.navigate(['dashboard', 'monthly', 'summary'], {
+      state: { date: `${month}-${this.year()}` },
+    });
   };
 }

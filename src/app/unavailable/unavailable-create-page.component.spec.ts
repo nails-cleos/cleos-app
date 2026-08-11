@@ -1,20 +1,22 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { UnavailableCreatePageComponent } from './unavailable-create-page.component';
 import { UnavailableStore } from '../store/unavailable.store';
 import { IUnavailableAll } from './unavailable';
 import { AuthUserService } from '../services/auth-user.service';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('UnavailableCreatePageComponent', () => {
   let component: UnavailableCreatePageComponent;
   let fixture: ComponentFixture<UnavailableCreatePageComponent>;
 
   let unavailableStoreSpy: {
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
-  let routerSpy: jasmine.SpyObj<Router>;
 
   const mockUnavailable: Partial<IUnavailableAll> = {
     description: 'Test Description',
@@ -23,21 +25,23 @@ describe('UnavailableCreatePageComponent', () => {
 
   beforeEach(async () => {
     unavailableStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
-    routerSpy = jasmine.createSpyObj('Router', ['navigate', 'currentNavigation']);
-    routerSpy.currentNavigation.and.returnValue(undefined as any);
 
     await TestBed.configureTestingModule({
       imports: [UnavailableCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
-        { provide: Router, useValue: routerSpy },
-        { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal({ isRoomAdmin: false }) },
+        },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(UnavailableCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UnavailableCreatePageComponent);
     component = fixture.componentInstance;
@@ -59,20 +63,25 @@ describe('UnavailableCreatePageComponent', () => {
     fixture = TestBed.createComponent(UnavailableCreatePageComponent);
     component = fixture.componentInstance;
 
-    expect(component.params()).toEqual(jasmine.objectContaining({
-      date,
-      room,
-      showDuration: true,
-      startTime: '11:15',
-    }));
+    expect(component.params()).toEqual(
+      expect.objectContaining({
+        date,
+        room,
+        showDuration: true,
+        startTime: '11:15',
+      }),
+    );
   });
 
   it('should call create when unavailable is received', () => {
     component.submit(mockUnavailable as any);
 
-    expect(unavailableStoreSpy.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'Test Description',
-      duration: '00:30',
-    }), false);
+    expect(unavailableStoreSpy.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'Test Description',
+        duration: '00:30',
+      }),
+      false,
+    );
   });
 });

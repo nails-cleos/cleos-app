@@ -46,44 +46,136 @@ const providers = [
 ];
 
 const children: Routes = [
-  { path: 'home', loadChildren: () => import('../main/main.routes').then(m => m.MAIN_ROUTES) },
   {
-    path: '', component: NavComponent,
+    path: 'home',
+    loadChildren: () =>
+      import('../main/main.routes').then((m) => m.MAIN_ROUTES),
+  },
+  {
+    path: '',
+    component: NavComponent,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
-      { path: 'dashboard', loadChildren: () => import('../dashboard/dashboard.routes').then(m => m.DASHBOARD_ROUTES) },
-      { path: 'auth', loadChildren: () => import('../auth/auth.routes').then(m => m.AUTH_ROUTES) },
-      { path: 'users', loadChildren: () => import('../user/user.routes').then(m => m.USER_ROUTES) },
-      { path: 'treatments', loadChildren: () => import('../treatment/treatment.routes').then(m => m.TREATMENT_ROUTES) },
-      { path: 'catalogues', loadChildren: () => import('../catalogue/catalogue.routes').then(m => m.CATALOGUE_ROUTES) },
-      { path: 'discounts', loadChildren: () => import('../discount/discount.routes').then(m => m.DISCOUNT_ROUTES) },
-      { path: 'offices', loadChildren: () => import('../office/office.routes').then(m => m.OFFICE_ROUTES) },
-      { path: 'rooms', loadChildren: () => import('../room/room.routes').then(m => m.ROOM_ROUTES) },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('../dashboard/dashboard.routes').then(
+            (m) => m.DASHBOARD_ROUTES,
+          ),
+      },
+      {
+        path: 'auth',
+        loadChildren: () =>
+          import('../auth/auth.routes').then((m) => m.AUTH_ROUTES),
+      },
+      {
+        path: 'users',
+        loadChildren: () =>
+          import('../user/user.routes').then((m) => m.USER_ROUTES),
+      },
+      {
+        path: 'treatments',
+        loadChildren: () =>
+          import('../treatment/treatment.routes').then(
+            (m) => m.TREATMENT_ROUTES,
+          ),
+      },
+      {
+        path: 'catalogues',
+        loadChildren: () =>
+          import('../catalogue/catalogue.routes').then(
+            (m) => m.CATALOGUE_ROUTES,
+          ),
+      },
+      {
+        path: 'discounts',
+        loadChildren: () =>
+          import('../discount/discount.routes').then((m) => m.DISCOUNT_ROUTES),
+      },
+      {
+        path: 'offices',
+        loadChildren: () =>
+          import('../office/office.routes').then((m) => m.OFFICE_ROUTES),
+      },
+      {
+        path: 'rooms',
+        loadChildren: () =>
+          import('../room/room.routes').then((m) => m.ROOM_ROUTES),
+      },
       {
         path: 'reservation',
-        loadChildren: () => import('../reservation/reservation.routes').then(m => m.RESERVATION_ROUTES),
+        loadChildren: () =>
+          import('../reservation/reservation.routes').then(
+            (m) => m.RESERVATION_ROUTES,
+          ),
       },
       {
         path: 'notifications',
-        loadChildren: () => import('../notification/notification.routes').then(m => m.NOTIFICATION_ROUTES),
+        loadChildren: () =>
+          import('../notification/notification.routes').then(
+            (m) => m.NOTIFICATION_ROUTES,
+          ),
       },
       {
         path: 'unavailable',
-        loadChildren: () => import('../unavailable/unavailable.routes').then(m => m.UNAVAILABLE_ROUTES),
+        loadChildren: () =>
+          import('../unavailable/unavailable.routes').then(
+            (m) => m.UNAVAILABLE_ROUTES,
+          ),
       },
       {
         path: 'additional',
-        loadChildren: () => import('../additional/additional.routes').then(m => m.ADDITIONAL_ROUTES),
+        loadChildren: () =>
+          import('../additional/additional.routes').then(
+            (m) => m.ADDITIONAL_ROUTES,
+          ),
       },
-      { path: 'currency', loadChildren: () => import('../currency/currency.routes').then(m => m.CURRENCY_ROUTES) },
-      { path: 'colors', loadChildren: () => import('../color/color.routes').then(m => m.COLOR_ROUTES) },
-      { path: 'me', loadChildren: () => import('../me/me.routes').then(m => m.ME_ROUTES) },
-      { path: 'invoices', loadChildren: () => import('../invoice/invoice.routes').then(m => m.INVOICE_ROUTES) },
-      { path: 'statements', loadChildren: () => import('../statement/statement.routes').then(m => m.STATEMENT_ROUTES) },
-      { path: 'documents', loadChildren: () => import('../document/document.routes').then(m => m.DOCUMENT_ROUTES) },
-      { path: 'notes', loadChildren: () => import('../note/note.routes').then(m => m.NOTE_ROUTES) },
-      { path: 'shortcut', loadChildren: () => import('../shortcut/shortcut.routes').then(m => m.SHORTCUT_ROUTES) },
-      { path: 'accounts', loadChildren: () => import('../account/account.routes').then(m => m.ACCOUNT_ROUTES) },
+      {
+        path: 'currency',
+        loadChildren: () =>
+          import('../currency/currency.routes').then((m) => m.CURRENCY_ROUTES),
+      },
+      {
+        path: 'colors',
+        loadChildren: () =>
+          import('../color/color.routes').then((m) => m.COLOR_ROUTES),
+      },
+      {
+        path: 'me',
+        loadChildren: () => import('../me/me.routes').then((m) => m.ME_ROUTES),
+      },
+      {
+        path: 'invoices',
+        loadChildren: () =>
+          import('../invoice/invoice.routes').then((m) => m.INVOICE_ROUTES),
+      },
+      {
+        path: 'statements',
+        loadChildren: () =>
+          import('../statement/statement.routes').then(
+            (m) => m.STATEMENT_ROUTES,
+          ),
+      },
+      {
+        path: 'documents',
+        loadChildren: () =>
+          import('../document/document.routes').then((m) => m.DOCUMENT_ROUTES),
+      },
+      {
+        path: 'notes',
+        loadChildren: () =>
+          import('../note/note.routes').then((m) => m.NOTE_ROUTES),
+      },
+      {
+        path: 'shortcut',
+        loadChildren: () =>
+          import('../shortcut/shortcut.routes').then((m) => m.SHORTCUT_ROUTES),
+      },
+      {
+        path: 'accounts',
+        loadChildren: () =>
+          import('../account/account.routes').then((m) => m.ACCOUNT_ROUTES),
+      },
     ],
   },
 ];

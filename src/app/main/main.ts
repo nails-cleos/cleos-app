@@ -14,7 +14,13 @@ export interface ISocialLink {
   phone?: string;
   phoneKey?: string;
   phoneText?: string;
-  svgIcon: 'WHATSAPP-NO-COLOR' | 'WHATSAPP' | 'INSTAGRAM-NO-COLOR' | 'INSTAGRAM' | 'FACEBOOK-NO-COLOR' | 'FACEBOOK';
+  svgIcon:
+    | 'WHATSAPP-NO-COLOR'
+    | 'WHATSAPP'
+    | 'INSTAGRAM-NO-COLOR'
+    | 'INSTAGRAM'
+    | 'FACEBOOK-NO-COLOR'
+    | 'FACEBOOK';
 }
 
 export interface IAnimation {

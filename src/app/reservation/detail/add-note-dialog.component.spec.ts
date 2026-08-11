@@ -1,13 +1,16 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { AddNoteDialogComponent } from './add-note-dialog.component';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AddNoteDialogComponent', () => {
   let component: AddNoteDialogComponent;
   let fixture: ComponentFixture<AddNoteDialogComponent>;
 
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<AddNoteDialogComponent>>;
+  let mockDialogRef: Pick<MatDialogRef<AddNoteDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockData = {
     isCustomer: false,
@@ -16,11 +19,14 @@ describe('AddNoteDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    mockDialogRef = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [AddNoteDialogComponent, TranslateModule.forRoot()],
+      imports: [AddNoteDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
       ],
@@ -47,7 +53,7 @@ describe('AddNoteDialogComponent', () => {
   it('should render the dialog title', () => {
     const compiled = fixture.nativeElement;
     const titleElement = compiled.querySelector('h1[mat-dialog-title]');
-    expect(titleElement.textContent).toBe('RESERVATION.NOTE.ADD');
+    expect(titleElement.textContent.trim()).toBe('RESERVATION.NOTE.ADD');
   });
 
   it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
@@ -65,8 +71,12 @@ describe('AddNoteDialogComponent', () => {
 
   it('should call dialogRef.close when No button is clicked', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
+    const buttons = Array.from(
+      compiled.querySelectorAll('button'),
+    ) as HTMLButtonElement[];
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.CANCEL'),
+    );
     expect(noButton).toBeTruthy();
     noButton?.click();
 
@@ -75,10 +85,16 @@ describe('AddNoteDialogComponent', () => {
 
   it('should display translated button texts', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('button')) as HTMLButtonElement[];
+    const buttons = Array.from(
+      compiled.querySelectorAll('button'),
+    ) as HTMLButtonElement[];
 
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.CANCEL'));
-    const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.SAVE'));
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.CANCEL'),
+    );
+    const yesButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.SAVE'),
+    );
 
     expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.CANCEL');
     expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.SAVE');
@@ -96,6 +112,9 @@ describe('AddNoteDialogComponent', () => {
     component.getForm.customerNote?.setValue(customerNote);
 
     component.doAction();
-    expect(mockDialogRef.close).toHaveBeenCalledWith({ note: undefined, customerNote });
+    expect(mockDialogRef.close).toHaveBeenCalledWith({
+      note: undefined,
+      customerNote,
+    });
   });
 });

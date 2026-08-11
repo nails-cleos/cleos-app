@@ -1,11 +1,12 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { ITreatmentGroupAll } from '../treatment';
-import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
-import { TreatmentStore } from '../../store/treatment.store';
+import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentGroupSortingComponent } from './treatment-group-sorting.component';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentGroupSortingComponent', () => {
   let component: TreatmentGroupSortingComponent;
@@ -13,9 +14,9 @@ describe('TreatmentGroupSortingComponent', () => {
   let treatmentStoreSpy: {
     data: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadAllGroups: jasmine.Spy;
-    sortGroups: jasmine.Spy;
+    clean: Mock;
+    loadAllGroups: Mock;
+    sortGroups: Mock;
   };
 
   const mockTreatmentGroupList: ITreatmentGroupAll[] = [
@@ -37,16 +38,20 @@ describe('TreatmentGroupSortingComponent', () => {
     treatmentStoreSpy = {
       data: signal({ kind: 'list', value: mockTreatmentGroupList }),
       response: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadAllGroups: jasmine.createSpy('loadAllGroups'),
-      sortGroups: jasmine.createSpy('sortGroups'),
+      clean: vi.fn().mockName('clean'),
+      loadAllGroups: vi.fn().mockName('loadAllGroups'),
+      sortGroups: vi.fn().mockName('sortGroups'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentGroupSortingComponent, TranslateModule.forRoot()],
+      imports: [TreatmentGroupSortingComponent],
       providers: [
+        provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
       ],
     }).compileComponents();
 

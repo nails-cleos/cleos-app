@@ -11,17 +11,26 @@
       </div>
     </div>
 
-    <form (ngSubmit)="submit()"
-          [formGroup]="form"
-          novalidate
-          (keydown.enter)="$event.preventDefault()"
-          class="app-crud-form">
+    <form
+      (ngSubmit)="submit()"
+      [formGroup]="form"
+      novalidate
+      (keydown.enter)="$event.preventDefault()"
+      class="app-crud-form"
+    >
       <div class="app-crud-form-grid app-crud-form-grid--single">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'COLOR.NAME.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.name" matInput required data-cy="name-input">
+          <input
+            [formControl]="getForm.name"
+            matInput
+            required
+            data-cy="name-input"
+          />
           @if (getForm.name.hasError('required')) {
-            <mat-error [innerHTML]="'COLOR.NAME.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COLOR.NAME.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['name']) {
             <mat-error>{{ errors()['name'] }}</mat-error>
           }
@@ -29,10 +38,13 @@
 
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
           <mat-label>{{ 'COLOR.DESCRIPTION.FIELD' | translate }}</mat-label>
-          <textarea #message [formControl]="getForm.description"
-                    matInput
-                    maxlength="256"
-                    data-cy="description-textarea"></textarea>
+          <textarea
+            #message
+            [formControl]="getForm.description"
+            matInput
+            maxlength="256"
+            data-cy="description-textarea"
+          ></textarea>
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
         </mat-form-field>
       </div>

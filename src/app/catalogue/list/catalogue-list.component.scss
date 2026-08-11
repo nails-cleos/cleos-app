@@ -27,7 +27,11 @@
   overflow: hidden;
   border: 1px solid var(--app-surface-card-border);
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--accent-color) 10%, transparent), transparent 45%),
+    radial-gradient(
+      circle at top left,
+      color-mix(in srgb, var(--accent-color) 10%, transparent),
+      transparent 45%
+    ),
     var(--app-surface-card-bg);
 }
 
@@ -78,7 +82,8 @@
   gap: 8px;
   min-height: 36px;
   padding: 0 12px;
-  border: 1px solid color-mix(in srgb, var(--accent-color) 18%, var(--app-surface-card-border));
+  border: 1px solid
+    color-mix(in srgb, var(--accent-color) 18%, var(--app-surface-card-border));
   border-radius: 999px;
   background: color-mix(in srgb, var(--app-surface-card-bg) 88%, #ffffff 12%);
   color: var(--app-surface-text);
@@ -129,7 +134,11 @@
 .catalogue-handle:hover,
 .catalogue-action:hover {
   transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent-color) 26%, var(--app-surface-card-border));
+  border-color: color-mix(
+    in srgb,
+    var(--accent-color) 26%,
+    var(--app-surface-card-border)
+  );
   box-shadow: 0 14px 24px rgba(58, 40, 31, 0.1);
 }
 
@@ -138,7 +147,11 @@
 }
 
 .catalogue-action--warn {
-  color: color-mix(in srgb, var(--warn-color, #b85c38) 82%, var(--app-surface-text) 18%);
+  color: color-mix(
+    in srgb,
+    var(--warn-color, #b85c38) 82%,
+    var(--app-surface-text) 18%
+  );
 }
 
 .catalogue-list-actions {
@@ -159,7 +172,8 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.catalogue-drop-shell.cdk-drop-list-dragging .catalogue-card:not(.cdk-drag-placeholder) {
+.catalogue-drop-shell.cdk-drop-list-dragging
+  .catalogue-card:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 

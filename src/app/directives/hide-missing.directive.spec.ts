@@ -1,10 +1,12 @@
 import { HideMissingDirective } from './hide-missing.directive';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 @Component({
   template: '<img appHideMissing src="test.jpg" />',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [HideMissingDirective],
 })
 class HostComponent {}
@@ -22,7 +24,9 @@ describe('HideMissingDirective', () => {
     fixture = TestBed.createComponent(HostComponent);
     fixture.detectChanges();
 
-    const debugEl = fixture.debugElement.query(By.directive(HideMissingDirective));
+    const debugEl = fixture.debugElement.query(
+      By.directive(HideMissingDirective),
+    );
     directive = debugEl.injector.get(HideMissingDirective);
     imgElement = debugEl.nativeElement as HTMLImageElement;
   });

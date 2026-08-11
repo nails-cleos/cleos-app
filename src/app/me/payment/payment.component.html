@@ -9,7 +9,9 @@
 
   <div class="app-detail-section-header">
     <div>
-      <span class="app-surface-eyebrow">{{ 'ME.PAYMENT.TITLE' | translate }}</span>
+      <span class="app-surface-eyebrow">{{
+        'ME.PAYMENT.TITLE' | translate
+      }}</span>
     </div>
   </div>
 
@@ -21,54 +23,99 @@
         <table [dataSource]="dataSource" mat-table>
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let payment; let i = index;" mat-cell>
+            <td *matCellDef="let payment; let i = index" mat-cell>
               <div>{{ i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</th>
-            <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+            </th>
+            <td
+              *matCellDef="let payment"
+              class="app-surface-cell-wrap"
+              mat-cell
+            >
               <div>{{ payment.description }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="type">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-            <td *matCellDef="let payment" class="app-surface-cell-wrap" mat-cell>
-              <div>{{ 'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate }}</div>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.TYPE' | translate }}
+            </th>
+            <td
+              *matCellDef="let payment"
+              class="app-surface-cell-wrap"
+              mat-cell
+            >
+              <div>
+                {{
+                  'COMMON.PAYMENT.TYPE.' + (payment.type || 'NONE') | translate
+                }}
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amount">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.AMOUNT' | translate }}
+            </th>
             <td *matCellDef="let payment" mat-cell>
-              <mat-icon matPrefix>{{ getCurrency(payment) }}</mat-icon>&nbsp;{{ payment.amount | number:'1.2-2' }}
+              <mat-icon matPrefix>{{ getCurrency(payment) }}</mat-icon
+              >&nbsp;{{ payment.amount | number: '1.2-2' }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="status">
-            <th *matHeaderCellDef class="app-surface-hide-mobile"
-                mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.COLUMN.STATUS' | translate }}
             </th>
-            <td *matCellDef="let payment" class="app-surface-hide-mobile" mat-cell>
-              {{ 'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE') | translate }}
+            <td
+              *matCellDef="let payment"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              {{
+                'COMMON.STATUS.PAYMENT.' + (payment.status || 'NONE')
+                  | translate
+              }}
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
             <td *matCellDef="let payment" mat-cell>
               @switch (payment.status) {
                 @case ('CREATED') {
-                  <button (click)="pay(payment)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.' + payment.type | translate }}" matTooltipPosition="above">
-                    <mat-icon [svgIcon]="payment.type" class="svg-icon"></mat-icon>
+                  <button
+                    (click)="pay(payment)"
+                    mat-icon-button
+                    matTooltip="{{
+                      'COMMON.BUTTON.' + payment.type | translate
+                    }}"
+                    matTooltipPosition="above"
+                  >
+                    <mat-icon
+                      [svgIcon]="payment.type"
+                      class="svg-icon"
+                    ></mat-icon>
                   </button>
                 }
                 @case ('PENDING') {
-                  <button (click)="notify(payment)" mat-icon-button
-                          matTooltip="{{ 'COMMON.BUTTON.NOTIFY'| translate }}" matTooltipPosition="above">
+                  <button
+                    (click)="notify(payment)"
+                    mat-icon-button
+                    matTooltip="{{ 'COMMON.BUTTON.NOTIFY' | translate }}"
+                    matTooltipPosition="above"
+                  >
                     <mat-icon color="primary">published_with_changes</mat-icon>
                   </button>
                 }
@@ -77,15 +124,28 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
               {{ 'ME.PAYMENT.LIST.ERROR.NO_CONTENT' | translate }}
             </td>
           </ng-container>
 
-          <tr *matFooterRowDef="['noContent']" [hidden]="hiddenSignal()" mat-footer-row></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="hiddenSignal()"
+            mat-footer-row
+          ></tr>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let row; columns: displayedColumns;" class="{{row.status}}" mat-row></tr>
+          <tr
+            *matRowDef="let row; columns: displayedColumns"
+            class="{{ row.status }}"
+            mat-row
+          ></tr>
         </table>
       }
     </div>

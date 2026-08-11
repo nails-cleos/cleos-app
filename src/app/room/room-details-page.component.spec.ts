@@ -1,6 +1,6 @@
-import { Component, input } from '@angular/core';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { RoomComponent } from './room.component';
 import { RoomDetailsPageComponent } from './room-details-page.component';
 import { IRoomAll } from './room';
@@ -10,6 +10,7 @@ import { signal } from '@angular/core';
 
 @Component({
   selector: 'app-room',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 class RoomComponentStub {
@@ -27,10 +28,10 @@ describe('RoomDetailsPageComponent', () => {
     selected: ReturnType<typeof signal<any>>;
     currencies: ReturnType<typeof signal<any>>;
     offices: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadInfo: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadInfo: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -41,7 +42,11 @@ describe('RoomDetailsPageComponent', () => {
     paymentTypes: [],
     primary: false,
     address: { id: 1, name: 'Main Location', location: { x: 0, y: 0 } },
-    office: { id: 'office-123', name: 'Office name', manager: { id: 'manager-1' } },
+    office: {
+      id: 'office-123',
+      name: 'Office name',
+      manager: { id: 'manager-1' },
+    },
     currency: { id: 'currency-123', code: 'EUR', icon: 'euro', name: 'Euro' },
     availabilities: [],
     professionals: [],
@@ -52,26 +57,20 @@ describe('RoomDetailsPageComponent', () => {
       selected: signal(undefined),
       currencies: signal(undefined),
       offices: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadInfo: jasmine.createSpy('loadInfo'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadInfo: vi.fn().mockName('loadInfo'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [RoomDetailsPageComponent, TranslateModule.forRoot()],
-      providers: [
-        { provide: RoomStore, useValue: roomStoreSpy },
-      ],
-    }).overrideComponent(RoomDetailsPageComponent, {
-      remove: { imports: [RoomComponent] },
-      add: { imports: [RoomComponentStub] },
+      imports: [RoomDetailsPageComponent],
+      providers: [{ provide: RoomStore, useValue: roomStoreSpy }],
     })
-      .overrideTemplate(RoomDetailsPageComponent, `
-        @if (room(); as room) {
-          <app-room [room]="room" [config]="config" />
-        }
-      `)
+      .overrideComponent(RoomDetailsPageComponent, {
+        remove: { imports: [RoomComponent] },
+        add: { imports: [RoomComponentStub] },
+      })
       .compileComponents();
 
     fixture = TestBed.createComponent(RoomDetailsPageComponent);
@@ -94,12 +93,15 @@ describe('RoomDetailsPageComponent', () => {
     roomStoreSpy.selected.set(mockRoom);
     fixture.detectChanges();
 
-    const roomComponent = fixture.debugElement.children[0].componentInstance as RoomComponentStub;
+    const roomComponent = fixture.debugElement.children[0]
+      .componentInstance as RoomComponentStub;
 
-    expect(roomComponent.room()).toEqual(jasmine.objectContaining({
-      id,
-      timeZone: 'Europe/Amsterdam',
-    }));
+    expect(roomComponent.room()).toEqual(
+      expect.objectContaining({
+        id,
+        timeZone: 'Europe/Amsterdam',
+      }),
+    );
   });
 
   it('should call update when room is received', () => {
@@ -107,8 +109,11 @@ describe('RoomDetailsPageComponent', () => {
 
     component.submit(mockRoom);
 
-    expect(roomStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      timeZone: 'Europe/Amsterdam',
-    }));
+    expect(roomStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        timeZone: 'Europe/Amsterdam',
+      }),
+    );
   });
 });

@@ -1,17 +1,35 @@
-import '../support/commands';
-import { Role } from '../../src/app/interfaces/token';
-import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '../../src/app/util/dates';
+import { Role } from '@app/interfaces/token';
+import { dayViewTitle, DEFAULT_LOCALE, monthViewTitle } from '@app/util/dates';
 import { devices } from '../support/utils';
 
 const displayName = 'Customer 1';
 const today = new Date();
 
 const mapRole = new Map([
-  [Role.customer, { email: 'Kdvek@jevfm', url: '/me/reservations', mocks: [() => cy.mockCustomerReservations()] }],
-  [Role.admin,
-    { email: 'nails.cleos@gmail.com', url: '/dashboard', mocks: [() => cy.mockAdminDashboard(today, displayName)] }],
-  [Role.roomAdmin,
-    { email: 'Jsbaj@nebeje', url: '/events', mocks: [() => cy.mockRoomAdminDashboard(today, displayName)] }],
+  [
+    Role.customer,
+    {
+      email: 'Kdvek@jevfm',
+      url: '/me/reservations',
+      mocks: [() => cy.mockCustomerReservations()],
+    },
+  ],
+  [
+    Role.admin,
+    {
+      email: 'nails.cleos@gmail.com',
+      url: '/dashboard',
+      mocks: [() => cy.mockAdminDashboard(today, displayName)],
+    },
+  ],
+  [
+    Role.roomAdmin,
+    {
+      email: 'Jsbaj@nebeje',
+      url: '/events',
+      mocks: [() => cy.mockRoomAdminDashboard(today, displayName)],
+    },
+  ],
 ]);
 
 devices.forEach(({ name, width, height }) => {
@@ -40,7 +58,9 @@ devices.forEach(({ name, width, height }) => {
           cy.get('button').contains('Next').click();
 
           cy.get('input[name="displayName"]').should('be.visible');
-          cy.get('input[name="displayName"]').type(displayName, { force: true });
+          cy.get('input[name="displayName"]').type(displayName, {
+            force: true,
+          });
 
           cy.get('input[name="password"]').should('be.visible');
           cy.get('input[name="password"]').type('password');
@@ -66,8 +86,10 @@ devices.forEach(({ name, width, height }) => {
           cy.mockCreateAuthUri(true, ['password']);
           cy.mockFirebase(email);
           cy.mockLogin(email, displayName, role, true);
-          value.mocks.forEach(fn => fn());
-          cy.get('button').contains('Sign in with Email').click({ force: true });
+          value.mocks.forEach((fn) => fn());
+          cy.get('button')
+            .contains('Sign in with Email')
+            .click({ force: true });
 
           cy.get('form').within(() => {
             cy.get('input[name="email"]').should('be.visible');
@@ -85,17 +107,22 @@ devices.forEach(({ name, width, height }) => {
 
           switch (role) {
             case Role.customer:
-              cy.get('.app-surface-eyebrow').contains('No upcoming reservations');
+              cy.get('.app-surface-eyebrow').contains(
+                'No upcoming reservations',
+              );
               cy.get('tr').contains('No reservations');
               break;
+
             case Role.admin:
               cy.get('h3').contains(monthViewTitle(today, DEFAULT_LOCALE));
               break;
-            case Role.roomAdmin:
+
+            case Role.roomAdmin: {
               const date = dayViewTitle(today, DEFAULT_LOCALE);
               cy.get('h2').contains(date);
               cy.get('h2').contains(`Room is not open ${date}`);
               break;
+            }
           }
         });
       });

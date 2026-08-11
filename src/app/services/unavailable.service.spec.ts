@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { HttpClient } from '@angular/common/http';
@@ -12,7 +13,12 @@ import { FrequencyEnum } from '../util/helper';
 
 describe('UnavailableService', () => {
   let service: UnavailableService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockProfessional: IUserAll = {
     id: 'prof-1',
@@ -25,7 +31,8 @@ describe('UnavailableService', () => {
 
   const mockUnavailableList: IUnavailableAll[] = [
     {
-      id: '1', description: 'Desc 1',
+      id: '1',
+      description: 'Desc 1',
       start: '',
       timestamp: getNowTimeZone().getTime() / 1000,
       end: '',
@@ -55,7 +62,12 @@ describe('UnavailableService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
       providers: [
         UnavailableService,
@@ -74,14 +86,17 @@ describe('UnavailableService', () => {
     const size = 10;
     const sort = 'name';
     const direction = 'asc';
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.mockReturnValue(of(mockPagination));
 
-    service.getUnavailablePage(page, sort, direction, size).subscribe((result) => {
-      expect(result).toEqual(mockPagination);
-    });
+    service
+      .getUnavailablePage(page, sort, direction, size)
+      .subscribe((result) => {
+        expect(result).toEqual(mockPagination);
+      });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/unavailable/pages', {
-      params: createFilter(page, size, sort, direction), ...paginated(),
+      params: createFilter(page, size, sort, direction),
+      ...paginated(),
     });
   });
 });

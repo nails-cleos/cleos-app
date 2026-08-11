@@ -10,9 +10,7 @@ import { ReservationEditPageComponent } from './reservation-edit-page.component'
 import { SearchComponent } from './search/search.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('reservation'),
-];
+const providers = [provideFeatureTranslations('reservation')];
 
 const children: Routes = [
   {
@@ -31,19 +29,31 @@ const children: Routes = [
     path: '',
     component: ReservationCreatePageComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] },
+    data: {
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional],
+    },
   },
   {
     path: ':id/edit',
     component: ReservationEditPageComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional] },
+    data: {
+      roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional],
+    },
   },
   {
     path: ':id',
     component: ReservationDetailComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.manager, Role.roomAdmin, Role.professional, Role.customer] },
+    data: {
+      roles: [
+        Role.admin,
+        Role.manager,
+        Role.roomAdmin,
+        Role.professional,
+        Role.customer,
+      ],
+    },
     runGuardsAndResolvers: 'always',
   },
   {

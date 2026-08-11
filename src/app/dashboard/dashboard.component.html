@@ -1,17 +1,23 @@
 @let mapDashboard = dashboardMapSignal();
 @let selectedDashboard = getForm.selectedDash.value;
-@let currentPeriod = viewDate() | calendarDate:(view + 'ViewTitle'):language;
+@let currentPeriod = viewDate() | calendarDate: view + 'ViewTitle' : language;
 @let cardLayout = cardLayoutSignal();
 
 <div class="dashboard-shell app-surface-canvas app-surface-stack">
   <section class="dashboard-toolbar app-surface-hero app-detail-panel">
     <div class="dashboard-toolbar__copy">
-      <span class="dashboard-toolbar__eyebrow app-surface-eyebrow">{{ currentPeriod }}</span>
-      <h2>{{ selectedDashboard || 'DASHBOARD.CARD.RESERVATION' | translate }}</h2>
+      <span class="dashboard-toolbar__eyebrow app-surface-eyebrow">{{
+        currentPeriod
+      }}</span>
+      <h2>
+        {{ selectedDashboard || 'DASHBOARD.CARD.RESERVATION' | translate }}
+      </h2>
       <p>
         {{ 'DASHBOARD.CARD.RESERVATION' | translate }}
         @if (selectedDashboard) {
-          <span class="dashboard-toolbar__context">· {{ selectedDashboard }}</span>
+          <span class="dashboard-toolbar__context"
+            >· {{ selectedDashboard }}</span
+          >
         }
       </p>
     </div>
@@ -35,73 +41,89 @@
       </div>
       <div class="dashboard-calendar__actions">
         <div class="app-surface-hide-desktop">
-          <button class="app-detail-action-button app-surface-hide-desktop"
-                  (viewDateChange)="closeOpenMonthViewDay($event)"
-                  [viewDate]="viewDate()"
-                  [view]="view"
-                  mat-icon-button
-                  mwlCalendarPreviousView
-                  type="button">
+          <button
+            class="app-detail-action-button app-surface-hide-desktop"
+            (viewDateChange)="closeOpenMonthViewDay($event)"
+            [viewDate]="viewDate()"
+            [view]="view"
+            mat-icon-button
+            mwlCalendarPreviousView
+            type="button"
+          >
             <mat-icon>navigate_before</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button app-surface-hide-mobile"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                [viewDate]="viewDate()"
-                [view]="view"
-                mat-stroked-button
-                mwlCalendarPreviousView
-                type="button">
+        <button
+          class="app-detail-action-button app-surface-hide-mobile"
+          (viewDateChange)="closeOpenMonthViewDay($event)"
+          [viewDate]="viewDate()"
+          [view]="view"
+          mat-stroked-button
+          mwlCalendarPreviousView
+          type="button"
+        >
           <mat-icon>navigate_before</mat-icon>
           <span>{{ 'COMMON.BUTTON.PREVIOUS' | translate }}</span>
         </button>
         <div class="app-surface-hide-desktop">
-          <button class="app-detail-action-button"
-                  [viewDate]="viewDate()"
-                  (viewDateChange)="closeOpenMonthViewDay($event)"
-                  mat-icon-button
-                  mwlCalendarToday
-                  type="button">
+          <button
+            class="app-detail-action-button"
+            [viewDate]="viewDate()"
+            (viewDateChange)="closeOpenMonthViewDay($event)"
+            mat-icon-button
+            mwlCalendarToday
+            type="button"
+          >
             <mat-icon>today</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button app-surface-hide-mobile"
-                [viewDate]="viewDate()"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                mat-stroked-button
-                mwlCalendarToday
-                type="button">
+        <button
+          class="app-detail-action-button app-surface-hide-mobile"
+          [viewDate]="viewDate()"
+          (viewDateChange)="closeOpenMonthViewDay($event)"
+          mat-stroked-button
+          mwlCalendarToday
+          type="button"
+        >
           <mat-icon>today</mat-icon>
           <span>{{ 'COMMON.BUTTON.TODAY' | translate }}</span>
         </button>
         <div class="app-surface-hide-desktop">
-          <button class="app-detail-action-button"
-                  (viewDateChange)="closeOpenMonthViewDay($event)"
-                  [viewDate]="viewDate()"
-                  [view]="view"
-                  mat-icon-button
-                  mwlCalendarNextView
-                  type="button">
+          <button
+            class="app-detail-action-button"
+            (viewDateChange)="closeOpenMonthViewDay($event)"
+            [viewDate]="viewDate()"
+            [view]="view"
+            mat-icon-button
+            mwlCalendarNextView
+            type="button"
+          >
             <mat-icon>navigate_next</mat-icon>
           </button>
         </div>
-        <button class="app-detail-action-button app-surface-hide-mobile"
-                (viewDateChange)="closeOpenMonthViewDay($event)"
-                [viewDate]="viewDate()"
-                [view]="view"
-                mat-stroked-button
-                mwlCalendarNextView
-                type="button">
+        <button
+          class="app-detail-action-button app-surface-hide-mobile"
+          (viewDateChange)="closeOpenMonthViewDay($event)"
+          [viewDate]="viewDate()"
+          [view]="view"
+          mat-stroked-button
+          mwlCalendarNextView
+          type="button"
+        >
           <span>{{ 'COMMON.BUTTON.NEXT' | translate }}</span>
           <mat-icon>navigate_next</mat-icon>
         </button>
       </div>
     </div>
 
-    <div class="dashboard-calendar__surface app-surface-item app-surface-item--section">
+    <div
+      class="dashboard-calendar__surface app-surface-item app-surface-item--section"
+    >
       <ng-template #customCellTemplate let-day="day" let-locale="locale">
         <div class="cal-cell-top">
-          <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+          <span class="cal-day-number">{{
+            day.date | calendarDate: 'monthViewDayNumber' : locale
+          }}</span>
         </div>
         <div class="cell-totals">
           @for (group of sortBy(day.eventGroups); track group) {
@@ -112,80 +134,142 @@
         </div>
       </ng-template>
 
-      <mwl-calendar-month-view (dayClicked)="dayClicked($event.day)"
-                               (eventClicked)="handleEvent($event.event)"
-                               (mwlClick)="cellClick(viewDate())"
-                               [cellTemplate]="customCellTemplate"
-                               (beforeViewRender)="beforeMonthViewRender($event)"
-                               [activeDayIsOpen]="activeDayIsOpen"
-                               [events]="calendar.calendarEvents"
-                               [locale]="language"
-                               [viewDate]="viewDate()"></mwl-calendar-month-view>
+      <mwl-calendar-month-view
+        (dayClicked)="dayClicked($event.day)"
+        (eventClicked)="handleEvent($event.event)"
+        (mwlClick)="cellClick(viewDate())"
+        [cellTemplate]="customCellTemplate"
+        (beforeViewRender)="beforeMonthViewRender($event)"
+        [activeDayIsOpen]="activeDayIsOpen"
+        [events]="calendar.calendarEvents"
+        [locale]="language"
+        [viewDate]="viewDate()"
+      ></mwl-calendar-month-view>
     </div>
 
     <div class="dashboard-metrics app-surface-grid app-surface-grid--quad">
-      <div class="dashboard-metric app-surface-item"
-           [innerHTML]="'DASHBOARD.RESERVATION.COMPLETED' | translate:{completed: completed, total: completedTotal}">
-      </div>
-      <div class="dashboard-metric app-surface-item"
-           [innerHTML]="'DASHBOARD.RESERVATION.UPCOMING' | translate:{upcoming: upcoming, total: upcomingTotal}">
-      </div>
-      <div class="dashboard-metric app-surface-item"
-           [innerHTML]="'DASHBOARD.RESERVATION.TRANSACTION' | translate:{transaction: transaction, total: transactionTotal}">
-      </div>
-      <div class="dashboard-metric app-surface-item"
-           [innerHTML]="'DASHBOARD.RESERVATION.PAYMENT' | translate:{total: thisMonthTotal}">
-      </div>
+      <div
+        class="dashboard-metric app-surface-item"
+        [innerHTML]="
+          'DASHBOARD.RESERVATION.COMPLETED'
+            | translate: { completed: completed, total: completedTotal }
+        "
+      ></div>
+      <div
+        class="dashboard-metric app-surface-item"
+        [innerHTML]="
+          'DASHBOARD.RESERVATION.UPCOMING'
+            | translate: { upcoming: upcoming, total: upcomingTotal }
+        "
+      ></div>
+      <div
+        class="dashboard-metric app-surface-item"
+        [innerHTML]="
+          'DASHBOARD.RESERVATION.TRANSACTION'
+            | translate: { transaction: transaction, total: transactionTotal }
+        "
+      ></div>
+      <div
+        class="dashboard-metric app-surface-item"
+        [innerHTML]="
+          'DASHBOARD.RESERVATION.PAYMENT' | translate: { total: thisMonthTotal }
+        "
+      ></div>
     </div>
 
-    <mat-grid-list class="dashboard-grid" [cols]="cardLayout.columns" [rowHeight]="cardLayout.rowHeight">
+    <mat-grid-list
+      class="dashboard-grid"
+      [cols]="cardLayout.columns"
+      [rowHeight]="cardLayout.rowHeight"
+    >
       @if (isLoading()) {
         @for (skeleton of miniCardSkeletons; track skeleton) {
-          <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
+          <mat-grid-tile
+            [colspan]="cardLayout.miniCard.cols"
+            [rowspan]="cardLayout.miniCard.rows"
+          >
             <app-mini-card [title]="''" [isLoading]="true"></app-mini-card>
           </mat-grid-tile>
         }
       } @else {
-      @for (mc of miniCardData; track mc.title) {
-        <mat-grid-tile [colspan]="cardLayout.miniCard.cols" [rowspan]="cardLayout.miniCard.rows">
-          <app-mini-card [color]="mc.color" [error]="mc.error" [icon]="mc.icon" [isInfinity]="mc.isInfinity"
-                         [isCurrency]="mc.isCurrency" [isIncrease]="mc.isIncrease" [isLoading]="isLoading()"
-                         [percentValue]="mc.percentValue" [title]="mc.title | translate" [period]="mc.period"
-                         [previousPeriod]="mc.previousPeriod" [isProjection]="mc.isProjection"
-                         [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate" [value]="mc.value"
-                         [duration]="'DASHBOARD.MINI_CARD.DURATION' | translate: {period: mc.previousPeriod}"
-                         [previousPeriodValue]="mc.previousPeriodValue">
-          </app-mini-card>
-        </mat-grid-tile>
-      }
+        @for (mc of miniCardData; track mc.title) {
+          <mat-grid-tile
+            [colspan]="cardLayout.miniCard.cols"
+            [rowspan]="cardLayout.miniCard.rows"
+          >
+            <app-mini-card
+              [color]="mc.color"
+              [error]="mc.error"
+              [icon]="mc.icon"
+              [isInfinity]="mc.isInfinity"
+              [isCurrency]="mc.isCurrency"
+              [isIncrease]="mc.isIncrease"
+              [isLoading]="isLoading()"
+              [percentValue]="mc.percentValue"
+              [title]="mc.title | translate"
+              [period]="mc.period"
+              [previousPeriod]="mc.previousPeriod"
+              [isProjection]="mc.isProjection"
+              [projection]="'DASHBOARD.MINI_CARD.PROJECTION' | translate"
+              [value]="mc.value"
+              [duration]="
+                'DASHBOARD.MINI_CARD.DURATION'
+                  | translate: { period: mc.previousPeriod }
+              "
+              [previousPeriodValue]="mc.previousPeriodValue"
+            >
+            </app-mini-card>
+          </mat-grid-tile>
+        }
       }
 
       @if (isLoading()) {
         @for (skeleton of chartSkeletons; track skeleton) {
-          <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
+          <mat-grid-tile
+            [colspan]="cardLayout.chart.cols"
+            [rowspan]="cardLayout.chart.rows"
+          >
             <app-card></app-card>
           </mat-grid-tile>
         }
       } @else {
-      @for (chart of charts; track chart.title) {
-        <mat-grid-tile [colspan]="cardLayout.chart.cols" [rowspan]="cardLayout.chart.rows">
-          <app-card [chart]="chart" [title]="chart.title" [timeZone]="timeZone">
-            <app-chart [chartSummary]="chart" [error]="errorSignal()" [currency]="currency" [isLoading]="isLoading()"
-                       [locale]="language" [timeZone]="timeZone"></app-chart>
-          </app-card>
-        </mat-grid-tile>
-      }
+        @for (chart of charts; track chart.title) {
+          <mat-grid-tile
+            [colspan]="cardLayout.chart.cols"
+            [rowspan]="cardLayout.chart.rows"
+          >
+            <app-card
+              [chart]="chart"
+              [title]="chart.title"
+              [timeZone]="timeZone"
+            >
+              <app-chart
+                [chartSummary]="chart"
+                [error]="errorSignal()"
+                [currency]="currency"
+                [isLoading]="isLoading()"
+                [locale]="language"
+                [timeZone]="timeZone"
+              ></app-chart>
+            </app-card>
+          </mat-grid-tile>
+        }
       }
 
       @if (roomId || professionalId) {
-        <mat-grid-tile [colspan]="cardLayout.table.cols" [rowspan]="cardLayout.table.rows">
+        <mat-grid-tile
+          [colspan]="cardLayout.table.cols"
+          [rowspan]="cardLayout.table.rows"
+        >
           <section class="app-table-panel">
             <div class="app-table-panel__header">
               <h3>{{ 'DASHBOARD.CARD.RESERVATION' | translate }}</h3>
             </div>
-            <app-reservation-table [roomId]="roomId"
-                                   [professionalId]="professionalId"
-                                   [all]="all"></app-reservation-table>
+            <app-reservation-table
+              [roomId]="roomId"
+              [professionalId]="professionalId"
+              [all]="all"
+            ></app-reservation-table>
           </section>
         </mat-grid-tile>
       }

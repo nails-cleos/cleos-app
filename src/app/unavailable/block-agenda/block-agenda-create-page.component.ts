@@ -1,15 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ICommon } from '../../interfaces/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ICommon } from '@app/interfaces/common';
 import { IUnavailable } from '../unavailable';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { getTimeNumber } from '../../util/dates';
-import { closest } from '../../util/numbers';
+import { getTimeNumber } from '@app/util/dates';
+import { closest } from '@app/util/numbers';
 
 @Component({
   selector: 'app-block-agenda-create-page',
-  template: '<app-block-agenda [config]="config" [params]="params()" (submitData)="submit($event)" />',
+  template:
+    '<app-block-agenda [config]="config" [params]="params()" (submitData)="submit($event)" />',
   imports: [BlockAgendaComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,12 +38,15 @@ export class BlockAgendaCreatePageComponent {
       if (room) {
         showDuration = true;
         const time = getTimeNumber(date);
-        const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
-        const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
-        startTime = `${ hour }:${ minute }`;
+        const hour = time ? `${time.hour}`.padStart(2, '0') : '12';
+        const minute = time ? `${closest(time.minute)}`.padStart(2, '0') : '00';
+        startTime = `${hour}:${minute}`;
       }
       return {
-        date, startTime, showDuration, room,
+        date,
+        startTime,
+        showDuration,
+        room,
       };
     }
     return undefined;
@@ -48,6 +57,9 @@ export class BlockAgendaCreatePageComponent {
   }
 
   submit(unavailable: IUnavailable) {
-    this.unavailableStore.createBlockAgenda(unavailable, this.authUserService.authUser()?.isRoomAdmin ?? false);
+    this.unavailableStore.createBlockAgenda(
+      unavailable,
+      this.authUserService.authUser()?.isRoomAdmin ?? false,
+    );
   }
 }

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { DiscountComponent } from './discount.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscount } from './discount';
@@ -7,7 +12,8 @@ import { CurrencyStore } from '../store/currency.store';
 
 @Component({
   selector: 'app-discount-create-page',
-  template: '<app-discount [currencies]="currencies()" [config]="config" (submitData)="submit($event)"/>',
+  template:
+    '<app-discount [currencies]="currencies()" [config]="config" (submitData)="submit($event)"/>',
   imports: [DiscountComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -19,11 +25,10 @@ export class DiscountCreatePageComponent {
     button: { icon: 'add', label: 'COMMON.BUTTON.CREATE' },
   };
 
-  currencies= computed(() => {
+  currencies = computed(() => {
     const data = this.currencyStore.data();
     return data?.kind === 'list' ? data.value : undefined;
   });
-
 
   constructor() {
     this.discountStore.clean();

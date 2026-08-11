@@ -4,7 +4,11 @@ import { Observable } from 'rxjs';
 import { IOfficeAll } from '../office/office';
 import { IInvoice, IInvoiceData } from '../invoice/invoice';
 import { toUrl } from '../util/helper';
-import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import {
+  paginated,
+  Pagination,
+  skipLoadingOverlay,
+} from '../interfaces/pagination';
 import { SortDirection } from '@angular/material/sort';
 import { createFilter } from '../util/service-helper';
 
@@ -12,14 +16,14 @@ import { createFilter } from '../util/service-helper';
   providedIn: 'root',
 })
 export class InvoiceService {
-
   private url = 'invoices';
   private urlV1 = `v1/${this.url}`;
   private officeUrl = 'offices';
 
   private http: HttpClient = inject(HttpClient);
 
-  getAllMyOffices = (): Observable<IOfficeAll[]> => this.http.get<IOfficeAll[]>(toUrl(this.urlV1, this.officeUrl));
+  getAllMyOffices = (): Observable<IOfficeAll[]> =>
+    this.http.get<IOfficeAll[]>(toUrl(this.urlV1, this.officeUrl));
 
   getInvoicesPage = (
     officeId: string,
@@ -27,10 +31,11 @@ export class InvoiceService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<IInvoiceData>> => this.http.get<Pagination<IInvoiceData>>(
-    toUrl(this.urlV1, this.officeUrl, officeId, 'pages'),
-    { ...paginated(), params: createFilter(page, size, sort, direction) },
-  );
+  ): Observable<Pagination<IInvoiceData>> =>
+    this.http.get<Pagination<IInvoiceData>>(
+      toUrl(this.urlV1, this.officeUrl, officeId, 'pages'),
+      { ...paginated(), params: createFilter(page, size, sort, direction) },
+    );
 
   getOfficeToInvoice = (
     officeId: string,
@@ -40,7 +45,7 @@ export class InvoiceService {
   ): Observable<IInvoice[]> => {
     let params = new HttpParams().set('start', start).set('end', end);
     if (types && types.length) {
-      types.forEach(type => {
+      types.forEach((type) => {
         params = params.append('types', type);
       });
     }
@@ -64,6 +69,10 @@ export class InvoiceService {
     formData.append('file', file, file.name);
 
     const headers = new HttpHeaders().set('Upload', 'true');
-    return this.http.post<void>(toUrl(this.urlV1, this.officeUrl, officeId), formData, { headers });
+    return this.http.post<void>(
+      toUrl(this.urlV1, this.officeUrl, officeId),
+      formData,
+      { headers },
+    );
   };
 }

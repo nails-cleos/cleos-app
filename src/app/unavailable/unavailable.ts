@@ -87,21 +87,15 @@ export class Unavailable {
         unavailableForm.description.value,
         currentUnavailable?.description,
       ),
-      time: fieldChange(
-        unavailableForm.duration,
-        currentUnavailable?.duration,
-      ),
-      repeat: fieldChange(
-        unavailableForm.repeat,
-        currentUnavailable?.repeat,
-      ),
+      time: fieldChange(unavailableForm.duration, currentUnavailable?.duration),
+      repeat: fieldChange(unavailableForm.repeat, currentUnavailable?.repeat),
       start: start.toLocaleString(DEFAULT_LOCALE),
       timeZone,
       allDay: unavailableForm.allDay.value,
       ...(unavailableForm.endDate.value && {
-        endString: createNewDate(
-          unavailableForm.endDate.value,
-        ).toLocaleString(DEFAULT_LOCALE),
+        endString: createNewDate(unavailableForm.endDate.value).toLocaleString(
+          DEFAULT_LOCALE,
+        ),
       }),
     };
   }
@@ -123,10 +117,7 @@ export class Unavailable {
       )?.id,
       start: start.toLocaleString(DEFAULT_LOCALE),
       timeZone,
-      time: fieldChange(
-        blockAgendaForm.duration,
-        currentUnavailable?.duration,
-      ),
+      time: fieldChange(blockAgendaForm.duration, currentUnavailable?.duration),
     };
   }
 
@@ -141,10 +132,6 @@ export class Unavailable {
 
     const time = getTimeNumber(startTime);
 
-    return createNewDate(
-      startDate,
-      time?.hour,
-      time?.minute,
-    );
+    return createNewDate(startDate, time?.hour, time?.minute);
   }
 }

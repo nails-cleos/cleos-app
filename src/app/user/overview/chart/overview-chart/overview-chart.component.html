@@ -4,8 +4,14 @@
   <div class="chartContainer">
     @if (chart && chart.charData && !currentError) {
       <div>
-        <canvas [type]="chart.type" [datasets]="chart.charData.datasets" [labels]="chart.labels" [legend]="true"
-                [options]="chart.options" baseChart>
+        <canvas
+          [type]="chart.type"
+          [datasets]="chart.charData.datasets"
+          [labels]="chart.labels"
+          [legend]="true"
+          [options]="chart.options"
+          baseChart
+        >
         </canvas>
       </div>
     } @else {

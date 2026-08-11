@@ -1,11 +1,18 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { IAwsExtract } from '../interfaces/aws';
-import { AwsLambdaService } from '../services/aws-lambda.service';
-import { createStoreInitialState, mapCrudHttpError, StoreState } from './crud-signal-store';
+import AwsLambdaService from '../services/aws-lambda.service';
+import {
+  createStoreInitialState,
+  mapCrudHttpError,
+  StoreState,
+} from './crud-signal-store';
 import type { Subscription } from 'rxjs';
 
-type AwsStoreState = Pick<StoreState<IAwsExtract>, 'data' | 'error' | 'isLoading'>;
+type AwsStoreState = Pick<
+  StoreState<IAwsExtract>,
+  'data' | 'error' | 'isLoading'
+>;
 
 const initialState: AwsStoreState = {
   ...createStoreInitialState<IAwsExtract, never>(),
@@ -35,10 +42,16 @@ export const AwsStore = signalStore(
         processPdfSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        processPdfSubscription = awsLambdaService.processPdf(token, file, userId).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: (err) => patchState(store, { error: mapCrudHttpError(err), isLoading: false }),
-        });
+        processPdfSubscription = awsLambdaService
+          .processPdf(token, file, userId)
+          .subscribe({
+            next: (data) => patchState(store, { data, isLoading: false }),
+            error: (err) =>
+              patchState(store, {
+                error: mapCrudHttpError(err),
+                isLoading: false,
+              }),
+          });
       },
     };
   }),

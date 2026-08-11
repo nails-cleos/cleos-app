@@ -1,45 +1,57 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddServiceComponent } from './add-service.component';
 import { of } from 'rxjs';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { IService, ServicePrice, ServiceType } from '../../room';
-import { TranslateModule } from '@ngx-translate/core';
-import { ITreatmentAll } from '../../../treatment/treatment';
+import { ITreatmentAll } from '@app/treatment/treatment';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
-import { RoomStore } from '../../../store/room.store';
-import { NavigationService } from '../../../services/navigation.service';
+import { RoomStore } from '@app/store/room.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AddServiceComponent', () => {
   let component: AddServiceComponent;
   let fixture: ComponentFixture<AddServiceComponent>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let roomStoreSpy: {
     services: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
     isLoading: ReturnType<typeof signal<boolean>>;
-    loadServices: jasmine.Spy;
-    updateServices: jasmine.Spy;
+    loadServices: Mock;
+    updateServices: Mock;
   };
 
   beforeEach(async () => {
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
     roomStoreSpy = {
       services: signal(undefined),
       response: signal(undefined),
       isLoading: signal(false),
-      loadServices: jasmine.createSpy('loadServices'),
-      updateServices: jasmine.createSpy('updateServices'),
+      loadServices: vi.fn().mockName('loadServices'),
+      updateServices: vi.fn().mockName('updateServices'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [AddServiceComponent, TranslateModule.forRoot()],
+      imports: [AddServiceComponent],
       providers: [
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        provideTranslateService(),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: RoomStore, useValue: roomStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
       ],
     }).compileComponents();
 
@@ -71,26 +83,28 @@ describe('AddServiceComponent', () => {
       },
     ]);
 
-    component.groups.set(new Map([
-      [
-        'group1',
-        {
-          id: 'group1',
-          name: 'Group 1',
-          treatments: [],
-          selectedTreatments: [
-            {
-              id: '2',
-              price: 30,
-              type: ServiceType.treatment,
-              duration: 'PT1H30M',
-              key: 'key-2',
-              name: 'Treatment 2',
-            },
-          ],
-        },
-      ],
-    ]));
+    component.groups.set(
+      new Map([
+        [
+          'group1',
+          {
+            id: 'group1',
+            name: 'Group 1',
+            treatments: [],
+            selectedTreatments: [
+              {
+                id: '2',
+                price: 30,
+                type: ServiceType.treatment,
+                duration: 'PT1H30M',
+                key: 'key-2',
+                name: 'Treatment 2',
+              },
+            ],
+          },
+        ],
+      ]),
+    );
 
     component.save();
 
@@ -108,7 +122,6 @@ describe('AddServiceComponent', () => {
 
     expect(roomStoreSpy.updateServices).not.toHaveBeenCalled();
   });
-
 
   it('should reorder items when dropped in same container', () => {
     component.selectedAdditional.set([
@@ -150,15 +163,17 @@ describe('AddServiceComponent', () => {
   });
 
   it('should transfer item when dropped in different container without dialog', () => {
-    component.additional.set([{
-      id: '1',
-      name: 'Item 1',
-      type: ServiceType.additional,
-      price: 0,
-      currency: 'USD',
-      duration: 'PT10M',
-      key: 'key-1',
-    }]);
+    component.additional.set([
+      {
+        id: '1',
+        name: 'Item 1',
+        type: ServiceType.additional,
+        price: 0,
+        currency: 'USD',
+        duration: 'PT10M',
+        key: 'key-1',
+      },
+    ]);
     component.selectedAdditional.set([]);
 
     const source = component.additional();
@@ -192,7 +207,7 @@ describe('AddServiceComponent', () => {
 
     component.selectedAdditional.set([service]);
 
-    dialogSpy.open.and.callFake(() => {
+    dialogSpy.open.mockImplementation(() => {
       return {
         afterClosed: () => of({ price: 99, type: ServiceType.additional }),
       } as any;
@@ -213,19 +228,21 @@ describe('AddServiceComponent', () => {
       type: ServiceType.treatment,
     };
 
-    component.groups.set(new Map([
-      [
-        'g1',
-        {
-          id: 'g1',
-          name: 'Wellness',
-          treatments: [],
-          selectedTreatments: [treatment],
-        },
-      ],
-    ]));
+    component.groups.set(
+      new Map([
+        [
+          'g1',
+          {
+            id: 'g1',
+            name: 'Wellness',
+            treatments: [],
+            selectedTreatments: [treatment],
+          },
+        ],
+      ]),
+    );
 
-    dialogSpy.open.and.callFake(() => {
+    dialogSpy.open.mockImplementation(() => {
       return {
         afterClosed: () => of({ price: 80, type: ServiceType.treatment }),
       } as any;
@@ -233,8 +250,7 @@ describe('AddServiceComponent', () => {
 
     component.changePrice(treatment);
 
-    const updated =
-      [...component.groups().values()][0].selectedTreatments[0];
+    const updated = [...component.groups().values()][0].selectedTreatments[0];
 
     expect(updated.price).toBe(80);
   });
@@ -252,14 +268,19 @@ describe('AddServiceComponent', () => {
     };
 
     // Initialize groups signal
-    component.groups.set(new Map([
-      [groupId, {
-        id: groupId,
-        name: 'Group 1',
-        treatments: [item],
-        selectedTreatments: [],
-      }],
-    ]));
+    component.groups.set(
+      new Map([
+        [
+          groupId,
+          {
+            id: groupId,
+            name: 'Group 1',
+            treatments: [item],
+            selectedTreatments: [],
+          },
+        ],
+      ]),
+    );
 
     const group = component.groups().get(groupId)!;
 
@@ -303,9 +324,19 @@ describe('AddServiceComponent', () => {
       },
     ];
 
-    component.groups.set(new Map([
-      [groupId, { id: groupId, name: 'group1', treatments: [...items], selectedTreatments: [] }],
-    ]));
+    component.groups.set(
+      new Map([
+        [
+          groupId,
+          {
+            id: groupId,
+            name: 'group1',
+            treatments: [...items],
+            selectedTreatments: [],
+          },
+        ],
+      ]),
+    );
 
     const group = component.groups().get(groupId)!;
     const event = {
@@ -321,5 +352,4 @@ describe('AddServiceComponent', () => {
     expect(updatedGroup.treatments[0].id).toBe('2');
     expect(updatedGroup.selectedTreatments[0].id).toBe('1');
   });
-
 });

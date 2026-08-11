@@ -2,13 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { DateAdapter as MaterialDateAdapter } from '@angular/material/core';
 import { DateAdapter as CalendarDateAdapter } from 'angular-calendar';
 import { provideAppCalendar, provideAppDateAdapter } from './app-date.provider';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('app-date.provider', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [TranslateModule.forRoot()],
       providers: [
+        provideTranslateService(),
         provideAppDateAdapter(),
         provideAppCalendar(),
       ],
@@ -20,6 +21,8 @@ describe('app-date.provider', () => {
     const calendarAdapter = TestBed.inject(CalendarDateAdapter);
 
     expect(typeof materialAdapter.setLocale).toBe('function');
-    expect(calendarAdapter).not.toBe(materialAdapter as unknown as CalendarDateAdapter);
+    expect(calendarAdapter).not.toBe(
+      materialAdapter as unknown as CalendarDateAdapter,
+    );
   });
 });

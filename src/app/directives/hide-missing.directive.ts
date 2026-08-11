@@ -4,7 +4,6 @@ import { Directive, ElementRef, HostListener, inject } from '@angular/core';
   selector: '[appHideMissing]',
 })
 export class HideMissingDirective {
-
   private el = inject(ElementRef);
 
   @HostListener('error') onError = (): void => {

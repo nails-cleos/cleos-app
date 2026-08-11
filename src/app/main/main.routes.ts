@@ -18,7 +18,9 @@ const providers = [
 
 const children: Routes = [
   {
-    path: '', component: MainComponent, children: [
+    path: '',
+    component: MainComponent,
+    children: [
       { path: '', component: MainContentComponent },
       { path: 'catalogs', component: CatalogComponent },
       { path: 'privacy', component: PrivacyComponent },

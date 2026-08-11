@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import {
+  paginated,
+  Pagination,
+  skipLoadingOverlay,
+} from '../interfaces/pagination';
 import { Observable } from 'rxjs';
 import { IColor, IColorAll } from '../color/color';
 import { createFilter } from '../util/service-helper';
@@ -12,9 +16,8 @@ import { IApiResponse } from '../interfaces/common';
   providedIn: 'root',
 })
 export class ColorService {
-
   private url = 'colors';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -23,24 +26,29 @@ export class ColorService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<Pagination<IColor>> => this.http.get<Pagination<IColor>>(toUrl(this.urlV1, 'pages'),
-    { ...paginated(), params: createFilter(page, size, sort, direction) },
-  );
+  ): Observable<Pagination<IColor>> =>
+    this.http.get<Pagination<IColor>>(toUrl(this.urlV1, 'pages'), {
+      ...paginated(),
+      params: createFilter(page, size, sort, direction),
+    });
 
-  getColorsByTreatmentId = (treatmentId: string): Observable<IColorAll[]> => this.http.get<IColorAll[]>(
-    toUrl(this.urlV1, 'treatments', treatmentId),
-  );
+  getColorsByTreatmentId = (treatmentId: string): Observable<IColorAll[]> =>
+    this.http.get<IColorAll[]>(toUrl(this.urlV1, 'treatments', treatmentId));
 
-  getAllColors = (): Observable<IColorAll[]> => this.http.get<IColorAll[]>(this.urlV1, { ...skipLoadingOverlay() });
+  getAllColors = (): Observable<IColorAll[]> =>
+    this.http.get<IColorAll[]>(this.urlV1, { ...skipLoadingOverlay() });
 
-  getColor = (id: string): Observable<IColorAll | undefined> => this.http.get<IColorAll | undefined>(
-    toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
+  getColor = (id: string): Observable<IColorAll | undefined> =>
+    this.http.get<IColorAll | undefined>(toUrl(this.urlV1, id), {
+      ...skipLoadingOverlay(),
+    });
 
-  createColor = (color: IColor): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, color);
+  createColor = (color: IColor): Observable<IApiResponse> =>
+    this.http.post<IApiResponse>(this.urlV1, color);
 
-  deleteColor = (id: string): Observable<IColor> => this.http.delete<IColor>(toUrl(this.urlV1, id));
+  deleteColor = (id: string): Observable<IColor> =>
+    this.http.delete<IColor>(toUrl(this.urlV1, id));
 
-  updateColor = (id: string, color: IColor): Observable<IApiResponse> => this.http.patch<IApiResponse>(
-    toUrl(this.urlV1, id), color,
-  );
+  updateColor = (id: string, color: IColor): Observable<IApiResponse> =>
+    this.http.patch<IApiResponse>(toUrl(this.urlV1, id), color);
 }

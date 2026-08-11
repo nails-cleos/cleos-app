@@ -1,10 +1,11 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentEditPageComponent } from './treatment-edit-page.component';
 import { ColorStore } from '../store/color.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentEditPageComponent', () => {
   let component: TreatmentEditPageComponent;
@@ -12,34 +13,38 @@ describe('TreatmentEditPageComponent', () => {
   let treatmentStoreSpy: {
     subErrors: ReturnType<typeof signal<any>>;
     selected: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
   let colorStoreSpy: {
     data: ReturnType<typeof signal<any>>;
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
 
   beforeEach(async () => {
     treatmentStoreSpy = {
       subErrors: signal(undefined),
       selected: signal({ id: '123', name: 'Deep Tissue' }),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
     colorStoreSpy = {
       data: signal(undefined),
-      loadAll: jasmine.createSpy('loadAll'),
+      loadAll: vi.fn().mockName('loadAll'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentEditPageComponent, TranslateModule.forRoot()],
+      imports: [TreatmentEditPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -69,6 +74,9 @@ describe('TreatmentEditPageComponent', () => {
 
     component.submit(treatmentGroup as any);
 
-    expect(treatmentStoreSpy.update).toHaveBeenCalledWith('123', treatmentGroup as any);
+    expect(treatmentStoreSpy.update).toHaveBeenCalledWith(
+      '123',
+      treatmentGroup as any,
+    );
   });
 });

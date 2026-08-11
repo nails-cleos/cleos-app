@@ -1,9 +1,27 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Currency, CurrencyForm, ICurrency, ICurrencyAll } from './currency';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatSelect, MatSelectTrigger } from '@angular/material/select';
@@ -15,8 +33,21 @@ import { CurrencyStore } from '../store/currency.store';
   selector: 'app-currency',
   templateUrl: './currency.component.html',
   styleUrls: ['./currency.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatSelect, MatOption, MatIcon, MatButton, ReactiveFormsModule,
-    TranslatePipe, MatError, BackButtonDirective, BackButtonDirective, MatSelectTrigger],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatError,
+    BackButtonDirective,
+    BackButtonDirective,
+    MatSelectTrigger,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CurrencyComponent {
@@ -26,7 +57,9 @@ export class CurrencyComponent {
   submitData = output<ICurrency>();
 
   private readonly currencyStore = inject(CurrencyStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
   private subErrorsSignal = this.currencyStore.subErrors;
 
@@ -49,7 +82,6 @@ export class CurrencyComponent {
         this.form.patchValue(selected);
       }
     });
-
 
     effect(() => {
       const subErrors = this.subErrorsSignal();

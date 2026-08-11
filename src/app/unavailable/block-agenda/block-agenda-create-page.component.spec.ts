@@ -1,17 +1,21 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BlockAgendaCreatePageComponent } from './block-agenda-create-page.component';
-import { UnavailableStore } from '../../store/unavailable.store';
+import { UnavailableStore } from '@app/store/unavailable.store';
 import { IUnavailableAll } from '../unavailable';
-import { AuthUserService } from '../../services/auth-user.service';
-
+import { AuthUserService } from '@app/services/auth-user.service';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 describe('BlockAgendaCreatePageComponent', () => {
   let component: BlockAgendaCreatePageComponent;
   let fixture: ComponentFixture<BlockAgendaCreatePageComponent>;
 
   let unavailableStoreSpy: {
-    clean: jasmine.Spy;
-    createBlockAgenda: jasmine.Spy;
+    clean: Mock;
+    createBlockAgenda: Mock;
+    subErrors: Mock;
   };
 
   const mockUnavailable: Partial<IUnavailableAll> = {
@@ -20,18 +24,24 @@ describe('BlockAgendaCreatePageComponent', () => {
 
   beforeEach(async () => {
     unavailableStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      createBlockAgenda: jasmine.createSpy('createBlockAgenda'),
+      clean: vi.fn().mockName('clean'),
+      createBlockAgenda: vi.fn().mockName('createBlockAgenda'),
+      subErrors: vi.fn().mockName('subErrors'),
     };
 
     await TestBed.configureTestingModule({
       imports: [BlockAgendaCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: UnavailableStore, useValue: unavailableStoreSpy },
-        { provide: AuthUserService, useValue: { authUser: signal({ isRoomAdmin: false }) } },
+        {
+          provide: AuthUserService,
+          useValue: { authUser: signal({ isRoomAdmin: false }) },
+        },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(BlockAgendaCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaCreatePageComponent);
     component = fixture.componentInstance;
@@ -55,19 +65,24 @@ describe('BlockAgendaCreatePageComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.params()).toEqual(jasmine.objectContaining({
-      date,
-      room,
-      showDuration: true,
-      startTime: '11:15',
-    }));
+    expect(component.params()).toEqual(
+      expect.objectContaining({
+        date,
+        room,
+        showDuration: true,
+        startTime: '11:15',
+      }),
+    );
   });
 
   it('should call createBlockAgenda when unavailable is received', () => {
     component.submit(mockUnavailable as any);
 
-    expect(unavailableStoreSpy.createBlockAgenda).toHaveBeenCalledWith(jasmine.objectContaining({
-      duration: '00:30',
-    }), false);
+    expect(unavailableStoreSpy.createBlockAgenda).toHaveBeenCalledWith(
+      expect.objectContaining({
+        duration: '00:30',
+      }),
+      false,
+    );
   });
 });

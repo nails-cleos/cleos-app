@@ -21,12 +21,25 @@
               <mat-icon matChipRemove>cancel</mat-icon>
             </mat-chip-row>
           }
-          <input #customerInput matInput [formControl]="getForm.customers" [matAutocomplete]="auto"
-                 [matChipInputFor]="chipList">
+          <input
+            #customerInput
+            matInput
+            [formControl]="getForm.customers"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+          />
         </mat-chip-grid>
-        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-          @for (customer of sortCustomers(filteredCustomerSignal()); track customer.id) {
-            <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="selected($event)"
+        >
+          @for (
+            customer of sortCustomers(filteredCustomerSignal());
+            track customer.id
+          ) {
+            <mat-option [value]="customer">{{
+              customer.displayName
+            }}</mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>
@@ -37,8 +50,16 @@
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
-    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" cdkFocusInitial color="primary" mat-flat-button type="button">
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
+    <button
+      (click)="doAction()"
+      cdkFocusInitial
+      color="primary"
+      mat-flat-button
+      type="button"
+    >
       {{ 'COMMON.BUTTON.DISCOUNT.SEND' | translate }}
     </button>
   </div>

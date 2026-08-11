@@ -4,21 +4,36 @@
       <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>calendar_month</mat-icon>
       </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">
+        {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+      </h1>
     </div>
   </div>
 
   <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
   <form [formGroup]="form" (ngSubmit)="onNoClick()">
-    <div class="app-surface-dialog-content calendar-dialog-content" mat-dialog-content>
-      <mat-radio-group [formControl]="getForm.radio" aria-label="Select an option" class="action-options">
-        <mat-radio-button value="reservation">{{ 'COMMON.BUTTON.BOOK' | translate }}</mat-radio-button>
+    <div
+      class="app-surface-dialog-content calendar-dialog-content"
+      mat-dialog-content
+    >
+      <mat-radio-group
+        [formControl]="getForm.radio"
+        aria-label="Select an option"
+        class="action-options"
+      >
+        <mat-radio-button value="reservation">{{
+          'COMMON.BUTTON.BOOK' | translate
+        }}</mat-radio-button>
         <mat-radio-button value="unavailable,block-agenda,add">
           {{ 'COMMON.BUTTON.BLOCK_AGENDA' | translate }}
         </mat-radio-button>
-        <mat-radio-button value="unavailable,add">{{ 'COMMON.BUTTON.UNAVAILABLE' | translate }}</mat-radio-button>
-        <mat-radio-button value="notes,add">{{ 'COMMON.BUTTON.NOTE' | translate }}</mat-radio-button>
+        <mat-radio-button value="unavailable,add">{{
+          'COMMON.BUTTON.UNAVAILABLE' | translate
+        }}</mat-radio-button>
+        <mat-radio-button value="notes,add">{{
+          'COMMON.BUTTON.NOTE' | translate
+        }}</mat-radio-button>
       </mat-radio-group>
     </div>
 
@@ -26,10 +41,20 @@
 
     <div mat-dialog-actions class="app-surface-dialog-actions">
       <div class="app-surface-dialog-spacer"></div>
-      <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
+      <button
+        (click)="onNoClick()"
+        cdkFocusInitial
+        mat-stroked-button
+        type="button"
+      >
         {{ 'COMMON.BUTTON.CANCEL' | translate }}
       </button>
-      <button [mat-dialog-close]="getForm.radio.value" color="primary" mat-flat-button type="button">
+      <button
+        [mat-dialog-close]="getForm.radio.value"
+        color="primary"
+        mat-flat-button
+        type="button"
+      >
         {{ 'COMMON.BUTTON.YES' | translate }}
       </button>
     </div>

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { UserComponent } from './user.component';
 import { ICommon } from '../interfaces/common';
 import { IUser } from './user';
@@ -7,7 +12,8 @@ import { UserStore } from '../store/user.store';
 
 @Component({
   selector: 'app-user-create-page',
-  template: '<app-user [config]="config" [role]="role()" (submitData)="submit($event)"/>',
+  template:
+    '<app-user [config]="config" [role]="role()" (submitData)="submit($event)"/>',
   imports: [UserComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

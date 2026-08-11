@@ -1,5 +1,19 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { combineLatestWith } from 'rxjs';
 import { getNowTimeZone, invoiceFormat, newDate } from '../util/dates';
 import { map, startWith } from 'rxjs/operators';
@@ -9,17 +23,32 @@ import { requireMatch } from '../util/validators';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { DriveAccessService } from '../services/drive-access.service';
 import { BackButtonDirective } from '../directives/back-button.directive';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { FileDropComponent, UploadFile } from '../shared/file-drop/file-drop.component';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
+import {
+  FileDropComponent,
+  UploadFile,
+} from '../shared/file-drop/file-drop.component';
 import { OfficeStore } from '../store/office.store';
 import { MatOption } from '@angular/material/core';
 import { provideYearMonthDateAdapter } from '../util/adapter/app-date.provider';
 import { EnvService } from '../services/env.service';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { IDocument } from '../document/document';
 import { ICommon } from '../interfaces/common';
 
@@ -32,10 +61,26 @@ type StatementForm = {
   selector: 'app-statement',
   templateUrl: './statement.component.html',
   styleUrls: ['./statement.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatOption,
-    MatIcon, MatButton, MatSuffix, ReactiveFormsModule, TranslatePipe, MatAutocomplete, MatError,
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatOption,
+    MatIcon,
+    MatButton,
+    MatSuffix,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatAutocomplete,
+    MatError,
     MatAutocompleteTrigger,
-    BackButtonDirective, BackButtonDirective, FileDropComponent],
+    BackButtonDirective,
+    BackButtonDirective,
+    FileDropComponent,
+  ],
   providers: [...provideYearMonthDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -46,9 +91,12 @@ export class StatementComponent {
   submitData = output<{ officeId: string; blob: Blob; fileName: string }>();
 
   private readonly env: EnvService = inject(EnvService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly officeStore = inject(OfficeStore);
-  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+  private readonly driveAccessService: DriveAccessService =
+    inject(DriveAccessService);
 
   private allOfficesSignal = signal<IOfficeAll[] | undefined>(undefined);
 
@@ -69,7 +117,9 @@ export class StatementComponent {
   filteredOfficeSignal = toSignal(
     this.getForm.office.valueChanges.pipe(
       startWith(''),
-      map((value: any) => !value || typeof value === 'string' ? value : value.code),
+      map((value: any) =>
+        !value || typeof value === 'string' ? value : value.code,
+      ),
       combineLatestWith(toObservable(this.allOfficesSignal)),
       map(([name, offices]) => {
         if (name) {
@@ -78,10 +128,13 @@ export class StatementComponent {
           return offices ? offices.slice() : offices;
         }
       }),
-    ));
+    ),
+  );
 
   private selectedOfficeSignal = toSignal(this.getForm.office.valueChanges);
-  private readonly selectedDateSignal = toSignal(this.getForm.date.valueChanges);
+  private readonly selectedDateSignal = toSignal(
+    this.getForm.date.valueChanges,
+  );
 
   constructor() {
     this.officeStore.loadMyOffices();
@@ -114,13 +167,15 @@ export class StatementComponent {
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
+      this.driveAccessService.requestAccessIfNeeded(
+        this.env.googleDriveUploadFile,
+      );
     });
 
     effect(() => {
       const date = this.selectedDateSignal();
       if (date && this.blob()) {
-        this.fileName.set(`Statement_${ invoiceFormat(newDate(date)) }.pdf`);
+        this.fileName.set(`Statement_${invoiceFormat(newDate(date))}.pdf`);
       } else {
         this.fileName.set(undefined);
       }
@@ -155,9 +210,12 @@ export class StatementComponent {
     }
   };
 
-  displayFnOffice = (office: IOfficeAll): string => office ? office.name : '';
+  displayFnOffice = (office: IOfficeAll): string => (office ? office.name : '');
 
-  setMonthAndYear = (normalizedMonthAndYear: Date, datepicker: MatDatepicker<Date>): void => {
+  setMonthAndYear = (
+    normalizedMonthAndYear: Date,
+    datepicker: Pick<MatDatepicker<Date>, 'close'>,
+  ): void => {
     const ctrlValue = new Date(this.getForm.date.value);
     ctrlValue?.setMonth(normalizedMonthAndYear.getMonth());
     ctrlValue?.setFullYear(normalizedMonthAndYear.getFullYear());
@@ -177,6 +235,11 @@ export class StatementComponent {
     }
   };
 
-  private filterOffice = (name: string, offices: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterOffice = (
+    name: string,
+    offices: IOfficeAll[],
+  ): IOfficeAll[] | undefined =>
+    offices?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

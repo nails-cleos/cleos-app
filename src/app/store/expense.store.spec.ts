@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { ExpenseStore } from './expense.store';
@@ -8,30 +8,29 @@ import { ExpenseService } from '../services/expense.service';
 
 describe('ExpenseStore', () => {
   let store: InstanceType<typeof ExpenseStore>;
-  let expenseServiceSpy: jasmine.SpyObj<ExpenseService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let expenseServiceSpy: {
+    getExpensesPage: Mock;
+    getAllExpensesInfo: Mock;
+    getExpense: Mock;
+    createExpense: Mock;
+    updateExpense: Mock;
+    deleteExpense: Mock;
+  };
 
   beforeEach(() => {
-    expenseServiceSpy = jasmine.createSpyObj<ExpenseService>('ExpenseService', [
-      'getExpensesPage',
-      'getAllExpensesInfo',
-      'getExpense',
-      'createExpense',
-      'updateExpense',
-      'deleteExpense',
-    ]);
-
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['invoice'] ?? ''}`,
-    );
+    expenseServiceSpy = {
+      getExpensesPage: vi.fn().mockName('ExpenseService.getExpensesPage'),
+      getAllExpensesInfo: vi.fn().mockName('ExpenseService.getAllExpensesInfo'),
+      getExpense: vi.fn().mockName('ExpenseService.getExpense'),
+      createExpense: vi.fn().mockName('ExpenseService.createExpense'),
+      updateExpense: vi.fn().mockName('ExpenseService.updateExpense'),
+      deleteExpense: vi.fn().mockName('ExpenseService.deleteExpense'),
+    };
 
     TestBed.configureTestingModule({
       providers: [
         ExpenseStore,
         { provide: ExpenseService, useValue: expenseServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -40,7 +39,7 @@ describe('ExpenseStore', () => {
 
   it('should load expense page and set data', () => {
     const page = { content: [] } as any;
-    expenseServiceSpy.getExpensesPage.and.returnValue(of(page));
+    expenseServiceSpy.getExpensesPage.mockReturnValue(of(page));
 
     store.loadPage({
       roomId: 'room-1',
@@ -63,33 +62,33 @@ describe('ExpenseStore', () => {
     );
 
     expect(store.data()).toEqual(page);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load expense info', () => {
     const info = { total: 100 } as any;
-    expenseServiceSpy.getAllExpensesInfo.and.returnValue(of(info));
+    expenseServiceSpy.getAllExpensesInfo.mockReturnValue(of(info));
 
     store.loadInfo('room-1');
 
     expect(expenseServiceSpy.getAllExpensesInfo).toHaveBeenCalledWith('room-1');
     expect(store.info()).toEqual(info);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load expense by id', () => {
     const expense = { id: 'e1' } as any;
-    expenseServiceSpy.getExpense.and.returnValue(of(expense));
+    expenseServiceSpy.getExpense.mockReturnValue(of(expense));
 
     store.loadById('room-1', 'e1');
 
     expect(expenseServiceSpy.getExpense).toHaveBeenCalledWith('room-1', 'e1');
     expect(store.selected()).toEqual(expense);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should create expense and set response', () => {
-    expenseServiceSpy.createExpense.and.returnValue(
+    expenseServiceSpy.createExpense.mockReturnValue(
       of({ id: '1', name: 'Invoice-1' } as any),
     );
 
@@ -99,25 +98,21 @@ describe('ExpenseStore', () => {
 
     expect(expenseServiceSpy.createExpense).toHaveBeenCalledWith(
       'room-1',
-      jasmine.any(Object),
+      expect.any(Object),
       file,
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'EXPENSE.CREATED',
-      { invoice: 'Invoice-1' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'EXPENSE.CREATED:Invoice-1',
+      messageKey: 'EXPENSE.CREATED',
+      messageParams: { invoice: 'Invoice-1' },
       path: 'rooms/room-1/expenses/1',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should update expense and set response', () => {
-    expenseServiceSpy.updateExpense.and.returnValue(
+    expenseServiceSpy.updateExpense.mockReturnValue(
       of({ id: '2', name: 'Updated-Inv' } as any),
     );
 
@@ -128,67 +123,65 @@ describe('ExpenseStore', () => {
     expect(expenseServiceSpy.updateExpense).toHaveBeenCalledWith(
       '2',
       'room-1',
-      jasmine.any(Object),
+      expect.any(Object),
       file,
     );
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'EXPENSE.UPDATED.MESSAGE',
-      { invoice: 'Updated-Inv' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'EXPENSE.UPDATED.MESSAGE:Updated-Inv',
+      messageKey: 'EXPENSE.UPDATED.MESSAGE',
+      messageParams: { invoice: 'Updated-Inv' },
       path: 'rooms/room-1/expenses/2',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should delete expense and show warning toast', () => {
-    expenseServiceSpy.deleteExpense.and.returnValue(of(void 0));
+    expenseServiceSpy.deleteExpense.mockReturnValue(of(void 0));
 
     store.delete('room-1', 'e1', 'INV-001');
 
-    expect(expenseServiceSpy.deleteExpense).toHaveBeenCalledWith('room-1', 'e1');
-
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'EXPENSE.DELETED.MESSAGE',
-      { invoice: 'INV-001' },
+    expect(expenseServiceSpy.deleteExpense).toHaveBeenCalledWith(
+      'room-1',
+      'e1',
     );
 
     expect(store.response()).toEqual({
-      message: 'EXPENSE.DELETED.MESSAGE:INV-001',
+      messageKey: 'EXPENSE.DELETED.MESSAGE',
+      messageParams: { invoice: 'INV-001' },
       reload: true,
       toastType: 'warning',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should map HTTP errors into error state', () => {
-    expenseServiceSpy.getExpense.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 400,
-          error: { message: 'EXPENSE.ERROR' },
-        }),
+    expenseServiceSpy.getExpense.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            error: { message: 'EXPENSE.ERROR' },
+          }),
       ),
     );
 
     store.loadById('room-1', 'missing');
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         message: 'EXPENSE.ERROR',
       }),
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should reset state on clean()', () => {
-    expenseServiceSpy.getExpensesPage.and.returnValue(of({ content: [] } as any));
+    expenseServiceSpy.getExpensesPage.mockReturnValue(
+      of({ content: [] } as any),
+    );
 
     store.loadPage({
       roomId: 'room-1',
@@ -206,7 +199,7 @@ describe('ExpenseStore', () => {
   });
 
   it('should clear response and error', () => {
-    expenseServiceSpy.getExpense.and.returnValue(of({ id: '1' } as any));
+    expenseServiceSpy.getExpense.mockReturnValue(of({ id: '1' } as any));
 
     store.loadById('room-1', '1');
 

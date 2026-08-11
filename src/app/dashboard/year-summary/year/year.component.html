@@ -1,7 +1,10 @@
 <div class="year-grid">
   @for (quarter of quarterRows(); track quarter.quarter) {
     <section class="app-surface-section app-crud-fields">
-      <div (click)="goToQuarter(quarter.quarter)" class="app-detail-section-header year-quarter__header pointer">
+      <div
+        (click)="goToQuarter(quarter.quarter)"
+        class="app-detail-section-header year-quarter__header pointer"
+      >
         <div>
           <span class="app-surface-eyebrow">Q{{ quarter.quarter }}</span>
         </div>
@@ -10,15 +13,21 @@
       <div class="year-quarter__months">
         @for (month of quarter.months; track month.month) {
           <section class="app-surface-item year-month-card">
-            <button (click)="goToMonth(month.month)" class="year-month-card__title" type="button">
+            <button
+              (click)="goToMonth(month.month)"
+              class="year-month-card__title"
+              type="button"
+            >
               {{ month.label }}
             </button>
 
             <div class="app-crud-fields">
-              <app-month [month]="month.summary"
-                         [year]="year()"
-                         [currency]="currency()"
-                         [showCash]="showCash()">
+              <app-month
+                [month]="month.summary"
+                [year]="year()"
+                [currency]="currency()"
+                [showCash]="showCash()"
+              >
               </app-month>
             </div>
           </section>

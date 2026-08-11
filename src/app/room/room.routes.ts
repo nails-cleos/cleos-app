@@ -12,12 +12,15 @@ import { ExpenseDetailsPageComponent } from './me/expense/expense-details-page.c
 import { RoomMeDetailsPageComponent } from './room-me-details-page.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('room'),
-];
+const providers = [provideFeatureTranslations('room')];
 
 const children: Routes = [
-  { path: '', component: RoomListComponent, canActivate: [authGuard], data: { roles: [Role.admin, Role.manager] } },
+  {
+    path: '',
+    component: RoomListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin, Role.manager] },
+  },
   {
     path: 'add',
     component: RoomCreatePageComponent,

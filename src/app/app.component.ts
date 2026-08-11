@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AuthUserService } from './services/auth-user.service';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -14,11 +19,14 @@ import { NavigationService } from './services/navigation.service';
 })
 export class AppComponent {
   private readonly authUserService = inject(AuthUserService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private readonly authUserSignal = this.authUserService.authUser;
 
-  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
+  private readonly language = toSignal(this.navigationService.urlLanguage$, {
+    initialValue: DEFAULT_LOCALE,
+  });
 
   constructor() {
     effect(() => {

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatIconRegistry } from '@angular/material/icon';
-import { matIconRegistryStub } from '../../util/app-material-registry-stub';
+import { matIconRegistryStub } from '@app/util/app-material-registry-stub';
 import { ColorPickerComponent } from './color-picker.component';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('ColorPickerComponent', () => {
   let component: ColorPickerComponent;
@@ -15,7 +15,7 @@ describe('ColorPickerComponent', () => {
     control = new FormControl('#123456', { nonNullable: true });
 
     await TestBed.configureTestingModule({
-      imports: [ColorPickerComponent, TranslateModule.forRoot()],
+      imports: [ColorPickerComponent],
       providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
     }).compileComponents();
 
@@ -35,19 +35,22 @@ describe('ColorPickerComponent', () => {
   });
 
   it('should update the bound control from the native color input', () => {
-    const nativeInput = fixture.debugElement.query(By.css('input[type="color"]')).nativeElement as HTMLInputElement;
+    const nativeInput = fixture.debugElement.query(
+      By.css('input[type="color"]'),
+    ).nativeElement as HTMLInputElement;
 
     nativeInput.value = '#abcdef';
     nativeInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
 
     expect(control.value).toBe('#abcdef');
-    expect(control.dirty).toBeTrue();
-    expect(control.touched).toBeTrue();
+    expect(control.dirty).toBe(true);
+    expect(control.touched).toBe(true);
   });
 
   it('should normalize typed short hex values on blur', () => {
-    const textInput = fixture.debugElement.query(By.css('input[type="text"]')).nativeElement as HTMLInputElement;
+    const textInput = fixture.debugElement.query(By.css('input[type="text"]'))
+      .nativeElement as HTMLInputElement;
 
     control.setValue('#0f0');
     textInput.dispatchEvent(new Event('blur'));
@@ -57,9 +60,14 @@ describe('ColorPickerComponent', () => {
   });
 
   it('should render the reservation preview card using the selected color', () => {
-    const previewCard = fixture.debugElement.query(By.css('.color-preview-card'));
-    const reservationPreview = fixture.debugElement.query(By.css('.reservation-example')).nativeElement as HTMLElement;
-    const subtitle = fixture.debugElement.query(By.css('mat-card-subtitle')).nativeElement as HTMLElement;
+    const previewCard = fixture.debugElement.query(
+      By.css('.color-preview-card'),
+    );
+    const reservationPreview = fixture.debugElement.query(
+      By.css('.reservation-example'),
+    ).nativeElement as HTMLElement;
+    const subtitle = fixture.debugElement.query(By.css('mat-card-subtitle'))
+      .nativeElement as HTMLElement;
 
     expect(previewCard).toBeTruthy();
     expect(subtitle.textContent).toContain('Dark reservation');
@@ -91,7 +99,8 @@ describe('ColorPickerComponent', () => {
 
     expect(component.previewColor()).toBe('#000000');
 
-    const textInput = fixture.debugElement.query(By.css('input[type="text"]')).nativeElement as HTMLInputElement;
+    const textInput = fixture.debugElement.query(By.css('input[type="text"]'))
+      .nativeElement as HTMLInputElement;
     textInput.dispatchEvent(new Event('blur'));
     fixture.detectChanges();
 
@@ -104,8 +113,11 @@ describe('ColorPickerComponent', () => {
     fixture.componentRef.setInput('previewTitle', 'Light reservation');
     fixture.detectChanges();
 
-    const reservationPreview = fixture.debugElement.query(By.css('.reservation-example')).nativeElement as HTMLElement;
-    const subtitle = fixture.debugElement.query(By.css('mat-card-subtitle')).nativeElement as HTMLElement;
+    const reservationPreview = fixture.debugElement.query(
+      By.css('.reservation-example'),
+    ).nativeElement as HTMLElement;
+    const subtitle = fixture.debugElement.query(By.css('mat-card-subtitle'))
+      .nativeElement as HTMLElement;
 
     expect(component.previewCardBackground()).toBe('#fafafa');
     expect(component.previewTitleColor()).toBe('#363636');

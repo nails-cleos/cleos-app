@@ -1,21 +1,35 @@
-<ng-template #hourSegmentTemplate let-segment="segment" let-isTimeLabel="isTimeLabel">
+<ng-template
+  #hourSegmentTemplate
+  let-segment="segment"
+  let-isTimeLabel="isTimeLabel"
+>
   @if (isTimeLabel) {
     <div class="cal-time">
-      {{ segment.date | date:'HH:mm' }}
+      {{ segment.date | date: 'HH:mm' }}
     </div>
   }
 </ng-template>
 
 <div class="cal-week-view" role="grid">
   <div class="cal-day-headers" role="row">
-    @for (professional of professionals(); track trackByProfessionalId($index, professional)) {
+    @for (
+      professional of professionals();
+      track trackByProfessionalId($index, professional)
+    ) {
       <div class="cal-header" role="columnheader" tabindex="0">
-        <mat-card appearance="outlined" [style.background-color]="professional.color.secondary"
-                  [style.border-color]="professional.color.primary"
-                  [style.border]="'3px solid'" class="mat-elevation-z0">
+        <mat-card
+          appearance="outlined"
+          [style.background-color]="professional.color.secondary"
+          [style.border-color]="professional.color.primary"
+          [style.border]="'3px solid'"
+          class="mat-elevation-z0"
+        >
           <mat-card-header>
-            <div [style.background-image]="'url(' + professional.img + ')'" [style.background-size]="'cover'"
-                 mat-card-avatar></div>
+            <div
+              [style.background-image]="'url(' + professional.img + ')'"
+              [style.background-size]="'cover'"
+              mat-card-avatar
+            ></div>
             <mat-card-title>{{ professional.name | titlecase }}</mat-card-title>
             <mat-card-subtitle class="professional-summary-badges">
               <span class="professional-summary-badge">
@@ -38,15 +52,31 @@
       <div class="dashboard-events-all-day__columns">
         @for (column of view.hourColumns; track column.date; let i = $index) {
           <div class="dashboard-events-all-day__column">
-            @for (row of view.allDayEventRows; track row; let rowIndex = $index) {
-              @for (allDayEvent of row.row; track allDayEvent.event.id ?? allDayEvent.event.title) {
+            @for (
+              row of view.allDayEventRows;
+              track row;
+              let rowIndex = $index
+            ) {
+              @for (
+                allDayEvent of row.row;
+                track allDayEvent.event.id ?? allDayEvent.event.title
+              ) {
                 @if (allDayEvent.offset === i) {
-                  <button type="button" class="dashboard-events-all-day__event"
-                          [style.border-color]="allDayEvent.event.color?.primary"
-                          [style.background-color]="allDayEvent.event.color?.secondary"
-                          [innerHTML]="allDayEvent.event.title"
-                          (click)="eventClicked.emit({event: allDayEvent.event, sourceEvent: $event})">
-                  </button>
+                  <button
+                    type="button"
+                    class="dashboard-events-all-day__event"
+                    [style.border-color]="allDayEvent.event.color?.primary"
+                    [style.background-color]="
+                      allDayEvent.event.color?.secondary
+                    "
+                    [innerHTML]="allDayEvent.event.title"
+                    (click)="
+                      eventClicked.emit({
+                        event: allDayEvent.event,
+                        sourceEvent: $event,
+                      })
+                    "
+                  ></button>
                 }
               }
             }
@@ -55,15 +85,25 @@
       </div>
     </div>
   }
-  <div (dragEnter)="dragEnter('time')" (dragLeave)="dragLeave('time')" class="cal-time-events" mwlDroppable>
+  <div
+    (dragEnter)="dragEnter('time')"
+    (dragLeave)="dragLeave('time')"
+    class="cal-time-events"
+    mwlDroppable
+  >
     @if (view.hourColumns.length > 0) {
       <div class="cal-time-label-column">
         @for (hour of view.hourColumns[0].hours; track hour; let odd = $odd) {
           <div [class.cal-hour-odd]="odd" class="cal-hour">
             @for (segment of hour.segments; track segment.date) {
               <mwl-calendar-week-view-hour-segment
-                [customTemplate]="hourSegmentTemplate" [isTimeLabel]="true" [locale]="locale"
-                [segmentHeight]="hourSegmentHeight" [segment]="segment" [style.height.px]="hourSegmentHeight">
+                [customTemplate]="hourSegmentTemplate"
+                [isTimeLabel]="true"
+                [locale]="locale"
+                [segmentHeight]="hourSegmentHeight"
+                [segment]="segment"
+                [style.height.px]="hourSegmentHeight"
+              >
               </mwl-calendar-week-view-hour-segment>
             }
           </div>
@@ -71,7 +111,11 @@
       </div>
     }
 
-    <div #dayColumns [class.cal-resize-active]="timeEventResizes.size > 0" class="cal-day-columns">
+    <div
+      #dayColumns
+      [class.cal-resize-active]="timeEventResizes.size > 0"
+      class="cal-day-columns"
+    >
       @for (column of view.hourColumns; track column.date; let i = $index) {
         <div class="cal-day-column">
           <mwl-calendar-week-view-current-time-marker
@@ -82,39 +126,97 @@
             [dayStartHour]="dayStartHour"
             [dayStartMinute]="dayStartMinute"
             [hourSegmentHeight]="hourSegmentHeight"
-            [hourSegments]="hourSegments"></mwl-calendar-week-view-current-time-marker>
-          @for (timeEvent of column.events; track timeEvent.event.id ?? timeEvent.event.start) {
-            <div #event (dragEnd)="dragEnded(timeEvent, $event, dayColumnWidth, true)"
-                 (dragStart)="dragStarted(dayColumns, event, timeEvent, true)" (dragging)="dragMove(timeEvent, $event)"
-                 (resizeEnd)="timeEventResizeEnded(timeEvent)"
-                 (resizeStart)="timeEventResizeStarted(dayColumns, timeEvent, $event)"
-                 (resizing)="timeEventResizing(timeEvent, $event)" [allowNegativeResizes]="true"
-                 [class.cal-draggable]="timeEvent.event.draggable && timeEventResizes.size === 0"
-                 [class.cal-ends-within-day]="!timeEvent.endsAfterDay"
-                 [class.cal-starts-within-day]="!timeEvent.startsBeforeDay"
-                 [dragAxis]="{x: !!timeEvent.event.draggable && timeEventResizes.size === 0, y: !!timeEvent.event.draggable && timeEventResizes.size === 0}"
-                 [dragSnapGrid]="snapDraggedEvents ? { x: dayColumnWidth, y: eventSnapSize || hourSegmentHeight } : {}"
-                 [dropData]="{ event: timeEvent.event, calendarId: calendarId }" [ghostDragEnabled]="!snapDraggedEvents"
-                 [hidden]="timeEvent.height === 0 && timeEvent.width === 0"
-                 [ngClass]="timeEvent.event.cssClass ?? ''"
-                 [resizeSnapGrid]="{left: dayColumnWidth, right: dayColumnWidth, top: eventSnapSize || hourSegmentHeight, bottom: eventSnapSize || hourSegmentHeight}"
-                 [style.height.px]="timeEvent.height" [style.left.%]="timeEvent.left" [style.top.px]="timeEvent.top"
-                 [style.width.%]="timeEvent.width" [validateDrag]="validateDrag" [validateResize]="validateResize"
-                 class="cal-event-container" dragActiveClass="cal-drag-active" mwlDraggable mwlResizable>
-              @if (timeEvent.event.resizable?.beforeStart && !timeEvent.startsBeforeDay) {
-                <div [resizeEdges]="{left: true, top: true}" class="cal-resize-handle cal-resize-handle-before-start"
-                     mwlResizeHandle></div>
+            [hourSegments]="hourSegments"
+          ></mwl-calendar-week-view-current-time-marker>
+          @for (
+            timeEvent of column.events;
+            track timeEvent.event.id ?? timeEvent.event.start
+          ) {
+            <div
+              #event
+              (dragEnd)="dragEnded(timeEvent, $event, dayColumnWidth, true)"
+              (dragStart)="dragStarted(dayColumns, event, timeEvent, true)"
+              (dragging)="dragMove(timeEvent, $event)"
+              (resizeEnd)="timeEventResizeEnded(timeEvent)"
+              (resizeStart)="
+                timeEventResizeStarted(dayColumns, timeEvent, $event)
+              "
+              (resizing)="timeEventResizing(timeEvent, $event)"
+              [allowNegativeResizes]="true"
+              [class.cal-draggable]="
+                timeEvent.event.draggable && timeEventResizes.size === 0
+              "
+              [class.cal-ends-within-day]="!timeEvent.endsAfterDay"
+              [class.cal-starts-within-day]="!timeEvent.startsBeforeDay"
+              [dragAxis]="{
+                x: !!timeEvent.event.draggable && timeEventResizes.size === 0,
+                y: !!timeEvent.event.draggable && timeEventResizes.size === 0,
+              }"
+              [dragSnapGrid]="
+                snapDraggedEvents
+                  ? { x: dayColumnWidth, y: eventSnapSize || hourSegmentHeight }
+                  : {}
+              "
+              [dropData]="{ event: timeEvent.event, calendarId: calendarId }"
+              [ghostDragEnabled]="!snapDraggedEvents"
+              [hidden]="timeEvent.height === 0 && timeEvent.width === 0"
+              [ngClass]="timeEvent.event.cssClass ?? ''"
+              [resizeSnapGrid]="{
+                left: dayColumnWidth,
+                right: dayColumnWidth,
+                top: eventSnapSize || hourSegmentHeight,
+                bottom: eventSnapSize || hourSegmentHeight,
+              }"
+              [style.height.px]="timeEvent.height"
+              [style.left.%]="timeEvent.left"
+              [style.top.px]="timeEvent.top"
+              [style.width.%]="timeEvent.width"
+              [validateDrag]="validateDrag"
+              [validateResize]="validateResize"
+              class="cal-event-container"
+              dragActiveClass="cal-drag-active"
+              mwlDraggable
+              mwlResizable
+            >
+              @if (
+                timeEvent.event.resizable?.beforeStart &&
+                !timeEvent.startsBeforeDay
+              ) {
+                <div
+                  [resizeEdges]="{ left: true, top: true }"
+                  class="cal-resize-handle cal-resize-handle-before-start"
+                  mwlResizeHandle
+                ></div>
               }
               <mwl-calendar-week-view-event
-                (eventClicked)="eventClicked.emit({event: timeEvent.event, sourceEvent: $event.sourceEvent})"
-                [column]="column" [customTemplate]="eventTemplate" [eventActionsTemplate]="eventActionsTemplate"
-                [eventTitleTemplate]="eventTitleTemplate" [locale]="locale" [tooltipAppendToBody]="tooltipAppendToBody"
-                [tooltipDelay]="tooltipDelay" [tooltipDisabled]="true" [tooltipPlacement]="tooltipPlacement"
-                [tooltipTemplate]="tooltipTemplate" [weekEvent]="timeEvent" class="cal-custom-event">
+                (eventClicked)="
+                  eventClicked.emit({
+                    event: timeEvent.event,
+                    sourceEvent: $event.sourceEvent,
+                  })
+                "
+                [column]="column"
+                [customTemplate]="eventTemplate"
+                [eventActionsTemplate]="eventActionsTemplate"
+                [eventTitleTemplate]="eventTitleTemplate"
+                [locale]="locale"
+                [tooltipAppendToBody]="tooltipAppendToBody"
+                [tooltipDelay]="tooltipDelay"
+                [tooltipDisabled]="true"
+                [tooltipPlacement]="tooltipPlacement"
+                [tooltipTemplate]="tooltipTemplate"
+                [weekEvent]="timeEvent"
+                class="cal-custom-event"
+              >
               </mwl-calendar-week-view-event>
-              @if (timeEvent.event.resizable?.afterEnd && !timeEvent.endsAfterDay) {
-                <div [resizeEdges]="{right: true, bottom: true}" class="cal-resize-handle cal-resize-handle-after-end"
-                     mwlResizeHandle></div>
+              @if (
+                timeEvent.event.resizable?.afterEnd && !timeEvent.endsAfterDay
+              ) {
+                <div
+                  [resizeEdges]="{ right: true, bottom: true }"
+                  class="cal-resize-handle cal-resize-handle-after-end"
+                  mwlResizeHandle
+                ></div>
               }
             </div>
           }
@@ -123,13 +225,26 @@
             <div [class.cal-hour-odd]="odd" class="cal-hour">
               @for (segment of hour.segments; track segment.date) {
                 <mwl-calendar-week-view-hour-segment
-                  (click)="segmentClick(segment.date, i)" (drop)="eventDropped($event, segment.date, false)"
-                  (mwlClick)="hourSegmentClicked.emit({date: segment.date, sourceEvent: $event})"
+                  (click)="segmentClick(segment.date, i)"
+                  (drop)="eventDropped($event, segment.date, false)"
+                  (mwlClick)="
+                    hourSegmentClicked.emit({
+                      date: segment.date,
+                      sourceEvent: $event,
+                    })
+                  "
                   [clickListenerDisabled]="!hourSegmentClicked.observed"
                   [customTemplate]="hourSegmentTemplate"
-                  [dragOverClass]="!dragActive || !snapDraggedEvents ? 'cal-drag-over' : ''" [locale]="locale"
-                  [segmentHeight]="hourSegmentHeight" [segment]="segment" [style.height.px]="hourSegmentHeight"
-                  dragActiveClass="cal-drag-active" mwlDroppable>
+                  [dragOverClass]="
+                    !dragActive || !snapDraggedEvents ? 'cal-drag-over' : ''
+                  "
+                  [locale]="locale"
+                  [segmentHeight]="hourSegmentHeight"
+                  [segment]="segment"
+                  [style.height.px]="hourSegmentHeight"
+                  dragActiveClass="cal-drag-active"
+                  mwlDroppable
+                >
                 </mwl-calendar-week-view-hour-segment>
               }
             </div>

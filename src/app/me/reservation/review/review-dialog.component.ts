@@ -1,9 +1,18 @@
-import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
-import { createNewDate, newDateTimestamp, reservationDuration } from '../../../util/dates';
-import { getPrice } from '../../../util/helper';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+} from '@angular/core';
+import {
+  createNewDate,
+  newDateTimestamp,
+  reservationDuration,
+} from '@app/util/dates';
+import { getPrice } from '@app/util/helper';
 import { IReview } from '../list/review';
-import { IReservationAll } from '../../../reservation/reservation';
-import { IPrice } from '../../../treatment/treatment';
+import { IReservationAll } from '@app/reservation/reservation';
+import { IPrice } from '@app/treatment/treatment';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -13,29 +22,52 @@ import {
 } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RoomNamePipe } from '../../../pipes/room-name.pipe';
-import { RatingComponent } from '../../../shared/rating/rating.component';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
+import { RatingComponent } from '@app/shared/rating/rating.component';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { FirebaseService } from '../../../services/firebase.service';
-import { MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { FirebaseService } from '@app/services/firebase.service';
+import {
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { MatDivider } from '@angular/material/list';
-import { NavigationService } from '../../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-review-dialog',
   templateUrl: './review-dialog.component.html',
   styleUrls: ['./review-dialog.component.scss'],
-  imports: [RoomNamePipe, RatingComponent, MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe,
-    DecimalPipe, DatePipe, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDivider, MatHint,
-    MatDialogActions],
+  imports: [
+    RoomNamePipe,
+    RatingComponent,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    DecimalPipe,
+    DatePipe,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDivider,
+    MatHint,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReviewDialogComponent {
-  private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(MatDialogRef<ReviewDialogComponent>);
+  private readonly dialogRef: MatDialogRef<ReviewDialogComponent> = inject(
+    MatDialogRef<ReviewDialogComponent>,
+  );
   private readonly data = inject<IReservationAll>(MAT_DIALOG_DATA);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly firebaseService = inject(FirebaseService);
 
   reservation?: IReservationAll;
@@ -53,10 +85,17 @@ export class ReviewDialogComponent {
 
   constructor() {
     effect(() => {
-      const start = newDateTimestamp(this.data.timestamp, this.data.room.timeZone);
+      const start = newDateTimestamp(
+        this.data.timestamp,
+        this.data.room.timeZone,
+      );
       this.reservation = Object.assign({}, this.data, { start });
       const duration = reservationDuration(this.data);
-      this.end = createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+      this.end = createNewDate(
+        start,
+        start.getHours() + duration.hour,
+        start.getMinutes() + duration.minute,
+      );
     });
     this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase

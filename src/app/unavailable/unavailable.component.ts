@@ -1,7 +1,21 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  Signal,
+  signal,
+} from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { combineLatestWith } from 'rxjs';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {
   IUnavailable,
   IUnavailableAll,
@@ -32,14 +46,27 @@ import { requireMatch } from '../util/validators';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { ICommon, IError } from '../interfaces/common';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
-import { MatDatepicker, MatDatepickerInput } from '@angular/material/datepicker';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+} from '@angular/material/datepicker';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { KeyValuePipe } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { TimepickerDirective } from '../shared/clock-timepicker/timepicker.directive';
 import { TimepickerComponent } from '../shared/clock-timepicker/timepicker.component';
@@ -50,10 +77,31 @@ import { UserStore } from '../store/user.store';
   selector: 'app-unavailable',
   templateUrl: './unavailable.component.html',
   styleUrls: ['./unavailable.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepicker, MatSelect, MatOption, MatIcon,
-    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, MatAutocomplete, MatError,
-    MatAutocompleteTrigger, MatPrefix, BackButtonDirective, BackButtonDirective, MatHint, MatCheckbox,
-    TimepickerDirective, TimepickerComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepicker,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    KeyValuePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    MatPrefix,
+    BackButtonDirective,
+    BackButtonDirective,
+    MatHint,
+    MatCheckbox,
+    TimepickerDirective,
+    TimepickerComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UnavailableComponent {
@@ -66,7 +114,9 @@ export class UnavailableComponent {
 
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly userStore = inject(UserStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
   private allRoomsSignal = this.userStore.rooms;
   private subErrorsSignal = this.unavailableStore.subErrors;
@@ -98,7 +148,9 @@ export class UnavailableComponent {
   filteredProfessionalSignal: Signal<IUserAll[] | undefined> = toSignal(
     this.getForm.professional.valueChanges.pipe(
       startWith(''),
-      map((value) => !value || typeof value === 'string' ? value : value.displayName),
+      map((value) =>
+        !value || typeof value === 'string' ? value : value.displayName,
+      ),
       combineLatestWith(toObservable(this.allProfessionalsSignal)),
       map(([name, professionals]) => {
         if (name) {
@@ -127,7 +179,9 @@ export class UnavailableComponent {
   private selectedRepeat = toSignal(this.getForm.repeat.valueChanges);
   private selectedStartDate = toSignal(this.getForm.startDate.valueChanges);
   private selectedStartTime = toSignal(this.getForm.startTime.valueChanges);
-  private selectedProfessional = toSignal(this.getForm.professional.valueChanges);
+  private selectedProfessional = toSignal(
+    this.getForm.professional.valueChanges,
+  );
 
   private readonly timeZone: string = getCurrentTimeZone();
 
@@ -198,7 +252,14 @@ export class UnavailableComponent {
 
     effect(() => {
       const repeat = this.selectedRepeat();
-      if (repeat && [FrequencyEnum.onceAWeek, FrequencyEnum.everyDay, FrequencyEnum.onceAMonth].includes(repeat)) {
+      if (
+        repeat &&
+        [
+          FrequencyEnum.onceAWeek,
+          FrequencyEnum.everyDay,
+          FrequencyEnum.onceAMonth,
+        ].includes(repeat)
+      ) {
         this.getForm.endDate.setValidators(Validators.required);
         this.showEnd = true;
       } else {
@@ -221,7 +282,11 @@ export class UnavailableComponent {
       if (startTime) {
         const startDate = this.getForm.startDate.value;
         const time = getTimeNumber(startTime);
-        const date = createNewDate(startDate ? newDate(startDate) : getNowTimeZone(), time?.hour, time?.minute);
+        const date = createNewDate(
+          startDate ? newDate(startDate) : getNowTimeZone(),
+          time?.hour,
+          time?.minute,
+        );
 
         this.calculateMaxDuration(date);
       }
@@ -236,7 +301,12 @@ export class UnavailableComponent {
 
     effect(() => {
       const professionals = this.allProfessionalsSignal();
-      if (professionals && !this.unavailable() && professionals.length === 1 && !this.getForm.professional.value) {
+      if (
+        professionals &&
+        !this.unavailable() &&
+        professionals.length === 1 &&
+        !this.getForm.professional.value
+      ) {
         this.getForm.professional.setValue(professionals[0]);
       }
     });
@@ -255,7 +325,9 @@ export class UnavailableComponent {
       return;
     }
 
-    this.submitData.emit(Unavailable.fromForm(this.getForm, this.timeZone, this.unavailable()));
+    this.submitData.emit(
+      Unavailable.fromForm(this.getForm, this.timeZone, this.unavailable()),
+    );
   }
 
   delete() {
@@ -270,12 +342,18 @@ export class UnavailableComponent {
     if (this.getForm.startTime.value) {
       const time = getTimeNumber(this.getForm.startTime.value);
       const date = createNewDate(
-        this.getForm.startDate.value ? newDate(this.getForm.startDate.value) : getNowTimeZone(),
+        this.getForm.startDate.value
+          ? newDate(this.getForm.startDate.value)
+          : getNowTimeZone(),
         time?.hour,
         time?.minute,
       );
       const day = date.getDay();
-      const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, date, rooms);
+      const { minDate, maxDate, roomAvailability } = getMinMaxDate(
+        day,
+        date,
+        rooms,
+      );
 
       this.setValues(
         this.getForm.startDate.value,
@@ -289,9 +367,11 @@ export class UnavailableComponent {
     }
   }
 
-  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
+  displayFn = (user: IUser): string =>
+    user?.displayName ? user.displayName : '';
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.roomAvailability);
+  myFilter = (d: Date | null): boolean =>
+    filterDateRoom(d, this.roomAvailability);
 
   keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
@@ -325,7 +405,11 @@ export class UnavailableComponent {
 
   private setMaxMin = (startDate: Date, rooms: IRoomAll[]): void => {
     const day = startDate.getDay();
-    const { minDate, maxDate, roomAvailability } = getMinMaxDate(day, startDate, rooms);
+    const { minDate, maxDate, roomAvailability } = getMinMaxDate(
+      day,
+      startDate,
+      rooms,
+    );
 
     this.minTime = getTime(minDate);
     this.maxTime = getTime(maxDate);
@@ -336,7 +420,12 @@ export class UnavailableComponent {
   private calculateMaxDuration = (date: Date): void => {
     const max = getTimeNumber(this.maxTime);
     if (max) {
-      const d = diffTime(date, this.timeZone, Number(max.hour), Number(max.minute));
+      const d = diffTime(
+        date,
+        this.timeZone,
+        Number(max.hour),
+        Number(max.minute),
+      );
       this.showDuration.set(true);
       this.durationMax = formatTime(d, this.timeZone);
       if (!this.unavailable()) {
@@ -345,7 +434,12 @@ export class UnavailableComponent {
     }
   };
 
-  private filter = (name: string, professionals?: IUserAll[]): IUserAll[] | undefined => professionals?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
-  );
+  private filter = (
+    name: string,
+    professionals?: IUserAll[],
+  ): IUserAll[] | undefined =>
+    professionals?.filter(
+      (option) =>
+        option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

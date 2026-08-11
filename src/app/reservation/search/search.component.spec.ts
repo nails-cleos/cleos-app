@@ -1,41 +1,60 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { CancelOption, IReservationAll, States } from '../reservation';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { SearchComponent } from './search.component';
-import { IUserAll } from '../../user/user';
-import { DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { ICurrencyAll } from '../../currency/currency';
-import { ServiceType } from '../../room/room';
+import { IUserAll } from '@app/user/user';
+import { DEFAULT_LOCALE, getNowTimeZone } from '@app/util/dates';
+import { ICurrencyAll } from '@app/currency/currency';
+import { ServiceType } from '@app/room/room';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { NavigationService } from '../../services/navigation.service';
-import { UserStore } from '../../store/user.store';
-import { ReservationStore } from '../../store/reservation.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { UserStore } from '@app/store/user.store';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('SearchComponent', () => {
   let component: SearchComponent;
   let fixture: ComponentFixture<SearchComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
 
   let reservationStoreSpy: {
     data: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    loadAllFiltered: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    cancel: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadAllFiltered: Mock;
+    clearResponse: Mock;
+    cancel: Mock;
+    clean: Mock;
   };
 
   let userStoreSpy: {
     customers: ReturnType<typeof signal>;
-    loadCustomers: jasmine.Spy;
+    loadCustomers: Mock;
   };
 
   const professional: IUserAll = {
@@ -48,7 +67,12 @@ describe('SearchComponent', () => {
   };
 
   const mockDate = getNowTimeZone();
-  const mockCurrency: ICurrencyAll = { id: 'c-1', icon: '€', code: 'EUR', name: 'Euro' };
+  const mockCurrency: ICurrencyAll = {
+    id: 'c-1',
+    icon: '€',
+    code: 'EUR',
+    name: 'Euro',
+  };
 
   const mockCustomers: IUserAll[] = [
     { id: 'a', displayName: 'Alice' } as IUserAll,
@@ -109,21 +133,22 @@ describe('SearchComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       data: signal({ kind: 'pagination', value: mockPagination }),
       isLoading: signal(false),
       response: signal(undefined),
-      loadAllFiltered: jasmine.createSpy('loadAllFiltered'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      cancel: jasmine.createSpy('cancel'),
-      clean: jasmine.createSpy('clean'),
+      loadAllFiltered: vi.fn().mockName('loadAllFiltered'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      cancel: vi.fn().mockName('cancel'),
+      clean: vi.fn().mockName('clean'),
     };
     userStoreSpy = {
       customers: signal<any>(undefined),
-      loadCustomers: jasmine.createSpy('loadCustomers'),
+      loadCustomers: vi.fn().mockName('loadCustomers'),
     };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -133,19 +158,24 @@ describe('SearchComponent', () => {
       },
     });
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [SearchComponent, TranslateModule.forRoot()],
+      imports: [SearchComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: UserStore, useValue: userStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
@@ -214,38 +244,41 @@ describe('SearchComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
-    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith(
-      {
-        page: 1,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        userId: component['selectCustomerSignal']()?.id,
-        states: component.selectedStatesSignal(),
-      },
-    );
+    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      userId: component['selectCustomerSignal']()?.id,
+      states: component.selectedStatesSignal(),
+    });
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
-    component['paginator'] = signal(paginatorMock);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
+    component['paginator'] = signal(paginatorMock) as any;
 
     reservationStoreSpy.response.set({ success: true });
     fixture.detectChanges();
 
-    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith(
-      {
-        page: 0,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        userId: component['selectCustomerSignal']()?.id,
-        states: component.selectedStatesSignal(),
-      },
-    );
+    expect(reservationStoreSpy.loadAllFiltered).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      userId: component['selectCustomerSignal']()?.id,
+      states: component.selectedStatesSignal(),
+    });
   });
 
   it('should exclude chargeAndAccount from cancel options', () => {
@@ -255,12 +288,19 @@ describe('SearchComponent', () => {
     const cancelDialogRef = {
       afterClosed: () => new BehaviorSubject(undefined).asObservable(),
     } as any;
-    const openSpy = spyOn(component['dialog'], 'open').and.returnValues(confirmDialogRef, cancelDialogRef);
+    const openSpy = vi
+      .spyOn(component['dialog'], 'open')
+      .mockReturnValueOnce(confirmDialogRef)
+      .mockReturnValueOnce(cancelDialogRef);
 
     component.cancel(mockReservation);
 
-    expect(openSpy.calls.count()).toBe(2);
-    const cancelConfig = openSpy.calls.argsFor(1)[1] as { data: { options: CancelOption[] } };
+    expect(vi.mocked(openSpy).mock.calls.length).toBe(2);
+    const cancelConfig = vi.mocked(openSpy).mock.calls[1][1] as {
+      data: {
+        options: CancelOption[];
+      };
+    };
     expect(cancelConfig.data.options).toEqual([
       CancelOption.refund,
       CancelOption.account,
@@ -307,7 +347,7 @@ describe('SearchComponent', () => {
     component.allStatesWritableSignal.set(Object.values(States));
     fixture.detectChanges();
 
-    component.getForm.state.setValue = jasmine.createSpy('setValue');
+    component.getForm.state.setValue = vi.fn().mockName('setValue');
     component.stateInput().nativeElement.value = 'something';
 
     const mockEvent = {
@@ -316,10 +356,13 @@ describe('SearchComponent', () => {
 
     component.selected(mockEvent);
 
-    expect(component.selectedStatesSignal()).toContain(Object.values(States)[2]);
+    expect(component.selectedStatesSignal()).toContain(
+      Object.values(States)[2],
+    );
 
-    expect(component.allStatesWritableSignal())
-      .toEqual(Object.values(States).filter(s => s !== Object.values(States)[2]));
+    expect(component.allStatesWritableSignal()).toEqual(
+      Object.values(States).filter((s) => s !== Object.values(States)[2]),
+    );
 
     expect(component.getForm.state.setValue).toHaveBeenCalledWith(undefined);
   });

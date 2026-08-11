@@ -11,5 +11,5 @@ export enum Role {
   manager = 'ROLE_MANAGER',
   roomAdmin = 'ROLE_ROOM_ADMIN',
   professional = 'ROLE_PROFESSIONAL',
-  customer = 'ROLE_CUSTOMER'
+  customer = 'ROLE_CUSTOMER',
 }

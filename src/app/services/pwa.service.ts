@@ -23,7 +23,11 @@ export class PwaService {
     const swUpdate: SwUpdate = inject(SwUpdate);
     if (swUpdate.isEnabled) {
       swUpdate.versionUpdates
-        .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
+        .pipe(
+          filter(
+            (evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY',
+          ),
+        )
         .subscribe(() => document.location.reload());
     }
   }
@@ -38,7 +42,8 @@ export class PwaService {
         });
       }
       if (this.platform.IOS) {
-        const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+        const isInStandaloneMode =
+          'standalone' in window.navigator && window.navigator.standalone;
         if (!isInStandaloneMode) {
           this.openPromptComponent('ios');
         }
@@ -49,6 +54,10 @@ export class PwaService {
   private openPromptComponent = (mobileType: 'ios' | 'android'): void => {
     timer(3000)
       .pipe(take(1))
-      .subscribe(() => this.bottomSheet.open(PromptComponent, { data: { mobileType, promptEvent: this.promptEvent } }));
+      .subscribe(() =>
+        this.bottomSheet.open(PromptComponent, {
+          data: { mobileType, promptEvent: this.promptEvent },
+        }),
+      );
   };
 }

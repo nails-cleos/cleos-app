@@ -79,12 +79,14 @@ export type MeReservationForms = {
 };
 
 export type ReservationFormField =
-  keyof CustomerForm |
-  keyof OfficeForm |
-  Exclude<keyof TreatmentForm, 'dateTimeList'> |
-  keyof ConfigurationForm;
+  | keyof CustomerForm
+  | keyof OfficeForm
+  | Exclude<keyof TreatmentForm, 'dateTimeList'>
+  | keyof ConfigurationForm;
 
-export type ReservationErrors = Partial<Record<ReservationFormField, string>> & {
+export type ReservationErrors = Partial<
+  Record<ReservationFormField, string>
+> & {
   schedule: boolean[];
   dateTimeList?: string[];
   events?: string[];
@@ -92,13 +94,15 @@ export type ReservationErrors = Partial<Record<ReservationFormField, string>> & 
 };
 
 export type MeReservationFormField =
-  keyof OfficeForm |
-  keyof MeReservationTreatmentForm |
-  keyof MeReservationEventForm |
-  keyof BankForm |
-  keyof MeReservationAcceptForm;
+  | keyof OfficeForm
+  | keyof MeReservationTreatmentForm
+  | keyof MeReservationEventForm
+  | keyof BankForm
+  | keyof MeReservationAcceptForm;
 
-export type MeReservationErrors = Partial<Record<MeReservationFormField, string>> & {
+export type MeReservationErrors = Partial<
+  Record<MeReservationFormField, string>
+> & {
   schedule?: boolean;
 };
 
@@ -109,5 +113,4 @@ export const createReservationErrors = (): ReservationErrors => ({
   overlapping: false,
 });
 
-export const createMeReservationErrors = (): MeReservationErrors => ({
-});
+export const createMeReservationErrors = (): MeReservationErrors => ({});

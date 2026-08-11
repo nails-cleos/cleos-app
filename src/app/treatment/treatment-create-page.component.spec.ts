@@ -1,41 +1,46 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { TreatmentStore } from '../store/treatment.store';
 import { TreatmentCreatePageComponent } from './treatment-create-page.component';
 import { ColorStore } from '../store/color.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentCreatePageComponent', () => {
   let component: TreatmentCreatePageComponent;
   let fixture: ComponentFixture<TreatmentCreatePageComponent>;
   let treatmentStoreSpy: {
     subErrors: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
   let colorStoreSpy: {
     data: ReturnType<typeof signal<any>>;
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
 
   beforeEach(async () => {
     treatmentStoreSpy = {
       subErrors: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
     colorStoreSpy = {
       data: signal(undefined),
-      loadAll: jasmine.createSpy('loadAll'),
+      loadAll: vi.fn().mockName('loadAll'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentCreatePageComponent, TranslateModule.forRoot()],
+      imports: [TreatmentCreatePageComponent],
       providers: [
+        provideTranslateService(),
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
-        { provide: NavigationService, useValue: { back: jasmine.createSpy('back') } },
+        {
+          provide: NavigationService,
+          useValue: { back: vi.fn().mockName('back') },
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -59,6 +64,8 @@ describe('TreatmentCreatePageComponent', () => {
 
     component.submit(treatmentGroup as any);
 
-    expect(treatmentStoreSpy.create).toHaveBeenCalledWith(treatmentGroup as any);
+    expect(treatmentStoreSpy.create).toHaveBeenCalledWith(
+      treatmentGroup as any,
+    );
   });
 });

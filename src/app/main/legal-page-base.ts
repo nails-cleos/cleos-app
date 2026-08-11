@@ -2,7 +2,17 @@ import { HttpClient } from '@angular/common/http';
 import { effect, ElementRef, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { catchError, concatMap, defaultIfEmpty, filter, from, map, Observable, of, take } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  defaultIfEmpty,
+  filter,
+  from,
+  map,
+  Observable,
+  of,
+  take,
+} from 'rxjs';
 import { getLocale } from '../util/helper';
 import { EnvService } from '../services/env.service';
 import { DEFAULT_LOCALE } from '../util/dates';
@@ -19,7 +29,9 @@ export abstract class LegalPageBase {
   protected readonly env: EnvService = inject(EnvService);
   protected readonly http: HttpClient = inject(HttpClient);
   protected readonly sanitizer: DomSanitizer = inject(DomSanitizer);
-  protected readonly host: ElementRef<HTMLElement> = inject(ElementRef<HTMLElement>);
+  protected readonly host: ElementRef<HTMLElement> = inject(
+    ElementRef<HTMLElement>,
+  );
   private readonly mainContent = inject(MainContentService);
   private readonly navigationService = inject(NavigationService);
 
@@ -27,22 +39,30 @@ export abstract class LegalPageBase {
   readonly title = this.env.title;
   readonly appDomain = this.env.appDomain;
 
-  readonly legalContent = signal<SafeHtml>(this.sanitizer.bypassSecurityTrustHtml(''));
+  readonly legalContent = signal<SafeHtml>(
+    this.sanitizer.bypassSecurityTrustHtml(''),
+  );
 
-  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
+  private readonly language = toSignal(this.navigationService.urlLanguage$, {
+    initialValue: DEFAULT_LOCALE,
+  });
 
   protected constructor(private readonly config: LegalPageConfig) {
     this.mainContent.configure(false, 'open');
 
     effect((onCleanup) => {
       const lang = this.language();
-      const sub = this.loadContent(lang).subscribe((html) => this.legalContent.set(html));
+      const sub = this.loadContent(lang).subscribe((html) =>
+        this.legalContent.set(html),
+      );
       onCleanup(() => sub.unsubscribe());
     });
 
     effect(() => {
       this.legalContent();
-      setTimeout(() => this.navigationService.scrollToAnchor(this.host.nativeElement));
+      setTimeout(() =>
+        this.navigationService.scrollToAnchor(this.host.nativeElement),
+      );
     });
   }
 
@@ -65,10 +85,14 @@ export abstract class LegalPageBase {
     event.preventDefault();
     event.stopPropagation();
 
-    this.navigationService.navigate(['home', this.config.routeSegment], {
-      fragment: id,
-      replaceUrl: true,
-    }, () => this.navigationService.scrollToAnchor(this.host.nativeElement, id));
+    this.navigationService.navigate(
+      ['home', this.config.routeSegment],
+      {
+        fragment: id,
+        replaceUrl: true,
+      },
+      () => this.navigationService.scrollToAnchor(this.host.nativeElement, id),
+    );
   }
 
   protected replaceEnvPlaceholders(content: string, language: string): string {
@@ -82,18 +106,30 @@ export abstract class LegalPageBase {
   private loadContent(lang: string): Observable<SafeHtml> {
     const locale = getLocale(lang).language;
     const languageOnly = locale.split('-')[0];
-    const files = Array.from(new Set([
-      `assets/legal/${ this.config.fileName }.${ locale }.html`,
-      `assets/legal/${ this.config.fileName }.${ languageOnly }.html`,
-      `assets/legal/${ this.config.fileName }.${ DEFAULT_LOCALE }.html`,
-    ]));
+    const files = Array.from(
+      new Set([
+        `assets/legal/${this.config.fileName}.${locale}.html`,
+        `assets/legal/${this.config.fileName}.${languageOnly}.html`,
+        `assets/legal/${this.config.fileName}.${DEFAULT_LOCALE}.html`,
+      ]),
+    );
 
     return from(files).pipe(
-      concatMap((file) => this.http.get(file, { responseType: 'text' }).pipe(catchError(() => of(undefined)))),
+      concatMap((file) =>
+        this.http
+          .get(file, { responseType: 'text' })
+          .pipe(catchError(() => of(undefined))),
+      ),
       filter((html): html is string => typeof html === 'string'),
       take(1),
-      map((html) => this.sanitizer.bypassSecurityTrustHtml(this.prepareContent(html, locale))),
-      defaultIfEmpty(this.sanitizer.bypassSecurityTrustHtml(this.config.unavailableHtml)),
+      map((html) =>
+        this.sanitizer.bypassSecurityTrustHtml(
+          this.prepareContent(html, locale),
+        ),
+      ),
+      defaultIfEmpty(
+        this.sanitizer.bypassSecurityTrustHtml(this.config.unavailableHtml),
+      ),
     );
   }
 

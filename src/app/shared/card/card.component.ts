@@ -1,19 +1,37 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { createChart } from '../../util/chart';
-import { IChart } from '../../dashboard/dashboard';
-import { ICurrency } from '../../currency/currency';
-import { AuthUserService } from '../../services/auth-user.service';
+import { createChart } from '@app/util/chart';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
+import { AuthUserService } from '@app/services/auth-user.service';
 import { CardChartComponent } from './card-chart.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatIconButton } from '@angular/material/button';
-import { MatCard, MatCardContent, MatCardHeader, MatCardTitle } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from '@angular/material/card';
 
 @Component({
   selector: 'app-card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
-  imports: [MatIcon, MatIconButton, MatCard, MatCardHeader, MatCardTitle, MatCardContent],
+  imports: [
+    MatIcon,
+    MatIconButton,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardContent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {
@@ -29,7 +47,9 @@ export class CardComponent {
 
   private authUserSignal = this.authUserService.authUser;
 
-  private isDarkMode = computed(() => this.authUserSignal()?.isDarkMode ?? false);
+  private isDarkMode = computed(
+    () => this.authUserSignal()?.isDarkMode ?? false,
+  );
 
   onClick(): void {
     const chart = this.chart();

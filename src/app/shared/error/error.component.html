@@ -1,9 +1,12 @@
 @if (imageSrc) {
-  <div class="app-surface-canvas app-surface-shell app-surface-stack" [class.error-page-shell]="!isCard()">
+  <div
+    class="app-surface-canvas app-surface-shell app-surface-stack"
+    [class.error-page-shell]="!isCard()"
+  >
     @if (isCard()) {
       <div class="card-container card-container--card">
         <div class="error-media error-media--card">
-          <img alt="error" class="error" src="{{imageSrc}}">
+          <img alt="error" class="error" src="{{ imageSrc }}" />
         </div>
       </div>
     } @else {
@@ -12,9 +15,11 @@
           <div class="error-state__eyebrow">{{ errorCode() }}</div>
           <h1 class="error-state__title">{{ titleKey() | translate }}</h1>
           <div class="error-state__media">
-            <img alt="error" class="error" src="{{imageSrc}}">
+            <img alt="error" class="error" src="{{ imageSrc }}" />
           </div>
-          <p class="error-state__description">{{ descriptionKey() | translate }}</p>
+          <p class="error-state__description">
+            {{ descriptionKey() | translate }}
+          </p>
           <div class="error-state__actions app-detail-actions">
             <button appBackButton mat-stroked-button type="button">
               <mat-icon>keyboard_return</mat-icon>

@@ -1,21 +1,27 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CancelDialogComponent } from './cancel-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { CancelOption } from '../../../reservation/reservation';
-import { provideAppIcons } from '../../../util/app-icons.provider';
+import { CancelOption } from '@app/reservation/reservation';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CancelDialogComponent', () => {
   let component: CancelDialogComponent;
   let fixture: ComponentFixture<CancelDialogComponent>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<CancelDialogComponent>>;
+  let dialogRefSpy: Pick<MatDialogRef<CancelDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: { options: [] } },
         provideAppIcons(),
@@ -38,7 +44,9 @@ describe('CancelDialogComponent', () => {
   });
 
   it('should close with selected cancel option and payment type', () => {
-    component.getForm.paymentCancellation.setValue(CancelOption.chargeAndAccount);
+    component.getForm.paymentCancellation.setValue(
+      CancelOption.chargeAndAccount,
+    );
     component.getTypeForm.option.setValue({ type: 'MOLLIE' } as any);
 
     component.doAction();
@@ -52,19 +60,30 @@ describe('CancelDialogComponent', () => {
   it('should not close when forms are invalid', () => {
     component.doAction();
 
-    expect(dialogRefSpy.close).not.toHaveBeenCalledWith(jasmine.objectContaining({
-      cancelOption: jasmine.anything(),
-    }));
+    expect(dialogRefSpy.close).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        cancelOption: expect.anything(),
+      }),
+    );
   });
 
   it('should preselect the only cancellation option', async () => {
-    const singleDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    await TestBed.resetTestingModule();
+    const singleDialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: singleDialogRefSpy },
-        { provide: MAT_DIALOG_DATA, useValue: { options: ['REFUND'], currency: { code: 'EUR', icon: 'EUR' } } },
+        {
+          provide: MAT_DIALOG_DATA,
+          useValue: {
+            options: ['REFUND'],
+            currency: { code: 'EUR', icon: 'EUR' },
+          },
+        },
       ],
     }).compileComponents();
 
@@ -76,11 +95,14 @@ describe('CancelDialogComponent', () => {
   });
 
   it('should hide percentage for provided payment options', async () => {
-    const dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
-    await TestBed.resetTestingModule();
+    const dialogRef = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
+    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [CancelDialogComponent, TranslateModule.forRoot()],
+      imports: [CancelDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRef },
         {
           provide: MAT_DIALOG_DATA,
@@ -98,6 +120,6 @@ describe('CancelDialogComponent', () => {
     const optionsComponent = optionsFixture.componentInstance;
     optionsFixture.detectChanges();
 
-    expect(optionsComponent.paymentOptions?.[0].hidePercentage).toBeTrue();
+    expect(optionsComponent.paymentOptions?.[0].hidePercentage).toBe(true);
   });
 });

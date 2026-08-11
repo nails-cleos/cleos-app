@@ -8,45 +8,77 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ITreatmentGroupAll } from '../../treatment/treatment';
+import { ITreatmentGroupAll } from '@app/treatment/treatment';
 import { IExperience, ISlide, ISocialLink, IStory, IWork } from '../main';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { goTo, observeElementSignal } from '../../util/animation';
-import { isMobile } from '../../util/helper';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { goTo, observeElementSignal } from '@app/util/animation';
+import { isMobile } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '@app/services/toast.service';
 import { BottomSheetBookAppointmentComponent } from './bottom-sheet-book-appointment';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ISendMessage } from '../../../main';
-import { EnvService } from '../../services/env.service';
-import { ICatalogueAll } from '../../catalogue/catalogue';
-import { getImage } from '../../util/file';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { EnvService } from '@app/services/env.service';
+import { ICatalogueAll } from '@app/catalogue/catalogue';
+import { getImage } from '@app/util/file';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
-import { MatButton, MatFabButton, MatIconButton } from '@angular/material/button';
+import {
+  MatButton,
+  MatFabButton,
+  MatIconButton,
+} from '@angular/material/button';
 import { NgClass, NgStyle } from '@angular/common';
-import { CardListSkeletonComponent } from '../../shared/skeleton/card-list-skeleton.component';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { MainStore } from '../../store/main.store';
-import { MainContentService } from '../../services/main-content.service';
-import { NavigationService } from '../../services/navigation.service';
+import { CardListSkeletonComponent } from '@app/shared/skeleton/card-list-skeleton.component';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { MainStore } from '@app/store/main.store';
+import { MainContentService } from '@app/services/main-content.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 type MainForm = {
   name: FormControl<string>;
   email: FormControl<string>;
   subject: FormControl<string>;
   body: FormControl<string>;
-}
+};
 
 @Component({
   selector: 'app-main-content',
   templateUrl: './main-content.component.html',
   styleUrls: ['./main-content.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
-    NgClass, MatError, NgStyle, MatPrefix, MatHint, MatFabButton, CardListSkeletonComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    NgClass,
+    MatError,
+    NgStyle,
+    MatPrefix,
+    MatHint,
+    MatFabButton,
+    CardListSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MainContentComponent {
@@ -54,22 +86,31 @@ export class MainContentComponent {
 
   private readonly catalogueStore = inject(CatalogueStore);
   private readonly mainStore = inject(MainStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly mainContent = inject(MainContentService);
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly bottomSheet: MatBottomSheet = inject(MatBottomSheet);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly env: EnvService = inject(EnvService);
 
-  private treatmentItem = viewChild<ElementRef<HTMLDivElement>>('treatmentItem');
-  private treatmentTitle = viewChild<ElementRef<HTMLDivElement>>('treatmentTitle');
+  private treatmentItem =
+    viewChild<ElementRef<HTMLDivElement>>('treatmentItem');
+  private treatmentTitle =
+    viewChild<ElementRef<HTMLDivElement>>('treatmentTitle');
   private workSubTitle = viewChild<ElementRef<HTMLDivElement>>('workSubTitle');
-  private experienceTitle = viewChild<ElementRef<HTMLDivElement>>('experienceTitle');
+  private experienceTitle =
+    viewChild<ElementRef<HTMLDivElement>>('experienceTitle');
   private storyTitle = viewChild<ElementRef<HTMLDivElement>>('storyTitle');
-  private storyDescription = viewChild<ElementRef<HTMLDivElement>>('storyDescription');
+  private storyDescription =
+    viewChild<ElementRef<HTMLDivElement>>('storyDescription');
   private storyMember = viewChild<ElementRef<HTMLDivElement>>('storyMember');
   private contactTitle = viewChild<ElementRef<HTMLDivElement>>('contactTitle');
   private contactText = viewChild<ElementRef<HTMLDivElement>>('contactText');
@@ -78,7 +119,10 @@ export class MainContentComponent {
   private contactItem2 = viewChild<ElementRef<HTMLDivElement>>('contactItem2');
   private contactItem3 = viewChild<ElementRef<HTMLDivElement>>('contactItem3');
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly responseSignal = this.mainStore.response;
@@ -119,15 +163,31 @@ export class MainContentComponent {
 
   form: FormGroup<MainForm> = this.formBuilder.group<MainForm>({
     name: this.formBuilder.control('', { validators: [Validators.required] }),
-    email: this.formBuilder.control('', { validators: [Validators.required, Validators.email] }),
-    subject: this.formBuilder.control('', { validators: [Validators.required] }),
+    email: this.formBuilder.control('', {
+      validators: [Validators.required, Validators.email],
+    }),
+    subject: this.formBuilder.control('', {
+      validators: [Validators.required],
+    }),
     body: this.formBuilder.control('', { validators: [Validators.required] }),
   });
 
   slides: ISlide[] = [
-    { id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59', image: 'assets/home_page/img/b1.webp', order: 0 },
-    { id: '3e989461-81b2-4723-9fa3-746c05fd69a2', image: 'assets/home_page/img/b2.webp', order: 1 },
-    { id: '25e33d58-34c3-4e55-b4e4-885f177fb570', image: 'assets/home_page/img/b3.webp', order: 2 },
+    {
+      id: 'c7ae73b1-c6be-4848-9f84-cbf451e8ee59',
+      image: 'assets/home_page/img/b1.webp',
+      order: 0,
+    },
+    {
+      id: '3e989461-81b2-4723-9fa3-746c05fd69a2',
+      image: 'assets/home_page/img/b2.webp',
+      order: 1,
+    },
+    {
+      id: '25e33d58-34c3-4e55-b4e4-885f177fb570',
+      image: 'assets/home_page/img/b3.webp',
+      order: 2,
+    },
   ];
   socialLinks: ISocialLink[] = [
     {
@@ -138,12 +198,14 @@ export class MainContentComponent {
       phone: 'MAIN.CONTACT.SEND.PHONE',
       phoneKey: '&text=',
       phoneText: 'MAIN.CONTACT.SEND.HELLO',
-    }, {
+    },
+    {
       name: 'INSTAGRAM',
       delay: '1100ms',
       href: 'https://www.instagram.com/carlanailscleos.nl/',
       svgIcon: 'INSTAGRAM-NO-COLOR',
-    }, {
+    },
+    {
       name: 'FACEBOOK',
       delay: '1200ms',
       href: 'https://www.facebook.com/carlanailscleos.nl/',
@@ -151,8 +213,11 @@ export class MainContentComponent {
     },
   ];
 
-  allWorks = computed<IWork[]>(() => (this.catalogueSignal() ?? []).map(it => this.mapToWork(it))
-    .filter(it => it !== undefined));
+  allWorks = computed<IWork[]>(() =>
+    (this.catalogueSignal() ?? [])
+      .map((it) => this.mapToWork(it))
+      .filter((it) => it !== undefined),
+  );
 
   works = computed(() => {
     const all = this.allWorks() ?? [];
@@ -162,7 +227,7 @@ export class MainContentComponent {
       return all;
     }
 
-    return all.filter(work => work.groupId === group.id);
+    return all.filter((work) => work.groupId === group.id);
   });
 
   experiences: IExperience[] = [
@@ -174,7 +239,8 @@ export class MainContentComponent {
       icon: 'waving_hand',
       position: '1°',
       text: 'MAIN.EXPERIENCE.TEXT_1',
-    }, {
+    },
+    {
       id: 'experienceItem2',
       state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'), // initial 'open'
       delay: this.isSmall() ? '0ms' : '300ms',
@@ -182,7 +248,8 @@ export class MainContentComponent {
       icon: 'coffee',
       position: '2°',
       text: 'MAIN.EXPERIENCE.TEXT_2',
-    }, {
+    },
+    {
       id: 'experienceItem3',
       state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'),
       delay: this.isSmall() ? '0ms' : '600ms',
@@ -190,7 +257,8 @@ export class MainContentComponent {
       icon: 'palette',
       position: '3°',
       text: 'MAIN.EXPERIENCE.TEXT_3',
-    }, {
+    },
+    {
       id: 'experienceItem4',
       state: signal<'open' | 'close'>(this.isSmall() ? 'open' : 'open'),
       delay: this.isSmall() ? '0ms' : '900ms',
@@ -202,15 +270,42 @@ export class MainContentComponent {
   ];
 
   stories: IStory[] = [
-    { id: 'storyItem1', state: signal<'open' | 'close'>('open') as any, delay: '100ms', text: 'MAIN.STORY.TEXT_1' },
-    { id: 'storyItem2', state: signal<'open' | 'close'>('open') as any, delay: '200ms', text: 'MAIN.STORY.TEXT_2' },
-    { id: 'storyItem3', state: signal<'open' | 'close'>('open') as any, delay: '300ms', text: 'MAIN.STORY.TEXT_3' },
-    { id: 'storyItem4', state: signal<'open' | 'close'>('open') as any, delay: '400ms', text: 'MAIN.STORY.TEXT_4' },
-    { id: 'storyItem5', state: signal<'open' | 'close'>('open') as any, delay: '500ms', text: 'MAIN.STORY.TEXT_5' },
+    {
+      id: 'storyItem1',
+      state: signal<'open' | 'close'>('open') as any,
+      delay: '100ms',
+      text: 'MAIN.STORY.TEXT_1',
+    },
+    {
+      id: 'storyItem2',
+      state: signal<'open' | 'close'>('open') as any,
+      delay: '200ms',
+      text: 'MAIN.STORY.TEXT_2',
+    },
+    {
+      id: 'storyItem3',
+      state: signal<'open' | 'close'>('open') as any,
+      delay: '300ms',
+      text: 'MAIN.STORY.TEXT_3',
+    },
+    {
+      id: 'storyItem4',
+      state: signal<'open' | 'close'>('open') as any,
+      delay: '400ms',
+      text: 'MAIN.STORY.TEXT_4',
+    },
+    {
+      id: 'storyItem5',
+      state: signal<'open' | 'close'>('open') as any,
+      delay: '500ms',
+      text: 'MAIN.STORY.TEXT_5',
+    },
   ];
 
   currentIndex = signal(0);
-  sliderTransform = computed(() => `translateX(-${ this.currentIndex() * 100 }%)`);
+  sliderTransform = computed(
+    () => `translateX(-${this.currentIndex() * 100}%)`,
+  );
 
   private readonly sliderIntervalMs = 5000;
 
@@ -249,79 +344,140 @@ export class MainContentComponent {
     effect((onCleanup) => {
       const tEl = this.treatmentItem()?.nativeElement;
       if (tEl) {
-        const obs = observeElementSignal(this.treatmentItemState, tEl, !this.isSmall());
+        const obs = observeElementSignal(
+          this.treatmentItemState,
+          tEl,
+          !this.isSmall(),
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const ttEl = this.treatmentTitle()?.nativeElement;
       if (ttEl) {
-        const obs = observeElementSignal(this.treatmentTitleState, ttEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.treatmentTitleState,
+          ttEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const wsEl = this.workSubTitle()?.nativeElement;
       if (wsEl) {
-        const obs = observeElementSignal(this.workSubTitleState, wsEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.workSubTitleState,
+          wsEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const etEl = this.experienceTitle()?.nativeElement;
       if (etEl) {
-        const obs = observeElementSignal(this.experienceTitleState, etEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.experienceTitleState,
+          etEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const stEl = this.storyTitle()?.nativeElement;
       if (stEl) {
-        const obs = observeElementSignal(this.storyTitleState, stEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.storyTitleState,
+          stEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const sdEl = this.storyDescription()?.nativeElement;
       if (sdEl) {
-        const obs = observeElementSignal(this.storyDescriptionState, sdEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.storyDescriptionState,
+          sdEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const smEl = this.storyMember()?.nativeElement;
       if (smEl) {
-        const obs = observeElementSignal(this.storyMemberState, smEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.storyMemberState,
+          smEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const ctEl = this.contactTitle()?.nativeElement;
       if (ctEl) {
-        const obs = observeElementSignal(this.contactTitleState, ctEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.contactTitleState,
+          ctEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const cTextEl = this.contactText()?.nativeElement;
       if (cTextEl) {
-        const obs = observeElementSignal(this.contactTextState, cTextEl, !this.isSmall(), 0.1);
+        const obs = observeElementSignal(
+          this.contactTextState,
+          cTextEl,
+          !this.isSmall(),
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const cMapEl = this.contactMap()?.nativeElement;
       if (cMapEl) {
-        const obs = observeElementSignal(this.contactMapState, cMapEl, false, 0.1);
+        const obs = observeElementSignal(
+          this.contactMapState,
+          cMapEl,
+          false,
+          0.1,
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const c1 = this.contactItem1()?.nativeElement;
       if (c1) {
-        const obs = observeElementSignal(this.contactItem1State, c1, !this.isSmall());
+        const obs = observeElementSignal(
+          this.contactItem1State,
+          c1,
+          !this.isSmall(),
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const c2 = this.contactItem2()?.nativeElement;
       if (c2) {
-        const obs = observeElementSignal(this.contactItem2State, c2, !this.isSmall());
+        const obs = observeElementSignal(
+          this.contactItem2State,
+          c2,
+          !this.isSmall(),
+        );
         onCleanup(() => obs?.disconnect());
       }
 
       const c3 = this.contactItem3()?.nativeElement;
       if (c3) {
-        const obs = observeElementSignal(this.contactItem3State, c3, !this.isSmall());
+        const obs = observeElementSignal(
+          this.contactItem3State,
+          c3,
+          !this.isSmall(),
+        );
         onCleanup(() => obs?.disconnect());
       }
 
@@ -347,7 +503,10 @@ export class MainContentComponent {
         return;
       }
 
-      const timerId = window.setInterval(() => this.moveForwardSlide(), this.sliderIntervalMs);
+      const timerId = window.setInterval(
+        () => this.moveForwardSlide(),
+        this.sliderIntervalMs,
+      );
       onCleanup(() => window.clearInterval(timerId));
     });
   }
@@ -374,10 +533,12 @@ export class MainContentComponent {
     }
   }
 
-  isCurrentSlideIndex = (index: number): boolean => this.currentIndex() === index;
+  isCurrentSlideIndex = (index: number): boolean =>
+    this.currentIndex() === index;
 
   goToTreatment = (name?: string): void => {
-    const treatmentId = name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
+    const treatmentId =
+      name === 'biab' ? MainContentComponent.BIAB_TREATMENT_ID : name;
     if (treatmentId === MainContentComponent.BIAB_TREATMENT_ID) {
       goTo('home');
       this.navigationService.navigate(['home', treatmentId, 'treatment']);
@@ -386,7 +547,7 @@ export class MainContentComponent {
 
   onHover = (social: ISocialLink, enter: boolean): void => {
     const suffix = enter ? '' : '-NO-COLOR';
-    social.svgIcon = `${ social.name }${ suffix }`;
+    social.svgIcon = `${social.name}${suffix}`;
   };
 
   filterBy = (group?: ITreatmentGroupAll): void => {

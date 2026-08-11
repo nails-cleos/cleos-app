@@ -1,9 +1,20 @@
-import { Directive, effect, ElementRef, HostListener, inject, input, OnDestroy } from '@angular/core';
+import {
+  Directive,
+  effect,
+  ElementRef,
+  HostListener,
+  inject,
+  input,
+  OnDestroy,
+} from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { take } from 'rxjs/operators';
 
-import { ClockTimepickerDialogComponent, ClockTimepickerDialogData } from './clock-timepicker-dialog.component';
+import {
+  ClockTimepickerDialogComponent,
+  ClockTimepickerDialogData,
+} from './clock-timepicker-dialog.component';
 import { TimepickerComponent } from './timepicker.component';
 
 @Directive({
@@ -12,9 +23,13 @@ import { TimepickerComponent } from './timepicker.component';
   standalone: true,
 })
 export class TimepickerDirective implements OnDestroy {
-  private readonly elementRef = inject<ElementRef<HTMLInputElement>>(ElementRef);
+  private readonly elementRef =
+    inject<ElementRef<HTMLInputElement>>(ElementRef);
   private readonly dialog = inject(MatDialog);
-  private readonly ngControl = inject(NgControl, { optional: true, self: true });
+  private readonly ngControl = inject(NgControl, {
+    optional: true,
+    self: true,
+  });
 
   private picker?: TimepickerComponent;
   private activeDialogRef?: MatDialogRef<ClockTimepickerDialogComponent>;
@@ -81,14 +96,17 @@ export class TimepickerDirective implements OnDestroy {
       width: '340px',
     });
 
-    this.activeDialogRef.afterClosed().pipe(take(1)).subscribe((selectedTime?: string) => {
-      this.activeDialogRef = undefined;
-      if (!selectedTime) {
-        return;
-      }
-      this.setValue(selectedTime);
-      picker.emitTimeSet(selectedTime);
-    });
+    this.activeDialogRef
+      .afterClosed()
+      .pipe(take(1))
+      .subscribe((selectedTime?: string) => {
+        this.activeDialogRef = undefined;
+        if (!selectedTime) {
+          return;
+        }
+        this.setValue(selectedTime);
+        picker.emitTimeSet(selectedTime);
+      });
   };
 
   private setValue = (selectedTime: string): void => {

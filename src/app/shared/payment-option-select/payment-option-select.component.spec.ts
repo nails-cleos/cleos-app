@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
 import { PaymentOptionSelectComponent } from './payment-option-select.component';
-import { IPaymentOption } from '../../interfaces/payment';
-import { provideAppIcons } from '../../util/app-icons.provider';
+import { IPaymentOption } from '@app/interfaces/payment';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PaymentOptionSelectComponent', () => {
   let component: PaymentOptionSelectComponent;
@@ -46,8 +47,8 @@ describe('PaymentOptionSelectComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaymentOptionSelectComponent, TranslateModule.forRoot()],
-      providers: [provideAppIcons()],
+      imports: [PaymentOptionSelectComponent],
+      providers: [provideAppIcons(), provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentOptionSelectComponent);
@@ -68,7 +69,10 @@ describe('PaymentOptionSelectComponent', () => {
     fixture.componentRef.setInput('allowedValues', ['TRANSFER', 'MOLLIE']);
     fixture.detectChanges();
 
-    expect(component.filteredOptions().map(option => option.type)).toEqual(['TRANSFER', 'MOLLIE']);
+    expect(component.filteredOptions().map((option) => option.type)).toEqual([
+      'TRANSFER',
+      'MOLLIE',
+    ]);
   });
 
   it('should resolve selected option from control value when valueMode is type', () => {

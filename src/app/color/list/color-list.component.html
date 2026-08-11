@@ -4,50 +4,90 @@
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
       @if (isLoading()) {
-        <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+        <app-table-skeleton
+          [columns]="tableColumns"
+          [showPaginator]="true"
+        ></app-table-skeleton>
       } @else if (dataSourceSignal(); as dataSource) {
-        <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc"
-               matSortDisableClear
-               multiTemplateDataRows>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
+          matSortDisableClear
+          multiTemplateDataRows
+        >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let color; let i = dataIndex;" mat-cell>
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            <td *matCellDef="let color; let i = dataIndex" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="name">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.COLUMN.NAME' | translate }}
+            </th>
             <td *matCellDef="let color" mat-cell>
               <div>{{ color.name }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="description">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-                mat-sort-header>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
             </th>
-            <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
+            <td
+              *matCellDef="let color"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               <div>{{ color.description }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
-              <button [routerLink]="['/', language, 'colors', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'COLOR.TITLE' | translate }}" matTooltipPosition="right" type="button">
+              <span class="app-surface-hide-mobile">{{
+                'COMMON.COLUMN.ACTIONS' | translate
+              }}</span>
+              <button
+                [routerLink]="['/', language, 'colors', 'add']"
+                mat-icon-button
+                id="add-button"
+                matTooltip="{{ 'COLOR.TITLE' | translate }}"
+                matTooltipPosition="right"
+                type="button"
+              >
                 <mat-icon color="primary">add</mat-icon>
               </button>
             </th>
-            <td *matCellDef="let color" class="app-surface-hide-mobile" mat-cell>
+            <td
+              *matCellDef="let color"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               @if (!color.deleted) {
-                <button (click)="edit(color)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                <button
+                  (click)="edit(color)"
+                  mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                  matTooltipPosition="left"
+                >
                   <mat-icon color="primary">edit</mat-icon>
                 </button>
-                <button (click)="delete(color)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                <button
+                  (click)="delete(color)"
+                  mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                  matTooltipPosition="right"
+                >
                   <mat-icon color="warn">delete</mat-icon>
                 </button>
               }
@@ -55,23 +95,42 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let color" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop" mat-cell>
-              <div [class.detail-expanded]="color === expandedColor"
-                   class="detail app-surface-hide-desktop">
+            <td
+              *matCellDef="let color"
+              [attr.colspan]="displayedColumns.length"
+              class="app-surface-hide-desktop"
+              mat-cell
+            >
+              <div
+                [class.detail-expanded]="color === expandedColor"
+                class="detail app-surface-hide-desktop"
+              >
                 <mat-list>
                   @if (color.description) {
                     <mat-list-item role="list">
-                      <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+                      <div matListItemTitle>
+                        {{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+                      </div>
                       <div matListItemLine>{{ color.description }}</div>
                     </mat-list-item>
                   }
                   @if (!color.deleted) {
-                    <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                    <div mat-subheader>
+                      {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                    </div>
                     <mat-list-item role="list">
-                      <button (click)="edit(color)" color="primary" mat-icon-button>
+                      <button
+                        (click)="edit(color)"
+                        color="primary"
+                        mat-icon-button
+                      >
                         <mat-icon matListItemIcon>edit</mat-icon>
                       </button>
-                      <button (click)="delete(color)" color="warn" mat-icon-button>
+                      <button
+                        (click)="delete(color)"
+                        color="warn"
+                        mat-icon-button
+                      >
                         <mat-icon matListItemIcon>delete</mat-icon>
                       </button>
                     </mat-list-item>
@@ -82,26 +141,46 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
               {{ 'COLOR.LIST.ERROR.NO_CONTENT' | translate }}
             </td>
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let color; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
-          <tr (click)="expandedColor = expandedColor === color ? null : color"
-              *matRowDef="let color; columns: displayedColumns;"
-              class="app-surface-hide-desktop app-table-master-row"
-              mat-row></tr>
-          <tr *matRowDef="let row; columns: ['expandedDetail']"
-              [class.app-table-detail-row--expanded]="row === expandedColor"
-              class="app-surface-hide-desktop app-table-detail-row"
-              mat-row></tr>
+          <tr
+            *matRowDef="let color; columns: displayedColumns"
+            class="app-surface-hide-mobile"
+            mat-row
+          ></tr>
+          <tr
+            (click)="expandedColor = expandedColor === color ? null : color"
+            *matRowDef="let color; columns: displayedColumns"
+            class="app-surface-hide-desktop app-table-master-row"
+            mat-row
+          ></tr>
+          <tr
+            *matRowDef="let row; columns: ['expandedDetail']"
+            [class.app-table-detail-row--expanded]="row === expandedColor"
+            class="app-surface-hide-desktop app-table-detail-row"
+            mat-row
+          ></tr>
 
-          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
         </table>
         @if (resultsLength) {
-          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
         }
       }
     </div>

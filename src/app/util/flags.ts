@@ -31,13 +31,15 @@ export const flags = (): IFlag[] => [
 
 export const findFlag = (lang: string): IFlag => {
   const flagList = flags();
-  let value = flagList.find(flag => flag.value === lang);
+  let value = flagList.find((flag) => flag.value === lang);
   if (!value) {
     const locale = getLocale(lang).flag;
-    value = flagList.find(flag => flag.value === locale);
+    value = flagList.find((flag) => flag.value === locale);
     if (!value) {
       value = flagList.find(
-        flag => flag.value.startsWith(navigator.language) || navigator.language.startsWith(flag.value),
+        (flag) =>
+          flag.value.startsWith(navigator.language) ||
+          navigator.language.startsWith(flag.value),
       );
     }
   }

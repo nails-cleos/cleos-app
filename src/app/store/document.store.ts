@@ -14,11 +14,13 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageRequest } from '../interfaces/common';
 import type { Subscription } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
 
 type DocumentStoreState = StoreState<Pagination<IDocument>, IDocument>;
 
-const initialState: DocumentStoreState = createStoreInitialState<Pagination<IDocument>, IDocument>();
+const initialState: DocumentStoreState = createStoreInitialState<
+  Pagination<IDocument>,
+  IDocument
+>();
 
 export type DocumentPageRequest = PageRequest & {
   officeId: string;
@@ -40,11 +42,7 @@ export type DocumentZipRequest = {
 export const DocumentStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    documentService = inject(DocumentService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, documentService = inject(DocumentService)) => {
     let loadPageSubscription: Subscription | undefined;
     let downloadSubscription: Subscription | undefined;
     let loadByIdSubscription: Subscription | undefined;
@@ -60,7 +58,8 @@ export const DocumentStore = signalStore(
       uploadStatementSubscription?.unsubscribe();
       deleteSubscription?.unsubscribe();
     };
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -76,12 +75,28 @@ export const DocumentStore = signalStore(
         patchState(store, { error: undefined, subErrors: undefined });
       },
 
-      loadPage({ officeId, date, page, sort, direction, size, types }: DocumentPageRequest): void {
+      loadPage({
+        officeId,
+        date,
+        page,
+        sort,
+        direction,
+        size,
+        types,
+      }: DocumentPageRequest): void {
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
         loadPageSubscription = documentService
-          .getDocumentsPage(officeId, page, sort, direction, size, date ? getDateFormat(date) : undefined, types)
+          .getDocumentsPage(
+            officeId,
+            page,
+            sort,
+            direction,
+            size,
+            date ? getDateFormat(date) : undefined,
+            types,
+          )
           .subscribe({
             next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
@@ -93,7 +108,11 @@ export const DocumentStore = signalStore(
         cleanCrudCreate(store);
 
         downloadSubscription = documentService.view(id).subscribe({
-          next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
+          next: (blob) =>
+            patchState(store, {
+              response: { blob, fileName },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -112,10 +131,16 @@ export const DocumentStore = signalStore(
         downloadZipSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        downloadZipSubscription = documentService.documentDownloadZip(officeId, getDateFormat(date)).subscribe({
-          next: (blob) => patchState(store, { response: { blob, fileName }, isLoading: false }),
-          error: patchError,
-        });
+        downloadZipSubscription = documentService
+          .documentDownloadZip(officeId, getDateFormat(date))
+          .subscribe({
+            next: (blob) =>
+              patchState(store, {
+                response: { blob, fileName },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       delete(id: string, name: string): void {
@@ -123,31 +148,47 @@ export const DocumentStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = documentService.deleteDocument(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('DOCUMENT.DELETED.MESSAGE', { name }),
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'DOCUMENT.DELETED.MESSAGE',
+                messageParams: {
+                  name,
+                },
+                reload: true,
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
 
-      uploadStatement(officeId: string, blob: Blob, fileName: string, id?: string): void {
+      uploadStatement(
+        officeId: string,
+        blob: Blob,
+        fileName: string,
+        id?: string,
+      ): void {
         uploadStatementSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        uploadStatementSubscription = documentService.uploadStatement(officeId, blob, fileName, id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('DOCUMENT.UPLOAD_SUCCESS', { fileName }),
-              redirect: 'statements',
-            }, isLoading: false,
-          }),
-          error: patchError,
-        });
+        uploadStatementSubscription = documentService
+          .uploadStatement(officeId, blob, fileName, id)
+          .subscribe({
+            next: () =>
+              patchState(store, {
+                response: {
+                  messageKey: 'DOCUMENT.UPLOAD_SUCCESS',
+                  messageParams: {
+                    fileName,
+                  },
+                  redirect: 'statements',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
     };
   }),

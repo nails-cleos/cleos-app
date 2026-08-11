@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DragDropDirective } from './drag-drop.directive';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 @Component({
   imports: [DragDropDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '<div appDragDrop (fileDropped)="onDropped($event)"></div>',
 })
 class TestHostComponent {
@@ -30,24 +32,11 @@ describe('DragDropDirective', () => {
     fixture.detectChanges();
   });
 
-  function createDragEvent(type: string, dataTransfer?: DataTransfer): DragEvent {
-    const event = new DragEvent(type, {
-      bubbles: true,
-      cancelable: true,
-    });
-
-    Object.defineProperty(event, 'dataTransfer', {
-      value: dataTransfer,
-    });
-
-    return event;
-  }
-
   it('should add fileover class on dragover', () => {
     div.dispatchEvent(createDragEvent('dragover'));
     fixture.detectChanges();
 
-    expect(div.classList.contains('fileover')).toBeTrue();
+    expect(div.classList.contains('fileover')).toBe(true);
   });
 
   it('should remove fileover class on dragleave', () => {
@@ -55,11 +44,11 @@ describe('DragDropDirective', () => {
     div.dispatchEvent(createDragEvent('dragleave'));
     fixture.detectChanges();
 
-    expect(div.classList.contains('fileover')).toBeFalse();
+    expect(div.classList.contains('fileover')).toBe(false);
   });
 
   it('should NOT emit when drop has no files', () => {
-    const dt = new DataTransfer();
+    const dt = createDataTransfer();
     const ev = createDragEvent('drop', dt);
 
     div.dispatchEvent(ev);
@@ -69,8 +58,8 @@ describe('DragDropDirective', () => {
   });
 
   it('should emit files on drop', () => {
-    const dt = new DataTransfer();
-    dt.items.add(new File(['test'], 'test.txt'));
+    const file = new File(['test'], 'test.txt');
+    const dt = createDataTransfer([file]);
 
     const ev = createDragEvent('drop', dt);
 
@@ -81,4 +70,29 @@ describe('DragDropDirective', () => {
     expect(host.droppedFiles!.length).toBe(1);
     expect(host.droppedFiles![0].name).toBe('test.txt');
   });
+
+  const createDataTransfer = (files: File[] = []): DataTransfer => {
+    return {
+      files: files as unknown as FileList,
+      items: {
+        add: vi.fn(),
+      },
+    } as unknown as DataTransfer;
+  };
+
+  const createDragEvent = (
+    type: string,
+    dataTransfer?: DataTransfer,
+  ): DragEvent => {
+    const event = new Event(type, {
+      bubbles: true,
+      cancelable: true,
+    });
+
+    Object.defineProperty(event, 'dataTransfer', {
+      value: dataTransfer,
+    });
+
+    return event as DragEvent;
+  };
 });

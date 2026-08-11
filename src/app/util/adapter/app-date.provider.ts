@@ -1,5 +1,9 @@
 import { Provider } from '@angular/core';
-import { DateAdapter as MaterialDateAdapter, MAT_DATE_FORMATS, provideNativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter as MaterialDateAdapter,
+  MAT_DATE_FORMATS,
+  provideNativeDateAdapter,
+} from '@angular/material/core';
 import { MAT_DATE_RANGE_SELECTION_STRATEGY } from '@angular/material/datepicker';
 import { YearMonthDateAdapter } from './year-month-date.adapter';
 import { YearMonthAdapter } from './year-month.adapter';
@@ -12,8 +16,8 @@ import {
   provideCalendar,
 } from 'angular-calendar';
 import { adapterFactory } from 'angular-calendar/date-adapters/date-fns';
-import { CustomDateFormatter } from '../../shared/CustomDateFormatter';
-import { CustomEventTitleFormatter } from '../../shared/CustomEventTitleFormatter';
+import { CustomDateFormatter } from '@app/shared/CustomDateFormatter';
+import { CustomEventTitleFormatter } from '@app/shared/CustomEventTitleFormatter';
 
 const YEAR_MONTH_FORMATS = {
   parse: {
@@ -47,22 +51,23 @@ export const provideAppDateAdapter = () => [
   },
 ];
 
-export const provideAppCalendar = () => provideCalendar(
-  {
-    provide: CalendarDateAdapter,
-    useFactory: adapterFactory,
-  },
-  {
-    dateFormatter: {
-      provide: CalendarDateFormatter,
-      useClass: CustomDateFormatter,
+export const provideAppCalendar = () =>
+  provideCalendar(
+    {
+      provide: CalendarDateAdapter,
+      useFactory: adapterFactory,
     },
-    eventTitleFormatter: {
-      provide: CalendarEventTitleFormatter,
-      useClass: CustomEventTitleFormatter,
+    {
+      dateFormatter: {
+        provide: CalendarDateFormatter,
+        useClass: CustomDateFormatter,
+      },
+      eventTitleFormatter: {
+        provide: CalendarEventTitleFormatter,
+        useClass: CustomEventTitleFormatter,
+      },
     },
-  },
-);
+  );
 
 export const provideYearMonthDateAdapter = (): Provider[] => [
   {

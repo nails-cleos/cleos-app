@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { PaymentStore } from './payment.store';
@@ -8,24 +9,43 @@ import { DEFAULT_LOCALE } from '../util/dates';
 
 describe('PaymentStore', () => {
   let store: InstanceType<typeof PaymentStore>;
-  let paymentService: jasmine.SpyObj<PaymentService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let paymentService: {
+    getPayment: Mock;
+    createPaymentLinkByReservationId: Mock;
+    recreate: Mock;
+    add: Mock;
+    notifyPayment: Mock;
+    updatePayment: Mock;
+    adjustPayments: Mock;
+    getPaymentOptions: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+    getCurrentLang: Mock;
+  };
 
   beforeEach(() => {
-    paymentService = jasmine.createSpyObj('PaymentService', [
-      'getPayment',
-      'createPaymentLinkByReservationId',
-      'recreate',
-      'add',
-      'notifyPayment',
-      'updatePayment',
-      'adjustPayments',
-      'getPaymentOptions',
-    ]);
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant', 'getCurrentLang']);
-    translateSpy.instant.and.callFake(
-      (key: string, params?: Record<string, string>) => `${ key }:${ params?.['name'] ?? '' }`);
-    translateSpy.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
+    paymentService = {
+      getPayment: vi.fn().mockName('PaymentService.getPayment'),
+      createPaymentLinkByReservationId: vi
+        .fn()
+        .mockName('PaymentService.createPaymentLinkByReservationId'),
+      recreate: vi.fn().mockName('PaymentService.recreate'),
+      add: vi.fn().mockName('PaymentService.add'),
+      notifyPayment: vi.fn().mockName('PaymentService.notifyPayment'),
+      updatePayment: vi.fn().mockName('PaymentService.updatePayment'),
+      adjustPayments: vi.fn().mockName('PaymentService.adjustPayments'),
+      getPaymentOptions: vi.fn().mockName('PaymentService.getPaymentOptions'),
+    };
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+      getCurrentLang: vi.fn().mockName('TranslateService.getCurrentLang'),
+    };
+    translateSpy.instant.mockImplementation(
+      (key: string, params?: Record<string, string>) =>
+        `${key}:${params?.['name'] ?? ''}`,
+    );
+    translateSpy.getCurrentLang.mockReturnValue(DEFAULT_LOCALE);
 
     TestBed.configureTestingModule({
       providers: [
@@ -37,17 +57,14 @@ describe('PaymentStore', () => {
     store = TestBed.inject(PaymentStore);
   });
 
-
   describe('clearResponse', () => {
     it('should clear response', () => {
-      paymentService.adjustPayments.and.returnValue(
-        of(void 0),
-      );
+      paymentService.adjustPayments.mockReturnValue(of(void 0));
 
       store.adjust([]);
 
       expect(store.response()).toEqual({
-        message: 'COMMON.PAYMENT.SUCCESS:',
+        messageKey: 'COMMON.PAYMENT.SUCCESS',
         reload: true,
       });
 
@@ -59,11 +76,12 @@ describe('PaymentStore', () => {
 
   describe('clearError', () => {
     it('should clear error', () => {
-      paymentService.adjustPayments.and.returnValue(
-        throwError(() =>
-          new HttpErrorResponse({
-            status: 500,
-          }),
+      paymentService.adjustPayments.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 500,
+            }),
         ),
       );
 
@@ -78,133 +96,112 @@ describe('PaymentStore', () => {
     });
   });
 
-  it('should fetch a payment and update `selected` signal', (done) => {
+  it('should fetch a payment and update `selected` signal', () => {
     const mockPayment = { id: 'pay_123' } as any;
-    paymentService.getPayment.and.returnValue(of(mockPayment));
+    paymentService.getPayment.mockReturnValue(of(mockPayment));
 
     store.getPayment('pay_123');
 
     // Allow observable to emit
-    setTimeout(() => {
-      expect(store.selected()).toEqual(mockPayment);
-      expect(store.isLoading()).toBeFalse();
-      done();
-    }, 0);
+    expect(store.selected()).toEqual(mockPayment);
+    expect(store.isLoading()).toBe(false);
   });
 
-  it('should open a payment link when creating a payment link by reservation id', (done) => {
+  it('should open a payment link when creating a payment link by reservation id', () => {
     const mockResponse = { link: 'https://example.com/pay' } as any;
-    paymentService.createPaymentLinkByReservationId.and.returnValue(of(mockResponse));
-    const openSpy = spyOn(window, 'open');
+    paymentService.createPaymentLinkByReservationId.mockReturnValue(
+      of(mockResponse),
+    );
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
     store.createPaymentLinkByReservationId('res_456', {} as any);
 
-    setTimeout(() => {
-      expect(openSpy).toHaveBeenCalledWith('https://example.com/pay', '_self');
-      expect(store.isLoading()).toBeFalse();
-      done();
-    }, 0);
+    expect(openSpy).toHaveBeenCalledWith('https://example.com/pay', '_self');
+    expect(store.isLoading()).toBe(false);
   });
 
-  it('should reset the store state when `clean` is called', (done) => {
+  it('should reset the store state when `clean` is called', () => {
     const mockPayment = { id: 'pay_789' } as any;
-    paymentService.getPayment.and.returnValue(of(mockPayment));
+    paymentService.getPayment.mockReturnValue(of(mockPayment));
     store.getPayment('pay_789');
 
-    setTimeout(() => {
-      expect(store.selected()).toEqual(mockPayment);
-      store.clean();
-      // After clean the selected signal should be undefined (or null)
-      expect(store.selected()).toBeUndefined();
-      done();
-    }, 0);
+    expect(store.selected()).toEqual(mockPayment);
+    store.clean();
+    // After clean the selected signal should be undefined (or null)
+    expect(store.selected()).toBeUndefined();
   });
 
-  it('should set success response on recreate', (done) => {
-    paymentService.recreate.and.returnValue(of({}));
+  it('should set success response on recreate', () => {
+    paymentService.recreate.mockReturnValue(of({}));
 
     store.recreate('pay_1', 'card');
 
-    setTimeout(() => {
-      expect(store.isLoading()).toBeFalse();
-      expect(store.response()).toEqual({
-        message: 'PAYMENT.RECREATE:',
-      });
-      done();
-    }, 0);
+    expect(store.isLoading()).toBe(false);
+    expect(store.response()).toEqual({
+      messageKey: 'PAYMENT.RECREATE',
+    });
   });
 
-  it('should open payment link on updateById', (done) => {
+  it('should open payment link on updateById', () => {
     const mock = { paymentLink: 'https://pay.com' } as any;
-    paymentService.updatePayment.and.returnValue(of(mock));
-    const openSpy = spyOn(window, 'open');
+    paymentService.updatePayment.mockReturnValue(of(mock));
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
     store.updateById('1', {} as any);
 
-    setTimeout(() => {
-      expect(openSpy).toHaveBeenCalledWith('https://pay.com', '_self');
-      expect(store.isLoading()).toBeFalse();
-      done();
-    }, 0);
+    expect(openSpy).toHaveBeenCalledWith('https://pay.com', '_self');
+    expect(store.isLoading()).toBe(false);
   });
 
-  it('should set success response on adjust', (done) => {
-    paymentService.adjustPayments.and.returnValue(of(void 0));
+  it('should set success response on adjust', () => {
+    paymentService.adjustPayments.mockReturnValue(of(void 0));
 
-    store.adjust([{ } as any]);
+    store.adjust([{} as any]);
 
-    setTimeout(() => {
-      expect(store.response()).toEqual({
-        message: 'COMMON.PAYMENT.SUCCESS:',
-        reload: true,
-      });
-      expect(store.isLoading()).toBeFalse();
-      done();
-    }, 0);
+    expect(store.response()).toEqual({
+      messageKey: 'COMMON.PAYMENT.SUCCESS',
+      reload: true,
+    });
+    expect(store.isLoading()).toBe(false);
   });
 
-  it('should load payment options', (done) => {
+  it('should load payment options', () => {
     const mockOptions = [{ id: 'opt_1' }] as any;
-    paymentService.getPaymentOptions.and.returnValue(of(mockOptions));
+    paymentService.getPaymentOptions.mockReturnValue(of(mockOptions));
 
     store.getOptions();
 
-    setTimeout(() => {
-      expect(store.options()).toEqual(mockOptions);
-      expect(store.isLoading()).toBeFalse();
-      done();
-    }, 0);
+    expect(store.options()).toEqual(mockOptions);
+    expect(store.isLoading()).toBe(false);
   });
 
-  it('should handle approved create payment response', (done) => {
-    paymentService.add.and.returnValue(of({
-      status: 'approved',
-      message: 'message',
-      paths: ['a', 'b'],
-    }));
+  it('should handle approved create payment response', () => {
+    paymentService.add.mockReturnValue(
+      of({
+        status: 'approved',
+        message: 'message',
+        paths: ['a', 'b'],
+      }),
+    );
 
     store.create('1', 'reservation', 'ok', {} as any);
 
-    setTimeout(() => {
-      expect(store.response()?.message).toBe('COMMON.PAYMENT.SUCCESS:');
-      expect(store.response()?.redirect).toBe('a/b');
-      done();
-    }, 0);
+    expect(store.response()?.messageKey).toBe('COMMON.PAYMENT.SUCCESS');
+    expect(store.response()?.redirect).toBe('a/b');
   });
 
-  it('should handle pending notify response', (done) => {
-    paymentService.notifyPayment.and.returnValue(of({
-      status: 'pending',
-      message: 'message',
-      paths: ['a', 'b'],
-    }));
+  it('should handle pending notify response', () => {
+    paymentService.notifyPayment.mockReturnValue(
+      of({
+        status: 'pending',
+        message: 'message',
+        paths: ['a', 'b'],
+      }),
+    );
 
     store.notify('1', 'reservation', 'r1', 'p1', 'card');
 
-    setTimeout(() => {
-      expect(store.response()?.toastType).toBe('success');
-      expect(store.response()?.reload).toBe(false);
-      done();
-    }, 0);
+    expect(store.response()?.toastType).toBe('success');
+    expect(store.response()?.reload).toBe(false);
   });
 });

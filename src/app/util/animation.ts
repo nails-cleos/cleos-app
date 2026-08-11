@@ -8,7 +8,11 @@ export const goTo = (elementId: string | HTMLElement): void => {
     element = elementId;
   }
 
-  element?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+  element?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+    inline: 'nearest',
+  });
 };
 
 export const observeElementSignal = (
@@ -20,18 +24,21 @@ export const observeElementSignal = (
   let observer: IntersectionObserver | undefined;
   if (el) {
     const rootMargin = '0px';
-    observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          animationState.set('close');
-          if (!reopen) {
-            observer?.disconnect();
+    observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animationState.set('close');
+            if (!reopen) {
+              observer?.disconnect();
+            }
+          } else {
+            animationState.set('open');
           }
-        } else {
-          animationState.set('open');
-        }
-      });
-    }, { threshold, rootMargin });
+        });
+      },
+      { threshold, rootMargin },
+    );
     observer.observe(el);
   }
   return observer;

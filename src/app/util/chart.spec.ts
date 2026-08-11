@@ -1,5 +1,6 @@
 import { createChart } from './chart';
 import { secondsToHHMM } from './dates';
+import { describe, expect, it } from 'vitest';
 
 describe('createChart util', () => {
   it('should create default chart with datasets and labels', () => {
@@ -8,10 +9,12 @@ describe('createChart util', () => {
       labels: ['A', 'B'],
       colors: 'COLORS',
       options: 'CHART',
-      dataSet: [{
-        label: 'Dataset 1',
-        data: [10, 20],
-      }],
+      dataSet: [
+        {
+          label: 'Dataset 1',
+          data: [10, 20],
+        },
+      ],
     };
 
     const result = createChart(chart);
@@ -30,17 +33,26 @@ describe('createChart util', () => {
       colors: 'COLORS',
       options: 'BAR_CHART',
       sum: true,
-      dataSet: [{
-        label: 'Revenue',
-        data: [100],
-      }],
+      dataSet: [
+        {
+          label: 'Revenue',
+          data: [100],
+        },
+      ],
     };
 
-    const result = createChart(chart, { code: 'EUR', symbol: '€' } as any, false, 'en-US');
+    const result = createChart(
+      chart,
+      { code: 'EUR', symbol: '€' } as any,
+      false,
+      'en-US',
+    );
 
-    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks
+      .label;
 
-    const tooltipFooter = (result.options.plugins as any).tooltip.callbacks.footer;
+    const tooltipFooter = (result.options.plugins as any).tooltip.callbacks
+      .footer;
 
     const label = tooltipLabel({
       raw: 100,
@@ -75,7 +87,8 @@ describe('createChart util', () => {
 
     const result = createChart(chart, undefined, false, 'en-US');
 
-    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks
+      .label;
 
     const label = tooltipLabel({
       raw: 80,
@@ -106,15 +119,18 @@ describe('createChart util', () => {
       type: 'pie',
       colors: 'COLORS_ARRAY',
       options: 'PERCENTAGE_CHART',
-      dataSet: [{
-        data: [20, 30],
-      }],
+      dataSet: [
+        {
+          data: [20, 30],
+        },
+      ],
       labels: ['A', 'B'],
     };
 
     const result = createChart(chart);
 
-    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks
+      .label;
 
     const label = tooltipLabel({
       label: 'A',
@@ -130,15 +146,18 @@ describe('createChart util', () => {
       type: 'bar',
       colors: 'COLORS',
       options: 'TIME_CHART',
-      dataSet: [{
-        label: 'Work',
-        data: [3600],
-      }],
+      dataSet: [
+        {
+          label: 'Work',
+          data: [3600],
+        },
+      ],
     };
 
     const result = createChart(chart, undefined, false);
 
-    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks.label;
+    const tooltipLabel = (result.options.plugins as any).tooltip.callbacks
+      .label;
 
     const label = tooltipLabel({
       dataset: { label: 'Work' },

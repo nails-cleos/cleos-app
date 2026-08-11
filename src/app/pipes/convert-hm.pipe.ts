@@ -5,6 +5,5 @@ import { secondsToHHMM } from '../util/dates';
   name: 'convertHM',
 })
 export class ConvertHMPipe implements PipeTransform {
-
   transform = (sec: number = 0): string => secondsToHHMM(sec);
 }

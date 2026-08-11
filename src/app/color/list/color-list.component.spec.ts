@@ -1,32 +1,53 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { ColorListComponent } from './color-list.component';
 import { IColor } from '../color';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ColorStore } from '../../store/color.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { ColorStore } from '@app/store/color.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('ColorListComponent', () => {
   let component: ColorListComponent;
   let fixture: ComponentFixture<ColorListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let colorStoreSpy: {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    loadPage: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    delete: jasmine.Spy;
+    loadPage: Mock;
+    clearResponse: Mock;
+    delete: Mock;
   };
 
   const mockColor: IColor[] = [
@@ -42,9 +63,10 @@ describe('ColorListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -53,28 +75,35 @@ describe('ColorListComponent', () => {
       },
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     colorStoreSpy = {
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
       isLoading: signal(false),
-      loadPage: jasmine.createSpy('loadPage'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      delete: jasmine.createSpy('delete'),
+      loadPage: vi.fn().mockName('loadPage'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ColorListComponent, TranslateModule.forRoot()],
+      imports: [ColorListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -142,11 +171,16 @@ describe('ColorListComponent', () => {
   });
 
   it('should dispatch getColorPage when paginatorPageIndex changes', () => {
-    colorStoreSpy.loadPage.calls.reset();
+    colorStoreSpy.loadPage.mockClear();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(colorStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -158,11 +192,13 @@ describe('ColorListComponent', () => {
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
 
-    component['paginator'] = signal(paginatorMock);
-    colorStoreSpy.clearResponse.calls.reset();
-    colorStoreSpy.loadPage.calls.reset();
+    component['paginator'] = signal(paginatorMock) as any;
+    colorStoreSpy.clearResponse.mockClear();
+    colorStoreSpy.loadPage.mockClear();
 
     colorStoreSpy.response.set({ success: true } as any);
     fixture.detectChanges();
@@ -180,28 +216,35 @@ describe('ColorListComponent', () => {
     const item = mockColor[0];
     component.edit(item);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['colors', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'colors',
+      item.id,
+    ]);
   });
 
   it('should dispatch deleteColor when dialog returns a result', () => {
     const item = mockColor[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'COLOR.DELETED.TITLE',
           content: 'COLOR.DELETED.CONTENT',
           value: item,
           variant: 'warning',
         },
-      }));
+      }),
+    );
 
-    expect(colorStoreSpy.delete).toHaveBeenCalledWith({ id: item.id!, name: item.name! });
+    expect(colorStoreSpy.delete).toHaveBeenCalledWith({
+      id: item.id!,
+      name: item.name!,
+    });
   });
 });

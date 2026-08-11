@@ -1,4 +1,5 @@
 import { ConvertHMPipe } from './convert-hm.pipe';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('ConvertHMPipe', () => {
   let pipe: ConvertHMPipe;

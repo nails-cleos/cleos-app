@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { CurrencyComponent } from './currency.component';
 import { CurrencyStore } from '../store/currency.store';
 import { ICurrency } from './currency';
@@ -9,7 +16,11 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-currency-details-page',
   template: `
     @if (currency(); as currency) {
-      <app-currency [currency]="currency" [config]="config" (submitData)="submit($event)"/>
+      <app-currency
+        [currency]="currency"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
       <app-skeleton />
     }

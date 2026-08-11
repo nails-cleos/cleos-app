@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TableSkeletonComponent } from './table-skeleton.component';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('TableSkeletonComponent', () => {
   let component: TableSkeletonComponent;
@@ -33,16 +34,24 @@ describe('TableSkeletonComponent', () => {
 
   it('should apply mobile visibility classes per column', () => {
     const headerCells = fixture.nativeElement.querySelectorAll('th');
-    const bodyCells = fixture.nativeElement.querySelectorAll('tbody tr:first-child td');
+    const bodyCells = fixture.nativeElement.querySelectorAll(
+      'tbody tr:first-child td',
+    );
 
-    expect(headerCells[1].classList.contains('app-surface-hide-mobile')).toBeTrue();
-    expect(bodyCells[1].classList.contains('app-surface-hide-mobile')).toBeTrue();
+    expect(headerCells[1].classList.contains('app-surface-hide-mobile')).toBe(
+      true,
+    );
+    expect(bodyCells[1].classList.contains('app-surface-hide-mobile')).toBe(
+      true,
+    );
   });
 
   it('should render paginator skeleton when enabled', () => {
     fixture.componentRef.setInput('showPaginator', true);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.app-table-skeleton-paginator')).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('.app-table-skeleton-paginator'),
+    ).toBeTruthy();
   });
 });

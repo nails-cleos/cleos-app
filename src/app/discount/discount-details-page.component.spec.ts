@@ -1,24 +1,27 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDetailsPageComponent } from './discount-details-page.component';
 import { DiscountStore } from '../store/discount.store';
 import { IDiscountAll } from './discount';
 import { DiscountComponent } from './discount.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountDetailsPageComponent', () => {
   let component: DiscountDetailsPageComponent;
   let fixture: ComponentFixture<DiscountDetailsPageComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let discountStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -30,30 +33,26 @@ describe('DiscountDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     discountStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [DiscountDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
       ],
-    }).overrideTemplate(DiscountComponent, '')
-      .overrideTemplate(DiscountDetailsPageComponent, `
-        @if (discount(); as discount) {
-          <app-discount [discount]="discount" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountDetailsPageComponent);
 
@@ -77,13 +76,16 @@ describe('DiscountDetailsPageComponent', () => {
     discountStoreSpy.selected.set(mockDiscount);
     fixture.detectChanges();
 
-    const discountComponent = fixture.debugElement.children[0].componentInstance as DiscountComponent;
+    const discountComponent = fixture.debugElement.children[0]
+      .componentInstance as DiscountComponent;
 
-    expect(discountComponent.discount()).toEqual(jasmine.objectContaining({
-      id,
-      name: 'Test Discount',
-      description: 'Test Description',
-    }));
+    expect(discountComponent.discount()).toEqual(
+      expect.objectContaining({
+        id,
+        name: 'Test Discount',
+        description: 'Test Description',
+      }),
+    );
   });
 
   it('should call update when discount is received', () => {
@@ -91,9 +93,12 @@ describe('DiscountDetailsPageComponent', () => {
 
     component.submit(mockDiscount);
 
-    expect(discountStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Discount',
-      description: 'Test Description',
-    }));
+    expect(discountStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Discount',
+        description: 'Test Description',
+      }),
+    );
   });
 });

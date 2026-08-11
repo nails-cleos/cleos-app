@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { MainContentService } from './main-content.service';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('MainContentService', () => {
   let service: MainContentService;

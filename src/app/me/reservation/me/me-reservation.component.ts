@@ -12,10 +12,22 @@ import {
   viewChildren,
 } from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { requireMatch } from '../../../util/validators';
-import { IGroupService, IPrice, ITreatment, ITreatmentGroup, Price } from '../../../treatment/treatment';
-import { IRoom, IRoomAll, IService } from '../../../room/room';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { requireMatch } from '@app/util/validators';
+import {
+  IGroupService,
+  IPrice,
+  ITreatment,
+  ITreatmentGroup,
+  Price,
+} from '@app/treatment/treatment';
+import { IRoom, IRoomAll, IService } from '@app/room/room';
 import {
   IAvailableDTO,
   IReservation,
@@ -23,7 +35,7 @@ import {
   IUpcomingAll,
   MAX_RESERVATION_CUSTOMER_MONTH,
   Reservation,
-} from '../../../reservation/reservation';
+} from '@app/reservation/reservation';
 import {
   createNewDate,
   Duration,
@@ -41,8 +53,12 @@ import {
   newDateTimestamp,
   plusMonthDate,
   totalDuration,
-} from '../../../util/dates';
-import { LangChangeEvent, TranslatePipe, TranslateService } from '@ngx-translate/core';
+} from '@app/util/dates';
+import {
+  LangChangeEvent,
+  TranslatePipe,
+  TranslateService,
+} from '@ngx-translate/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, startWith } from 'rxjs/operators';
 import {
@@ -59,33 +75,51 @@ import {
   removeDiscount,
   roomDetail,
   round,
-} from '../../../util/helper';
-import { DiscountType, IDiscount, IUserDiscount } from '../../../discount/discount';
+} from '@app/util/helper';
+import { DiscountType, IDiscount, IUserDiscount } from '@app/discount/discount';
 import { isEqual } from 'date-fns';
-import { IAdditionalAll } from '../../../additional/additional';
-import { MatDivider, MatListOption, MatSelectionList } from '@angular/material/list';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
-import { IOffice, IOfficeAll } from '../../../office/office';
+import { IAdditionalAll } from '@app/additional/additional';
+import {
+  MatDivider,
+  MatListOption,
+  MatSelectionList,
+} from '@angular/material/list';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
+import { IOffice, IOfficeAll } from '@app/office/office';
 import { MatDialog } from '@angular/material/dialog';
-import { Role } from '../../../interfaces/token';
-import { IUser, IUserAll } from '../../../user/user';
-import { IPaymentOption, PaymentPercentage, PENALTY } from '../../../interfaces/payment';
-import { AuthUserService } from '../../../services/auth-user.service';
-import { enableStep, getBackIndex, getIndex, IStep, Step } from '../../../util/step';
-import { RoomNamePipe } from '../../../pipes/room-name.pipe';
-import { SortByPipe } from '../../../pipes/sort-by.pipe';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { DurationTimePipe } from '../../../pipes/durationTime.pipe';
-import { PriceComponent } from '../../../shared/price/price.component';
-import { PaymentPreviewComponent } from '../../../shared/payment-preview/payment-preview.component';
-import { GoogleMapComponent } from '../../../shared/google-map/google-map.component';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { Role } from '@app/interfaces/token';
+import { IUser, IUserAll } from '@app/user/user';
+import {
+  IPaymentOption,
+  PaymentPercentage,
+  PENALTY,
+} from '@app/interfaces/payment';
+import { AuthUserService } from '@app/services/auth-user.service';
+import {
+  enableStep,
+  getBackIndex,
+  getIndex,
+  IStep,
+  Step,
+} from '@app/util/step';
+import { RoomNamePipe } from '@app/pipes/room-name.pipe';
+import { SortByPipe } from '@app/pipes/sort-by.pipe';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { PriceComponent } from '@app/shared/price/price.component';
+import { PaymentPreviewComponent } from '@app/shared/payment-preview/payment-preview.component';
+import { GoogleMapComponent } from '@app/shared/google-map/google-map.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { NgxMaterialIntlTelInputComponent } from 'ngx-material-intl-tel-input';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ToastService } from '../../../services/toast.service';
-import { IError } from '../../../interfaces/common';
-import { BankForm } from '../../../shared/bank/bank.component';
-import { FirebaseService } from '../../../services/firebase.service';
+import { ToastService } from '@app/services/toast.service';
+import { IError } from '@app/interfaces/common';
+import { BankForm } from '@app/shared/bank/bank.component';
+import { FirebaseService } from '@app/services/firebase.service';
 import {
   createMeReservationErrors,
   MeReservationAcceptForm,
@@ -95,29 +129,42 @@ import {
   MeReservationForms,
   MeReservationTreatmentForm,
   OfficeForm,
-} from '../../../reservation/reservation-form.types';
-import { ReservationFormErrorService } from '../../../reservation/reservation-form-error.service';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+} from '@app/reservation/reservation-form.types';
+import { ReservationFormErrorService } from '@app/reservation/reservation-form-error.service';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
 import { MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
-import { DatePipe, DecimalPipe, KeyValuePipe, NgTemplateOutlet } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  DatePipe,
+  DecimalPipe,
+  KeyValuePipe,
+  NgTemplateOutlet,
+} from '@angular/common';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { MatCard, MatCardContent } from '@angular/material/card';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { NavigationService } from '../../../services/navigation.service';
-import { TreatmentStore } from '../../../store/treatment.store';
-import { AdditionalStore } from '../../../store/additional.store';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
-import { MeReservationParams } from '../../../util/models/reservation.models';
+import { NavigationService } from '@app/services/navigation.service';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { AdditionalStore } from '@app/store/additional.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { MeReservationParams } from '@app/util/models/reservation.models';
 
 const MAX_UPCOMING_RESERVATION = 10;
 
-type AvailabilityData = { time: string; date: Date }
+type AvailabilityData = { time: string; date: Date };
 
 const ME_RESERVATION_ERROR_FIELDS = [
   'room',
@@ -137,12 +184,48 @@ const ME_RESERVATION_ERROR_FIELDS = [
 @Component({
   selector: 'app-me-reservation',
   templateUrl: './me-reservation.component.html',
-  imports: [MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle, MatDatepicker, MatSelect,
-    MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, KeyValuePipe, DecimalPipe,
-    NgTemplateOutlet, DatePipe, MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective,
-    CurrencySymbolPipe, MatCard, MatCardContent, RoomNamePipe, SortByPipe, CurrencySymbolPipe, DurationTimePipe,
-    PriceComponent, PaymentPreviewComponent, NgxMaterialIntlTelInputComponent, GoogleMapComponent, BackButtonDirective,
-    MatSelectionList, MatListOption, MatDivider, MatTabGroup, MatTab, MatCheckbox, MatSuffix],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    KeyValuePipe,
+    DecimalPipe,
+    NgTemplateOutlet,
+    DatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    MatCard,
+    MatCardContent,
+    RoomNamePipe,
+    SortByPipe,
+    CurrencySymbolPipe,
+    DurationTimePipe,
+    PriceComponent,
+    PaymentPreviewComponent,
+    NgxMaterialIntlTelInputComponent,
+    GoogleMapComponent,
+    BackButtonDirective,
+    MatSelectionList,
+    MatListOption,
+    MatDivider,
+    MatTabGroup,
+    MatTab,
+    MatCheckbox,
+    MatSuffix,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MeReservationComponent {
@@ -152,23 +235,32 @@ export class MeReservationComponent {
 
   submitData = output<{ reservation: IReservation; role: Role }>();
 
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly toastService: ToastService = inject(ToastService);
   private readonly reservationStore = inject(ReservationStore);
   private readonly treatmentStore = inject(TreatmentStore);
   private readonly additionalStore = inject(AdditionalStore);
   private readonly paymentStore = inject(PaymentStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly firebaseService = inject(FirebaseService);
   private readonly formErrorService = inject(ReservationFormErrorService);
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
-  private readonly treatmentDiscountSignal = this.treatmentStore.treatmentDiscount;
+  private readonly treatmentDiscountSignal =
+    this.treatmentStore.treatmentDiscount;
   private readonly selectedReservationSignal = this.reservationStore.selected;
   private readonly customerReservationSignal = computed(() => {
     const data = this.reservationStore.data();
@@ -179,22 +271,25 @@ export class MeReservationComponent {
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly paymentOptionsSignal = this.paymentStore.options;
 
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
-  private langChangeSignal = toSignal<LangChangeEvent>(this.translateService.onLangChange, {
-    initialValue: undefined,
   });
-  private readonly paymentOptions = computed(
-    () => this.paymentOptionsSignal().filter(option => option.enabled && option.enabledCustomer),
+  private langChangeSignal = toSignal<LangChangeEvent>(
+    this.translateService.onLangChange,
+    {
+      initialValue: undefined,
+    },
+  );
+  private readonly paymentOptions = computed(() =>
+    this.paymentOptionsSignal().filter(
+      (option) => option.enabled && option.enabledCustomer,
+    ),
   );
 
   readonly additionalListSignal = computed(() => {
@@ -204,7 +299,8 @@ export class MeReservationComponent {
 
   labels = computed(() => {
     this.langChangeSignal();
-    const phoneTranslations = this.translateService.instant('COMMON.USER.PHONE');
+    const phoneTranslations =
+      this.translateService.instant('COMMON.USER.PHONE');
 
     return {
       mainLabel: '',
@@ -223,24 +319,26 @@ export class MeReservationComponent {
 
   errors = signal<MeReservationErrors>(createMeReservationErrors());
 
-  treatmentForm: FormGroup<MeReservationTreatmentForm> = this.formBuilder.group<MeReservationTreatmentForm>({
-    treatment: this.formBuilder.control(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-    discount: this.formBuilder.control(undefined),
-    startDate: this.formBuilder.control(undefined, {
-      validators: [Validators.required],
-    }),
-    group: this.formBuilder.control(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-  });
+  treatmentForm: FormGroup<MeReservationTreatmentForm> =
+    this.formBuilder.group<MeReservationTreatmentForm>({
+      treatment: this.formBuilder.control(undefined, {
+        validators: [Validators.required, requireMatch],
+      }),
+      discount: this.formBuilder.control(undefined),
+      startDate: this.formBuilder.control(undefined, {
+        validators: [Validators.required],
+      }),
+      group: this.formBuilder.control(undefined, {
+        validators: [Validators.required, requireMatch],
+      }),
+    });
 
-  eventGroup: FormGroup<MeReservationEventForm> = this.formBuilder.group<MeReservationEventForm>({
-    event: this.formBuilder.control(undefined, {
-      validators: [Validators.required],
-    }),
-  });
+  eventGroup: FormGroup<MeReservationEventForm> =
+    this.formBuilder.group<MeReservationEventForm>({
+      event: this.formBuilder.control(undefined, {
+        validators: [Validators.required],
+      }),
+    });
 
   officeForm: FormGroup<OfficeForm> = this.formBuilder.group<OfficeForm>({
     office: this.formBuilder.control(undefined, {
@@ -259,28 +357,30 @@ export class MeReservationComponent {
     percentage: this.formBuilder.control(undefined),
   });
 
-  acceptForm: FormGroup<MeReservationAcceptForm> = this.formBuilder.group<MeReservationAcceptForm>({
-    accept: this.formBuilder.control(false, {
-      validators: [Validators.required],
-    }),
-    phone: this.formBuilder.control(undefined, {
-      validators: [Validators.required],
-    }),
-  });
+  acceptForm: FormGroup<MeReservationAcceptForm> =
+    this.formBuilder.group<MeReservationAcceptForm>({
+      accept: this.formBuilder.control(false, {
+        validators: [Validators.required],
+      }),
+      phone: this.formBuilder.control(undefined, {
+        validators: [Validators.required],
+      }),
+    });
 
-  form: FormGroup<MeReservationForms> = this.formBuilder.group<MeReservationForms>({
-    officeForm: this.officeForm,
-    treatmentForm: this.treatmentForm,
-    eventGroup: this.eventGroup,
-    typeForm: this.typeForm,
-    acceptForm: this.acceptForm,
-  });
+  form: FormGroup<MeReservationForms> =
+    this.formBuilder.group<MeReservationForms>({
+      officeForm: this.officeForm,
+      treatmentForm: this.treatmentForm,
+      eventGroup: this.eventGroup,
+      typeForm: this.typeForm,
+      acceptForm: this.acceptForm,
+    });
 
   groups = signal<IGroupService[] | undefined>(undefined);
   filteredGroupSignal = toSignal(
     this.getTreatmentForm.group.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.groups)),
       map(([name, groups]) => {
         if (name) {
@@ -296,7 +396,7 @@ export class MeReservationComponent {
   filteredTreatmentSignal = toSignal(
     this.getTreatmentForm.treatment.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.treatmentList)),
       map(([name, treatmentList]) => {
         if (name) {
@@ -312,7 +412,9 @@ export class MeReservationComponent {
   filteredRoomSignal = toSignal(
     this.getOfficeForm.room.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.address?.name),
+      map((value) =>
+        typeof value === 'string' ? value : value?.address?.name,
+      ),
       combineLatestWith(toObservable(this.roomList)),
       map(([name, rooms]) => {
         if (name) {
@@ -320,14 +422,17 @@ export class MeReservationComponent {
         } else {
           return rooms ? rooms.slice() : rooms;
         }
-      })),
+      }),
+    ),
   );
 
-  offices = computed(() => Array.from(createRoomOffice(this.rooms())?.values() || []));
+  offices = computed(() =>
+    Array.from(createRoomOffice(this.rooms())?.values() || []),
+  );
   filteredOfficeSignal = toSignal(
     this.getOfficeForm.office.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.offices)),
       map(([name, offices]) => {
         if (name) {
@@ -335,14 +440,15 @@ export class MeReservationComponent {
         } else {
           return offices ? offices.slice() : offices;
         }
-      })),
+      }),
+    ),
   );
 
   professionalList = signal<IUserAll[] | undefined>(undefined);
   filteredProfessionalSignal = toSignal(
     this.getOfficeForm.professional.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.displayName),
+      map((value) => (typeof value === 'string' ? value : value?.displayName)),
       combineLatestWith(toObservable(this.professionalList)),
       map(([name, professionals]) => {
         if (name) {
@@ -350,7 +456,8 @@ export class MeReservationComponent {
         } else {
           return professionals ? professionals.slice() : professionals;
         }
-      })),
+      }),
+    ),
   );
 
   discounts = computed(() =>
@@ -358,24 +465,30 @@ export class MeReservationComponent {
       let title = ud.discountCustomer.name;
       switch (ud.discountCustomer.type) {
         case DiscountType.money:
-          title =
-            `${ currencySymbol(ud.discountCustomer.discount?.currency) } ${ ud.discountCustomer.amount } ${ title }`;
+          title = `${currencySymbol(ud.discountCustomer.discount?.currency)} ${ud.discountCustomer.amount} ${title}`;
           break;
         case DiscountType.percentage:
-          title = `${ ud.discountCustomer.amount } % ${ title }`;
+          title = `${ud.discountCustomer.amount} % ${title}`;
           break;
       }
       return Object.assign({}, ud, { title });
-    }));
+    }),
+  );
   showDiscount = false;
   price = signal<IPrice>(new Price());
   oldPrice?: IPrice;
 
   private selectOfficeSignal = toSignal(this.getOfficeForm.office.valueChanges);
   private selectRoomSignal = toSignal(this.getOfficeForm.room.valueChanges);
-  private selectGroupSignal = toSignal(this.getTreatmentForm.group.valueChanges);
-  private selectTreatmentSignal = toSignal(this.getTreatmentForm.treatment.valueChanges);
-  private selectDiscountSignal = toSignal(this.getTreatmentForm.discount.valueChanges);
+  private selectGroupSignal = toSignal(
+    this.getTreatmentForm.group.valueChanges,
+  );
+  private selectTreatmentSignal = toSignal(
+    this.getTreatmentForm.treatment.valueChanges,
+  );
+  private selectDiscountSignal = toSignal(
+    this.getTreatmentForm.discount.valueChanges,
+  );
 
   private reservation?: IUpcomingAll;
   private measure = 'long';
@@ -407,16 +520,19 @@ export class MeReservationComponent {
       if (startDate) {
         map.set(createNewDate(startDate).toString(), []);
       }
-      availableList.reduce((group: Map<string, AvailabilityData[]>, item: IAvailableDTO) => {
-        const date = newDateTimestamp(item.dateTime);
-        const key = createNewDate(date).toString();
+      availableList.reduce(
+        (group: Map<string, AvailabilityData[]>, item: IAvailableDTO) => {
+          const date = newDateTimestamp(item.dateTime);
+          const key = createNewDate(date).toString();
 
-        let dates: any = group.get(key) || [];
-        dates = [...dates, { time: getTime(date, this.language), date }];
-        group.set(key, dates);
+          let dates: any = group.get(key) || [];
+          dates = [...dates, { time: getTime(date, this.language), date }];
+          group.set(key, dates);
 
-        return group;
-      }, map);
+          return group;
+        },
+        map,
+      );
       return map;
     }
     return new Map<string, AvailabilityData[]>();
@@ -432,7 +548,11 @@ export class MeReservationComponent {
   balance = 0;
   distance?: string;
   minDate: Date = getNowTimeZone();
-  maxDate: Date = plusMonthDate(this.minDate, this.reservationMonths, this.minDate.getDate() + 1);
+  maxDate: Date = plusMonthDate(
+    this.minDate,
+    this.reservationMonths,
+    this.minDate.getDate() + 1,
+  );
   maxDateFormat: string = formatDateTwoDigit(this.maxDate, this.language);
   date?: Date;
   endDate?: Date;
@@ -448,7 +568,14 @@ export class MeReservationComponent {
     const preview = new Step(5, 'preview', () => this.create());
     const payment = new Step(4, 'payment', () => this.callStepSix, preview);
     const book = new Step(3, 'book_online', () => this.callStepFive, payment);
-    const additional = new Step(2, 'post_add', () => this.callStepFour, book, true, false);
+    const additional = new Step(
+      2,
+      'post_add',
+      () => this.callStepFour,
+      book,
+      true,
+      false,
+    );
     const treatment = new Step(1, 'spa', () => this.callStepThree, additional);
     const room = new Step(0, 'room', () => this.callStepTwo, treatment);
     this.steps = [room, treatment, additional, book, payment, preview];
@@ -472,14 +599,14 @@ export class MeReservationComponent {
       if (reservationId) {
         this.firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Edit customer reservation ${ reservationId }`,
+          firebase_screen: `Edit customer reservation ${reservationId}`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MeReservationComponent',
         });
         this.reservationId = reservationId;
         this.isEditing = true;
         this.activeStepIndex.set(1);
-        this.steps = this.steps.map(value => {
+        this.steps = this.steps.map((value) => {
           switch (value.order) {
             case 0:
               value.enable = false;
@@ -500,7 +627,9 @@ export class MeReservationComponent {
       }
       this.roomList.set(office.rooms);
       const room = getList(office.rooms, this.roomId);
-      this.getOfficeForm.room.setValue(room, { emitEvent: !this.hydratingEdit });
+      this.getOfficeForm.room.setValue(room, {
+        emitEvent: !this.hydratingEdit,
+      });
     });
 
     effect(() => {
@@ -510,19 +639,35 @@ export class MeReservationComponent {
         if (!this.dismiss && !isSameTimeZone(room.timeZone)) {
           const now = getNowTimeZone();
           const localDate = localeTimeZoneDate(this.language, now);
-          const timeZoneDate = localeTimeZoneDate(this.language, now, room.timeZone);
-          const warning = this.translateService.instant('COMMON.TIME_ZONE.WARNING');
-          const localDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.LOCAL', { date: localDate });
-          const roomDateLabel = this.translateService.instant('COMMON.TIME_ZONE.DATE.ROOM', { date: timeZoneDate });
-          const message = `${ warning } - ${ localDateLabel } / ${ roomDateLabel }`;
-          const toastRef = this.toastService.show(message, 'warning', 0, { actionType: 'button' });
+          const timeZoneDate = localeTimeZoneDate(
+            this.language,
+            now,
+            room.timeZone,
+          );
+          const warning = this.translateService.instant(
+            'COMMON.TIME_ZONE.WARNING',
+          );
+          const localDateLabel = this.translateService.instant(
+            'COMMON.TIME_ZONE.DATE.LOCAL',
+            { date: localDate },
+          );
+          const roomDateLabel = this.translateService.instant(
+            'COMMON.TIME_ZONE.DATE.ROOM',
+            { date: timeZoneDate },
+          );
+          const message = `${warning} - ${localDateLabel} / ${roomDateLabel}`;
+          const toastRef = this.toastService.show(message, 'warning', 0, {
+            actionType: 'button',
+          });
           toastRef.onAction().subscribe(() => {
             this.dismiss = true;
           });
         }
         this.professionalList.set(room.professionals);
         const professional = getList(room.professionals, this.professionalId);
-        this.getOfficeForm.professional.setValue(professional, { emitEvent: !this.hydratingEdit });
+        this.getOfficeForm.professional.setValue(professional, {
+          emitEvent: !this.hydratingEdit,
+        });
         this.professionalId = professional?.id;
       }
       if (this.hydratingEdit) {
@@ -542,7 +687,9 @@ export class MeReservationComponent {
       }
       this.treatmentList.set(group.treatments);
       const treatment = getList(group.treatments, this.treatmentId);
-      this.getTreatmentForm.treatment.setValue(treatment, { emitEvent: !this.hydratingEdit });
+      this.getTreatmentForm.treatment.setValue(treatment, {
+        emitEvent: !this.hydratingEdit,
+      });
     });
 
     effect(() => {
@@ -550,7 +697,9 @@ export class MeReservationComponent {
       this.treatmentId = treatment?.id;
       if (treatment) {
         const currentPrice = untracked(() => this.price());
-        this.setPrice(newPrice(currentPrice, treatment.price, this.treatmentDiscount));
+        this.setPrice(
+          newPrice(currentPrice, treatment.price, this.treatmentDiscount),
+        );
       }
     });
 
@@ -558,7 +707,7 @@ export class MeReservationComponent {
       const discountId = this.selectDiscountSignal();
       const discounts = this.discounts();
       if (discountId && discounts) {
-        const userDiscount = discounts.find(d => d.id === discountId);
+        const userDiscount = discounts.find((d) => d.id === discountId);
         if (userDiscount) {
           this.treatmentDiscount = userDiscount.discountCustomer;
           const currentPrice = untracked(() => this.price());
@@ -577,14 +726,20 @@ export class MeReservationComponent {
         enableStep(this.steps, 'post_add');
         const additionalSelected = this.additionalSelected();
         if (additionalSelected?.length) {
-          const selectIds = additionalSelected?.map(value => value.id);
-          const newList = additionalList.filter(al => selectIds.includes(al.id));
+          const selectIds = additionalSelected?.map((value) => value.id);
+          const newList = additionalList.filter((al) =>
+            selectIds.includes(al.id),
+          );
           if (this.shouldSyncAdditionalSelection(additionalSelected, newList)) {
             this.additionalSelected.set(newList);
             this.syncRenderedAdditionalSelections();
             const currentPrice = untracked(() => this.price());
             this.setPrice(
-              newAdditional(currentPrice, newList, this.reservation?.treatment?.discountCustomer),
+              newAdditional(
+                currentPrice,
+                newList,
+                this.reservation?.treatment?.discountCustomer,
+              ),
             );
           }
         }
@@ -597,24 +752,42 @@ export class MeReservationComponent {
         const room = this.getOfficeForm.room.value || this.reservation?.room;
         if (room) {
           const groups = Array.from(
-            createTreatmentGroupService(new Map<string, IGroupService>(), treatmentDiscount.treatments,
-              room.currency.code).values());
+            createTreatmentGroupService(
+              new Map<string, IGroupService>(),
+              treatmentDiscount.treatments,
+              room.currency.code,
+            ).values(),
+          );
           this.groups.set(groups);
 
           const currentGroupId = this.groupId;
           const currentGroup = currentGroupId
-            ? groups.find(group => group.id === currentGroupId)
-            : groups.find(group => group.treatments.some(treatment => treatment.id === this.treatmentId));
+            ? groups.find((group) => group.id === currentGroupId)
+            : groups.find((group) =>
+                group.treatments.some(
+                  (treatment) => treatment.id === this.treatmentId,
+                ),
+              );
 
           if (currentGroup) {
             this.treatmentList.set(currentGroup.treatments);
             if (this.getTreatmentForm.group.value?.id !== currentGroup.id) {
-              this.getTreatmentForm.group.setValue(currentGroup, { emitEvent: !this.hydratingEdit });
+              this.getTreatmentForm.group.setValue(currentGroup, {
+                emitEvent: !this.hydratingEdit,
+              });
             }
 
-            const currentTreatment = getList(currentGroup.treatments, this.treatmentId);
-            if (currentTreatment && this.getTreatmentForm.treatment.value?.id !== currentTreatment.id) {
-              this.getTreatmentForm.treatment.setValue(currentTreatment, { emitEvent: !this.hydratingEdit });
+            const currentTreatment = getList(
+              currentGroup.treatments,
+              this.treatmentId,
+            );
+            if (
+              currentTreatment &&
+              this.getTreatmentForm.treatment.value?.id !== currentTreatment.id
+            ) {
+              this.getTreatmentForm.treatment.setValue(currentTreatment, {
+                emitEvent: !this.hydratingEdit,
+              });
             }
           }
         }
@@ -625,7 +798,12 @@ export class MeReservationComponent {
       const groups = this.groups();
       if (groups && this.treatmentId && !this.getTreatmentForm.group.value) {
         this.getTreatmentForm.group.setValue(
-          groups?.find(group => group.treatments?.find(p => p.id === this.treatmentId) ? group : undefined));
+          groups?.find((group) =>
+            group.treatments?.find((p) => p.id === this.treatmentId)
+              ? group
+              : undefined,
+          ),
+        );
         if (this.reservation) {
           this.datePicker?.open();
         }
@@ -648,7 +826,9 @@ export class MeReservationComponent {
         }
         this.hydratedReservationKey = reservationKey;
         if (reservation.paymentRequired) {
-          const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.PAYMENT');
+          const message = this.translateService.instant(
+            'ME.RESERVATION.UPCOMING.ERROR.PAYMENT',
+          );
           this.canNotContinue(message, 'update');
         } else {
           this.setData(reservation);
@@ -663,17 +843,28 @@ export class MeReservationComponent {
 
     effect(() => {
       const customerReservation = this.customerReservationSignal();
-      if (customerReservation?.upcoming && customerReservation.upcoming.length >=
-        MAX_UPCOMING_RESERVATION) {
-        const dates = customerReservation.upcoming.map((upcoming: IReservationAll) => formatFullDateTime(
-          newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone), this.language));
-        const message = this.translateService.instant('ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
-          { date1: dates[0], date2: dates[1], date3: dates[2] });
+      if (
+        customerReservation?.upcoming &&
+        customerReservation.upcoming.length >= MAX_UPCOMING_RESERVATION
+      ) {
+        const dates = customerReservation.upcoming.map(
+          (upcoming: IReservationAll) =>
+            formatFullDateTime(
+              newDateTimestamp(upcoming.timestamp, upcoming.room.timeZone),
+              this.language,
+            ),
+        );
+        const message = this.translateService.instant(
+          'ME.RESERVATION.UPCOMING.ERROR.CUSTOMER',
+          { date1: dates[0], date2: dates[1], date3: dates[2] },
+        );
         this.canNotContinue(message, 'create');
       } else {
         this.canCreate = true;
         this.applyCustomerBalance(customerReservation?.balance);
-        this.getAcceptForm.phone.setValue(customerReservation?.phone || this.reservation?.customer?.phone);
+        this.getAcceptForm.phone.setValue(
+          customerReservation?.phone || this.reservation?.customer?.phone,
+        );
         if (customerReservation?.isFirstTime) {
           this.firstTime = true;
           this.getTypeForm.option.setValidators([Validators.required]);
@@ -724,7 +915,9 @@ export class MeReservationComponent {
   }
 
   get room() {
-    return this.getOfficeForm.room.value || this.selectedReservationSignal()?.room;
+    return (
+      this.getOfficeForm.room.value || this.selectedReservationSignal()?.room
+    );
   }
 
   get summaryRoom() {
@@ -732,11 +925,17 @@ export class MeReservationComponent {
   }
 
   get summaryProfessional() {
-    return this.getOfficeForm.professional.value || this.selectedReservationSignal()?.professional;
+    return (
+      this.getOfficeForm.professional.value ||
+      this.selectedReservationSignal()?.professional
+    );
   }
 
   get summaryTreatment() {
-    return this.getTreatmentForm.treatment.value || this.selectedReservationSignal()?.treatment;
+    return (
+      this.getTreatmentForm.treatment.value ||
+      this.selectedReservationSignal()?.treatment
+    );
   }
 
   get treatment() {
@@ -756,8 +955,11 @@ export class MeReservationComponent {
   }
 
   get hasDiscountApplied(): boolean {
-    return !!this.getTreatmentForm.discount.value ||
-      this.price().total !== this.price().totalWithoutDiscount || this.price().discount > 0;
+    return (
+      !!this.getTreatmentForm.discount.value ||
+      this.price().total !== this.price().totalWithoutDiscount ||
+      this.price().discount > 0
+    );
   }
 
   get selectedTreatmentPrice(): number {
@@ -765,7 +967,10 @@ export class MeReservationComponent {
   }
 
   get selectedAdditionalTotal(): number {
-    return this.additionalSelected().reduce((total, additional) => total + Number(additional.price || 0), 0);
+    return this.additionalSelected().reduce(
+      (total, additional) => total + Number(additional.price || 0),
+      0,
+    );
   }
 
   get effectiveDiscountAmount(): number {
@@ -773,7 +978,8 @@ export class MeReservationComponent {
   }
 
   get effectiveTotalWithoutDiscount(): number {
-    const fallbackTotal = this.selectedTreatmentPrice + this.selectedAdditionalTotal;
+    const fallbackTotal =
+      this.selectedTreatmentPrice + this.selectedAdditionalTotal;
     return this.price().totalWithoutDiscount === 0 && fallbackTotal > 0
       ? fallbackTotal
       : this.price().totalWithoutDiscount;
@@ -782,7 +988,10 @@ export class MeReservationComponent {
   get effectiveTreatmentDisplayPrice(): number {
     if (this.hasDiscountApplied && this.effectiveDiscountAmount > 0) {
       const discountedPrice = this.price().priceWithDiscount;
-      return discountedPrice || Math.max(this.selectedTreatmentPrice - this.effectiveDiscountAmount, 0);
+      return (
+        discountedPrice ||
+        Math.max(this.selectedTreatmentPrice - this.effectiveDiscountAmount, 0)
+      );
     }
 
     return this.selectedTreatmentPrice;
@@ -790,7 +999,10 @@ export class MeReservationComponent {
 
   get effectiveTotalPrice(): number {
     if (this.price().total === 0 && this.effectiveTotalWithoutDiscount > 0) {
-      return Math.max(this.effectiveTotalWithoutDiscount - this.effectiveDiscountAmount, 0);
+      return Math.max(
+        this.effectiveTotalWithoutDiscount - this.effectiveDiscountAmount,
+        0,
+      );
     }
 
     return this.price().total;
@@ -805,7 +1017,11 @@ export class MeReservationComponent {
   }
 
   get appointmentStart(): Date | undefined {
-    return this.getEventForm.event.value || this.getTreatmentForm.startDate.value || this.date;
+    return (
+      this.getEventForm.event.value ||
+      this.getTreatmentForm.startDate.value ||
+      this.date
+    );
   }
 
   get appointmentEnd(): Date | undefined {
@@ -819,8 +1035,15 @@ export class MeReservationComponent {
       return undefined;
     }
 
-    const duration = totalDuration(treatment, this.additionalSelected()).duration;
-    return createNewDate(start, start.getHours() + duration.hour, start.getMinutes() + duration.minute);
+    const duration = totalDuration(
+      treatment,
+      this.additionalSelected(),
+    ).duration;
+    return createNewDate(
+      start,
+      start.getHours() + duration.hour,
+      start.getMinutes() + duration.minute,
+    );
   }
 
   private get getForm(): MeReservationForms {
@@ -856,7 +1079,9 @@ export class MeReservationComponent {
 
     const covered = this.oldPrice.totalPaid + this.oldPrice.balance;
     const amount = this.showPenalty
-      ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price().total : this.oldPrice.penalty)
+      ? this.hasReservationChanges
+        ? this.oldPrice.penalty + this.price().total
+        : this.oldPrice.penalty
       : this.price().total;
     return Math.max(amount - covered, 0);
   }
@@ -872,7 +1097,9 @@ export class MeReservationComponent {
       return 0;
     }
 
-    const amount = this.showPenalty ? this.oldPrice.penalty + this.price().total : this.price().total;
+    const amount = this.showPenalty
+      ? this.oldPrice.penalty + this.price().total
+      : this.price().total;
     const covered = this.oldPrice.totalPaid + this.accountBalanceUsed;
     return Math.max(covered - amount, 0);
   }
@@ -882,13 +1109,18 @@ export class MeReservationComponent {
       const totalPaid = this.oldPrice.totalPaid;
       const balance = this.oldPrice.balance || this.balance || 0;
       const amount = this.showPenalty
-        ? (this.hasReservationChanges ? this.oldPrice.penalty + this.price().total : this.oldPrice.penalty)
+        ? this.hasReservationChanges
+          ? this.oldPrice.penalty + this.price().total
+          : this.oldPrice.penalty
         : this.price().total;
       return Math.min(balance, Math.max(amount - totalPaid, 0));
     }
 
     const balance = this.price().balance || this.balance || 0;
-    return Math.min(balance, Math.max(this.price().total - this.price().totalPaid, 0));
+    return Math.min(
+      balance,
+      Math.max(this.price().total - this.price().totalPaid, 0),
+    );
   }
 
   get hasReservationChanges(): boolean {
@@ -900,17 +1132,29 @@ export class MeReservationComponent {
     const professionalId = this.getOfficeForm.professional.value?.id;
     const treatmentId = this.getTreatmentForm.treatment.value?.id;
     const event = this.getEventForm.event.value;
-    const reservationDate = newDateTimestamp(this.reservation.timestamp, this.reservation.room.timeZone);
-    const currentAdditionalIds = this.additionalSelected().map(item => item.id).sort();
-    const reservationAdditionalIds = (this.reservation.additional ?? []).map(item => item.id ?? item.key).sort();
-    const reservationTreatmentId = this.reservation.treatment.id ?? this.reservation.treatment.key;
+    const reservationDate = newDateTimestamp(
+      this.reservation.timestamp,
+      this.reservation.room.timeZone,
+    );
+    const currentAdditionalIds = this.additionalSelected()
+      .map((item) => item.id)
+      .sort();
+    const reservationAdditionalIds = (this.reservation.additional ?? [])
+      .map((item) => item.id ?? item.key)
+      .sort();
+    const reservationTreatmentId =
+      this.reservation.treatment.id ?? this.reservation.treatment.key;
 
-    return roomId !== this.reservation.room.id ||
+    return (
+      roomId !== this.reservation.room.id ||
       professionalId !== this.reservation.professional.id ||
       treatmentId !== reservationTreatmentId ||
-      !!event && !isEqual(event, reservationDate) ||
+      (!!event && !isEqual(event, reservationDate)) ||
       currentAdditionalIds.length !== reservationAdditionalIds.length ||
-      currentAdditionalIds.some((id, index) => id !== reservationAdditionalIds[index]);
+      currentAdditionalIds.some(
+        (id, index) => id !== reservationAdditionalIds[index],
+      )
+    );
   }
 
   back(): void {
@@ -936,7 +1180,8 @@ export class MeReservationComponent {
     const option = this.getTypeForm.option?.value;
     let payment = undefined;
     if (option && option.type.toLowerCase() !== 'account') {
-      const percentage = this.getTypeForm.percentage?.value || PaymentPercentage.total;
+      const percentage =
+        this.getTypeForm.percentage?.value || PaymentPercentage.total;
 
       payment = { type: option.type, percentage };
     }
@@ -944,7 +1189,7 @@ export class MeReservationComponent {
       this.getForm,
       this.customerId(),
       this.date,
-      this.additionalSelected()?.map(value => value.id),
+      this.additionalSelected()?.map((value) => value.id),
       payment,
       this.isEditing ? this.reservation : undefined,
     );
@@ -993,14 +1238,18 @@ export class MeReservationComponent {
     }
     const additionalSelected = this.additionalSelected();
     const duration = totalDuration(treatment, additionalSelected);
-    this.totalDurationFormatted = formatTime(duration.duration, room.timeZone, this.language);
+    this.totalDurationFormatted = formatTime(
+      duration.duration,
+      room.timeZone,
+      this.language,
+    );
 
     this.reservationStore.loadAvailability(
       room.id,
       treatment.id,
       startDate,
       professional.id,
-      additionalSelected?.map(additional => additional.id),
+      additionalSelected?.map((additional) => additional.id),
     );
     if (goNext) {
       this.completeAndGoToNextStep(2);
@@ -1009,12 +1258,15 @@ export class MeReservationComponent {
 
   callStepFive = (goNext: boolean): void => {
     if (this.eventGroup.invalid) {
-      this.errors.update(prev => ({ ...prev, schedule: true }));
+      this.errors.update((prev) => ({ ...prev, schedule: true }));
     }
 
     this.date = newDate(this.getEventForm.event.value!);
-    this.endDate = createNewDate(this.date, this.date.getHours() + this.duration.hour,
-      this.date.getMinutes() + this.duration.minute);
+    this.endDate = createNewDate(
+      this.date,
+      this.date.getHours() + this.duration.hour,
+      this.date.getMinutes() + this.duration.minute,
+    );
 
     const requiresPayment = this.paymentToPay > 0 || this.paymentCredit > 0;
     const paymentIndex = getIndex(this.steps, 'payment');
@@ -1057,7 +1309,7 @@ export class MeReservationComponent {
   };
 
   private completeStep = (index: number): void => {
-    const step = this.steps.find(value => value.order === index);
+    const step = this.steps.find((value) => value.order === index);
     if (!step) {
       return;
     }
@@ -1065,7 +1317,7 @@ export class MeReservationComponent {
     this.steps[step.order] = step;
     this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
-      firebase_screen: `Customer reservation. Step: ${ step.name }`,
+      firebase_screen: `Customer reservation. Step: ${step.name}`,
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'MeReservationComponent',
     });
@@ -1079,7 +1331,9 @@ export class MeReservationComponent {
     }
   };
 
-  private getNextEnabledStepIndex = (currentIndex: number): number | undefined => {
+  private getNextEnabledStepIndex = (
+    currentIndex: number,
+  ): number | undefined => {
     for (const step of this.steps.slice(currentIndex + 1)) {
       if (step.enable) {
         return step.order;
@@ -1088,25 +1342,39 @@ export class MeReservationComponent {
     return undefined;
   };
 
-  openDialog = (reservationDate?: Date): void => openDialog(
-    this.room!, this.language, this.translateService, this.dialog, reservationDate,
-  );
+  openDialog = (reservationDate?: Date): void =>
+    openDialog(
+      this.room!,
+      this.language,
+      this.translateService,
+      this.dialog,
+      reservationDate,
+    );
 
-  myFilter = (d: Date | null): boolean => filterDateRoom(d, this.getOfficeForm.room.value);
+  myFilter = (d: Date | null): boolean =>
+    filterDateRoom(d, this.getOfficeForm.room.value);
 
-  displayFnGroup = (group: ITreatmentGroup): string => group ? `${ group.name }` : '';
+  displayFnGroup = (group: ITreatmentGroup): string =>
+    group ? `${group.name}` : '';
 
-  displayFnTreatment = (treatment: ITreatment): string => treatment ? `${ treatment.name }` : '';
+  displayFnTreatment = (treatment: ITreatment): string =>
+    treatment ? `${treatment.name}` : '';
 
-  displayFnOffice = (office: IOffice): string => office ? `${ office.name }` : '';
+  displayFnOffice = (office: IOffice): string =>
+    office ? `${office.name}` : '';
 
-  displayFnRoom = (room: IRoom): string => room.address ? room.address.name : '';
+  displayFnRoom = (room: IRoom): string =>
+    room.address ? room.address.name : '';
 
-  displayFnProfessional = (professional: IUser): string => professional?.displayName ? professional.displayName : '';
+  displayFnProfessional = (professional: IUser): string =>
+    professional?.displayName ? professional.displayName : '';
 
-  dateNoContent = (date?: Date): string => formatDateName(
-    createNewDate(date ? date : this.getTreatmentForm.startDate.value!), this.language, this.measure,
-  );
+  dateNoContent = (date?: Date): string =>
+    formatDateName(
+      createNewDate(date ? date : this.getTreatmentForm.startDate.value!),
+      this.language,
+      this.measure,
+    );
 
   selectDate = (datetime: AvailabilityData): void => {
     this.getEventForm.event.setValue(datetime.date);
@@ -1116,31 +1384,42 @@ export class MeReservationComponent {
   areEquals = (datetime: AvailabilityData): boolean => {
     let result = false;
     if (this.getEventForm.event.value) {
-      result = isEqual(this.getEventForm.event.value, datetime.date) && this.time === datetime.time;
+      result =
+        isEqual(this.getEventForm.event.value, datetime.date) &&
+        this.time === datetime.time;
     }
     return result;
   };
 
-  sortDate = (a: { key: string }, b: { key: string }): number => newDate(a.key).getTime() - newDate(b.key).getTime();
+  sortDate = (a: { key: string }, b: { key: string }): number =>
+    newDate(a.key).getTime() - newDate(b.key).getTime();
 
   formatKey = (key: string): string => {
     const date = newDate(key);
-    const formattedDate = this.smallScreen() ? formatDateTwoDigit(date, this.language)
+    const formattedDate = this.smallScreen()
+      ? formatDateTwoDigit(date, this.language)
       : formatDateName(date, this.language, this.measure);
 
     return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
   };
 
-  sortTime = (data: AvailabilityData[]): AvailabilityData[] => data.sort(
-    (a: AvailabilityData, b: AvailabilityData) => newDate(a.date).getTime() -
-      newDate(b.date).getTime());
+  sortTime = (data: AvailabilityData[]): AvailabilityData[] =>
+    data.sort(
+      (a: AvailabilityData, b: AvailabilityData) =>
+        newDate(a.date).getTime() - newDate(b.date).getTime(),
+    );
 
   setDistance = ($event: number): void => {
-    this.distance = $event > 999 ?
-      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
-        { distance: round($event / 1000) }) :
-      this.translateService.instant('ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
-        { distance: round($event) });
+    this.distance =
+      $event > 999
+        ? this.translateService.instant(
+            'ME.RESERVATION.ROOM.ADDRESS.DISTANCE.KM',
+            { distance: round($event / 1000) },
+          )
+        : this.translateService.instant(
+            'ME.RESERVATION.ROOM.ADDRESS.DISTANCE.M',
+            { distance: round($event) },
+          );
   };
 
   keyDownHandler = (event: KeyboardEvent, form: FormControl): void => {
@@ -1163,23 +1442,36 @@ export class MeReservationComponent {
 
   onChange = (list: MatSelectionList): void => {
     Promise.resolve().then(() => {
-      const additionalSelected = list.selectedOptions.selected.map(option => option.value as IAdditionalAll);
-      const currentIds = this.additionalSelected().map(item => item.id).sort();
-      const nextIds = additionalSelected.map(item => item.id).sort();
+      const additionalSelected = list.selectedOptions.selected.map(
+        (option) => option.value as IAdditionalAll,
+      );
+      const currentIds = this.additionalSelected()
+        .map((item) => item.id)
+        .sort();
+      const nextIds = additionalSelected.map((item) => item.id).sort();
 
-      if (currentIds.length === nextIds.length && currentIds.every((id, index) => id === nextIds[index])) {
+      if (
+        currentIds.length === nextIds.length &&
+        currentIds.every((id, index) => id === nextIds[index])
+      ) {
         return;
       }
 
       this.additionalSelected.set(additionalSelected);
       this.syncRenderedAdditionalSelections();
-      this.setPrice(newAdditional(this.price(), additionalSelected, this.treatmentDiscount));
+      this.setPrice(
+        newAdditional(this.price(), additionalSelected, this.treatmentDiscount),
+      );
     });
   };
 
-  isSelected = (it: IAdditionalAll): boolean => this.additionalSelected().filter(el => el.id === it.id).length > 0;
+  isSelected = (it: IAdditionalAll): boolean =>
+    this.additionalSelected().filter((el) => el.id === it.id).length > 0;
 
-  compareAdditional = (first?: IAdditionalAll, second?: IAdditionalAll): boolean => first?.id === second?.id;
+  compareAdditional = (
+    first?: IAdditionalAll,
+    second?: IAdditionalAll,
+  ): boolean => first?.id === second?.id;
 
   getPercentage = (percentage: number): void => {
     this.setPrice(newPercentage(this.price(), percentage));
@@ -1189,21 +1481,31 @@ export class MeReservationComponent {
     this.treatmentStore.getAllTreatments(roomId);
   };
 
-  private shouldSyncAdditionalSelection = (current: IAdditionalAll[], next: IAdditionalAll[]): boolean => {
+  private shouldSyncAdditionalSelection = (
+    current: IAdditionalAll[],
+    next: IAdditionalAll[],
+  ): boolean => {
     if (current.length !== next.length) {
       return true;
     }
 
-    return next.some((item, index) => current[index]?.id !== item.id || current[index] !== item);
+    return next.some(
+      (item, index) =>
+        current[index]?.id !== item.id || current[index] !== item,
+    );
   };
 
   private syncRenderedAdditionalSelections = (): void => {
     queueMicrotask(() => {
-      const selectedIds = new Set(this.additionalSelected().map(item => item.id));
-      this.additionalLists().forEach(list => {
+      const selectedIds = new Set(
+        this.additionalSelected().map((item) => item.id),
+      );
+      this.additionalLists().forEach((list) => {
         list.options.forEach((option: MatListOption) => {
           const additionalId = (option.value as IAdditionalAll | undefined)?.id;
-          option.selected = additionalId ? selectedIds.has(additionalId) : false;
+          option.selected = additionalId
+            ? selectedIds.has(additionalId)
+            : false;
         });
       });
     });
@@ -1218,7 +1520,7 @@ export class MeReservationComponent {
   private canNotContinue = (message: string, type: string): void => {
     this.firebaseService.logEvent('screen_view', {
       // eslint-disable-next-line camelcase
-      firebase_screen: `Customer cannot ${ type } a reservation`,
+      firebase_screen: `Customer cannot ${type} a reservation`,
       // eslint-disable-next-line camelcase
       firebase_screen_class: 'MeReservationComponent',
     });
@@ -1236,40 +1538,71 @@ export class MeReservationComponent {
     if (!date) {
       return;
     }
-    new Map([...this.availableList().entries()]
-      .sort((a: any, b: any) => this.sortDate({ key: a[0] }, { key: b[0] })))
-      .forEach((_value, key) => {
-        if (isEqual(date, newDate(key))) {
-          this.selectedIndex = i;
-        }
-        i++;
-      });
+    new Map(
+      [...this.availableList().entries()].sort((a: any, b: any) =>
+        this.sortDate({ key: a[0] }, { key: b[0] }),
+      ),
+    ).forEach((_value, key) => {
+      if (isEqual(date, newDate(key))) {
+        this.selectedIndex = i;
+      }
+      i++;
+    });
   };
 
-  private filterGroup = (name: string, groups?: IGroupService[]): IGroupService[] | undefined => groups?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterGroup = (
+    name: string,
+    groups?: IGroupService[],
+  ): IGroupService[] | undefined =>
+    groups?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
-  private filterTreatment = (name: string, treatmentList?: IService[]): IService[] | undefined => treatmentList?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterTreatment = (
+    name: string,
+    treatmentList?: IService[],
+  ): IService[] | undefined =>
+    treatmentList?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
-  private filterOffice = (name: string, offices?: IOfficeAll[]): IOfficeAll[] | undefined => offices?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterOffice = (
+    name: string,
+    offices?: IOfficeAll[],
+  ): IOfficeAll[] | undefined =>
+    offices?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
-  private filterRoom = (addressName: string, roomList?: IRoomAll[]): IRoomAll[] | undefined => roomList?.filter(
-    option => option.address?.name?.toLowerCase().indexOf(addressName.toLowerCase()) === 0);
+  private filterRoom = (
+    addressName: string,
+    roomList?: IRoomAll[],
+  ): IRoomAll[] | undefined =>
+    roomList?.filter(
+      (option) =>
+        option.address?.name
+          ?.toLowerCase()
+          .indexOf(addressName.toLowerCase()) === 0,
+    );
 
   private filterProfessional = (
     name: string,
     professionalList?: IUserAll[],
-  ): IUserAll[] | undefined => professionalList?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  ): IUserAll[] | undefined =>
+    professionalList?.filter(
+      (option) =>
+        option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
   private setData = (reservation: IUpcomingAll): void => {
     this.hydratingEdit = true;
     this.treatmentDiscount = reservation.treatment.discountCustomer;
     this.reservation = reservation;
     this.isPreview = false;
-    const date = newDateTimestamp(reservation.timestamp, this.reservation.room.timeZone);
+    const date = newDateTimestamp(
+      reservation.timestamp,
+      this.reservation.room.timeZone,
+    );
     this.groupId = reservation.treatment.groupId;
     this.treatmentId = reservation.treatment.key;
     this.roomId = reservation.room.id;
@@ -1278,15 +1611,26 @@ export class MeReservationComponent {
     this.professionalList.set(reservation.room.professionals);
     this.getEventForm.event.setValue(date, { emitEvent: false });
     this.time = getTime(date, this.language);
-    this.getOfficeForm.office.setValue(reservation.room.office, { emitEvent: false });
+    this.getOfficeForm.office.setValue(reservation.room.office, {
+      emitEvent: false,
+    });
     this.getOfficeForm.room.setValue(reservation.room, { emitEvent: false });
-    this.getOfficeForm.professional.setValue(reservation.professional, { emitEvent: false });
+    this.getOfficeForm.professional.setValue(reservation.professional, {
+      emitEvent: false,
+    });
     this.getTreatmentForm.startDate.setValue(date, { emitEvent: false });
-    this.getTreatmentForm.treatment.setValue(reservation.treatment, { emitEvent: false });
+    this.getTreatmentForm.treatment.setValue(reservation.treatment, {
+      emitEvent: false,
+    });
     this.setPrice(getPrice(this.reservation, this.reservation?.payments));
     this.applyCustomerBalance(this.balance);
-    this.additionalSelected.set(this.reservation.additional ? this.reservation.additional
-      .map(ad => Object.assign({}, ad, { id: ad.key })) : []);
+    this.additionalSelected.set(
+      this.reservation.additional
+        ? this.reservation.additional.map((ad) =>
+            Object.assign({}, ad, { id: ad.key }),
+          )
+        : [],
+    );
     this.syncRenderedAdditionalSelections();
     if (this.isEditing) {
       this.oldPrice = this.price();
@@ -1311,16 +1655,19 @@ export class MeReservationComponent {
     });
   };
 
-  private getReservationHydrationKey = (reservation: IUpcomingAll): string => [
-    reservation.id,
-    reservation.timestamp,
-    reservation.room.id,
-    reservation.professional.id,
-    reservation.treatment.id ?? reservation.treatment.key,
-    (reservation.additional ?? []).map(item => item.id ?? item.key).join(','),
-    reservation.canEdit ? '1' : '0',
-    reservation.paymentRequired ? '1' : '0',
-  ].join('|');
+  private getReservationHydrationKey = (reservation: IUpcomingAll): string =>
+    [
+      reservation.id,
+      reservation.timestamp,
+      reservation.room.id,
+      reservation.professional.id,
+      reservation.treatment.id ?? reservation.treatment.key,
+      (reservation.additional ?? [])
+        .map((item) => item.id ?? item.key)
+        .join(','),
+      reservation.canEdit ? '1' : '0',
+      reservation.paymentRequired ? '1' : '0',
+    ].join('|');
 
   private applyCustomerBalance = (balance?: number): void => {
     this.balance = balance || 0;
@@ -1334,8 +1681,9 @@ export class MeReservationComponent {
   private setTypes = (): void => {
     const options = this.paymentOptions();
     const types = this.getOfficeForm.room.value?.paymentTypes.filter(
-      p => !['cash', 'transfer'].includes(p.toLowerCase()));
-    this.options.set(options.filter(option => types?.includes(option.type)));
+      (p) => !['cash', 'transfer'].includes(p.toLowerCase()),
+    );
+    this.options.set(options.filter((option) => types?.includes(option.type)));
   };
 
   private cleanTreatment = (): void => {
@@ -1361,25 +1709,34 @@ export class MeReservationComponent {
       this.setActiveStep(state.stepIndex);
     }
 
-    state.fields.forEach(field => {
+    state.fields.forEach((field) => {
       if (field in this.getOfficeForm) {
-        this.getOfficeForm[field as keyof OfficeForm]?.setErrors({ incorrect: true });
+        this.getOfficeForm[field as keyof OfficeForm]?.setErrors({
+          incorrect: true,
+        });
       }
       if (field in this.getTreatmentForm) {
-        this.getTreatmentForm[field as keyof MeReservationTreatmentForm]?.setErrors({ incorrect: true });
+        this.getTreatmentForm[
+          field as keyof MeReservationTreatmentForm
+        ]?.setErrors({ incorrect: true });
       }
       if (field in this.getEventForm) {
-        this.getEventForm[field as keyof MeReservationEventForm]?.setErrors({ incorrect: true });
+        this.getEventForm[field as keyof MeReservationEventForm]?.setErrors({
+          incorrect: true,
+        });
       }
       if (field in this.getTypeForm) {
-        this.getTypeForm[field as keyof BankForm]?.setErrors({ incorrect: true });
+        this.getTypeForm[field as keyof BankForm]?.setErrors({
+          incorrect: true,
+        });
       }
       if (field in this.getAcceptForm) {
-        this.getAcceptForm[field as keyof MeReservationAcceptForm]?.setErrors({ incorrect: true });
+        this.getAcceptForm[field as keyof MeReservationAcceptForm]?.setErrors({
+          incorrect: true,
+        });
       }
     });
 
     this.errors.set(state.errors);
   };
-
 }

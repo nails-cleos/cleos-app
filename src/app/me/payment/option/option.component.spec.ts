@@ -1,45 +1,56 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OptionComponent } from './option.component';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { IPaymentOption } from '../../../interfaces/payment';
-import { IReservationAll } from '../../../reservation/reservation';
-import { provideHttpClient } from '@angular/common/http';
-import { NavigationService } from '../../../services/navigation.service';
-import { provideAppIcons } from '../../../util/app-icons.provider';
-import { DEFAULT_LOCALE } from '../../../util/dates';
+import { IPaymentOption } from '@app/interfaces/payment';
+import { IReservationAll } from '@app/reservation/reservation';
+import { provideHttpClient, withXhr } from '@angular/common/http';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideAppIcons } from '@app/util/app-icons.provider';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 import { signal } from '@angular/core';
-import { PaymentStore } from '../../../store/payment.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('OptionComponent', () => {
   let component: OptionComponent;
   let fixture: ComponentFixture<OptionComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let paymentStoreSpy: {
     options: ReturnType<typeof signal>;
     data: ReturnType<typeof signal>;
-    getOptions: jasmine.Spy;
-    getPaymentByResourceId: jasmine.Spy;
-    createPaymentLinkByReservationId: jasmine.Spy;
-    clean: jasmine.Spy;
+    getOptions: Mock;
+    getPaymentByResourceId: Mock;
+    createPaymentLinkByReservationId: Mock;
+    clean: Mock;
   };
 
   let reservationStoreSpy: {
     selected: ReturnType<typeof signal>;
-    loadById: jasmine.Spy;
+    loadById: Mock;
   };
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
 
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     const paymentOptions = [
       {
         type: 'PAYPAL',
@@ -87,29 +98,37 @@ describe('OptionComponent', () => {
     paymentStoreSpy = {
       options: signal(paymentOptions),
       data: signal(undefined),
-      getOptions: jasmine.createSpy('getOptions'),
-      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
-      createPaymentLinkByReservationId: jasmine.createSpy('createPaymentLinkByReservationId'),
-      clean: jasmine.createSpy('clean'),
+      getOptions: vi.fn().mockName('getOptions'),
+      getPaymentByResourceId: vi.fn().mockName('getPaymentByResourceId'),
+      createPaymentLinkByReservationId: vi
+        .fn()
+        .mockName('createPaymentLinkByReservationId'),
+      clean: vi.fn().mockName('clean'),
     };
     reservationStoreSpy = {
       selected: signal(undefined),
-      loadById: jasmine.createSpy('loadById'),
+      loadById: vi.fn().mockName('loadById'),
     };
     breakpoint$ = new BehaviorSubject(undefined);
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [OptionComponent, TranslateModule.forRoot()],
+      imports: [OptionComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
     }).compileComponents();
@@ -126,14 +145,19 @@ describe('OptionComponent', () => {
   it('should dispatch getPaymentByResourceId when reservationId is emitted', () => {
     fixture.componentRef.setInput('id', 'res-123');
     fixture.detectChanges();
-    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('res-123', 'reservation');
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(
+      'res-123',
+      'reservation',
+    );
     expect(reservationStoreSpy.loadById).toHaveBeenCalledWith('res-123');
   });
 
   it('should derive options from the reservation room payment types', () => {
-    const paymentsMock = [{
-      amount: 100,
-    }];
+    const paymentsMock = [
+      {
+        amount: 100,
+      },
+    ];
     const reservation = {
       id: 'res1',
       room: { paymentTypes: ['PAYPAL', 'IDEAL'], currency: { icon: 'euro' } },
@@ -145,17 +169,21 @@ describe('OptionComponent', () => {
     reservationStoreSpy.selected.set(reservation);
     fixture.detectChanges();
 
-    expect(component.options()).toEqual(jasmine.arrayContaining([
-      jasmine.objectContaining({ type: 'PAYPAL' }),
-      jasmine.objectContaining({ type: 'IDEAL' }),
-    ]));
+    expect(component.options()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'PAYPAL' }),
+        expect.objectContaining({ type: 'IDEAL' }),
+      ]),
+    );
     expect(component.reservation()).toEqual(reservation);
   });
 
   it('should keep local options empty when no online payment type is available', () => {
-    const paymentsMock = [{
-      amount: 50,
-    }];
+    const paymentsMock = [
+      {
+        amount: 50,
+      },
+    ];
 
     const reservation = {
       id: 'res2',
@@ -172,9 +200,11 @@ describe('OptionComponent', () => {
 
   it('should dispatch createPaymentLinkByReservationId on pay()', () => {
     fixture.componentRef.setInput('id', 'res-123');
-    paymentStoreSpy.data.set([{
-      amount: 100,
-    }]);
+    paymentStoreSpy.data.set([
+      {
+        amount: 100,
+      },
+    ]);
     reservationStoreSpy.selected.set({
       id: 'res-123',
       room: { paymentTypes: ['PAYPAL'], currency: { icon: 'euro' } },
@@ -198,7 +228,9 @@ describe('OptionComponent', () => {
 
     component.pay();
 
-    expect(paymentStoreSpy.createPaymentLinkByReservationId).toHaveBeenCalledWith('res-123', jasmine.any(Object));
+    expect(
+      paymentStoreSpy.createPaymentLinkByReservationId,
+    ).toHaveBeenCalledWith('res-123', expect.any(Object));
   });
 
   it('should not dispatch createPaymentLinkByReservationId if form type is undefined', () => {
@@ -207,7 +239,9 @@ describe('OptionComponent', () => {
     component.form.controls.option.setValue(undefined);
     component.pay();
 
-    expect(paymentStoreSpy.createPaymentLinkByReservationId).not.toHaveBeenCalledWith('res-123', jasmine.any(Object));
+    expect(
+      paymentStoreSpy.createPaymentLinkByReservationId,
+    ).not.toHaveBeenCalledWith('res-123', expect.any(Object));
   });
 
   it('should move one step back without going below zero', () => {
@@ -238,5 +272,4 @@ describe('OptionComponent', () => {
     component.callStepTwo(true);
     expect(component.currentStepIndex()).toBe(1);
   });
-
 });

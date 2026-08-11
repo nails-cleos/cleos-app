@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { ColorComponent } from './color.component';
 import { ColorStore } from '../store/color.store';
 import { IColor } from './color';
@@ -9,9 +16,13 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-color-details-page',
   template: `
     @if (color(); as color) {
-      <app-color [color]="color" [config]="config" (submitData)="submit($event)"/>
+      <app-color
+        [color]="color"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton/>
+      <app-skeleton />
     }
   `,
   imports: [ColorComponent, SkeletonComponent],

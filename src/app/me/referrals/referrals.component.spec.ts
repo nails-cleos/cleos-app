@@ -1,14 +1,18 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReferralsComponent } from './referrals.component';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { TranslateModule } from '@ngx-translate/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
-import { ToastService } from '../../services/toast.service';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { provideHttpClient } from '@angular/common/http';
+import { ToastService } from '@app/services/toast.service';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
+import { provideHttpClient, withXhr } from '@angular/common/http';
 import { signal } from '@angular/core';
-import { DiscountStore } from '../../store/discount.store';
-
+import { DiscountStore } from '@app/store/discount.store';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('ReferralsComponent', () => {
   let component: ReferralsComponent;
   let fixture: ComponentFixture<ReferralsComponent>;
@@ -17,36 +21,49 @@ describe('ReferralsComponent', () => {
 
   let discountStoreSpy: {
     referrals: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadReferrals: jasmine.Spy;
+    clean: Mock;
+    loadReferrals: Mock;
   };
-  let clipboardSpy: jasmine.SpyObj<Clipboard>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let bottomSheetSpy: jasmine.SpyObj<MatBottomSheet>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let clipboardSpy: {
+    copy: Mock;
+  };
+  let toastServiceSpy: {
+    show: Mock;
+  };
+  let bottomSheetSpy: Pick<MatBottomSheet, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   beforeEach(async () => {
     discountStoreSpy = {
       referrals: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadReferrals: jasmine.createSpy('loadReferrals'),
+      clean: vi.fn().mockName('clean'),
+      loadReferrals: vi.fn().mockName('loadReferrals'),
     };
-    clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
-    bottomSheetSpy = jasmine.createSpyObj('MatBottomSheet', ['open']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', [], {
+    clipboardSpy = {
+      copy: vi.fn().mockName('Clipboard.copy'),
+    };
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
+    bottomSheetSpy = {
+      open: vi.fn().mockName('MatBottomSheet.open'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
-      imports: [ReferralsComponent, TranslateModule.forRoot()],
+      imports: [ReferralsComponent],
       providers: [
+        provideTranslateService(),
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: Clipboard, useValue: clipboardSpy },
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: MatBottomSheet, useValue: bottomSheetSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
       ],
     }).compileComponents();
 
@@ -67,7 +84,10 @@ describe('ReferralsComponent', () => {
     component.copy();
 
     expect(clipboardSpy.copy).toHaveBeenCalledWith('abc123');
-    expect(toastServiceSpy.show).toHaveBeenCalledWith('ME.REFERRAL.COPY', 'info');
+    expect(toastServiceSpy.show).toHaveBeenCalledWith(
+      'ME.REFERRAL.COPY',
+      'info',
+    );
   });
 
   it('should open share bottom sheet', () => {
@@ -85,7 +105,11 @@ describe('ReferralsComponent', () => {
   });
 
   it('should set userId and referralMax on ngOnInit', () => {
-    authUserSignal.update(prev => ({ ...prev, userId: '123', referralMax: 5 }));
+    authUserSignal.update((prev) => ({
+      ...prev,
+      userId: '123',
+      referralMax: 5,
+    }));
 
     fixture.detectChanges();
 

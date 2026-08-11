@@ -4,56 +4,96 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav-content>
     @let currentNavigationState = navigationState();
-    <mat-toolbar class="nav-fixed-top"
-                 [class.nav-transparent]="currentNavigationState === 'close'"
-                 [class.nav-gradient]="currentNavigationState !== 'close'"
-                 [style.color]="currentNavigationState === 'close' ? '#fff' : '#000'"
-                 [class.nav-fixed-top-solid]="currentNavigationState === 'open'">
+    <mat-toolbar
+      class="nav-fixed-top"
+      [class.nav-transparent]="currentNavigationState === 'close'"
+      [class.nav-gradient]="currentNavigationState !== 'close'"
+      [style.color]="currentNavigationState === 'close' ? '#fff' : '#000'"
+      [class.nav-fixed-top-solid]="currentNavigationState === 'open'"
+    >
       <span class="brand-logo" aria-hidden="true"></span>
 
       <span class="brand-title">{{ title | uppercase }}</span>
       <span class="mat-spacer"></span>
       @if (!isHandsetSignal()) {
         <span class="header-container">
-          <span (click)="scrollToElement('story')" class="pointer-only" aria-label="My story">
+          <span
+            (click)="scrollToElement('story')"
+            class="pointer-only"
+            aria-label="My story"
+          >
             {{ 'MAIN.SECTION.STORY' | translate }}
           </span>
           <!--        <button (click)="scrollToElement('work')" mat-button type="button" aria-label="Cleos works">-->
           <!--          <span>{{'MAIN.SECTION.WORK' | translate }}</span>-->
           <!--        </button>-->
-          <span (click)="scrollToElement('treatments')" aria-label="Go to treatments" class="pointer-only">
+          <span
+            (click)="scrollToElement('treatments')"
+            aria-label="Go to treatments"
+            class="pointer-only"
+          >
             {{ 'MAIN.SECTION.TREATMENT' | translate }}
           </span>
-          <span (click)="treatment()" aria-label="biab"
-                class="pointer-only">
+          <span (click)="treatment()" aria-label="biab" class="pointer-only">
             {{ 'MAIN.SECTION.BIAB' | translate }}
           </span>
-          <span (click)="scrollToElement('contact')" aria-label="Go to contact" class="pointer-only">
+          <span
+            (click)="scrollToElement('contact')"
+            aria-label="Go to contact"
+            class="pointer-only"
+          >
             {{ 'MAIN.SECTION.CONTACT' | translate }}
           </span>
           @if (isAuthenticated()) {
-            <span (click)="redirect()" aria-label="Go to my account" class="pointer-only">
+            <span
+              (click)="redirect()"
+              aria-label="Go to my account"
+              class="pointer-only"
+            >
               {{ 'MAIN.SECTION.ACCOUNT' | translate }}
             </span>
           } @else {
-            <span [routerLink]="['/', language, 'auth']" aria-label="Go to login" class="pointer-only">
+            <span
+              [routerLink]="['/', language, 'auth']"
+              aria-label="Go to login"
+              class="pointer-only"
+            >
               {{ 'MAIN.SECTION.AUTH' | translate }}&nbsp;
             </span>
           }
         </span>
-        <button class="toolbar-action-button" mat-icon-button (click)="changeTheme()" aria-label="Change theme">
+        <button
+          class="toolbar-action-button"
+          mat-icon-button
+          (click)="changeTheme()"
+          aria-label="Change theme"
+        >
           <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
       } @else {
-        <button class="toolbar-action-button" mat-icon-button (click)="changeTheme()" aria-label="Change theme">
+        <button
+          class="toolbar-action-button"
+          mat-icon-button
+          (click)="changeTheme()"
+          aria-label="Change theme"
+        >
           <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
         </button>
-        <button class="toolbar-action-button" [matMenuTriggerFor]="menuLogged" mat-icon-button aria-label="Open menu" name="menu">
+        <button
+          class="toolbar-action-button"
+          [matMenuTriggerFor]="menuLogged"
+          mat-icon-button
+          aria-label="Open menu"
+          name="menu"
+        >
           <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #menuLogged="matMenu">
           <mat-nav-list>
-            <mat-list-item (click)="scrollToElement('story')" aria-label="My story">
+            <mat-list-item
+              (click)="scrollToElement('story')"
+              aria-label="My story"
+            >
               <mat-icon matListItemIcon>auto_stories</mat-icon>
               <div matListItemTitle>{{ 'MAIN.SECTION.STORY' | translate }}</div>
             </mat-list-item>
@@ -63,19 +103,38 @@
             <!--              <div mat-line>{{'MAIN.SECTION.WORK' | translate }}</div>-->
             <!--            </a>-->
             <mat-divider></mat-divider>
-            <mat-list-item (click)="scrollToElement('treatments')" aria-label="Treatments">
+            <mat-list-item
+              (click)="scrollToElement('treatments')"
+              aria-label="Treatments"
+            >
               <mat-icon matListItemIcon>spa</mat-icon>
-              <div matListItemTitle>{{ 'MAIN.SECTION.TREATMENT' | translate }}</div>
+              <div matListItemTitle>
+                {{ 'MAIN.SECTION.TREATMENT' | translate }}
+              </div>
             </mat-list-item>
             <mat-divider></mat-divider>
-            <mat-list-item [routerLink]="['/', language, 'home', 'biab-treatment', 'treatment']" aria-label="biab">
+            <mat-list-item
+              [routerLink]="[
+                '/',
+                language,
+                'home',
+                'biab-treatment',
+                'treatment',
+              ]"
+              aria-label="biab"
+            >
               <mat-icon matListItemIcon>spa</mat-icon>
               <div matListItemTitle>{{ 'MAIN.SECTION.BIAB' | translate }}</div>
             </mat-list-item>
             <mat-divider></mat-divider>
-            <mat-list-item (click)="scrollToElement('contact')" aria-label="Contact">
+            <mat-list-item
+              (click)="scrollToElement('contact')"
+              aria-label="Contact"
+            >
               <mat-icon matListItemIcon>contact_page</mat-icon>
-              <div matListItemTitle>{{ 'MAIN.SECTION.CONTACT' | translate }}</div>
+              <div matListItemTitle>
+                {{ 'MAIN.SECTION.CONTACT' | translate }}
+              </div>
             </mat-list-item>
             <!--            <mat-divider></mat-divider>-->
             <!--            <a [routerLink]="['/', language, 'catalogs']" mat-list-item aria-label="Catalogs">-->
@@ -86,17 +145,24 @@
             @if (isAuthenticated()) {
               <mat-list-item (click)="redirect()" aria-label="My account">
                 <mat-icon matListItemIcon>person_pin</mat-icon>
-                <div matListItemTitle>{{ 'MAIN.SECTION.ACCOUNT' | translate }}</div>
+                <div matListItemTitle>
+                  {{ 'MAIN.SECTION.ACCOUNT' | translate }}
+                </div>
               </mat-list-item>
             } @else {
-              <mat-list-item [routerLink]="['/', language, 'auth']" aria-label="Login">
+              <mat-list-item
+                [routerLink]="['/', language, 'auth']"
+                aria-label="Login"
+              >
                 <mat-icon matListItemIcon>login</mat-icon>
-                <div matListItemTitle>{{ 'MAIN.SECTION.AUTH' | translate }}</div>
+                <div matListItemTitle>
+                  {{ 'MAIN.SECTION.AUTH' | translate }}
+                </div>
               </mat-list-item>
               <!--              <a [routerLink]="['/', language, 'auth']" mat-list-item aria-label="Go to login">-->
-                <!--                <mat-icon matListItemIcon>login</mat-icon>-->
-                <!--                <div mat-line>{{ 'MAIN.SECTION.AUTH' | translate }}</div>-->
-                <!--              </a>-->
+              <!--                <mat-icon matListItemIcon>login</mat-icon>-->
+              <!--                <div mat-line>{{ 'MAIN.SECTION.AUTH' | translate }}</div>-->
+              <!--              </a>-->
             }
           </mat-nav-list>
         </mat-menu>
@@ -109,56 +175,99 @@
         <mat-toolbar>
           <mat-toolbar-row>
             <span class="footer-image-container">
-              <img src="assets/icons/icon-512x512-maskable.png" style="transform: scale(2);" alt="Logo footer">
+              <img
+                src="assets/icons/icon-512x512-maskable.png"
+                style="transform: scale(2)"
+                alt="Logo footer"
+              />
             </span>
           </mat-toolbar-row>
           <mat-toolbar-row class="footer-links-row">
             <span class="links">
-              <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'home', 'privacy']" mat-button
-                      aria-label="Go to privacy">
+              <button
+                [routerLinkActive]="['active']"
+                [routerLink]="['/', language, 'home', 'privacy']"
+                mat-button
+                aria-label="Go to privacy"
+              >
                 <span>{{ 'MAIN.SECTION.PRIVACY' | translate }}</span>
               </button>
               <span class="separator">•</span>
-              <button [routerLinkActive]="['active']" [routerLink]="['/', language, 'home', 'term-and-conditions']"
-                      mat-button
-                      aria-label="Go to term-and-conditions">
-                <span>{{ 'MAIN.SECTION.TERM_AND_CONDITIONS' | translate }}</span>
+              <button
+                [routerLinkActive]="['active']"
+                [routerLink]="['/', language, 'home', 'term-and-conditions']"
+                mat-button
+                aria-label="Go to term-and-conditions"
+              >
+                <span>{{
+                  'MAIN.SECTION.TERM_AND_CONDITIONS' | translate
+                }}</span>
               </button>
               <span class="separator">•</span>
-              <button (click)="scrollToElement('contact')" mat-button aria-label="Go to contact">
+              <button
+                (click)="scrollToElement('contact')"
+                mat-button
+                aria-label="Go to contact"
+              >
                 <span>{{ 'MAIN.SECTION.CONTACT' | translate }}</span>
               </button>
             </span>
           </mat-toolbar-row>
           <mat-toolbar-row>
-            <span style="margin: auto;">
-              <a mat-icon-button rel="noreferrer" target="_blank" aria-label="Whatsapp"
-                 [href]="'https://api.whatsapp.com/send?phone=' + ('MAIN.CONTACT.SEND.PHONE' | translate) + '&text=' + ('MAIN.CONTACT.SEND.HELLO' | translate)">
+            <span style="margin: auto">
+              <a
+                mat-icon-button
+                rel="noreferrer"
+                target="_blank"
+                aria-label="Whatsapp"
+                [href]="
+                  'https://api.whatsapp.com/send?phone=' +
+                  ('MAIN.CONTACT.SEND.PHONE' | translate) +
+                  '&text=' +
+                  ('MAIN.CONTACT.SEND.HELLO' | translate)
+                "
+              >
                 <mat-icon [svgIcon]="'WHATSAPP-NO-COLOR'"></mat-icon>
               </a>
-              <a [href]="'https://www.instagram.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
-                 target="_blank" aria-label="Instagram">
+              <a
+                [href]="'https://www.instagram.com/carlanailscleos.nl/'"
+                mat-icon-button
+                rel="noreferrer"
+                target="_blank"
+                aria-label="Instagram"
+              >
                 <mat-icon [svgIcon]="'INSTAGRAM-NO-COLOR'"></mat-icon>
               </a>
-              <a [href]="'https://www.facebook.com/carlanailscleos.nl/'" mat-icon-button rel="noreferrer"
-                 target="_blank" aria-label="Facebook">
+              <a
+                [href]="'https://www.facebook.com/carlanailscleos.nl/'"
+                mat-icon-button
+                rel="noreferrer"
+                target="_blank"
+                aria-label="Facebook"
+              >
                 <mat-icon [svgIcon]="'FACEBOOK-NO-COLOR'"></mat-icon>
               </a>
             </span>
           </mat-toolbar-row>
           <mat-toolbar-row>
-            <span class="text-center" style="margin: auto; font-size: small; white-space: break-spaces">
-              {{ 'MAIN.LEGALS' | translate }} - v{{ appVersion }}</span>
+            <span
+              class="text-center"
+              style="margin: auto; font-size: small; white-space: break-spaces"
+            >
+              {{ 'MAIN.LEGALS' | translate }} - v{{ appVersion }}</span
+            >
           </mat-toolbar-row>
         </mat-toolbar>
       </div>
     </footer>
     @if (showArrow) {
-      <a class="pointer-only"
-         [class.back-top-visible]="currentNavigationState === 'open'"
-         (click)="scrollToElement(home)"
-         id="back-top"
-         type="button">
+      <a
+        class="pointer-only"
+        [class.back-top-visible]="currentNavigationState === 'open'"
+        (click)="scrollToElement(home)"
+        id="back-top"
+        type="button"
+      >
         <mat-icon>keyboard_double_arrow_up</mat-icon>
       </a>
     }

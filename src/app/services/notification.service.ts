@@ -11,9 +11,8 @@ import { SortDirection } from '@angular/material/sort';
   providedIn: 'root',
 })
 export class NotificationService {
-
   private url = 'notifications';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
@@ -22,20 +21,20 @@ export class NotificationService {
     sort: string,
     direction: SortDirection,
     size: number,
-  ): Observable<INotificationDTO> => this.http.get<INotificationDTO>(toUrl(this.urlV1, 'pages'),
-    { ...paginated(), params: createFilter(page, size, sort, direction) },
-  );
+  ): Observable<INotificationDTO> =>
+    this.http.get<INotificationDTO>(toUrl(this.urlV1, 'pages'), {
+      ...paginated(),
+      params: createFilter(page, size, sort, direction),
+    });
 
   readNotification = (
     notificationId: string,
-  ): Observable<INotification | undefined> => this.http.post<INotification>(
-    toUrl(this.urlV1, notificationId),
-    null,
-  );
+  ): Observable<INotification | undefined> =>
+    this.http.post<INotification>(toUrl(this.urlV1, notificationId), null);
 
-  deleteNotification = (
-    id: string,
-  ): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
+  deleteNotification = (id: string): Observable<void> =>
+    this.http.delete<void>(toUrl(this.urlV1, id));
 
-  subscribeNotification = (token: string): Observable<any> => this.http.post(toUrl(this.urlV1, 'subscribe'), { token });
+  subscribeNotification = (token: string): Observable<any> =>
+    this.http.post(toUrl(this.urlV1, 'subscribe'), { token });
 }

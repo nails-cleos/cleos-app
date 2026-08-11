@@ -12,7 +12,8 @@ export const environment = {
   title: 'Nails Cleos DEV',
   version: packageJson.version + '-dev',
   baseUrl: 'http://localhost:9999/api',
-  googleClientId: '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
+  googleClientId:
+    '364998384255-kk09n0fq6p79s7oim94ljevf8bb0etip.apps.googleusercontent.com',
   facebookClientId: '453309609006101',
   firebase: {
     apiKey: 'AIzaSyCIx8KV4QW1hJuOQWT3bKO4UkiQpCqU0dg',
@@ -22,8 +23,10 @@ export const environment = {
     messagingSenderId: '364998384255',
     appId: '1:364998384255:web:a39b48b0b30392aefcbd4a',
     measurementId: 'G-Q2NR1R8MWQ',
-    vapidKey: 'BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8',
-    databaseURL: 'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app',
+    vapidKey:
+      'BJOQTLLmUxq8uJ3aE19sB7Hhda7MAx0K7aI5A9BXfA2TJyaMHU7rbLDyAGTSe-8dahCyj7zJVK8VqWHeE3PFTc8',
+    databaseURL:
+      'https://nails-cleos-dev-default-rtdb.europe-west1.firebasedatabase.app',
   },
   awsIdentityPoolId: 'eu-central-1:e77fb0cd-db20-4959-8010-e5d71ca4ef52',
   awsLoginsKey: 'securetoken.google.com/nails-cleos-dev',

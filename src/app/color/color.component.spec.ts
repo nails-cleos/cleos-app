@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 
 import { ColorComponent } from './color.component';
@@ -7,6 +6,8 @@ import { IColorAll } from './color';
 import { ICommon } from '../interfaces/common';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('ColorComponent', () => {
   let component: ColorComponent;
@@ -33,11 +34,14 @@ describe('ColorComponent', () => {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
     };
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    const navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [ColorComponent, TranslateModule.forRoot()],
+      imports: [ColorComponent],
       providers: [
+        provideTranslateService(),
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
@@ -63,20 +67,18 @@ describe('ColorComponent', () => {
   });
 
   it('should handle form errors from subErrorsSignal', () => {
-    const errors = [
-      { field: 'name', message: 'Name required' },
-    ];
+    const errors = [{ field: 'name', message: 'Name required' }];
 
     colorStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
     const errs = component.errors();
     expect(errs['name']).toBe('Name required');
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
   });
 
   it('should not dispatch when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
@@ -89,7 +91,7 @@ describe('ColorComponent', () => {
   });
 
   it('should emit submitData when form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const nameControl = component.getForm.name;
@@ -101,18 +103,24 @@ describe('ColorComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Color',
-      description: 'New Description',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Color',
+        description: 'New Description',
+      }),
+    );
   });
 
   it('should emit changed fields when editing an existing color', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
-    fixture.componentRef.setInput('color', { id: 'abc-123', name: 'Old', description: 'old' });
+    fixture.componentRef.setInput('color', {
+      id: 'abc-123',
+      name: 'Old',
+      description: 'old',
+    });
     fixture.detectChanges();
 
     const nameControl = component.getForm.name;
@@ -124,10 +132,12 @@ describe('ColorComponent', () => {
 
     component.submit();
 
-    expect(component.form.valid).toBeTrue();
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'Updated Description',
-      name: 'Updated Color',
-    }));
+    expect(component.form.valid).toBe(true);
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'Updated Description',
+        name: 'Updated Color',
+      }),
+    );
   });
 });

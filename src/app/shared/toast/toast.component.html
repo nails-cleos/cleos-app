@@ -8,15 +8,28 @@
     <div class="toast-title">{{ data.type | titlecase }}</div>
     <div class="toast-message" [innerHTML]="data.message | translate"></div>
   </div>
-  <div class="toast-actions" [class.toast-actions--empty]="data.actionType === 'none'">
+  <div
+    class="toast-actions"
+    [class.toast-actions--empty]="data.actionType === 'none'"
+  >
     @switch (data.actionType) {
       @case ('link') {
-        <a class="toast-action-button" mat-icon-button [href]="data.action" target="_blank" rel="noopener">
+        <a
+          class="toast-action-button"
+          mat-icon-button
+          [href]="data.action"
+          target="_blank"
+          rel="noopener"
+        >
           <mat-icon>open_in_new</mat-icon>
         </a>
       }
       @case ('button') {
-        <button class="toast-action-button" mat-icon-button (click)="onAction()">
+        <button
+          class="toast-action-button"
+          mat-icon-button
+          (click)="onAction()"
+        >
           <mat-icon>{{ data.action || 'done_all' }}</mat-icon>
         </button>
       }

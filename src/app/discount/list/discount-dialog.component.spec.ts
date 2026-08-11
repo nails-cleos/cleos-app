@@ -1,21 +1,26 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountDialogComponent } from './discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DiscountType, IDiscountAll } from '../discount';
-import { IUserAll } from '../../user/user';
-import { TranslateModule } from '@ngx-translate/core';
+import { IUserAll } from '@app/user/user';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
-
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('DiscountDialogComponent', () => {
   let component: DiscountDialogComponent;
   let fixture: ComponentFixture<DiscountDialogComponent>;
 
   let customersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<DiscountDialogComponent>>;
+  let userStoreSpy: {
+    clean: Mock;
+    loadCustomers: Mock;
+  };
+  let dialogRefSpy: Pick<MatDialogRef<DiscountDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   let mockDiscount: IDiscountAll;
 
@@ -27,8 +32,13 @@ describe('DiscountDialogComponent', () => {
   beforeEach(async () => {
     customersSignal = signal<IUserAll[] | undefined>(undefined);
 
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadCustomers']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
+    userStoreSpy = {
+      clean: vi.fn().mockName('UserStore.clean'),
+      loadCustomers: vi.fn().mockName('UserStore.loadCustomers'),
+    };
     Object.assign(userStoreSpy, {
       customers: customersSignal.asReadonly(),
     });
@@ -47,8 +57,9 @@ describe('DiscountDialogComponent', () => {
     };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountDialogComponent, TranslateModule.forRoot()],
+      imports: [DiscountDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => ({ discount: mockDiscount }),
@@ -109,7 +120,7 @@ describe('DiscountDialogComponent', () => {
     ]);
     fixture.detectChanges();
 
-    component.getForm.customers.setValue = jasmine.createSpy('setValue');
+    component.getForm.customers.setValue = vi.fn().mockName('setValue');
     component.customerInput().nativeElement.value = 'something';
 
     const mockEvent = {
@@ -124,7 +135,9 @@ describe('DiscountDialogComponent', () => {
       { id: '2', displayName: 'Bob' } as IUserAll,
     ]);
 
-    expect(component.getForm.customers.setValue).toHaveBeenCalledWith(undefined);
+    expect(component.getForm.customers.setValue).toHaveBeenCalledWith(
+      undefined,
+    );
   });
 
   it('should close dialog with selected customers', () => {

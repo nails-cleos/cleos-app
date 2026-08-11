@@ -1,34 +1,54 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { IDiscount } from '../discount';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { DiscountListComponent } from './discount-list.component';
 import { MatDialog } from '@angular/material/dialog';
-import { DiscountStore } from '../../store/discount.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
-
+import { DiscountStore } from '@app/store/discount.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('DiscountListComponent', () => {
   let component: DiscountListComponent;
   let fixture: ComponentFixture<DiscountListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let discountStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    delete: jasmine.Spy;
-    sendToCustomers: jasmine.Spy;
+    clean: Mock;
+    clearResponse: Mock;
+    loadPage: Mock;
+    delete: Mock;
+    sendToCustomers: Mock;
   };
 
   const mockDiscount: IDiscount[] = [
@@ -44,9 +64,10 @@ describe('DiscountListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -55,30 +76,37 @@ describe('DiscountListComponent', () => {
       },
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     discountStoreSpy = {
       isLoading: signal(false),
       data: signal<any>({ kind: 'paginationDiscount', value: mockPagination }),
       response: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      loadPage: jasmine.createSpy('loadPage'),
-      delete: jasmine.createSpy('delete'),
-      sendToCustomers: jasmine.createSpy('sendToCustomers'),
+      clean: vi.fn().mockName('clean'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      loadPage: vi.fn().mockName('loadPage'),
+      delete: vi.fn().mockName('delete'),
+      sendToCustomers: vi.fn().mockName('sendToCustomers'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [DiscountListComponent, TranslateModule.forRoot()],
+      imports: [DiscountListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -102,7 +130,10 @@ describe('DiscountListComponent', () => {
   });
 
   it('should compute dataSourceSignal correctly', () => {
-    discountStoreSpy.data.set({ kind: 'paginationDiscount', value: mockPagination });
+    discountStoreSpy.data.set({
+      kind: 'paginationDiscount',
+      value: mockPagination,
+    });
     fixture.detectChanges();
 
     const data = component.dataSourceSignal() as any;
@@ -118,7 +149,10 @@ describe('DiscountListComponent', () => {
   });
 
   it('should compute resultsLengthSignal correctly', () => {
-    discountStoreSpy.data.set({ kind: 'paginationDiscount', value: mockPagination });
+    discountStoreSpy.data.set({
+      kind: 'paginationDiscount',
+      value: mockPagination,
+    });
     fixture.detectChanges();
 
     expect(component.resultsLengthSignal()).toBe(2);
@@ -151,11 +185,16 @@ describe('DiscountListComponent', () => {
   });
 
   it('should dispatch getDiscountPage when paginatorPageIndex changes', () => {
-    discountStoreSpy.loadPage.calls.reset();
+    discountStoreSpy.loadPage.mockClear();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(discountStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -167,11 +206,13 @@ describe('DiscountListComponent', () => {
   });
 
   it('should dispatch clean and reset paginator when responseSignal emits', () => {
-    const paginatorMock = jasmine.createSpyObj('MatPaginator', ['firstPage']);
+    const paginatorMock = {
+      firstPage: vi.fn().mockName('MatPaginator.firstPage'),
+    };
 
-    component['paginator'] = signal(paginatorMock);
-    discountStoreSpy.clearResponse.calls.reset();
-    discountStoreSpy.loadPage.calls.reset();
+    component['paginator'] = signal(paginatorMock) as any;
+    discountStoreSpy.clearResponse.mockClear();
+    discountStoreSpy.loadPage.mockClear();
 
     discountStoreSpy.response.set({ success: true });
 
@@ -190,12 +231,15 @@ describe('DiscountListComponent', () => {
     const item = mockDiscount[0];
     component.edit(item);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['discounts', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'discounts',
+      item.id,
+    ]);
   });
 
   it('should dispatch deleteDiscount when dialog returns a result', () => {
     const item = mockDiscount[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 

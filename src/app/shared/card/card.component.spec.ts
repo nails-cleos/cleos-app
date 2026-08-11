@@ -1,8 +1,13 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CardComponent } from './card.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { IChart } from '../../dashboard/dashboard';
-import { ICurrency } from '../../currency/currency';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
 import { NO_ERRORS_SCHEMA, signal } from '@angular/core';
 
 describe('CardComponent', () => {
@@ -11,27 +16,26 @@ describe('CardComponent', () => {
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let dialogSpy: jasmine.Spy<any>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let dialogSpy: Mock;
 
   beforeEach(async () => {
-
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
       imports: [CardComponent],
-      providers: [
-        { provide: AuthUserService, useValue: authUserServiceSpy },
-      ],
+      providers: [{ provide: AuthUserService, useValue: authUserServiceSpy }],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
 
-    dialogSpy = spyOn(component['dialog'], 'open');
+    dialogSpy = vi
+      .spyOn(component['dialog'], 'open')
+      .mockReturnValue(undefined as any);
   });
 
   it('should create', () => {
@@ -39,13 +43,13 @@ describe('CardComponent', () => {
   });
 
   it('should subscribe to AuthUserService and set dark mode', () => {
-    authUserSignal.update(prev => ({ ...prev, isDarkMode: true }));
+    authUserSignal.update((prev) => ({ ...prev, isDarkMode: true }));
     fixture.detectChanges();
-    expect(component['isDarkMode']()).toBeTrue();
+    expect(component['isDarkMode']()).toBe(true);
 
-    authUserSignal.update(prev => ({ ...prev, isDarkMode: false }));
+    authUserSignal.update((prev) => ({ ...prev, isDarkMode: false }));
     fixture.detectChanges();
-    expect(component['isDarkMode']()).toBeFalse();
+    expect(component['isDarkMode']()).toBe(false);
   });
 
   it('should open dialog when chart is provided on click', () => {
@@ -75,17 +79,29 @@ describe('CardComponent', () => {
     component.onClick();
 
     expect(dialogSpy).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
-        data: jasmine.objectContaining({
-          chart: jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
+        data: expect.objectContaining({
+          chart: expect.objectContaining({
             labels: ['Jan', 'Feb', 'Mar'],
             type: 'bar',
-            charData: jasmine.objectContaining({
+            charData: expect.objectContaining({
               datasets: [
-                jasmine.objectContaining({ data: 10, label: '1', type: 'number' }),
-                jasmine.objectContaining({ data: 20, label: '2', type: 'number' }),
-                jasmine.objectContaining({ data: 30, label: '3', type: 'number' }),
+                expect.objectContaining({
+                  data: 10,
+                  label: '1',
+                  type: 'number',
+                }),
+                expect.objectContaining({
+                  data: 20,
+                  label: '2',
+                  type: 'number',
+                }),
+                expect.objectContaining({
+                  data: 30,
+                  label: '3',
+                  type: 'number',
+                }),
               ],
             }),
           }),

@@ -18,69 +18,123 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Expense, ExpenseForm, IExpense, IExpenseAll, ISupplyStore, ITotalExpense } from './expense';
+import {
+  Expense,
+  ExpenseForm,
+  IExpense,
+  IExpenseAll,
+  ISupplyStore,
+  ITotalExpense,
+} from './expense';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { combineLatestWith } from 'rxjs';
-import { createNewDateZonedTime, getNowTimeZone } from '../../../util/dates';
-import { noDuplicateDatesValidator } from '../../../util/validators';
+import { createNewDateZonedTime, getNowTimeZone } from '@app/util/dates';
+import { noDuplicateDatesValidator } from '@app/util/validators';
 import { map, startWith } from 'rxjs/operators';
-import { TwoDigitsDirective } from '../../../directives/two-digits.directive';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { TwoDigitsDirective } from '@app/directives/two-digits.directive';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ICommon, IError } from '../../../interfaces/common';
-import { FileDropComponent, UploadFile } from '../../../shared/file-drop/file-drop.component';
-import { awsExtractToNumberFormat } from '../../../interfaces/aws';
-import { calculateBTW, calculateNet } from '../../../util/numbers';
-import { AuthUserService } from '../../../services/auth-user.service';
-import { DriveAccessService } from '../../../services/drive-access.service';
-import { EnvService } from '../../../services/env.service';
-import { TokenService } from '../../../services/token.service';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { ICommon, IError } from '@app/interfaces/common';
+import {
+  FileDropComponent,
+  UploadFile,
+} from '@app/shared/file-drop/file-drop.component';
+import { awsExtractToNumberFormat } from '@app/interfaces/aws';
+import { calculateBTW, calculateNet } from '@app/util/numbers';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
+import { EnvService } from '@app/services/env.service';
+import { TokenService } from '@app/services/token.service';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatSuffix } from '@angular/material/form-field';
-import { MatDatepicker, MatDatepickerInput, MatDatepickerToggle } from '@angular/material/datepicker';
+import {
+  MatDatepicker,
+  MatDatepickerInput,
+  MatDatepickerToggle,
+} from '@angular/material/datepicker';
 import { MatOptgroup, MatSelect } from '@angular/material/select';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DecimalPipe, KeyValuePipe } from '@angular/common';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { MatCheckbox } from '@angular/material/checkbox';
-import { AwsStore } from '../../../store/aws.store';
-import { ExpenseStore } from '../../../store/expense.store';
-import { NavigationService } from '../../../services/navigation.service';
+import { AwsStore } from '@app/store/aws.store';
+import { ExpenseStore } from '@app/store/expense.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type TotalsForm = {
   type: FormControl<string>;
   gross: FormControl<string>;
   btw: FormControl<string>;
   description: FormControl<string>;
-}
+};
 
 @Component({
   selector: 'app-expense',
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
-  imports: [TwoDigitsDirective, MatFormField, MatLabel, MatInput, MatDatepickerInput, MatDatepickerToggle,
-    MatDatepicker, MatSelect, MatOption, MatIcon, MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe,
-    KeyValuePipe, DecimalPipe, MatAutocomplete, MatError, MatAutocompleteTrigger, MatPrefix, MatSuffix,
-    BackButtonDirective, TwoDigitsDirective, BackButtonDirective, FileDropComponent, MatOptgroup, MatHint,
-    MatCheckbox],
+  imports: [
+    TwoDigitsDirective,
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatDatepickerInput,
+    MatDatepickerToggle,
+    MatDatepicker,
+    MatSelect,
+    MatOption,
+    MatIcon,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    KeyValuePipe,
+    DecimalPipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    MatPrefix,
+    MatSuffix,
+    BackButtonDirective,
+    TwoDigitsDirective,
+    BackButtonDirective,
+    FileDropComponent,
+    MatOptgroup,
+    MatHint,
+    MatCheckbox,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ExpenseComponent {
   roomId = input.required<string>();
   config = input.required<ICommon>();
   expense = input<IExpenseAll | undefined>();
-  submitData = output<{ expense: IExpense, file?: File }>();
+  submitData = output<{ expense: IExpense; file?: File }>();
 
   private readonly env: EnvService = inject(EnvService);
   private readonly expenseStore = inject(ExpenseStore);
   private readonly awsStore = inject(AwsStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly driveAccessService: DriveAccessService = inject(DriveAccessService);
+  private readonly driveAccessService: DriveAccessService =
+    inject(DriveAccessService);
   private readonly tokenService: TokenService = inject(TokenService);
   private readonly formDirective = viewChild(FormGroupDirective);
 
@@ -108,7 +162,9 @@ export class ExpenseComponent {
     date: this.formBuilder.control(undefined, {
       validators: [Validators.required],
     }),
-    totals: this.formBuilder.array<FormGroup<TotalsForm>>([], { validators: [noDuplicateDatesValidator('btw')] }),
+    totals: this.formBuilder.array<FormGroup<TotalsForm>>([], {
+      validators: [noDuplicateDatesValidator('btw')],
+    }),
   });
 
   types = computed(() => this.infoSignal()?.types || []);
@@ -121,7 +177,7 @@ export class ExpenseComponent {
   filteredSupplyStore = toSignal(
     this.getForm.supplyStore.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.supplyStores)),
       map(([name, supplyStores]) => {
         if (name) {
@@ -133,7 +189,7 @@ export class ExpenseComponent {
     ),
   );
 
-  totalMap: Map<number, { btwValue: string, net: string }> = new Map();
+  totalMap: Map<number, { btwValue: string; net: string }> = new Map();
 
   file = signal<UploadFile | undefined>(undefined);
   private timeZone = computed(() => this.infoSignal()?.timeZone || '');
@@ -148,10 +204,19 @@ export class ExpenseComponent {
       if (selected) {
         queueMicrotask(() => {
           this.form.patchValue(selected);
-          this.getForm.date.setValue(createNewDateZonedTime(selected.timestamp, selected.room?.timeZone));
+          this.getForm.date.setValue(
+            createNewDateZonedTime(selected.timestamp, selected.room?.timeZone),
+          );
           this.removeExpense(0);
-          selected.expenseTotals.forEach(
-            (it, index) => this.addTotal(true, index, it.gross, it.btw, it.description, it.type),
+          selected.expenseTotals.forEach((it, index) =>
+            this.addTotal(
+              true,
+              index,
+              it.gross,
+              it.btw,
+              it.description,
+              it.type,
+            ),
           );
         });
       }
@@ -261,13 +326,19 @@ export class ExpenseComponent {
 
     effect(() => {
       const supplyStore = this.selectedSupplyStore();
-      if (supplyStore && typeof supplyStore === 'string' && this.getForm.supplyStore.value === supplyStore) {
+      if (
+        supplyStore &&
+        typeof supplyStore === 'string' &&
+        this.getForm.supplyStore.value === supplyStore
+      ) {
         this.getForm.supplyStore.setValue({ id: '', name: supplyStore });
       }
     });
 
     effect(() => {
-      this.driveAccessService.requestAccessIfNeeded(this.env.googleDriveUploadFile);
+      this.driveAccessService.requestAccessIfNeeded(
+        this.env.googleDriveUploadFile,
+      );
     });
   }
 
@@ -288,7 +359,7 @@ export class ExpenseComponent {
       return true;
     }
 
-    return this.totals.controls.some(control => {
+    return this.totals.controls.some((control) => {
       return control.invalid;
     });
   }
@@ -299,7 +370,8 @@ export class ExpenseComponent {
     this.totalMap = new Map();
     if (formDirective?.form) {
       formDirective.resetForm();
-      (formDirective as FormGroupDirective & { submitted: boolean }).submitted = false;
+      (formDirective as FormGroupDirective & { submitted: boolean }).submitted =
+        false;
     }
 
     this.getForm.invoice.reset('', { emitEvent: false });
@@ -318,8 +390,12 @@ export class ExpenseComponent {
       return;
     }
 
-    const expense: IExpense = Expense.fromForm(this.getForm, date, this.expense(),
-      this.totals.getRawValue() as unknown as ITotalExpense[]);
+    const expense: IExpense = Expense.fromForm(
+      this.getForm,
+      date,
+      this.expense(),
+      this.totals.getRawValue() as unknown as ITotalExpense[],
+    );
     const file = uploadFile.raw;
     if (!this.expense() && this.createAnother) {
       this.pendingCreateAnotherReset.set(true);
@@ -334,29 +410,35 @@ export class ExpenseComponent {
 
   get totalGross(): number {
     return this.totals.controls
-      .map(expense => expense.value.gross || '0')
+      .map((expense) => expense.value.gross || '0')
       .reduce((acc, grossValue) => acc + parseFloat(grossValue), 0);
   }
 
   get totalBTW(): number {
     return Array.from(this.totalMap.values())
-      .map(total => parseFloat(total.btwValue) || 0)
+      .map((total) => parseFloat(total.btwValue) || 0)
       .reduce((acc, btw) => acc + btw, 0);
   }
 
   get totalNet(): number {
     return Array.from(this.totalMap.values())
-      .map(total => parseFloat(total.net) || 0)
+      .map((total) => parseFloat(total.net) || 0)
       .reduce((acc, btw) => acc + btw, 0);
   }
 
-  displayFnSupplyStore = (supplyStore: ISupplyStore): string => supplyStore ? `${ supplyStore.name }` : '';
+  displayFnSupplyStore = (supplyStore: ISupplyStore): string =>
+    supplyStore ? `${supplyStore.name}` : '';
 
-  validateInputValue = (input: HTMLInputElement, index: number, min?: number, max?: number): void => {
-    const id = input.id.replace(`${ index }`, '');
+  validateInputValue = (
+    input: HTMLInputElement,
+    index: number,
+    min?: number,
+    max?: number,
+  ): void => {
+    const id = input.id.replace(`${index}`, '');
     const expense = this.totals.at(index)?.get(id);
     if (input.value) {
-      this.errors.update(prev => {
+      this.errors.update((prev) => {
         prev[input.id] = null;
         return prev;
       });
@@ -367,12 +449,12 @@ export class ExpenseComponent {
       }
       const EXPENSE = this.translateService.instant('EXPENSE');
       if (min !== undefined && value < min) {
-        this.errors.update(prev => {
+        this.errors.update((prev) => {
           prev[input.id] = EXPENSE[id.toUpperCase()].MIN;
           return prev;
         });
       } else if (max && value > max) {
-        this.errors.update(prev => {
+        this.errors.update((prev) => {
           prev[input.id] = EXPENSE[id.toUpperCase()].MAX;
           return prev;
         });
@@ -408,18 +490,21 @@ export class ExpenseComponent {
     gross: string = '',
     btw: string = '',
     description: string = '',
-  ): FormGroup => this.formBuilder.group({
-    type: [type, [Validators.required]],
-    gross: [gross, [Validators.required]],
-    btw: [btw, [Validators.required]],
-    description: [description],
-  });
+  ): FormGroup =>
+    this.formBuilder.group({
+      type: [type, [Validators.required]],
+      gross: [gross, [Validators.required]],
+      btw: [btw, [Validators.required]],
+      description: [description],
+    });
 
   private filterSupplyStore = (
     name: string,
     supplyStores: ISupplyStore[],
-  ): ISupplyStore[] | undefined => supplyStores?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  ): ISupplyStore[] | undefined =>
+    supplyStores?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 
   onSelectedFile(currentFile?: UploadFile) {
     this.file.set(currentFile);
@@ -434,7 +519,9 @@ export class ExpenseComponent {
   }
 
   private setSupplierOrName(supplyStore: string = '') {
-    const supplier = this.supplyStores().find(it => it.name.toLowerCase() === supplyStore?.toLowerCase());
+    const supplier = this.supplyStores().find(
+      (it) => it.name.toLowerCase() === supplyStore?.toLowerCase(),
+    );
     if (supplier) {
       this.getForm.supplyStore.setValue(supplier);
     } else {
@@ -442,7 +529,14 @@ export class ExpenseComponent {
     }
   }
 
-  private addTotal(add: boolean, index: number, gross: number, btw?: number, description?: string, type?: string) {
+  private addTotal(
+    add: boolean,
+    index: number,
+    gross: number,
+    btw?: number,
+    description?: string,
+    type?: string,
+  ) {
     const total = this.totalMap.get(index) ?? { net: '', btwValue: '' };
     const grossValue = gross.toFixed(2);
     if (btw) {
@@ -451,7 +545,9 @@ export class ExpenseComponent {
       total.net = grossValue;
     }
     if (add) {
-      this.totals.push(this.createTotals(type, grossValue, (btw ?? 0).toFixed(2), description));
+      this.totals.push(
+        this.createTotals(type, grossValue, (btw ?? 0).toFixed(2), description),
+      );
     }
     total.btwValue = (gross - parseFloat(total.net)).toFixed(2);
     this.totalMap.set(index, total);

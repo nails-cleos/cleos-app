@@ -8,21 +8,27 @@ export class DragDropDirective {
   fileDropped = output<FileList>();
 
   // Dragover listener
-  @HostListener('dragover', ['$event']) onDragOver = ($event: DragEvent): void => {
+  @HostListener('dragover', ['$event']) onDragOver = (
+    $event: DragEvent,
+  ): void => {
     $event.preventDefault();
     $event.stopPropagation();
     this.fileOver = true;
   };
 
   // Dragleave listener
-  @HostListener('dragleave', ['$event']) public onDragLeave = ($event: DragEvent): void => {
+  @HostListener('dragleave', ['$event']) public onDragLeave = (
+    $event: DragEvent,
+  ): void => {
     $event.preventDefault();
     $event.stopPropagation();
     this.fileOver = false;
   };
 
   // Drop listener
-  @HostListener('drop', ['$event']) public ondrop = ($event: DragEvent): void => {
+  @HostListener('drop', ['$event']) public ondrop = (
+    $event: DragEvent,
+  ): void => {
     $event.preventDefault();
     $event.stopPropagation();
     this.fileOver = false;

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TimepickerComponent } from './timepicker.component';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('TimepickerComponent', () => {
   let component: TimepickerComponent;
@@ -32,7 +33,7 @@ describe('TimepickerComponent', () => {
   });
 
   it('should forward open to registered directive', () => {
-    const openSpy = jasmine.createSpy('open');
+    const openSpy = vi.fn().mockName('open');
 
     component.registerDirective({ open: openSpy } as any);
     component.open();
@@ -41,8 +42,8 @@ describe('TimepickerComponent', () => {
   });
 
   it('should only unregister the matching directive', () => {
-    const first = { open: jasmine.createSpy('open-first') };
-    const second = { open: jasmine.createSpy('open-second') };
+    const first = { open: vi.fn().mockName('open-first') };
+    const second = { open: vi.fn().mockName('open-second') };
 
     component.registerDirective(first as any);
     component.unregisterDirective(second as any);
@@ -57,7 +58,9 @@ describe('TimepickerComponent', () => {
   });
 
   it('should emit selected time', () => {
-    const emitSpy = spyOn(component.timeSet, 'emit');
+    const emitSpy = vi
+      .spyOn(component.timeSet, 'emit')
+      .mockReturnValue(undefined);
 
     component.emitTimeSet('08:30');
 

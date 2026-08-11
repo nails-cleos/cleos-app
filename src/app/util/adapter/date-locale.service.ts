@@ -9,7 +9,7 @@ export class DateLocaleService {
   private readonly dateAdapter = inject(DateAdapter<Date>);
 
   setLanguage(lang?: string) {
-    this.dateAdapter.setLocale(this.normalizeLocale((lang)));
+    this.dateAdapter.setLocale(this.normalizeLocale(lang));
   }
 
   private normalizeLocale(lang?: string): string {

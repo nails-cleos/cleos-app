@@ -1,18 +1,29 @@
+import { Injectable } from '@angular/core';
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth, onIdTokenChanged } from 'firebase/auth';
-import { connectDatabaseEmulator, getDatabase, ref, update } from 'firebase/database';
+import {
+  connectDatabaseEmulator,
+  getDatabase,
+  ref,
+  update,
+} from 'firebase/database';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
-import { getAnalytics, logEvent } from 'firebase/analytics';
+import {
+  getAnalytics,
+  isSupported,
+  logEvent,
+  type Analytics,
+} from 'firebase/analytics';
 import { environment } from '../../environments/environment';
-import { Injectable } from '@angular/core';
 
 const app = initializeApp(environment.firebase);
-
 const auth = getAuth(app);
 const database = getDatabase(app);
 const messaging = getMessaging(app);
-const analytics = getAnalytics(app);
+
+let analytics: Analytics | undefined;
+
 const appCheck = initializeAppCheck(app, {
   provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
   isTokenAutoRefreshEnabled: true,
@@ -30,8 +41,11 @@ export class FirebaseSdkService {
   auth = auth;
   messaging = messaging;
   database = database;
-  analytics = analytics;
   appCheck = appCheck;
+
+  get analytics(): Analytics | undefined {
+    return analytics;
+  }
 
   getToken = getToken;
   onMessage = onMessage;
@@ -39,4 +53,12 @@ export class FirebaseSdkService {
   ref = ref;
   update = update;
   onIdTokenChanged = onIdTokenChanged;
+
+  constructor() {
+    isSupported().then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    });
+  }
 }

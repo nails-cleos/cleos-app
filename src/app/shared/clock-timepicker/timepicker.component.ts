@@ -1,8 +1,14 @@
-import { Component, input, output } from '@angular/core';
+import {
+  Component,
+  input,
+  output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import type { TimepickerDirective } from './timepicker.directive';
 
 @Component({
   selector: 'app-timepicker',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: '',
 })
 export class TimepickerComponent {

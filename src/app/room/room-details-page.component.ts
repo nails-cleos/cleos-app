@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { RoomComponent } from './room.component';
 import { ICommon } from '../interfaces/common';
 import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
@@ -9,9 +15,15 @@ import { RoomStore } from '../store/room.store';
   selector: 'app-room-details-page',
   template: `
     @if (room(); as room) {
-      <app-room [room]="room" [config]="config" [currencies]="currencies()" [offices]="offices()" (submitData)="submit($event)"/>
+      <app-room
+        [room]="room"
+        [config]="config"
+        [currencies]="currencies()"
+        [offices]="offices()"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton [lines]="0" [boxes]="3"/>
+      <app-skeleton [lines]="0" [boxes]="3" />
     }
   `,
   imports: [RoomComponent, SkeletonComponent],

@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 import { TreatmentComponent } from './treatment.component';
 import { IColorAll } from '../color/color';
 import { ITreatmentGroupAll } from './treatment';
@@ -8,11 +8,16 @@ import { TreatmentStore } from '../store/treatment.store';
 import { DEFAULT_LOCALE } from '../util/dates';
 import { ColorStore } from '../store/color.store';
 import { NavigationService } from '../services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { provideRouter } from '@angular/router';
 
 describe('TreatmentComponent', () => {
   let component: TreatmentComponent;
   let fixture: ComponentFixture<TreatmentComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let treatmentStoreSpy: {
     subErrors: ReturnType<typeof signal<any>>;
@@ -20,7 +25,7 @@ describe('TreatmentComponent', () => {
 
   let colorStoreSpy: {
     data: ReturnType<typeof signal<any>>;
-    loadAll: jasmine.Spy;
+    loadAll: Mock;
   };
 
   const mockColor = {
@@ -41,29 +46,30 @@ describe('TreatmentComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     treatmentStoreSpy = {
       subErrors: signal<any>(undefined),
     };
     colorStoreSpy = {
       data: signal<any>(undefined),
-      loadAll: jasmine.createSpy('loadAll'),
+      loadAll: vi.fn().mockName('loadAll'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentComponent, TranslateModule.forRoot()],
+      imports: [TreatmentComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
       ],
     }).compileComponents();
 
-    fixture =
-      TestBed.overrideTemplate(TreatmentComponent, '<input #colorInput /> <input #nameInput />')
-        .createComponent(TreatmentComponent);
+    fixture = TestBed.createComponent(TreatmentComponent);
     component = fixture.componentInstance;
 
     fixture.componentRef.setInput('config', config);
@@ -77,15 +83,19 @@ describe('TreatmentComponent', () => {
   it('should patch form when treatment input emits', () => {
     colorStoreSpy.data.set({
       kind: 'list',
-      value: [
-        mockColor,
-        { id: 'g2', name: 'Color 2' },
-      ] as IColorAll[],
+      value: [mockColor, { id: 'g2', name: 'Color 2' }] as IColorAll[],
     });
-    fixture.componentRef.setInput('treatment', mockTreatment as ITreatmentGroupAll);
+    fixture.componentRef.setInput(
+      'treatment',
+      mockTreatment as ITreatmentGroupAll,
+    );
     fixture.detectChanges();
     expect(component.colorsSignal().length).toBe(1);
-    expect(component.allColorsWritableSignal()?.some((g: IColorAll) => g.id === 'g2')).toBeTrue();
+    expect(
+      component
+        .allColorsWritableSignal()
+        ?.some((g: IColorAll) => g.id === 'g2'),
+    ).toBe(true);
   });
 
   it('should handle form errors from subErrors signal', () => {
@@ -95,11 +105,11 @@ describe('TreatmentComponent', () => {
     fixture.detectChanges();
 
     expect(component.errors()['name']).toBe('Name required');
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
   });
 
   it('should not emit when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('');
@@ -111,7 +121,7 @@ describe('TreatmentComponent', () => {
   });
 
   it('should emit submitData when in add mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     component.getForm.name.setValue('New Treatment');
@@ -126,14 +136,16 @@ describe('TreatmentComponent', () => {
 
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Treatment',
-      description: 'New Description',
-    }));
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Treatment',
+        description: 'New Description',
+      }),
+    );
   });
 
   it('should emit submitData when in edit mode and form valid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     fixture.componentRef.setInput('treatment', {
@@ -151,10 +163,12 @@ describe('TreatmentComponent', () => {
 
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: 'Updated Description',
-      name: 'Updated Treatment',
-    }));
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        description: 'Updated Description',
+        name: 'Updated Treatment',
+      }),
+    );
   });
 
   it('filteredColorSignal should return colors when input empty and filter when value set', () => {
@@ -191,34 +205,66 @@ describe('TreatmentComponent', () => {
       { id: 'g1', name: 'G1' } as any,
       { id: 'g2', name: 'G2' } as any,
     ]);
-    component.allColorsWritableSignal.set([
-      { id: 'g3', name: 'G3' } as any,
-    ]);
+    component.allColorsWritableSignal.set([{ id: 'g3', name: 'G3' } as any]);
     fixture.detectChanges();
 
     component.remove(component.colorsSignal()[1]);
     fixture.detectChanges();
 
     expect(component.colorsSignal().length).toBe(1);
-    expect(component.allColorsWritableSignal()?.some((g: any) => g.id === 'g2')).toBeTrue();
+    expect(
+      component.allColorsWritableSignal()?.some((g: any) => g.id === 'g2'),
+    ).toBe(true);
     expect(component.getForm.color.value).toBeUndefined();
   });
 
   it('selectedColor should add selected color, remove it from allColorsWritableSignal and clear input', () => {
-    const g1 = { id: 'g1', name: 'G1' } as any;
-    colorStoreSpy.data.set({ kind: 'list', value: [g1, { id: 'g2', name: 'G2' } as any] });
-    component.colorsSignal.set([]);
-    component.allColorsWritableSignal.set([g1, { id: 'g2', name: 'G2' } as any]);
+    const g1 = {
+      id: 'g1',
+      name: 'G1',
+      treatments: [],
+      selectedTreatments: [],
+    };
 
-    const event: any = { option: { value: g1 } };
-    component.colorInput()!.nativeElement.value = 'something';
+    colorStoreSpy.data.set({
+      kind: 'list',
+      value: [
+        g1,
+        {
+          id: 'g2',
+          name: 'G2',
+          treatments: [],
+          selectedTreatments: [],
+        },
+      ],
+    });
 
-    component.selectedColor(event);
     fixture.detectChanges();
 
-    expect(component.colorsSignal().some((g: any) => g.id === 'g1')).toBeTrue();
-    expect(component.allColorsWritableSignal()?.some((g: any) => g.id === 'g1')).toBeFalse();
+    component.colorsSignal.set([]);
+    component.allColorsWritableSignal.set([
+      g1,
+      { id: 'g2', name: 'G2', treatments: [], selectedTreatments: [] },
+    ]);
+
+    const input = component.colorInput()?.nativeElement as HTMLInputElement;
+
+    input.value = 'something';
+
+    const event = {
+      option: { value: g1 },
+    } as MatAutocompleteSelectedEvent;
+
+    component.selectedColor(event);
+
+    expect(component.colorsSignal()).toContain(g1);
+
+    expect(
+      component.allColorsWritableSignal()?.some((g) => g.id === 'g1'),
+    ).toBe(false);
+
     expect(component.getForm.color.value).toBeUndefined();
+    expect(input.value).toBe('');
   });
 
   it('should not show selected colors in filteredColorSignal', () => {
@@ -248,7 +294,9 @@ describe('TreatmentComponent', () => {
     component.selectedColor({ option: { value: color } } as any);
     fixture.detectChanges();
 
-    expect(component.colorsSignal().filter(({ id }) => id === color.id).length).toBe(1);
+    expect(
+      component.colorsSignal().filter(({ id }) => id === color.id).length,
+    ).toBe(1);
   });
 
   it('sortColors should sort alphabetically ignoring case', () => {

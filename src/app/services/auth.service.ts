@@ -8,13 +8,15 @@ import { toUrl } from '../util/helper';
   providedIn: 'root',
 })
 export class AuthService {
-
   private url = 'auth';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
-  login = (token: string, code?: string | null, theme?: string): Observable<Token> => this.http.post<Token>(
-    toUrl(this.urlV1, 'login'), { token, code, theme },
-  );
+  login = (
+    token: string,
+    code?: string | null,
+    theme?: string,
+  ): Observable<Token> =>
+    this.http.post<Token>(toUrl(this.urlV1, 'login'), { token, code, theme });
 }

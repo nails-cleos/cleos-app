@@ -1,15 +1,19 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
 import { ICatalogueAll } from './catalogue';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('CatalogueCreatePageComponent', () => {
   let component: CatalogueCreatePageComponent;
   let fixture: ComponentFixture<CatalogueCreatePageComponent>;
 
   let catalogueStoreSpy: {
-    clean: jasmine.Spy;
-    create: jasmine.Spy;
+    clean: Mock;
+    create: Mock;
   };
 
   const mockCatalogue: ICatalogueAll = {
@@ -26,17 +30,19 @@ describe('CatalogueCreatePageComponent', () => {
 
   beforeEach(async () => {
     catalogueStoreSpy = {
-      clean: jasmine.createSpy('clean'),
-      create: jasmine.createSpy('create'),
+      clean: vi.fn().mockName('clean'),
+      create: vi.fn().mockName('create'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CatalogueCreatePageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(CatalogueCreatePageComponent, '')
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueCreatePageComponent);
     component = fixture.componentInstance;
@@ -53,7 +59,7 @@ describe('CatalogueCreatePageComponent', () => {
     component.submit({ catalogue: mockCatalogue, resizedImageDataUrl });
 
     expect(catalogueStoreSpy.create).toHaveBeenCalledWith(
-      jasmine.objectContaining({
+      expect.objectContaining({
         name: 'Test Catalogue',
         home: true,
         catalog: true,

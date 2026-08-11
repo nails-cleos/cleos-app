@@ -1,9 +1,15 @@
-import { ChangeDetectionStrategy, Component, effect, input, signal } from '@angular/core';
-import { createChart, IChartUtil } from '../../../../util/chart';
-import { IChart } from '../../../../dashboard/dashboard';
-import { ICurrency } from '../../../../currency/currency';
-import { ErrorComponent } from '../../../../shared/error/error.component';
-import { IError } from '../../../../interfaces/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  signal,
+} from '@angular/core';
+import { createChart, IChartUtil } from '@app/util/chart';
+import { IChart } from '@app/dashboard/dashboard';
+import { ICurrency } from '@app/currency/currency';
+import { ErrorComponent } from '@app/shared/error/error.component';
+import { IError } from '@app/interfaces/common';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
@@ -25,7 +31,9 @@ export class OverviewChartComponent {
     effect(() => {
       const chartSummary = this.chartSummary();
       if (chartSummary) {
-        this.chartSignal.set(createChart(chartSummary, this.currency(), this.isDark()));
+        this.chartSignal.set(
+          createChart(chartSummary, this.currency(), this.isDark()),
+        );
       }
     });
   }

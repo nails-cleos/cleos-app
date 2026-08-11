@@ -1,6 +1,13 @@
 @if (itemsSignal(); as items) {
-  <app-drag-drop-sorting [title]="'TREATMENT.DETAIL' | translate" [items]="items"
-                         (sorted)="sorted($event)"></app-drag-drop-sorting>
+  <app-drag-drop-sorting
+    [title]="'TREATMENT.DETAIL' | translate"
+    [items]="items"
+    (sorted)="sorted($event)"
+  ></app-drag-drop-sorting>
 } @else {
-  <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [showMedia]="false"></app-card-list-skeleton>
+  <app-card-list-skeleton
+    [badgeCount]="0"
+    [actionCount]="0"
+    [showMedia]="false"
+  ></app-card-list-skeleton>
 }

@@ -34,7 +34,11 @@
   position: absolute;
   inset: 6px auto 6px 0;
   width: 1px;
-  background: color-mix(in srgb, var(--app-surface-card-border) 85%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--app-surface-card-border) 85%,
+    transparent
+  );
 }
 
 .sub-menu {
@@ -53,7 +57,16 @@
   background-color: var(--app-drawer-panel-bg) !important;
 }
 
-:host-context(.dark-theme) :is(.mat-mdc-list-item, .mat-mdc-list-item .mdc-list-item__primary-text, .mat-mdc-list-item .mdc-list-item__supporting-text, .mat-mdc-list-item .mat-icon, [matListItemTitle], [matListItemLine], [matListItemMeta]) {
+:host-context(.dark-theme)
+  :is(
+    .mat-mdc-list-item,
+    .mat-mdc-list-item .mdc-list-item__primary-text,
+    .mat-mdc-list-item .mdc-list-item__supporting-text,
+    .mat-mdc-list-item .mat-icon,
+    [matListItemTitle],
+    [matListItemLine],
+    [matListItemMeta]
+  ) {
   color: #ffffff !important;
   opacity: 1 !important;
   -webkit-text-fill-color: #ffffff !important;
@@ -61,8 +74,14 @@
 
 :host-context(.dark-theme) ::ng-deep .mat-mdc-list-item,
 :host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__content,
-:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__primary-text,
-:host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__supporting-text,
+:host-context(.dark-theme)
+  ::ng-deep
+  .mat-mdc-list-item
+  .mdc-list-item__primary-text,
+:host-context(.dark-theme)
+  ::ng-deep
+  .mat-mdc-list-item
+  .mdc-list-item__supporting-text,
 :host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__start,
 :host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mdc-list-item__end,
 :host-context(.dark-theme) ::ng-deep .mat-mdc-list-item .mat-icon {

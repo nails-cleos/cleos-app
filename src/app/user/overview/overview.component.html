@@ -1,112 +1,172 @@
-<div class="overview-canvas app-surface-canvas app-surface-shell app-surface-stack">
-    <div class="overview-hero">
-      <mat-card appearance="outlined" class="overview-card--hero app-surface-hero app-detail-panel">
-        <mat-card-content>
-          <div class="overview-card__eyebrow app-surface-eyebrow">Customer overview</div>
+<div
+  class="overview-canvas app-surface-canvas app-surface-shell app-surface-stack"
+>
+  <div class="overview-hero">
+    <mat-card
+      appearance="outlined"
+      class="overview-card--hero app-surface-hero app-detail-panel"
+    >
+      <mat-card-content>
+        <div class="overview-card__eyebrow app-surface-eyebrow">
+          Customer overview
+        </div>
 
-          <div class="overview-hero__header">
-            <div class="overview-hero__identity">
+        <div class="overview-hero__header">
+          <div class="overview-hero__identity">
+            @if (customer) {
+              <app-avatar
+                class="overview-avatar"
+                [src]="image"
+                [initials]="initials"
+                alt="Profile"
+              >
+              </app-avatar>
+            } @else {
+              <div class="overview-avatar-skeleton ssc-circle"></div>
+            }
+
+            <div class="overview-hero__copy">
               @if (customer) {
-                <app-avatar class="overview-avatar"
-                            [src]="image"
-                            [initials]="initials"
-                            alt="Profile">
-                </app-avatar>
+                <h1>{{ customer.displayName }}</h1>
+
+                <div class="overview-hero__meta">
+                  <span class="overview-chip app-detail-chip">
+                    <mat-icon>cake</mat-icon>
+                    {{ customer.dob || 'N/A' }}
+                  </span>
+
+                  <span class="overview-chip app-detail-chip">
+                    <mat-icon>phone</mat-icon>
+                    {{ customer.phone || 'N/A' }}
+                  </span>
+
+                  <span class="overview-chip app-detail-chip">
+                    <mat-icon>mail_outline</mat-icon>
+                    {{ customer.email || 'N/A' }}
+                  </span>
+                </div>
               } @else {
-                <div class="overview-avatar-skeleton ssc-circle"></div>
-              }
-
-              <div class="overview-hero__copy">
-                @if (customer) {
-                  <h1>{{ customer.displayName }}</h1>
-
-                  <div class="overview-hero__meta">
-                    <span class="overview-chip app-detail-chip">
-                      <mat-icon>cake</mat-icon>
-                      {{ customer.dob || 'N/A' }}
-                    </span>
-
-                    <span class="overview-chip app-detail-chip">
-                      <mat-icon>phone</mat-icon>
-                      {{ customer.phone || 'N/A' }}
-                    </span>
-
-                    <span class="overview-chip app-detail-chip">
-                      <mat-icon>mail_outline</mat-icon>
-                      {{ customer.email || 'N/A' }}
-                    </span>
-                  </div>
-                } @else {
-                  <div class="ssc-line overview-skeleton overview-skeleton--hero-title"></div>
-                  <div class="overview-hero__meta">
-                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
-                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
-                    <div class="ssc-head-line overview-skeleton overview-skeleton--chip"></div>
-                  </div>
-                }
-              </div>
-            </div>
-
-            <div class="overview-hero__actions app-detail-actions">
-              @if (customer) {
-                @if (customer.phone) {
-                  <button color="accent" mat-stroked-button type="button" (click)="notification()">
-                    <mat-icon>campaign</mat-icon>
-                    Notify
-                  </button>
-                }
-
-                <button color="accent" mat-stroked-button type="button" (click)="goToProfile()">
-                  <mat-icon>edit</mat-icon>
-                  {{ 'COMMON.BUTTON.EDIT' | translate }}
-                </button>
-              } @else {
-                <div class="ssc-head-line overview-skeleton overview-skeleton--button"></div>
-                <div class="ssc-head-line overview-skeleton overview-skeleton--button"></div>
+                <div
+                  class="ssc-line overview-skeleton overview-skeleton--hero-title"
+                ></div>
+                <div class="overview-hero__meta">
+                  <div
+                    class="ssc-head-line overview-skeleton overview-skeleton--chip"
+                  ></div>
+                  <div
+                    class="ssc-head-line overview-skeleton overview-skeleton--chip"
+                  ></div>
+                  <div
+                    class="ssc-head-line overview-skeleton overview-skeleton--chip"
+                  ></div>
+                </div>
               }
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
 
-    <mat-card appearance="outlined" class="app-surface-section">
-      <mat-card-content>
-        <div class="overview-stats-grid">
-          @if (isLoadingSignal()) {
-            @for (skeleton of miniCardSkeletons; track skeleton) {
-              <mat-card appearance="outlined" class="overview-stat-card app-surface-item app-surface-item--section">
-                <mat-card-content class="overview-skeleton-card">
-                  <div class="ssc-line overview-skeleton overview-skeleton--stat-label"></div>
-                  <div class="ssc-line overview-skeleton overview-skeleton--stat-value"></div>
-                </mat-card-content>
-              </mat-card>
+          <div class="overview-hero__actions app-detail-actions">
+            @if (customer) {
+              @if (customer.phone) {
+                <button
+                  color="accent"
+                  mat-stroked-button
+                  type="button"
+                  (click)="notification()"
+                >
+                  <mat-icon>campaign</mat-icon>
+                  Notify
+                </button>
+              }
+
+              <button
+                color="accent"
+                mat-stroked-button
+                type="button"
+                (click)="goToProfile()"
+              >
+                <mat-icon>edit</mat-icon>
+                {{ 'COMMON.BUTTON.EDIT' | translate }}
+              </button>
+            } @else {
+              <div
+                class="ssc-head-line overview-skeleton overview-skeleton--button"
+              ></div>
+              <div
+                class="ssc-head-line overview-skeleton overview-skeleton--button"
+              ></div>
             }
-          } @else {
-          <mat-card appearance="outlined" class="overview-stat-card overview-stat-card--balance app-surface-item app-surface-item--section">
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card appearance="outlined" class="app-surface-section">
+    <mat-card-content>
+      <div class="overview-stats-grid">
+        @if (isLoadingSignal()) {
+          @for (skeleton of miniCardSkeletons; track skeleton) {
+            <mat-card
+              appearance="outlined"
+              class="overview-stat-card app-surface-item app-surface-item--section"
+            >
+              <mat-card-content class="overview-skeleton-card">
+                <div
+                  class="ssc-line overview-skeleton overview-skeleton--stat-label"
+                ></div>
+                <div
+                  class="ssc-line overview-skeleton overview-skeleton--stat-value"
+                ></div>
+              </mat-card-content>
+            </mat-card>
+          }
+        } @else {
+          <mat-card
+            appearance="outlined"
+            class="overview-stat-card overview-stat-card--balance app-surface-item app-surface-item--section"
+          >
             <mat-card-content>
-              <div class="overview-stat-card__icon overview-stat-card__icon--action">
+              <div
+                class="overview-stat-card__icon overview-stat-card__icon--action"
+              >
                 <mat-icon>account_balance_wallet</mat-icon>
                 @if (account) {
-                  <button aria-label="Open transactions" class="overview-stat-card__plus-button"
-                          color="accent" mat-mini-fab type="button" (click)="goTo()">
+                  <button
+                    aria-label="Open transactions"
+                    class="overview-stat-card__plus-button"
+                    color="accent"
+                    mat-mini-fab
+                    type="button"
+                    (click)="goTo()"
+                  >
                     <mat-icon>add</mat-icon>
                   </button>
                 }
               </div>
 
-              <div class="overview-stat-card__label app-surface-item__label">{{ 'COMMON.ACCOUNT.BALANCE' | translate }}</div>
+              <div class="overview-stat-card__label app-surface-item__label">
+                {{ 'COMMON.ACCOUNT.BALANCE' | translate }}
+              </div>
 
               @if (account) {
-                <div class="overview-stat-card__balance app-surface-item__value">{{ account.balance | currency: account.currency.code }}</div>
+                <div
+                  class="overview-stat-card__balance app-surface-item__value"
+                >
+                  {{ account.balance | currency: account.currency.code }}
+                </div>
               } @else {
-                <div class="ssc-line overview-skeleton overview-skeleton--stat-value"></div>
+                <div
+                  class="ssc-line overview-skeleton overview-skeleton--stat-value"
+                ></div>
               }
             </mat-card-content>
           </mat-card>
 
           @for (mc of miniCardData(); track mc) {
-            <mat-card appearance="outlined" class="overview-stat-card app-surface-item app-surface-item--section">
+            <mat-card
+              appearance="outlined"
+              class="overview-stat-card app-surface-item app-surface-item--section"
+            >
               @if (!mc.error) {
                 <mat-card-content>
                   @if (mc.title) {
@@ -114,18 +174,31 @@
                       <mat-icon>{{ mc.icon }}</mat-icon>
                     </div>
 
-                    <div class="overview-stat-card__label app-surface-item__label">{{ mc.title | translate }}</div>
+                    <div
+                      class="overview-stat-card__label app-surface-item__label"
+                    >
+                      {{ mc.title | translate }}
+                    </div>
 
                     @if (mc.split) {
                       <div class="overview-stat-card__split">
                         @if (mc.link) {
-                          <button mat-button type="button" [disabled]="!mc.primaryId" (click)="mc.link(mc.primaryId)">
+                          <button
+                            mat-button
+                            type="button"
+                            [disabled]="!mc.primaryId"
+                            (click)="mc.link(mc.primaryId)"
+                          >
                             {{ mc.primaryValue }}
                           </button>
 
                           @if (mc.secondaryValue) {
-                            <button mat-button type="button" [disabled]="!mc.secondaryId"
-                                    (click)="mc.link(mc.secondaryId)">
+                            <button
+                              mat-button
+                              type="button"
+                              [disabled]="!mc.secondaryId"
+                              (click)="mc.link(mc.secondaryId)"
+                            >
                               {{ mc.secondaryValue }}
                             </button>
                           }
@@ -137,75 +210,109 @@
                         }
                       </div>
                     } @else {
-                      <div class="overview-stat-card__value app-surface-item__value">{{ mc.primaryValue }}/{{ mc.secondaryValue }}</div>
+                      <div
+                        class="overview-stat-card__value app-surface-item__value"
+                      >
+                        {{ mc.primaryValue }}/{{ mc.secondaryValue }}
+                      </div>
                     }
                   } @else {
                     <div class="ssc-square"></div>
                   }
                 </mat-card-content>
               } @else {
-                <app-error [error]="mc.error" [isCard]="true" class="text-center"></app-error>
+                <app-error
+                  [error]="mc.error"
+                  [isCard]="true"
+                  class="text-center"
+                ></app-error>
               }
             </mat-card>
           }
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-grid-list class="overview-chart-grid" [cols]="chartColumns()" rowHeight="430px" gutterSize="16px">
-      @if (isLoadingSignal()) {
-        @for (skeleton of chartSkeletons; track skeleton) {
-          <mat-grid-tile>
-            <mat-card appearance="outlined" class="overview-chart-skeleton app-surface-section">
-              <mat-card-content>
-                <div class="ssc-line overview-skeleton overview-skeleton--chart-title"></div>
-                <div class="ssc-line overview-skeleton overview-skeleton--chart-subtitle"></div>
-                <div class="overview-chart-skeleton__body">
-                  <div class="ssc-square overview-skeleton overview-skeleton--chart"></div>
-                </div>
-              </mat-card-content>
-            </mat-card>
-          </mat-grid-tile>
         }
-      } @else {
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-grid-list
+    class="overview-chart-grid"
+    [cols]="chartColumns()"
+    rowHeight="430px"
+    gutterSize="16px"
+  >
+    @if (isLoadingSignal()) {
+      @for (skeleton of chartSkeletons; track skeleton) {
+        <mat-grid-tile>
+          <mat-card
+            appearance="outlined"
+            class="overview-chart-skeleton app-surface-section"
+          >
+            <mat-card-content>
+              <div
+                class="ssc-line overview-skeleton overview-skeleton--chart-title"
+              ></div>
+              <div
+                class="ssc-line overview-skeleton overview-skeleton--chart-subtitle"
+              ></div>
+              <div class="overview-chart-skeleton__body">
+                <div
+                  class="ssc-square overview-skeleton overview-skeleton--chart"
+                ></div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-grid-tile>
+      }
+    } @else {
       @for (chart of charts(); track chart) {
         <mat-grid-tile>
           <app-card [chart]="chart" [title]="chart.title">
-            <app-chart [chartSummary]="chart" [error]="errorSignal()" [locale]="language"></app-chart>
+            <app-chart
+              [chartSummary]="chart"
+              [error]="errorSignal()"
+              [locale]="language"
+            ></app-chart>
           </app-card>
         </mat-grid-tile>
       }
-      }
-    </mat-grid-list>
-
-    @if (customer?.address; as address) {
-      <mat-card appearance="outlined" class="app-surface-section">
-        <mat-card-content>
-          <div class="overview-card__eyebrow app-surface-eyebrow">Location</div>
-
-          <div class="overview-map app-surface-item app-surface-item--section">
-            <app-google-map [latitudeMarker]="address.location.y"
-                            [longitudeMarker]="address.location.x"
-                            [markInfo]="'<b>' + address.name + '</b>'"></app-google-map>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    } @else if (isLoadingSignal()) {
-      <mat-card appearance="outlined" class="app-surface-section">
-        <mat-card-content>
-          <div class="ssc-head-line overview-skeleton overview-skeleton--map-title"></div>
-          <div class="overview-map overview-map--skeleton app-surface-item app-surface-item--section">
-            <div class="ssc-square overview-skeleton overview-skeleton--map"></div>
-          </div>
-        </mat-card-content>
-      </mat-card>
     }
+  </mat-grid-list>
 
-    <div class="app-detail-actions">
-      <button appBackButton mat-stroked-button type="button">
-        <mat-icon>keyboard_return</mat-icon>
-        <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
-      </button>
-    </div>
+  @if (customer?.address; as address) {
+    <mat-card appearance="outlined" class="app-surface-section">
+      <mat-card-content>
+        <div class="overview-card__eyebrow app-surface-eyebrow">Location</div>
+
+        <div class="overview-map app-surface-item app-surface-item--section">
+          <app-google-map
+            [latitudeMarker]="address.location.y"
+            [longitudeMarker]="address.location.x"
+            [markInfo]="'<b>' + address.name + '</b>'"
+          ></app-google-map>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else if (isLoadingSignal()) {
+    <mat-card appearance="outlined" class="app-surface-section">
+      <mat-card-content>
+        <div
+          class="ssc-head-line overview-skeleton overview-skeleton--map-title"
+        ></div>
+        <div
+          class="overview-map overview-map--skeleton app-surface-item app-surface-item--section"
+        >
+          <div
+            class="ssc-square overview-skeleton overview-skeleton--map"
+          ></div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <div class="app-detail-actions">
+    <button appBackButton mat-stroked-button type="button">
+      <mat-icon>keyboard_return</mat-icon>
+      <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
+    </button>
+  </div>
 </div>

@@ -1,13 +1,15 @@
 <table class="app-table-skeleton-table">
   @if (showHeader()) {
     <thead>
-    <tr>
-      @for (column of columns(); track column.key) {
-        <th [class.app-surface-hide-mobile]="column.hideOnMobile">
-          <div class="ssc-line app-table-skeleton-line app-table-skeleton-line--header"></div>
-        </th>
-      }
-    </tr>
+      <tr>
+        @for (column of columns(); track column.key) {
+          <th [class.app-surface-hide-mobile]="column.hideOnMobile">
+            <div
+              class="ssc-line app-table-skeleton-line app-table-skeleton-line--header"
+            ></div>
+          </th>
+        }
+      </tr>
     </thead>
   }
   <tbody>
@@ -25,6 +27,8 @@
 
 @if (showPaginator()) {
   <div class="app-table-skeleton-paginator">
-    <div class="ssc-line app-table-skeleton-line app-table-skeleton-line--paginator"></div>
+    <div
+      class="ssc-line app-table-skeleton-line app-table-skeleton-line--paginator"
+    ></div>
   </div>
 }

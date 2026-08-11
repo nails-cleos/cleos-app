@@ -6,14 +6,27 @@ import { provideFeatureTranslations } from '../shared/feature-providers';
 import { CatalogueCreatePageComponent } from './catalogue-create-page.component';
 import { CatalogueDetailsPageComponent } from './catalogue-details-page.component';
 
-const providers = [
-  provideFeatureTranslations('catalogue'),
-];
+const providers = [provideFeatureTranslations('catalogue')];
 
 const children: Routes = [
-  { path: '', component: CatalogueListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: CatalogueCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: CatalogueDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  {
+    path: '',
+    component: CatalogueListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: 'add',
+    component: CatalogueCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: ':id',
+    component: CatalogueDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
 ];
 
 export const CATALOGUE_ROUTES: Routes = [{ path: '', providers, children }];

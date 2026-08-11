@@ -2,24 +2,36 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ getConfig.title | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          getConfig.title | translate
+        }}</span>
         @if (additional(); as additional) {
           <h2 class="app-crud-title">{{ additional.name }}</h2>
         }
       </div>
     </div>
 
-    <form (ngSubmit)="submit()"
-          [formGroup]="form"
-          novalidate
-          (keydown.enter)="$event.preventDefault()"
-          class="app-crud-form">
+    <form
+      (ngSubmit)="submit()"
+      [formGroup]="form"
+      novalidate
+      (keydown.enter)="$event.preventDefault()"
+      class="app-crud-form"
+    >
       <div class="app-crud-form-grid">
         <mat-form-field appearance="outline">
           <mat-label>{{ 'ADDITIONAL.NAME.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.name" autocomplete="name" matInput required data-cy="name-input">
+          <input
+            [formControl]="getForm.name"
+            autocomplete="name"
+            matInput
+            required
+            data-cy="name-input"
+          />
           @if (getForm.name.hasError('required')) {
-            <mat-error [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'ADDITIONAL.NAME.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['name']) {
             <mat-error>{{ errors()['name'] }}</mat-error>
           }
@@ -27,37 +39,54 @@
 
         <mat-form-field appearance="outline">
           <mat-label>{{ 'ADDITIONAL.DURATION.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.duration"
-                 [format]="24"
-                 [timepicker]="t"
-                 data-cy="duration-input"
-                 matInput
-                 name="duration"
-                 readonly
-                 required/>
-          <span matPrefix><mat-icon (click)="t.open()" matPrefix>timer</mat-icon> &nbsp;</span>
+          <input
+            [formControl]="getForm.duration"
+            [format]="24"
+            [timepicker]="t"
+            data-cy="duration-input"
+            matInput
+            name="duration"
+            readonly
+            required
+          />
+          <span matPrefix
+            ><mat-icon (click)="t.open()" matPrefix>timer</mat-icon>
+            &nbsp;</span
+          >
           <app-timepicker #t [minutesGap]="15"></app-timepicker>
           @if (getForm.duration.hasError('required')) {
-            <mat-error [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'ADDITIONAL.DURATION.REQUIRED' | translate"
+            ></mat-error>
           } @else if (errors()['duration']) {
             <mat-error>{{ errors()['duration'] }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="app-crud-form-grid__full">
-          <mat-label>{{ 'ADDITIONAL.DESCRIPTION.FIELD' | translate }}</mat-label>
-          <textarea #message [formControl]="getForm.description"
-                    data-cy="description-textarea"
-                    matInput
-                    maxlength="256"></textarea>
+          <mat-label>{{
+            'ADDITIONAL.DESCRIPTION.FIELD' | translate
+          }}</mat-label>
+          <textarea
+            #message
+            [formControl]="getForm.description"
+            data-cy="description-textarea"
+            matInput
+            maxlength="256"
+          ></textarea>
           <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
         </mat-form-field>
 
-        <div class="app-inline-field-action app-crud-form-grid__full" id="groups">
+        <div
+          class="app-inline-field-action app-crud-form-grid__full"
+          id="groups"
+        >
           @if (allGroupsWritableSignal(); as allGroups) {
             @if (allGroups.length || groupsSignal().length) {
               <mat-form-field class="chip-list" appearance="outline">
-                <mat-label>{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</mat-label>
+                <mat-label>{{
+                  'COMMON.TREATMENT.GROUP.FIELD' | translate
+                }}</mat-label>
                 <mat-chip-grid #chipList aria-label="Group selection">
                   @for (group of groupsSignal(); track group.id) {
                     <mat-chip-row (removed)="remove(group)" [removable]="true">
@@ -65,25 +94,37 @@
                       <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip-row>
                   }
-                  <input #groupInput
-                         [formControl]="getForm.group"
-                         [matAutocomplete]="auto"
-                         [matChipInputFor]="chipList"
-                         matInput>
+                  <input
+                    #groupInput
+                    [formControl]="getForm.group"
+                    [matAutocomplete]="auto"
+                    [matChipInputFor]="chipList"
+                    matInput
+                  />
                 </mat-chip-grid>
-                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectedGroup($event)">
-                  @for (group of sortGroups(filteredGroupSignal()); track group.id) {
+                <mat-autocomplete
+                  #auto="matAutocomplete"
+                  (optionSelected)="selectedGroup($event)"
+                >
+                  @for (
+                    group of sortGroups(filteredGroupSignal());
+                    track group.id
+                  ) {
                     <mat-option [value]="group">{{ group.name }}</mat-option>
                   }
                 </mat-autocomplete>
               </mat-form-field>
 
-              <button mat-stroked-button
-                      type="button"
-                      [routerLink]="['/', language, 'treatments', 'add']"
-                      class="app-surface-filter-action app-detail-action-button">
+              <button
+                mat-stroked-button
+                type="button"
+                [routerLink]="['/', language, 'treatments', 'add']"
+                class="app-surface-filter-action app-detail-action-button"
+              >
                 <mat-icon>add</mat-icon>
-                <span>{{ 'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate }}</span>
+                <span>{{
+                  'COMMON.TREATMENT.GROUP.ADD_BUTTON' | translate
+                }}</span>
               </button>
             }
           } @else {

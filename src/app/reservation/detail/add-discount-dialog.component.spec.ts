@@ -1,18 +1,21 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddDiscountDialogComponent } from './add-discount-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { DiscountStore } from '../../store/discount.store';
+import { DiscountStore } from '@app/store/discount.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AddDiscountDialogComponent', () => {
   let component: AddDiscountDialogComponent;
   let fixture: ComponentFixture<AddDiscountDialogComponent>;
-  let dialogRef: jasmine.SpyObj<MatDialogRef<AddDiscountDialogComponent>>;
+  let dialogRef: Pick<MatDialogRef<AddDiscountDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
   let discountStoreSpy: {
     data: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadUserDiscounts: jasmine.Spy;
+    clean: Mock;
+    loadUserDiscounts: Mock;
   };
 
   const dialogData = {
@@ -20,19 +23,19 @@ describe('AddDiscountDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRef = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
     discountStoreSpy = {
       data: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadUserDiscounts: jasmine.createSpy('loadUserDiscounts'),
+      clean: vi.fn().mockName('clean'),
+      loadUserDiscounts: vi.fn().mockName('loadUserDiscounts'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [
-        AddDiscountDialogComponent,
-        TranslateModule.forRoot(),
-      ],
+      imports: [AddDiscountDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: DiscountStore, useValue: discountStoreSpy },
         {
           provide: MAT_DIALOG_DATA,
@@ -58,7 +61,7 @@ describe('AddDiscountDialogComponent', () => {
   it('should initialize the form with empty discount', () => {
     expect(component.form).toBeDefined();
     expect(component.getForm.discount.value).toBe('');
-    expect(component.getForm.discount.valid).toBeFalse();
+    expect(component.getForm.discount.valid).toBe(false);
   });
 
   it('should compute customerId from dialog data', () => {
@@ -67,7 +70,9 @@ describe('AddDiscountDialogComponent', () => {
 
   it('should load user discounts on init', () => {
     expect(discountStoreSpy.clean).toHaveBeenCalled();
-    expect(discountStoreSpy.loadUserDiscounts).toHaveBeenCalledWith('customer-123');
+    expect(discountStoreSpy.loadUserDiscounts).toHaveBeenCalledWith(
+      'customer-123',
+    );
   });
 
   it('onNoClick should close the dialog without data', () => {
@@ -81,6 +86,8 @@ describe('AddDiscountDialogComponent', () => {
 
     component.doAction();
 
-    expect(dialogRef.close).toHaveBeenCalledWith({ discountId: 'discount-456' });
+    expect(dialogRef.close).toHaveBeenCalledWith({
+      discountId: 'discount-456',
+    });
   });
 });

@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { ICatalogue, ICatalogueAll } from '../catalogue/catalogue';
 import { IApiResponse } from '../interfaces/common';
 import { CatalogueService } from '../services/catalogue.service';
@@ -19,11 +18,7 @@ const initialState = createStoreInitialState<ICatalogueAll[], ICatalogueAll>();
 export const CatalogueStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    catalogueService = inject(CatalogueService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, catalogueService = inject(CatalogueService)) => {
     let loadAllCataloguesSubscription: Subscription | undefined;
     let getAllHomeSubscription: Subscription | undefined;
     let loadCatalogsSubscription: Subscription | undefined;
@@ -44,7 +39,8 @@ export const CatalogueStore = signalStore(
       deleteSubscription?.unsubscribe();
     };
 
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -64,10 +60,12 @@ export const CatalogueStore = signalStore(
         loadAllCataloguesSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadAllCataloguesSubscription = catalogueService.getAllCatalogues().subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: patchError,
-        });
+        loadAllCataloguesSubscription = catalogueService
+          .getAllCatalogues()
+          .subscribe({
+            next: (data) => patchState(store, { data, isLoading: false }),
+            error: patchError,
+          });
       },
 
       getAllHome(): void {
@@ -104,50 +102,73 @@ export const CatalogueStore = signalStore(
         createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        createSubscription = catalogueService.createCatalogue(catalogue, resizedImageDataUrl).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('CATALOGUE.CREATED', { name: response.name }),
-              path: `catalogues/${ response.id }`,
-              redirect: 'catalogues',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        createSubscription = catalogueService
+          .createCatalogue(catalogue, resizedImageDataUrl)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'CATALOGUE.CREATED',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `catalogues/${response.id}`,
+                  redirect: 'catalogues',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
-      update(id: string, catalogue: ICatalogue, resizedImageDataUrl: string): void {
+      update(
+        id: string,
+        catalogue: ICatalogue,
+        resizedImageDataUrl: string,
+      ): void {
         updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        updateSubscription = catalogueService.updateCatalogue(id, catalogue, resizedImageDataUrl).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('CATALOGUE.UPDATED.MESSAGE', { name: response.name }),
-              path: `catalogues/${ response.id }`,
-              redirect: 'catalogues',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        updateSubscription = catalogueService
+          .updateCatalogue(id, catalogue, resizedImageDataUrl)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'CATALOGUE.UPDATED.MESSAGE',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `catalogues/${response.id}`,
+                  redirect: 'catalogues',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       sort(catalogues: ICatalogueAll[]): void {
         sortSubscription?.unsubscribe();
-        patchState(store, { data: undefined, response: undefined, isLoading: true });
-
-        sortSubscription = catalogueService.updateCatalogueOrder(catalogues).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: 'CATALOGUE.UPDATED.ALL.MESSAGE',
-            },
-            subErrors: undefined,
-            isLoading: false,
-          }),
-          error: patchError,
+        patchState(store, {
+          data: undefined,
+          response: undefined,
+          isLoading: true,
         });
+
+        sortSubscription = catalogueService
+          .updateCatalogueOrder(catalogues)
+          .subscribe({
+            next: () =>
+              patchState(store, {
+                response: {
+                  message: 'CATALOGUE.UPDATED.ALL.MESSAGE',
+                },
+                subErrors: undefined,
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       delete(id: string, name: string): void {
@@ -155,14 +176,18 @@ export const CatalogueStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = catalogueService.deleteCatalogue(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('CATALOGUE.DELETED.MESSAGE', { name }),
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'CATALOGUE.DELETED.MESSAGE',
+                messageParams: {
+                  name,
+                },
+                reload: true,
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },

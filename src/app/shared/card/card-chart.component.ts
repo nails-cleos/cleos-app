@@ -6,7 +6,7 @@ import {
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import { IChartUtil } from '../../util/chart';
+import { IChartUtil } from '@app/util/chart';
 import { ChartComponent } from '../chart/chart.component';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MatButton } from '@angular/material/button';
@@ -14,13 +14,20 @@ import { MatButton } from '@angular/material/button';
 type CardChartData = {
   chart: IChartUtil;
   title: string;
-}
+};
 
 @Component({
   selector: 'app-card-chart-component',
   templateUrl: './card-chart-component.html',
   styleUrls: ['./card-chart-component.scss'],
-  imports: [MatButton, TranslatePipe, ChartComponent, MatDialogTitle, MatDialogContent, MatDialogActions],
+  imports: [
+    MatButton,
+    TranslatePipe,
+    ChartComponent,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardChartComponent {

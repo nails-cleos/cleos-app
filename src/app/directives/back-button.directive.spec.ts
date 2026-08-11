@@ -1,20 +1,22 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { BackButtonDirective } from './back-button.directive';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavigationService } from '../services/navigation.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 import { DEFAULT_LOCALE } from '../util/dates';
 
 @Component({
-  template: `
-    <button
-      appBackButton
-      [form]="form"
-      [date]="date"
-      [step]="step"></button>`,
+  template: ` <button
+    appBackButton
+    [form]="form"
+    [date]="date"
+    [step]="step"
+  ></button>`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [BackButtonDirective],
 })
 class HostComponent {
@@ -27,16 +29,21 @@ describe('BackButtonDirective', () => {
   let fixture: ComponentFixture<HostComponent>;
   let hostComp: HostComponent;
   let directive: BackButtonDirective;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let dialogSpy: jasmine.Spy<any>;
+  let navigationServiceSpy: Pick<NavigationService, 'back'> & {
+    back: ReturnType<typeof vi.fn>;
+  };
+  let dialogSpy: Mock;
   let translateService: TranslateService;
 
   beforeEach(() => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     TestBed.configureTestingModule({
-      imports: [HostComponent, TranslateModule.forRoot()],
+      imports: [HostComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     });
@@ -50,13 +57,17 @@ describe('BackButtonDirective', () => {
 
     fixture.detectChanges();
 
-    const debugEl = fixture.debugElement.query(By.directive(BackButtonDirective));
+    const debugEl = fixture.debugElement.query(
+      By.directive(BackButtonDirective),
+    );
     directive = debugEl.injector.get(BackButtonDirective);
 
     translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
 
-    dialogSpy = spyOn(directive.dialog, 'open');
+    dialogSpy = vi
+      .spyOn(directive.dialog, 'open')
+      .mockReturnValue(undefined as any);
   });
 
   it('should create an instance', () => {
@@ -66,11 +77,14 @@ describe('BackButtonDirective', () => {
   it('should call navigation.back when form is pristine', () => {
     hostComp.form?.markAsPristine(); // ensure pristine
 
-    dialogSpy.and.returnValue({ afterClosed: () => of(hostComp.form) });
+    dialogSpy.mockReturnValue({ afterClosed: () => of(hostComp.form) });
 
     directive.onClick();
 
-    expect(navigationServiceSpy.back).toHaveBeenCalledWith(hostComp.date, hostComp.step);
+    expect(navigationServiceSpy.back).toHaveBeenCalledWith(
+      hostComp.date,
+      hostComp.step,
+    );
   });
 
   it('should call navigation.back when no form is provided', () => {
@@ -78,7 +92,10 @@ describe('BackButtonDirective', () => {
 
     directive.onClick();
 
-    expect(navigationServiceSpy.back).toHaveBeenCalledWith(hostComp.date, hostComp.step);
+    expect(navigationServiceSpy.back).toHaveBeenCalledWith(
+      hostComp.date,
+      hostComp.step,
+    );
   });
 
   it('should show dialog when form is dirty', () => {
@@ -88,11 +105,13 @@ describe('BackButtonDirective', () => {
       COMMON: { BACK: { TITLE: 'Back Title', CONTENT: 'Back Content' } },
     });
 
-    dialogSpy.and.returnValue({ afterClosed: () => of(hostComp.form) });
+    dialogSpy.mockReturnValue({ afterClosed: () => of(hostComp.form) });
 
     directive.onClick();
 
     expect(translateService.instant('COMMON.BACK.TITLE')).toBe('Back Title');
-    expect(translateService.instant('COMMON.BACK.CONTENT')).toBe('Back Content');
+    expect(translateService.instant('COMMON.BACK.CONTENT')).toBe(
+      'Back Content',
+    );
   });
 });

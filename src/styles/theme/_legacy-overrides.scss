@@ -81,7 +81,9 @@
 
   .timepicker {
     .timepicker__header {
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette(
+        $primary-palette
+      ) !important;
 
       @if $is-dark {
         color: #fff !important;
@@ -107,46 +109,74 @@
     .timepicker__body,
     .timepicker__actions {
       @if $is-dark {
-        background-color: mat.m2-get-color-from-palette($background, background) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $background,
+          background
+        ) !important;
       } @else {
-        background-color: mat.m2-get-color-from-palette($background, card) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $background,
+          card
+        ) !important;
       }
     }
 
     .clock-face {
       @if $is-dark {
-        background-color: mat.m2-get-color-from-palette($background, card) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $background,
+          card
+        ) !important;
       } @else {
-        background-color: mat.m2-get-color-from-palette($background, background) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $background,
+          background
+        ) !important;
       }
     }
 
     .clock-face__clock-hand {
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette(
+        $primary-palette
+      ) !important;
 
       &::after {
-        background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $primary-palette
+        ) !important;
       }
 
       &::before {
-        border-color: mat.m2-get-color-from-palette($primary-palette) !important;
+        border-color: mat.m2-get-color-from-palette(
+          $primary-palette
+        ) !important;
       }
     }
 
     .clock-face__center {
-      background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+      background-color: mat.m2-get-color-from-palette(
+        $primary-palette
+      ) !important;
     }
 
     .clock-face__number {
       &.active,
       > span.active {
-        background-color: mat.m2-get-color-from-palette($primary-palette) !important;
-        color: mat.m2-get-color-from-palette($primary-palette, default-contrast) !important;
+        background-color: mat.m2-get-color-from-palette(
+          $primary-palette
+        ) !important;
+        color: mat.m2-get-color-from-palette(
+          $primary-palette,
+          default-contrast
+        ) !important;
       }
 
       &.disabled,
       > span.disabled {
-        color: mat.m2-get-color-from-palette($background, disabled-button) !important;
+        color: mat.m2-get-color-from-palette(
+          $background,
+          disabled-button
+        ) !important;
       }
 
       &,
@@ -155,7 +185,9 @@
       }
     }
 
-    button:not(.timepicker-dial__item):not(.timepicker__time-part):not(.timepicker__meridiem-button) {
+    button:not(.timepicker-dial__item):not(.timepicker__time-part):not(
+        .timepicker__meridiem-button
+      ) {
       color: mat.m2-get-color-from-palette($primary-palette) !important;
     }
   }
@@ -182,7 +214,8 @@
   }
 
   #account-spinner mat-progress-spinner {
-    box-shadow: 0 0 0 1.4em mat.m2-get-color-from-palette($primary-palette, default, 0.2) inset;
+    box-shadow: 0 0 0 1.4em
+      mat.m2-get-color-from-palette($primary-palette, default, 0.2) inset;
   }
 
   .card-text-color {
@@ -201,8 +234,12 @@
   }
 
   .stepper-item .step-counter {
-    border: 4px solid mat.m2-get-color-from-palette($background, unselected-chip);
-    background: mat.m2-get-color-from-palette($background, unselected-chip) !important;
+    border: 4px solid
+      mat.m2-get-color-from-palette($background, unselected-chip);
+    background: mat.m2-get-color-from-palette(
+      $background,
+      unselected-chip
+    ) !important;
   }
 
   .stepper-item.completed::after {
@@ -210,7 +247,9 @@
   }
 
   .stepper-item.completed .step-counter {
-    background-color: mat.m2-get-color-from-palette($primary-palette) !important;
+    background-color: mat.m2-get-color-from-palette(
+      $primary-palette
+    ) !important;
     color: mat.m2-get-color-from-palette($foreground, base);
   }
 
@@ -222,7 +261,8 @@
   }
 
   mat-drawer-container .footer {
-    border-top: 2px solid mat.m2-get-color-from-palette($background, disabled-button);
+    border-top: 2px solid
+      mat.m2-get-color-from-palette($background, disabled-button);
 
     a {
       color: mat.m2-get-color-from-palette($foreground, base);
@@ -231,7 +271,8 @@
 
   .stepper-item::before,
   .stepper-item::after {
-    border-bottom: 4px solid mat.m2-get-color-from-palette($background, unselected-chip) !important;
+    border-bottom: 4px solid
+      mat.m2-get-color-from-palette($background, unselected-chip) !important;
   }
 
   a {

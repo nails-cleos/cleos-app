@@ -6,7 +6,11 @@
       </div>
     </div>
 
-    <div cdkDropList class="sorting-item-list" (cdkDropListDropped)="drop($event)">
+    <div
+      cdkDropList
+      class="sorting-item-list"
+      (cdkDropListDropped)="drop($event)"
+    >
       @for (item of items(); track item) {
         <div class="app-surface-item sorting-item-box" cdkDrag>
           <div class="sorting-item-placeholder" *cdkDragPlaceholder></div>

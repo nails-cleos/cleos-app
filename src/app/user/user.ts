@@ -90,22 +90,21 @@ export class User {
     const dob = fieldChange(userForm.dob, currentUser?.dob);
 
     return {
-      locale: valueChange(userForm.lang.value, currentUser?.locale) || currentLang,
+      locale:
+        valueChange(userForm.lang.value, currentUser?.locale) || currentLang,
       email: fieldChange(userForm.email, currentUser?.email),
       displayName: fieldChange(userForm.displayName, currentUser?.displayName),
       phone: fieldChange(userForm.phone, currentUser?.phone),
       dob: dob ? backendFormatDate(newDate(dob)) : dob,
-      ...(isProfessionalOrManager && userForm.lightColor.value && {
-        lightColor: userForm.lightColor.value,
-      }),
-      ...(isProfessionalOrManager && userForm.darkColor.value && {
-        darkColor: userForm.darkColor.value,
-      }),
-      address: createAddress(
-        formattedAddress,
-        location,
-        currentUser?.address,
-      ),
+      ...(isProfessionalOrManager &&
+        userForm.lightColor.value && {
+          lightColor: userForm.lightColor.value,
+        }),
+      ...(isProfessionalOrManager &&
+        userForm.darkColor.value && {
+          darkColor: userForm.darkColor.value,
+        }),
+      address: createAddress(formattedAddress, location, currentUser?.address),
     };
   }
 
@@ -120,8 +119,12 @@ export class User {
     const dob = fieldChange(profileForm.dob, currentUser?.dob);
 
     return {
-      locale: valueChange(profileForm.lang.value, currentUser?.locale) || currentLang,
-      displayName: fieldChange(profileForm.displayName, currentUser?.displayName),
+      locale:
+        valueChange(profileForm.lang.value, currentUser?.locale) || currentLang,
+      displayName: fieldChange(
+        profileForm.displayName,
+        currentUser?.displayName,
+      ),
       phone: fieldChange(profileForm.phone, currentUser?.phone),
       dob: dob ? backendFormatDate(newDate(dob)) : dob,
       showCash,
@@ -131,11 +134,7 @@ export class User {
       ...(profileForm.darkColor.value && {
         darkColor: profileForm.darkColor.value,
       }),
-      address: createAddress(
-        formattedAddress,
-        location,
-        currentUser?.address,
-      ),
+      address: createAddress(formattedAddress, location, currentUser?.address),
     };
   }
 }

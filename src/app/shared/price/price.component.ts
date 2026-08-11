@@ -1,8 +1,13 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { IPrice } from '../../treatment/treatment';
-import { ICurrency } from '../../currency/currency';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
+import { IPrice } from '@app/treatment/treatment';
+import { ICurrency } from '@app/currency/currency';
 import { FormGroup } from '@angular/forms';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { BankComponent, BankForm } from '../bank/bank.component';
 import { MatDivider } from '@angular/material/divider';
 import { PricePreviewComponent } from '../price-preview/price-preview.component';
@@ -30,7 +35,8 @@ export class PriceComponent {
   accountBalanceUsed = input<number>();
   percentageEmitter = output<number>();
 
-  emitter = (percentage: number): void => this.percentageEmitter.emit(percentage);
+  emitter = (percentage: number): void =>
+    this.percentageEmitter.emit(percentage);
 
   get summaryPrice(): IPrice | undefined {
     return this.price() ?? this.paymentPrice();
@@ -51,7 +57,10 @@ export class PriceComponent {
       return 0;
     }
 
-    const remainingAfterPaid = Math.max(this.targetAmount - currentPrice.totalPaid, 0);
+    const remainingAfterPaid = Math.max(
+      this.targetAmount - currentPrice.totalPaid,
+      0,
+    );
     return Math.min(currentPrice.balance ?? 0, remainingAfterPaid);
   }
 
@@ -63,7 +72,10 @@ export class PriceComponent {
     }
 
     if (paymentPrice && this.hasChanges()) {
-      return paymentPrice.total + (this.showPenalty() ? (originalPrice?.penalty ?? 0) : 0);
+      return (
+        paymentPrice.total +
+        (this.showPenalty() ? (originalPrice?.penalty ?? 0) : 0)
+      );
     }
 
     if (this.showPenalty()) {

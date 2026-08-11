@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { NativeDateAdapter } from '@angular/material/core';
 import { DateAdapter } from 'angular-calendar';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('CustomDateFormatter', () => {
   let formatter: CustomDateFormatter;
@@ -30,7 +31,10 @@ describe('CustomDateFormatter', () => {
   describe('monthViewColumnHeader', () => {
     it('should format weekday name', () => {
       const date = new Date(2024, 0, 1); // Monday
-      const header = formatter.monthViewColumnHeader({ date, locale: DEFAULT_LOCALE });
+      const header = formatter.monthViewColumnHeader({
+        date,
+        locale: DEFAULT_LOCALE,
+      });
       expect(header).toBe('Monday');
       expect(header.charAt(0)).toBe(header.charAt(0).toUpperCase());
     });
@@ -39,7 +43,10 @@ describe('CustomDateFormatter', () => {
   describe('weekViewColumnHeader', () => {
     it('should format weekday name', () => {
       const date = new Date(2024, 0, 1); // Monday
-      const header = formatter.weekViewColumnHeader({ date, locale: DEFAULT_LOCALE });
+      const header = formatter.weekViewColumnHeader({
+        date,
+        locale: DEFAULT_LOCALE,
+      });
       expect(header).toBe('Monday');
       expect(header.charAt(0)).toBe(header.charAt(0).toUpperCase());
     });
@@ -48,7 +55,10 @@ describe('CustomDateFormatter', () => {
   describe('weekViewHour', () => {
     it('should format hour and minute', () => {
       const date = new Date(2024, 0, 1, 14, 30);
-      const formatted = formatter.weekViewHour({ date, locale: DEFAULT_LOCALE });
+      const formatted = formatter.weekViewHour({
+        date,
+        locale: DEFAULT_LOCALE,
+      });
       expect(formatted).toBe('14:30');
       expect(formatted.charAt(0)).toBe(formatted.charAt(0).toUpperCase());
     });

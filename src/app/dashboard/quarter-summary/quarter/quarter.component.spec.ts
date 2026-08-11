@@ -1,22 +1,27 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterComponent } from './quarter.component';
-import { TranslateModule } from '@ngx-translate/core';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('QuarterComponent', () => {
   let component: QuarterComponent;
   let fixture: ComponentFixture<QuarterComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
 
     await TestBed.configureTestingModule({
-      imports: [QuarterComponent, TranslateModule.forRoot()],
+      imports: [QuarterComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();

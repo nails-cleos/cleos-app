@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { NoteComponent } from './note.component';
 import { NoteStore } from '../store/note.store';
 import { INote } from './note';
@@ -6,7 +11,8 @@ import { ICommon } from '../interfaces/common';
 
 @Component({
   selector: 'app-note-create-page',
-  template: '<app-note [config]="config" [params]="params()" (submitData)="submit($event)"/>',
+  template:
+    '<app-note [config]="config" [params]="params()" (submitData)="submit($event)"/>',
   imports: [NoteComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -21,7 +27,10 @@ export class NoteCreatePageComponent {
   params = computed(() => {
     const navigationState = history.state;
     if (navigationState) {
-      return { professional: navigationState['professional'], date: navigationState['date'] };
+      return {
+        professional: navigationState['professional'],
+        date: navigationState['date'],
+      };
     }
     return undefined;
   });

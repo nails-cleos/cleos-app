@@ -1,7 +1,9 @@
 .total-summary-operation__header,
 .total-summary-row {
   display: grid;
-  grid-template-columns: minmax(110px, 140px) minmax(110px, 1fr) 56px minmax(110px, 1fr) 56px minmax(120px, 1fr);
+  grid-template-columns:
+    minmax(110px, 140px) minmax(110px, 1fr) 56px minmax(110px, 1fr)
+    56px minmax(120px, 1fr);
   gap: 12px;
   align-items: center;
 }
@@ -59,7 +61,9 @@
 @media (max-width: 900px) {
   .total-summary-operation__header,
   .total-summary-row {
-    grid-template-columns: minmax(90px, 110px) minmax(0, 1fr) 40px minmax(0, 1fr) 40px minmax(0, 1fr);
+    grid-template-columns:
+      minmax(90px, 110px) minmax(0, 1fr) 40px minmax(0, 1fr)
+      40px minmax(0, 1fr);
     gap: 8px;
   }
 }

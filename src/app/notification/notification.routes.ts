@@ -4,13 +4,14 @@ import { authGuard } from '../services/auth-guard.service';
 import { Role } from '../interfaces/token';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('notification'),
-];
+const providers = [provideFeatureTranslations('notification')];
 
 const children: Routes = [
   {
-    path: '', component: NotificationListComponent, canActivate: [authGuard], data: {
+    path: '',
+    component: NotificationListComponent,
+    canActivate: [authGuard],
+    data: {
       roles: [Role.admin, Role.professional, Role.customer],
     },
   },

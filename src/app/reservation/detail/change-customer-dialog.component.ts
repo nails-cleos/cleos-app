@@ -1,8 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IUser, IUserAll } from '../../user/user';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { IUser, IUserAll } from '@app/user/user';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -13,47 +25,72 @@ import {
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { UserStore } from '../../store/user.store';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import { UserStore } from '@app/store/user.store';
 
 type ChangeCustomerForm = {
-  customer: FormControl<IUserAll | undefined>,
-}
+  customer: FormControl<IUserAll | undefined>;
+};
 
 type ChangeCustomerDialogData = {
-  customerId: string,
+  customerId: string;
   small: boolean;
-}
+};
 
 @Component({
   selector: 'app-change-customer-dialog-component',
   templateUrl: './change-customer-dialog.component.html',
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete, MatError,
-    MatAutocompleteTrigger, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeCustomerDialogComponent {
   private readonly userStore = inject(UserStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly dialogRef: MatDialogRef<ChangeCustomerDialogComponent> = inject(
-    MatDialogRef<ChangeCustomerDialogComponent>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly dialogRef: MatDialogRef<ChangeCustomerDialogComponent> =
+    inject(MatDialogRef<ChangeCustomerDialogComponent>);
   readonly data = inject<ChangeCustomerDialogData>(MAT_DIALOG_DATA);
 
-  form: FormGroup<ChangeCustomerForm> = this.formBuilder.group<ChangeCustomerForm>({
-    customer: this.formBuilder.control<IUserAll | undefined>(undefined, {
-      validators: [Validators.required, requireMatch],
-    }),
-  });
+  form: FormGroup<ChangeCustomerForm> =
+    this.formBuilder.group<ChangeCustomerForm>({
+      customer: this.formBuilder.control<IUserAll | undefined>(undefined, {
+        validators: [Validators.required, requireMatch],
+      }),
+    });
 
   customersSignal = this.userStore.customers;
   filteredCustomerSignal = toSignal(
     this.getForm.customer.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.displayName),
+      map((value) => (typeof value === 'string' ? value : value?.displayName)),
       combineLatestWith(toObservable(this.customersSignal)),
       map(([name, customerList]) => {
         if (!customerList) {
@@ -80,7 +117,9 @@ export class ChangeCustomerDialogComponent {
     effect(() => {
       const customers = this.customersSignal();
       const customerId = this.customerId();
-      this.getForm.customer.setValue(customers?.find(customer => customer.id === customerId));
+      this.getForm.customer.setValue(
+        customers?.find((customer) => customer.id === customerId),
+      );
     });
   }
 
@@ -96,7 +135,8 @@ export class ChangeCustomerDialogComponent {
     this.dialogRef.close({ customerId: this.getForm.customer.value?.id });
   }
 
-  displayFnUser = (user: IUser): string => user?.displayName ? user.displayName : '';
+  displayFnUser = (user: IUser): string =>
+    user?.displayName ? user.displayName : '';
 
   keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
@@ -104,7 +144,12 @@ export class ChangeCustomerDialogComponent {
     }
   };
 
-  private filterCustomer = (name: string, customers: IUserAll[]): IUserAll[] | undefined => customers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
-
+  private filterCustomer = (
+    name: string,
+    customers: IUserAll[],
+  ): IUserAll[] | undefined =>
+    customers?.filter(
+      (option) =>
+        option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

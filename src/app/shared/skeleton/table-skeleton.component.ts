@@ -17,5 +17,6 @@ export class TableSkeletonComponent {
   showHeader = input(true);
   showPaginator = input(false);
 
-  rows = (): number[] => Array.from({ length: this.rowCount() }, (_, index) => index);
+  rows = (): number[] =>
+    Array.from({ length: this.rowCount() }, (_, index) => index);
 }

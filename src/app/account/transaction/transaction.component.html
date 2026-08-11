@@ -1,27 +1,54 @@
 @let account = accountSignal();
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  <app-balance [account]="account" [showView]="true" [showUser]="hasAdminRole()" [language]="language"></app-balance>
+  <app-balance
+    [account]="account"
+    [showView]="true"
+    [showUser]="hasAdminRole()"
+    [language]="language"
+  ></app-balance>
 
-  <form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+  <form
+    (ngSubmit)="submit()"
+    [formGroup]="form"
+    novalidate
+    (keydown.enter)="$event.preventDefault()"
+  >
     @if (account) {
       <section class="app-surface-section">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</span>
+            <span class="app-surface-eyebrow">{{
+              'ACCOUNT.TRANSACTION.TITLE' | translate
+            }}</span>
           </div>
         </div>
 
         <div class="app-crud-form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate }}</mat-label>
+            <mat-label>{{
+              'ACCOUNT.TRANSACTION.AMOUNT.FIELD' | translate
+            }}</mat-label>
             <mat-icon matPrefix>{{ currencyIcon }}</mat-icon>
-            <input [formControl]="getForm.amount" matInput matNativeControl required [type]="'number'" [step]="1"
-                   [min]="amountMin">
+            <input
+              [formControl]="getForm.amount"
+              matInput
+              matNativeControl
+              required
+              [type]="'number'"
+              [step]="1"
+              [min]="amountMin"
+            />
             @if (getForm.amount.hasError('required')) {
-              <mat-error [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate"></mat-error>
+              <mat-error
+                [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.REQUIRED' | translate"
+              ></mat-error>
             } @else if (getForm.amount.hasError('min')) {
               <mat-error
-                [innerHTML]="'ACCOUNT.TRANSACTION.AMOUNT.MIN' | translate:{min: amountMin, currency: currencyIcon}">
+                [innerHTML]="
+                  'ACCOUNT.TRANSACTION.AMOUNT.MIN'
+                    | translate: { min: amountMin, currency: currencyIcon }
+                "
+              >
               </mat-error>
             } @else if (errors()['amount']) {
               <mat-error>{{ errors()['amount'] }}</mat-error>
@@ -30,17 +57,26 @@
 
           @if (!hasAdminRole()) {
             <div class="app-surface-item app-crud-loading">
-              <app-bank [firstTime]="true" [form]="bankForm" [options]="optionsSignal()"></app-bank>
+              <app-bank
+                [firstTime]="true"
+                [form]="bankForm"
+                [options]="optionsSignal()"
+              ></app-bank>
             </div>
           } @else {
             <div class="app-crud-form-grid">
-
-              <app-payment-option-select [control]="getBankForm.option" [options]="optionsSignal()" [required]="false"></app-payment-option-select>
+              <app-payment-option-select
+                [control]="getBankForm.option"
+                [options]="optionsSignal()"
+                [required]="false"
+              ></app-payment-option-select>
 
               @if (getBankForm.option.value?.type === 'TRANSFER') {
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'ACCOUNT.TRANSACTION.TRANSFER' | translate }}</mat-label>
-                  <input [formControl]="getForm.transfer" matInput>
+                  <mat-label>{{
+                    'ACCOUNT.TRANSACTION.TRANSFER' | translate
+                  }}</mat-label>
+                  <input [formControl]="getForm.transfer" matInput />
                 </mat-form-field>
               }
             </div>

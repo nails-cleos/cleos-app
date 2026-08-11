@@ -1,10 +1,14 @@
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { UserDetailsPageComponent } from './user-details-page.component';
 import { UserStore } from '../store/user.store';
 import { IUserAll } from './user';
 import { UserComponent } from './user.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { provideRouter } from '@angular/router';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 describe('UserDetailsPageComponent', () => {
   let component: UserDetailsPageComponent;
@@ -13,10 +17,10 @@ describe('UserDetailsPageComponent', () => {
   let userStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    save: jasmine.Spy;
-    userNavigationParams: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    save: Mock;
+    userNavigationParams: Mock;
   };
 
   const id = '123';
@@ -30,24 +34,28 @@ describe('UserDetailsPageComponent', () => {
     userStoreSpy = {
       selected: signal<any>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      save: jasmine.createSpy('save'),
-      userNavigationParams: jasmine.createSpy('userNavigationParams'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      save: vi.fn().mockName('save'),
+      userNavigationParams: vi.fn().mockName('userNavigationParams'),
+    };
+
+    const cookieConsentService = {
+      getConfig: vi.fn().mockName('NgcCookieConsentService.getConfig'),
+      destroy: vi.fn().mockName('NgcCookieConsentService.destroy'),
+      init: vi.fn().mockName('NgcCookieConsentService.init'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [UserDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [UserDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
+        provideNativeDateAdapter(),
         { provide: UserStore, useValue: userStoreSpy },
+        { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
-    }).overrideTemplate(UserComponent, '')
-      .overrideTemplate(UserDetailsPageComponent, `
-        @if (user(); as user) {
-          <app-user [user]="user" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(UserDetailsPageComponent);
 
@@ -71,12 +79,15 @@ describe('UserDetailsPageComponent', () => {
     userStoreSpy.selected.set(mockUser);
     fixture.detectChanges();
 
-    const userComponent = fixture.debugElement.children[0].componentInstance as UserComponent;
+    const userComponent = fixture.debugElement.children[0]
+      .componentInstance as UserComponent;
 
-    expect(userComponent.user()).toEqual(jasmine.objectContaining({
-      id,
-      displayName: 'Test User',
-    }));
+    expect(userComponent.user()).toEqual(
+      expect.objectContaining({
+        id,
+        displayName: 'Test User',
+      }),
+    );
   });
 
   it('should call update when user is received', () => {
@@ -84,8 +95,11 @@ describe('UserDetailsPageComponent', () => {
 
     component.submit({ user: mockUser });
 
-    expect(userStoreSpy.save).toHaveBeenCalledWith(jasmine.objectContaining({
-      displayName: 'Test User',
-    }), id);
+    expect(userStoreSpy.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        displayName: 'Test User',
+      }),
+      id,
+    );
   });
 });

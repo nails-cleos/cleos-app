@@ -3,29 +3,57 @@
     @for (section of sections(); track section; let index = $index) {
       @switch (section.type) {
         @case ('title') {
-          <h1 class="section-title" [class.hero-title]="index === 0" [ngClass]="section.class" [innerHTML]="section.value"></h1>
+          <h1
+            class="section-title"
+            [class.hero-title]="index === 0"
+            [ngClass]="section.class"
+            [innerHTML]="section.value"
+          ></h1>
         }
         @case ('subtitle') {
-          <h2 class="section-subtitle" [ngClass]="section.class" [innerHTML]="section.value"></h2>
+          <h2
+            class="section-subtitle"
+            [ngClass]="section.class"
+            [innerHTML]="section.value"
+          ></h2>
         }
         @case ('detail') {
-          <div class="detail-card" [class.hero-copy]="index <= 3" [ngClass]="section.class">
+          <div
+            class="detail-card"
+            [class.hero-copy]="index <= 3"
+            [ngClass]="section.class"
+          >
             <p [innerHTML]="section.value"></p>
           </div>
         }
         @case ('image') {
           <div class="image-container image-frame">
-            <img class="responsive-image" [ngSrc]="section.value" [width]="section.width" [height]="section.height"
-                 alt="{{section.alt}}" priority>
+            <img
+              class="responsive-image"
+              [ngSrc]="section.value"
+              [width]="section.width"
+              [height]="section.height"
+              alt="{{ section.alt }}"
+              priority
+            />
           </div>
         }
         @case ('image-text') {
           <div class="image-container image-text-grid">
             @for (detail of section.details; track detail) {
               <div class="image-margin image-text-card">
-                <p class="image-text-description" [ngClass]="detail.class" [innerHTML]="detail.description"></p>
-                <img [ngSrc]="detail.value" [width]="detail.width" [height]="detail.height"
-                     alt="{{detail.alt}}" priority>
+                <p
+                  class="image-text-description"
+                  [ngClass]="detail.class"
+                  [innerHTML]="detail.description"
+                ></p>
+                <img
+                  [ngSrc]="detail.value"
+                  [width]="detail.width"
+                  [height]="detail.height"
+                  alt="{{ detail.alt }}"
+                  priority
+                />
               </div>
             }
           </div>
@@ -34,18 +62,29 @@
           <div class="image-detail-container" [class]="section.class">
             @if (section.class && section.class.indexOf('left') >= 0) {
               <div class="image-detail image-detail-media">
-                <img [ngSrc]="section.value" [width]="section.width" [height]="section.height" alt="{{section.alt}}"
-                     priority>
+                <img
+                  [ngSrc]="section.value"
+                  [width]="section.width"
+                  [height]="section.height"
+                  alt="{{ section.alt }}"
+                  priority
+                />
               </div>
               <div class="text image-detail-copy" [class]="section.class">
                 @if (section.details) {
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
                       @case ('subtitle') {
-                        <h3 class="title image-detail-title" [innerHTML]="detail.value"></h3>
+                        <h3
+                          class="title image-detail-title"
+                          [innerHTML]="detail.value"
+                        ></h3>
                       }
                       @case ('detail') {
-                        <div class="detail-card nested-detail" [class]="detail.class">
+                        <div
+                          class="detail-card nested-detail"
+                          [class]="detail.class"
+                        >
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
@@ -59,10 +98,16 @@
                   @for (detail of section.details; track detail) {
                     @switch (detail.type) {
                       @case ('subtitle') {
-                        <h3 class="title image-detail-title" [innerHTML]="detail.value"></h3>
+                        <h3
+                          class="title image-detail-title"
+                          [innerHTML]="detail.value"
+                        ></h3>
                       }
                       @case ('detail') {
-                        <div class="detail-card nested-detail" [class]="detail.class">
+                        <div
+                          class="detail-card nested-detail"
+                          [class]="detail.class"
+                        >
                           <p [innerHTML]="detail.value"></p>
                         </div>
                       }
@@ -71,8 +116,13 @@
                 }
               </div>
               <div class="image-detail image-detail-media">
-                <img [ngSrc]="section.value" [width]="section.width" [height]="section.height" alt="{{section.alt}}"
-                     priority>
+                <img
+                  [ngSrc]="section.value"
+                  [width]="section.width"
+                  [height]="section.height"
+                  alt="{{ section.alt }}"
+                  priority
+                />
               </div>
             }
           </div>
@@ -107,21 +157,33 @@
                   @switch (detail.type) {
                     @case ('subtitle') {
                       @for (subtitle of detail.details; track subtitle) {
-                        <th [ngClass]="subtitle.class" [innerHTML]="subtitle.value"></th>
+                        <th
+                          [ngClass]="subtitle.class"
+                          [innerHTML]="subtitle.value"
+                        ></th>
                       }
                     }
                     @case ('image') {
                       @for (image of detail.details; track image) {
                         <td [ngClass]="image.class">
                           <div class="image-container">
-                            <img class="image" [ngSrc]="image.value" [width]="image.width" [height]="image.height"
-                                 alt="{{image.alt}}" priority>
+                            <img
+                              class="image"
+                              [ngSrc]="image.value"
+                              [width]="image.width"
+                              [height]="image.height"
+                              alt="{{ image.alt }}"
+                              priority
+                            />
                           </div>
                         </td>
                       }
                     }
                     @case ('detail') {
-                      @for (detailDetail of detail.details; track detailDetail) {
+                      @for (
+                        detailDetail of detail.details;
+                        track detailDetail
+                      ) {
                         <td [ngClass]="detailDetail.class">
                           <p [innerHTML]="detailDetail.value"></p>
                         </td>
@@ -137,13 +199,30 @@
               @for (detail of section.details.slice(1); track detail) {
                 <article class="comparison-card">
                   @if (detail.details && detail.details[0]) {
-                    <h4 class="comparison-card-title" [innerHTML]="detail.details[0].value"></h4>
+                    <h4
+                      class="comparison-card-title"
+                      [innerHTML]="detail.details[0].value"
+                    ></h4>
                   }
                   @if (detail.details && section.details[0].details) {
-                    @for (detailDetail of detail.details.slice(1); track detailDetail; let cellIndex = $index) {
+                    @for (
+                      detailDetail of detail.details.slice(1);
+                      track detailDetail;
+                      let cellIndex = $index
+                    ) {
                       <div class="comparison-card-row">
-                        <span class="comparison-card-label" [innerHTML]="section.details[0].details[cellIndex + 1]?.value"></span>
-                        <p class="comparison-card-value" [innerHTML]="detailDetail.value"></p>
+                        <span
+                          class="comparison-card-label"
+                          [innerHTML]="
+                            $safeNavigationMigration(
+                              section.details[0].details[cellIndex + 1]?.value
+                            )
+                          "
+                        ></span>
+                        <p
+                          class="comparison-card-value"
+                          [innerHTML]="detailDetail.value"
+                        ></p>
                       </div>
                     }
                   }

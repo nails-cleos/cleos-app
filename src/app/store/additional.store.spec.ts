@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
 import { AdditionalStore } from './additional.store';
@@ -8,32 +8,39 @@ import { AdditionalService } from '../services/additional.service';
 
 describe('AdditionalStore', () => {
   let store: InstanceType<typeof AdditionalStore>;
-  let additionalServiceSpy: jasmine.SpyObj<AdditionalService>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let additionalServiceSpy: {
+    getAdditionalPage: Mock;
+    getAdditionalList: Mock;
+    getAllAdditionalByGroupId: Mock;
+    getAdditional: Mock;
+    createAdditional: Mock;
+    updateAdditional: Mock;
+    sortAdditional: Mock;
+    deleteAdditional: Mock;
+  };
 
   beforeEach(() => {
-    additionalServiceSpy = jasmine.createSpyObj<AdditionalService>('AdditionalService', [
-      'getAdditionalPage',
-      'getAdditionalList',
-      'getAllAdditionalByGroupId',
-      'getAdditional',
-      'createAdditional',
-      'updateAdditional',
-      'sortAdditional',
-      'deleteAdditional',
-    ]);
-
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake(
-      (key: string, params?: Record<string, string>) =>
-        `${key}:${params?.['name'] ?? ''}`,
-    );
+    additionalServiceSpy = {
+      getAdditionalPage: vi
+        .fn()
+        .mockName('AdditionalService.getAdditionalPage'),
+      getAdditionalList: vi
+        .fn()
+        .mockName('AdditionalService.getAdditionalList'),
+      getAllAdditionalByGroupId: vi
+        .fn()
+        .mockName('AdditionalService.getAllAdditionalByGroupId'),
+      getAdditional: vi.fn().mockName('AdditionalService.getAdditional'),
+      createAdditional: vi.fn().mockName('AdditionalService.createAdditional'),
+      updateAdditional: vi.fn().mockName('AdditionalService.updateAdditional'),
+      sortAdditional: vi.fn().mockName('AdditionalService.sortAdditional'),
+      deleteAdditional: vi.fn().mockName('AdditionalService.deleteAdditional'),
+    };
 
     TestBed.configureTestingModule({
       providers: [
         AdditionalStore,
         { provide: AdditionalService, useValue: additionalServiceSpy },
-        { provide: TranslateService, useValue: translateSpy },
       ],
     });
 
@@ -42,7 +49,7 @@ describe('AdditionalStore', () => {
 
   it('should load page and map pagination data', () => {
     const page = { content: [] } as any;
-    additionalServiceSpy.getAdditionalPage.and.returnValue(of(page));
+    additionalServiceSpy.getAdditionalPage.mockReturnValue(of(page));
 
     store.loadPage({
       sort: 'name',
@@ -63,12 +70,12 @@ describe('AdditionalStore', () => {
       value: page,
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load list and map list data', () => {
     const list = [{ id: '1' }] as any;
-    additionalServiceSpy.getAdditionalList.and.returnValue(of(list));
+    additionalServiceSpy.getAdditionalList.mockReturnValue(of(list));
 
     store.loadList();
 
@@ -79,12 +86,12 @@ describe('AdditionalStore', () => {
       value: list,
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should load all by group id', () => {
     const list = [{ id: '1' }] as any;
-    additionalServiceSpy.getAllAdditionalByGroupId.and.returnValue(of(list));
+    additionalServiceSpy.getAllAdditionalByGroupId.mockReturnValue(of(list));
 
     store.loadAllByGroupId('room-1', 'group-1');
 
@@ -101,42 +108,38 @@ describe('AdditionalStore', () => {
 
   it('should load entity by id', () => {
     const item = { id: '1' } as any;
-    additionalServiceSpy.getAdditional.and.returnValue(of(item));
+    additionalServiceSpy.getAdditional.mockReturnValue(of(item));
 
     store.loadById('1');
 
     expect(additionalServiceSpy.getAdditional).toHaveBeenCalledWith('1');
     expect(store.selected()).toEqual(item);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should create additional and set response', () => {
-    additionalServiceSpy.createAdditional.and.returnValue(
+    additionalServiceSpy.createAdditional.mockReturnValue(
       of({ id: '1', name: 'Extra' } as any),
     );
 
     store.create({ name: 'Extra' } as any);
 
     expect(additionalServiceSpy.createAdditional).toHaveBeenCalledWith(
-      jasmine.any(Object),
-    );
-
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'ADDITIONAL.CREATED',
-      { name: 'Extra' },
+      expect.any(Object),
     );
 
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.CREATED:Extra',
+      messageKey: 'ADDITIONAL.CREATED',
+      messageParams: { name: 'Extra' },
       path: 'additional/1',
       redirect: 'additional',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should update additional and set response', () => {
-    additionalServiceSpy.updateAdditional.and.returnValue(
+    additionalServiceSpy.updateAdditional.mockReturnValue(
       of({ id: '2', name: 'Updated' } as any),
     );
 
@@ -144,25 +147,21 @@ describe('AdditionalStore', () => {
 
     expect(additionalServiceSpy.updateAdditional).toHaveBeenCalledWith(
       '2',
-      jasmine.any(Object),
-    );
-
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'ADDITIONAL.UPDATED.MESSAGE',
-      { name: 'Updated' },
+      expect.any(Object),
     );
 
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.UPDATED.MESSAGE:Updated',
+      messageKey: 'ADDITIONAL.UPDATED.MESSAGE',
+      messageParams: { name: 'Updated' },
       path: 'additional/2',
       redirect: 'additional',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should sort additional list and set success response', () => {
-    additionalServiceSpy.sortAdditional.and.returnValue(of(void 0));
+    additionalServiceSpy.sortAdditional.mockReturnValue(of(void 0));
 
     const list = [{ id: '1', order: 1 }] as any;
 
@@ -174,56 +173,51 @@ describe('AdditionalStore', () => {
       message: 'ADDITIONAL.SORTED.MESSAGE',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should delete additional and show warning toast', () => {
-    additionalServiceSpy.deleteAdditional.and.returnValue(of(void 0));
+    additionalServiceSpy.deleteAdditional.mockReturnValue(of(void 0));
 
     store.delete('1', 'Item A');
 
     expect(additionalServiceSpy.deleteAdditional).toHaveBeenCalledWith('1');
 
-    expect(translateSpy.instant).toHaveBeenCalledWith(
-      'ADDITIONAL.DELETED.MESSAGE',
-      { name: 'Item A' },
-    );
-
     expect(store.response()).toEqual({
-      message: 'ADDITIONAL.DELETED.MESSAGE:Item A',
+      messageKey: 'ADDITIONAL.DELETED.MESSAGE',
+      messageParams: { name: 'Item A' },
       reload: true,
       toastType: 'warning',
     });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should map HTTP errors into error state', () => {
-    additionalServiceSpy.getAdditional.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 404,
-          error: { message: 'NOT_FOUND' },
-        }),
+    additionalServiceSpy.getAdditional.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 404,
+            error: { message: 'NOT_FOUND' },
+          }),
       ),
     );
 
     store.loadById('missing');
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         status: 'NOT_FOUND',
         message: 'NOT_FOUND',
       }),
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should reset state on clean()', () => {
-    additionalServiceSpy.getAdditional.and.returnValue(
-      of({ id: '1' } as any),
-    );
+    additionalServiceSpy.getAdditional.mockReturnValue(of({ id: '1' } as any));
 
     store.loadById('1');
     store.clean();
@@ -233,9 +227,7 @@ describe('AdditionalStore', () => {
   });
 
   it('should clear response and error separately', () => {
-    additionalServiceSpy.getAdditional.and.returnValue(
-      of({ id: '1' } as any),
-    );
+    additionalServiceSpy.getAdditional.mockReturnValue(of({ id: '1' } as any));
 
     store.loadById('1');
 

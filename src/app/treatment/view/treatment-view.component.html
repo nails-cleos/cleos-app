@@ -3,7 +3,9 @@
     <section class="app-surface-section">
       <div class="app-detail-section-header">
         <div>
-          <span class="app-surface-eyebrow">{{ 'TREATMENT.DETAIL'| translate }}</span>
+          <span class="app-surface-eyebrow">{{
+            'TREATMENT.DETAIL' | translate
+          }}</span>
           <h2 class="app-crud-title">{{ viewGroup.name }}</h2>
         </div>
       </div>
@@ -11,12 +13,16 @@
       <div class="app-crud-form">
         <div class="app-surface-grid app-surface-grid--auto">
           <div class="app-surface-item">
-            <span class="app-surface-item__label">{{ 'COMMON.TREATMENT.GROUP.FIELD' | translate }}</span>
+            <span class="app-surface-item__label">{{
+              'COMMON.TREATMENT.GROUP.FIELD' | translate
+            }}</span>
             <div class="app-surface-item__value">{{ viewGroup.name }}</div>
           </div>
 
           <div class="app-surface-item">
-            <span class="app-surface-item__label">{{ 'TREATMENT.PRICE_FROM.FIELD' | translate }}</span>
+            <span class="app-surface-item__label">{{
+              'TREATMENT.PRICE_FROM.FIELD' | translate
+            }}</span>
             <div class="app-surface-item__value app-detail-icon">
               <mat-icon>euro</mat-icon>
               <span>{{ viewGroup.priceFrom || '-' }}</span>
@@ -24,14 +30,24 @@
           </div>
         </div>
 
-        <div class="app-surface-item app-surface-item--section app-crud-form-grid__full">
-          <span class="app-surface-item__label">{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</span>
-          <div class="app-surface-item__value">{{ viewGroup.description || '-' }}</div>
+        <div
+          class="app-surface-item app-surface-item--section app-crud-form-grid__full"
+        >
+          <span class="app-surface-item__label">{{
+            'TREATMENT.DESCRIPTION.FIELD' | translate
+          }}</span>
+          <div class="app-surface-item__value">
+            {{ viewGroup.description || '-' }}
+          </div>
         </div>
 
         @if (viewGroup.colors?.length) {
-          <section class="app-surface-item app-surface-item--section treatment-view-colors">
-            <span class="app-surface-item__label">{{ 'TREATMENT.COLORS' | translate }}</span>
+          <section
+            class="app-surface-item app-surface-item--section treatment-view-colors"
+          >
+            <span class="app-surface-item__label">{{
+              'TREATMENT.COLORS' | translate
+            }}</span>
             <mat-chip-listbox>
               @for (color of viewGroup.colors; track color.id) {
                 <mat-chip>{{ color.name }}</mat-chip>
@@ -40,10 +56,16 @@
           </section>
         }
 
-        <section class="app-surface-item app-surface-item--section treatment-builder">
-          <div class="app-detail-section-header treatment-view-treatments__header">
+        <section
+          class="app-surface-item app-surface-item--section treatment-builder"
+        >
+          <div
+            class="app-detail-section-header treatment-view-treatments__header"
+          >
             <div>
-              <span class="app-surface-eyebrow">{{ 'COMMON.TREATMENT.FIELD' | translate }}</span>
+              <span class="app-surface-eyebrow">{{
+                'COMMON.TREATMENT.FIELD' | translate
+              }}</span>
             </div>
           </div>
 
@@ -54,7 +76,11 @@
                   <div>
                     <span class="app-surface-item__label">{{ tab.name }}</span>
                   </div>
-                  <button (click)="getHistory(tab.id)" mat-stroked-button type="button">
+                  <button
+                    (click)="getHistory(tab.id)"
+                    mat-stroked-button
+                    type="button"
+                  >
                     <mat-icon>timeline</mat-icon>
                     <span>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</span>
                   </button>
@@ -62,11 +88,17 @@
 
                 <div class="treatment-view-card__grid">
                   <div>
-                    <span class="app-surface-item__label">{{ 'TREATMENT.DESCRIPTION.FIELD' | translate }}</span>
-                    <div class="app-surface-item__value">{{ tab.description || '-' }}</div>
+                    <span class="app-surface-item__label">{{
+                      'TREATMENT.DESCRIPTION.FIELD' | translate
+                    }}</span>
+                    <div class="app-surface-item__value">
+                      {{ tab.description || '-' }}
+                    </div>
                   </div>
                   <div>
-                    <span class="app-surface-item__label">{{ 'TREATMENT.DURATION.FIELD' | translate }}</span>
+                    <span class="app-surface-item__label">{{
+                      'TREATMENT.DURATION.FIELD' | translate
+                    }}</span>
                     <div class="app-surface-item__value app-detail-icon">
                       <mat-icon>timer</mat-icon>
                       <span>{{ tab.duration | durationTime }}</span>
@@ -80,7 +112,9 @@
                       <h3>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</h3>
                     </div>
                     <div class="app-table-shell">
-                      <app-table-skeleton [columns]="historyTableColumns"></app-table-skeleton>
+                      <app-table-skeleton
+                        [columns]="historyTableColumns"
+                      ></app-table-skeleton>
                     </div>
                   </div>
                 } @else if (tab.history && tab.showHistory) {
@@ -89,7 +123,9 @@
                       <h3>{{ 'COMMON.COLUMN.LAST_UPDATE' | translate }}</h3>
                     </div>
                     <div class="app-table-shell">
-                      <app-treatment-table [treatment]="tab.history"></app-treatment-table>
+                      <app-treatment-table
+                        [treatment]="tab.history"
+                      ></app-treatment-table>
                     </div>
                   </div>
                 }
@@ -113,5 +149,5 @@
     </section>
   </div>
 } @else {
-  <app-skeleton [boxes]="1"/>
+  <app-skeleton [boxes]="1" />
 }

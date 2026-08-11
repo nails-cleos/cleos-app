@@ -1,7 +1,17 @@
 import { inject, Injectable } from '@angular/core';
-import { from, interval, map, Observable, switchMap, throwError, timer } from 'rxjs';
+import {
+  from,
+  interval,
+  map,
+  Observable,
+  of,
+  switchMap,
+  throwError,
+  timer,
+} from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import { CognitoIdentityCredentialProvider, fromCognitoIdentityPool } from '@aws-sdk/credential-providers';
+import { fromCognitoIdentityPool } from '@aws-sdk/credential-provider-cognito-identity';
+import type { AwsCredentialIdentityProvider } from '@smithy/types';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
 import { HttpRequest } from '@smithy/protocol-http';
@@ -13,7 +23,7 @@ import { EnvService } from './env.service';
 @Injectable({
   providedIn: 'root',
 })
-export class AwsLambdaService {
+class AwsLambdaService {
   private readonly env: EnvService = inject(EnvService);
 
   private readonly region = 'eu-central-1';
@@ -28,13 +38,14 @@ export class AwsLambdaService {
     file: File,
     userId?: string,
   ): Observable<IAwsExtract> {
-
     const jobId = crypto.randomUUID();
 
     return this.getCredentials(firebaseIdToken).pipe(
-      switchMap(credentials =>
+      switchMap((credentials) =>
         from(file.arrayBuffer()).pipe(
-          switchMap(buffer => this.uploadPdfToS3(credentials, buffer, file, jobId)),
+          switchMap((buffer) =>
+            this.uploadPdfToS3(credentials, buffer, file, jobId),
+          ),
           switchMap(() => this.startStepFunction(credentials, jobId, userId)),
           switchMap(() => timer(10000)),
           switchMap(() => this.pollResult(jobId, credentials)),
@@ -45,7 +56,7 @@ export class AwsLambdaService {
 
   private pollResult(
     jobId: string,
-    credentials: CognitoIdentityCredentialProvider,
+    credentials: AwsCredentialIdentityProvider,
     intervalMs = 5000,
     maxAttempts = 10,
   ): Observable<IAwsExtract> {
@@ -57,16 +68,23 @@ export class AwsLambdaService {
           return throwError(() => new Error('Textract result not ready'));
         }
 
-        return this.callLambda(credentials, this.getPDFLambdaUrl, 'application/json', JSON.stringify({ JobId: jobId }));
+        return this.callLambda(
+          credentials,
+          this.getPDFLambdaUrl,
+          'application/json',
+          JSON.stringify({ JobId: jobId }),
+        );
       }),
-      filter(res => res.status !== 202),
-      map(res => res.body as IAwsExtract),
+      filter((res) => res.status !== 202),
+      map((res) => res.body as IAwsExtract),
       take(1),
     );
   }
 
-  private getCredentials(firebaseIdToken: string): Observable<CognitoIdentityCredentialProvider> {
-    return from([
+  private getCredentials(
+    firebaseIdToken: string,
+  ): Observable<AwsCredentialIdentityProvider> {
+    return of(
       fromCognitoIdentityPool({
         clientConfig: { region: this.region },
         identityPoolId: this.env.awsIdentityPoolId,
@@ -74,16 +92,15 @@ export class AwsLambdaService {
           [this.env.awsLoginsKey]: firebaseIdToken,
         },
       }),
-    ]);
+    );
   }
 
   private uploadPdfToS3(
-    credentials: CognitoIdentityCredentialProvider,
+    credentials: AwsCredentialIdentityProvider,
     buffer: ArrayBuffer,
     file: File,
     jobId: string,
   ): Observable<void> {
-
     const s3 = new S3Client({ region: this.region, credentials });
     const key = `uploads/${jobId}.pdf`;
 
@@ -100,7 +117,7 @@ export class AwsLambdaService {
   }
 
   private startStepFunction(
-    credentials: CognitoIdentityCredentialProvider,
+    credentials: AwsCredentialIdentityProvider,
     key: string,
     userId?: string,
   ): Observable<void> {
@@ -117,7 +134,7 @@ export class AwsLambdaService {
   }
 
   private callLambda(
-    credentials: CognitoIdentityCredentialProvider,
+    credentials: AwsCredentialIdentityProvider,
     lambdaUrl: string,
     contentType: string,
     body?: any,
@@ -144,7 +161,7 @@ export class AwsLambdaService {
     });
 
     return from(signer.sign(request)).pipe(
-      switchMap(async signed => {
+      switchMap(async (signed) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { host, ...headers } = signed.headers;
         const response = await fetch(lambdaUrl, {
@@ -162,3 +179,5 @@ export class AwsLambdaService {
     );
   }
 }
+
+export default AwsLambdaService;

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   allElementsHaveSameKeyFilterValue,
   areEquals,
@@ -26,7 +27,12 @@ import { Role } from '../interfaces/token';
 import { IUser, IUserAll } from '../user/user';
 import { IAddress, IRoomAll, ServiceType } from '../room/room';
 import { ICurrency, ICurrencyAll } from '../currency/currency';
-import { GroupService, IPrice, ITreatmentAll, Price } from '../treatment/treatment';
+import {
+  GroupService,
+  IPrice,
+  ITreatmentAll,
+  Price,
+} from '../treatment/treatment';
 import { IExtras, IReservationAll } from '../reservation/reservation';
 import { DEFAULT_LOCALE, getCurrentTimeZone } from './dates';
 import { IPayment } from '../interfaces/payment';
@@ -45,9 +51,7 @@ describe('Helper Utils', () => {
     email: 'john@example.com',
     locale: 'en-US',
     timeZone: 'UTC',
-    authorities: [
-      { authority: Role.professional },
-    ],
+    authorities: [{ authority: Role.professional }],
     theme: 'light-theme',
     showCash: true,
     referralMax: 10,
@@ -86,11 +90,11 @@ describe('Helper Utils', () => {
 
   describe('hasRoomAdmin', () => {
     it('should return true if user has room admin role', () => {
-      expect(hasRoomAdmin([{ authority: Role.roomAdmin }])).toBeTrue();
+      expect(hasRoomAdmin([{ authority: Role.roomAdmin }])).toBe(true);
     });
 
     it('should return false if user does not have room admin role', () => {
-      expect(hasRoomAdmin([{ authority: Role.admin }])).toBeFalse();
+      expect(hasRoomAdmin([{ authority: Role.admin }])).toBe(false);
     });
   });
 
@@ -116,11 +120,15 @@ describe('Helper Utils', () => {
 
   describe('getUserImage', () => {
     it('should return imageUrl if available', () => {
-      expect(getUserImage(userAll)).toEqual(`data:image/jpeg;base64,${ userAll.image }`);
+      expect(getUserImage(userAll)).toEqual(
+        `data:image/jpeg;base64,${userAll.image}`,
+      );
     });
 
     it('should return image if imageUrl is not available', () => {
-      expect(getUserImage(user)).toEqual(`data:image/jpeg;base64,${ user.image }`);
+      expect(getUserImage(user)).toEqual(
+        `data:image/jpeg;base64,${user.image}`,
+      );
     });
 
     it('should return undefined when user doesnt exist', () => {
@@ -208,7 +216,12 @@ describe('Helper Utils', () => {
       } as IUserAll;
 
       address = { id: 1, name: 'Main Location' } as IAddress;
-      currency = { id: 'currency-id', code: 'EUR', icon: 'EUR', name: 'Euro' } as ICurrencyAll;
+      currency = {
+        id: 'currency-id',
+        code: 'EUR',
+        icon: 'EUR',
+        name: 'Euro',
+      } as ICurrencyAll;
 
       room = {
         id: 'room-id',
@@ -269,7 +282,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply percentage discount correctly (10%)', () => {
-      reservation.treatment.discountCustomer = { type: DiscountType.money, amount: 2 } as IDiscount;
+      reservation.treatment.discountCustomer = {
+        type: DiscountType.money,
+        amount: 2,
+      } as IDiscount;
 
       const result = getPrice(reservation);
 
@@ -281,9 +297,14 @@ describe('Helper Utils', () => {
     it('should include extras, additional, and discount together', () => {
       reservation.extras = [{ price: 5 }] as IExtras[];
       reservation.additional = [{ price: 10 }] as IAdditionalAll[];
-      reservation.treatment.discountCustomer = { type: DiscountType.percentage, amount: 20 } as IDiscount;
+      reservation.treatment.discountCustomer = {
+        type: DiscountType.percentage,
+        amount: 20,
+      } as IDiscount;
 
-      const payments: IPayment[] = [{ transactionAmount: 10, status: 'APPROVED' } as IPayment];
+      const payments: IPayment[] = [
+        { transactionAmount: 10, status: 'APPROVED' } as IPayment,
+      ];
 
       const result = getPrice(reservation, payments);
 
@@ -332,14 +353,22 @@ describe('Helper Utils', () => {
   });
 
   describe('openDialog & createDialog', () => {
-    let dialog: jasmine.SpyObj<MatDialog>;
-    let translateService: jasmine.SpyObj<TranslateService>;
+    let dialogSpy: Pick<MatDialog, 'open'> & {
+      open: ReturnType<typeof vi.fn>;
+    };
+    let translateServiceSpy: Pick<TranslateService, 'instant'> & {
+      instant: ReturnType<typeof vi.fn>;
+    };
     let myRoom: IRoomAll;
 
     beforeEach(() => {
-      dialog = jasmine.createSpyObj('MatDialog', ['open']);
-      translateService = jasmine.createSpyObj('TranslateService', ['instant']);
-      translateService.instant.and.callFake((key: string) => key);
+      dialogSpy = {
+        open: vi.fn().mockName('MatDialog.open'),
+      };
+      translateServiceSpy = {
+        instant: vi.fn().mockName('TranslateService.instant'),
+      };
+      translateServiceSpy.instant.mockImplementation((key: string) => key);
 
       myRoom = {
         id: 'room-1',
@@ -351,13 +380,16 @@ describe('Helper Utils', () => {
     it('openDialog should call createDialog and open dialog', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      openDialog(myRoom, 'en', translateService, dialog, time);
+      openDialog(myRoom, 'en', translateServiceSpy, dialogSpy, time);
 
-      expect(dialog.open).toHaveBeenCalledWith(DialogComponent, jasmine.any(Object));
-      const dataArg = dialog.open.calls.mostRecent().args[1]?.data;
+      expect(dialogSpy.open).toHaveBeenCalledWith(
+        DialogComponent,
+        expect.any(Object),
+      );
+      const dataArg = vi.mocked(dialogSpy.open).mock.lastCall?.[1]?.data;
 
       expect(dataArg).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           hideNoButton: true,
           hideOkButton: true,
           title: 'COMMON.TIME_ZONE.TITLE',
@@ -368,21 +400,31 @@ describe('Helper Utils', () => {
     it('createDialog should open dialog with correct translation keys', () => {
       const time = new Date('2024-10-01T10:00:00Z');
 
-      createDialog('ROOM_INFO', 'Main Room', 'en', translateService, dialog, 'Europe/Amsterdam', time);
+      createDialog(
+        'ROOM_INFO',
+        'Main Room',
+        'en',
+        translateServiceSpy,
+        dialogSpy,
+        'Europe/Amsterdam',
+        time,
+      );
 
-      expect(translateService.instant).toHaveBeenCalledWith('COMMON.TIME_ZONE.TITLE');
-      expect(translateService.instant).toHaveBeenCalledWith(
+      expect(translateServiceSpy.instant).toHaveBeenCalledWith(
+        'COMMON.TIME_ZONE.TITLE',
+      );
+      expect(translateServiceSpy.instant).toHaveBeenCalledWith(
         'COMMON.TIME_ZONE.ROOM_INFO',
-        jasmine.objectContaining({
-          localTime: jasmine.any(String),
-          timeZoneTime: jasmine.any(String),
+        expect.objectContaining({
+          localTime: expect.any(String),
+          timeZoneTime: expect.any(String),
           value: 'Main Room',
-          arg: jasmine.any(String),
+          arg: expect.any(String),
         }),
       );
 
-      expect(dialog.open).toHaveBeenCalledWith(DialogComponent, {
-        data: jasmine.objectContaining({
+      expect(dialogSpy.open).toHaveBeenCalledWith(DialogComponent, {
+        data: expect.objectContaining({
           title: 'COMMON.TIME_ZONE.TITLE',
           content: 'COMMON.TIME_ZONE.ROOM_INFO',
           hideNoButton: true,
@@ -392,35 +434,55 @@ describe('Helper Utils', () => {
     });
 
     it('createDialog should add +1D when localDate is earlier', () => {
-      translateService.instant.and.callFake((key: string, params?: any) => {
-        if (params?.arg) {
-          expect(params.arg).toContain('+1D');
-        }
-        return key;
-      });
+      translateServiceSpy.instant.mockImplementation(
+        (key: string, params?: any) => {
+          if (params?.arg) {
+            expect(params.arg).toContain('+1D');
+          }
+          return key;
+        },
+      );
 
       const now = new Date();
       const pastDate = new Date(now.getTime() - 86400000); // 1 día antes
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, pastDate);
+      createDialog(
+        'ROOM_INFO',
+        'Test Room',
+        'en',
+        translateServiceSpy,
+        dialogSpy,
+        undefined,
+        pastDate,
+      );
 
-      expect(dialog.open).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
     });
 
     it('createDialog should add -1D when localDate is later', () => {
-      translateService.instant.and.callFake((key: string, params?: any) => {
-        if (params?.arg) {
-          expect(params.arg).toContain('-1D');
-        }
-        return key;
-      });
+      translateServiceSpy.instant.mockImplementation(
+        (key: string, params?: any) => {
+          if (params?.arg) {
+            expect(params.arg).toContain('-1D');
+          }
+          return key;
+        },
+      );
 
       const now = new Date();
       const futureDate = new Date(now.getTime() + 86400000); // 1 día después
 
-      createDialog('ROOM_INFO', 'Test Room', 'en', translateService, dialog, undefined, futureDate);
+      createDialog(
+        'ROOM_INFO',
+        'Test Room',
+        'en',
+        translateServiceSpy,
+        dialogSpy,
+        undefined,
+        futureDate,
+      );
 
-      expect(dialog.open).toHaveBeenCalled();
+      expect(dialogSpy.open).toHaveBeenCalled();
     });
   });
 
@@ -438,7 +500,7 @@ describe('Helper Utils', () => {
 
     it('should create a new Price instance', () => {
       const result = newPrice(basePrice, 100);
-      expect(result instanceof Price).toBeTrue();
+      expect(result instanceof Price).toBe(true);
     });
 
     it('should correctly calculate totals without discount', () => {
@@ -451,7 +513,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply fixed discount (money type)', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 20 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 20,
+      } as any;
       const result = newPrice(basePrice, 100, discount);
 
       // base total = 115; discount = 20
@@ -461,7 +526,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply percentage discount', () => {
-      const discount: IDiscount = { type: DiscountType.percentage, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.percentage,
+        amount: 10,
+      } as any;
       const result = newPrice(basePrice, 100, discount);
 
       // base total = 115; discount = 11.5 (10%)
@@ -488,7 +556,7 @@ describe('Helper Utils', () => {
 
     it('should return a Price instance', () => {
       const result = newExtra(basePrice, 20);
-      expect(result instanceof Price).toBeTrue();
+      expect(result instanceof Price).toBe(true);
     });
 
     it('should correctly calculate total with new extras', () => {
@@ -501,7 +569,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply fixed (money) discount', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 15 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 15,
+      } as any;
       const result = newExtra(basePrice, 20, discount);
 
       // total before discount = 100 + 20 + 5 = 125
@@ -512,7 +583,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply percentage discount', () => {
-      const discount: IDiscount = { type: DiscountType.percentage, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.percentage,
+        amount: 10,
+      } as any;
       const result = newExtra(basePrice, 20, discount);
 
       // total before discount = 125, discount = 12.5
@@ -535,7 +609,10 @@ describe('Helper Utils', () => {
     });
 
     it('should not apply discount if amount is 0 in discount object', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 0 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 0,
+      } as any;
       const result = newExtra(basePrice, 20, discount);
       expect(result.discount).toBe(0);
       expect(result.total).toBe(125); // unchanged
@@ -558,7 +635,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply a fixed (money) discount', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 20 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 20,
+      } as any;
       const result = newDiscount(basePrice, discount);
 
       // amount = 100, extras = 10, additional = 5
@@ -572,7 +652,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply a percentage discount', () => {
-      const discount: IDiscount = { type: DiscountType.percentage, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.percentage,
+        amount: 10,
+      } as any;
       const result = newDiscount(basePrice, discount);
 
       // discount = 10% of 100 = 10
@@ -582,7 +665,10 @@ describe('Helper Utils', () => {
     });
 
     it('should handle a 0 discount amount', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 0 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 0,
+      } as any;
       const result = newDiscount(basePrice, discount);
 
       expect(result.discount).toBe(0);
@@ -591,7 +677,10 @@ describe('Helper Utils', () => {
     });
 
     it('should preserve extras/additional values', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 10,
+      } as any;
       const result = newDiscount(basePrice, discount);
 
       expect(result.extra).toBe(basePrice.extra);
@@ -600,7 +689,10 @@ describe('Helper Utils', () => {
 
     it('should handle when extras and additional are 0', () => {
       const price = new Price(100, 0, 0, 0, 100, 0, 100, 100, 100, 100, 100, 0);
-      const discount: IDiscount = { type: DiscountType.money, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 10,
+      } as any;
       const result = newDiscount(price, discount);
 
       expect(result.total).toBe(90);
@@ -609,7 +701,7 @@ describe('Helper Utils', () => {
 
     it('should return a Price instance', () => {
       const result = newAdditional(basePrice, additionalList);
-      expect(result instanceof Price).toBeTrue();
+      expect(result instanceof Price).toBe(true);
     });
 
     it('should correctly sum additionals and update totals', () => {
@@ -631,7 +723,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply fixed (money) discount', () => {
-      const discount: IDiscount = { type: DiscountType.money, amount: 20 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.money,
+        amount: 20,
+      } as any;
       const result = newAdditional(basePrice, additionalList, discount);
 
       // base total = 135; discount = 20
@@ -641,7 +736,10 @@ describe('Helper Utils', () => {
     });
 
     it('should apply percentage discount', () => {
-      const discount: IDiscount = { type: DiscountType.percentage, amount: 10 } as any;
+      const discount: IDiscount = {
+        type: DiscountType.percentage,
+        amount: 10,
+      } as any;
       const result = newAdditional(basePrice, additionalList, discount);
 
       // total = 135; discount = 13.5
@@ -657,14 +755,16 @@ describe('Helper Utils', () => {
     });
 
     it('should handle 0-value additionals', () => {
-      const result = newAdditional(basePrice, [{ id: 1, name: 'Free', price: 0 }] as any);
+      const result = newAdditional(basePrice, [
+        { id: 1, name: 'Free', price: 0 },
+      ] as any);
       expect(result.additional).toBe(0);
       expect(result.total).toBe(110); // amount + extra
     });
 
     it('should return a new Price instance', () => {
       const result = newPercentage(basePrice, 75);
-      expect(result instanceof Price).toBeTrue();
+      expect(result instanceof Price).toBe(true);
     });
 
     it('should update only the percentageToPaid value', () => {
@@ -705,7 +805,12 @@ describe('Helper Utils', () => {
     it('should get room detail for ARG', () => {
       const roomArg: IRoomAll = {
         ...room,
-        currency: { id: 'currency-id', code: 'ARS', icon: '$', name: 'Peso Argentino' },
+        currency: {
+          id: 'currency-id',
+          code: 'ARS',
+          icon: '$',
+          name: 'Peso Argentino',
+        },
         timeZone: 'America/Argentina/Cordoba',
       };
       const result = roomDetail(roomArg);
@@ -714,15 +819,17 @@ describe('Helper Utils', () => {
   });
 
   describe('createRoomOffice', () => {
-    const makeOffice = (id: string, name = 'Office'): IOffice => ({
-      id,
-      name,
-    } as IOffice);
+    const makeOffice = (id: string, name = 'Office'): IOffice =>
+      ({
+        id,
+        name,
+      }) as IOffice;
 
-    const makeRoom = (id: string, office?: IOffice): IRoomAll => ({
-      id,
-      office,
-    } as IRoomAll);
+    const makeRoom = (id: string, office?: IOffice): IRoomAll =>
+      ({
+        id,
+        office,
+      }) as IRoomAll;
 
     it('should return undefined if rooms is undefined', () => {
       const result = createRoomOffice();
@@ -731,7 +838,7 @@ describe('Helper Utils', () => {
 
     it('should return an empty Map if rooms is an empty array', () => {
       const result = createRoomOffice([]);
-      expect(result instanceof Map).toBeTrue();
+      expect(result instanceof Map).toBe(true);
       expect(result?.size).toBe(0);
     });
 
@@ -754,7 +861,7 @@ describe('Helper Utils', () => {
 
       expect(officeAGroup?.id).toBe('A');
       expect(officeAGroup?.rooms?.length).toBe(2);
-      expect(officeAGroup?.rooms?.map(r => r.id)).toEqual(['1', '2']);
+      expect(officeAGroup?.rooms?.map((r) => r.id)).toEqual(['1', '2']);
 
       expect(officeBGroup?.id).toBe('B');
       expect(officeBGroup?.rooms?.length).toBe(1);
@@ -789,20 +896,30 @@ describe('Helper Utils', () => {
     let groups: Map<string, GroupService>;
     let treatments: ITreatmentAll[];
 
-    const makeColor = (id: string, name = 'Color', description?: string, deleted?: boolean): IColorAll => ({
+    const makeColor = (
+      id: string,
+      name = 'Color',
+      description?: string,
+      deleted?: boolean,
+    ): IColorAll => ({
       id,
       name,
       description,
       deleted,
     });
 
-    const makeTreatment = (id: string, groupId: string, name = 'Treatment'): ITreatmentAll => ({
-      id,
-      name,
-      group: { id: groupId, name: `Group ${ groupId }` },
-      type: ServiceType.treatment,
-      currency: 'USD',
-    } as ITreatmentAll);
+    const makeTreatment = (
+      id: string,
+      groupId: string,
+      name = 'Treatment',
+    ): ITreatmentAll =>
+      ({
+        id,
+        name,
+        group: { id: groupId, name: `Group ${groupId}` },
+        type: ServiceType.treatment,
+        currency: 'USD',
+      }) as ITreatmentAll;
 
     beforeEach(() => {
       groups = new Map<string, GroupService>();
@@ -816,14 +933,14 @@ describe('Helper Utils', () => {
     it('should return a Map with the correct group services', () => {
       const result = createTreatmentGroupService(groups, treatments, 'USD');
 
-      expect(result instanceof Map).toBeTrue();
+      expect(result instanceof Map).toBe(true);
       expect(result.size).toBe(2);
 
       const g1 = result.get('G1');
       const g2 = result.get('G2');
 
       expect(g1?.treatments.length).toBe(2);
-      expect(g1?.treatments.map(t => t.id)).toEqual(['t1', 't2']);
+      expect(g1?.treatments.map((t) => t.id)).toEqual(['t1', 't2']);
       expect(g1?.selectedTreatments.length).toBe(0);
 
       expect(g2?.treatments.length).toBe(1);
@@ -832,7 +949,12 @@ describe('Helper Utils', () => {
     });
 
     it('should add treatments to selectedTreatments if isSelected is true', () => {
-      const result = createTreatmentGroupService(groups, treatments, 'USD', true);
+      const result = createTreatmentGroupService(
+        groups,
+        treatments,
+        'USD',
+        true,
+      );
 
       const g1 = result.get('G1');
       const g2 = result.get('G2');
@@ -846,14 +968,16 @@ describe('Helper Utils', () => {
       const result = createTreatmentGroupService(groups, treatments, 'EUR');
 
       const g1 = result.get('G1')!;
-      g1.treatments.forEach(t => {
+      g1.treatments.forEach((t) => {
         expect(t.currency).toBe('EUR');
         expect(t.type).toBe(ServiceType.treatment);
       });
     });
 
     it('should append to existing group if already present in the Map', () => {
-      const existingGroup = new GroupService('G1', 'Existing Group', [makeColor('C3', 'Green')]);
+      const existingGroup = new GroupService('G1', 'Existing Group', [
+        makeColor('C3', 'Green'),
+      ]);
       existingGroup.treatments.push(makeTreatment('t0', 'G1'));
       groups.set('G1', existingGroup);
 
@@ -861,7 +985,7 @@ describe('Helper Utils', () => {
 
       const g1 = result.get('G1');
       expect(g1?.treatments.length).toBe(3);
-      expect(g1?.treatments.map(t => t.id)).toEqual(['t0', 't1', 't2']);
+      expect(g1?.treatments.map((t) => t.id)).toEqual(['t0', 't1', 't2']);
     });
 
     it('should handle empty treatment list gracefully', () => {
@@ -871,7 +995,6 @@ describe('Helper Utils', () => {
   });
 
   describe('allElementsHaveSameKeyFilterValue', () => {
-
     it('should return true if all keys have the same top-level property value', () => {
       const map = new Map<any, any>([
         [{ id: 1, group: 'A' }, 'value1'],
@@ -880,7 +1003,7 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['group']);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should return false if keys have different top-level property values', () => {
@@ -890,7 +1013,7 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['group']);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('should return true if all nested property values are equal', () => {
@@ -900,7 +1023,7 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['group', 'name']);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should return false if nested property values differ', () => {
@@ -910,13 +1033,13 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['group', 'name']);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('should return true for an empty map', () => {
       const map = new Map();
       const result = allElementsHaveSameKeyFilterValue(map, ['group']);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should handle missing nested properties gracefully', () => {
@@ -926,7 +1049,7 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['group', 'name']);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('should return true when all keys resolve to undefined (same value)', () => {
@@ -936,96 +1059,111 @@ describe('Helper Utils', () => {
       ]);
 
       const result = allElementsHaveSameKeyFilterValue(map, ['nonexistent']);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
   });
 
   describe('areEquals', () => {
     it('should return true for two identical arrays of simple objects', () => {
-      const arr1 = [{ id: 1, name: 'Alice' }, { id: 2, name: 'Bob' }];
-      const arr2 = [{ id: 2, name: 'Bob' }, { id: 1, name: 'Alice' }];
+      const arr1 = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+      ];
+      const arr2 = [
+        { id: 2, name: 'Bob' },
+        { id: 1, name: 'Alice' },
+      ];
 
-      expect(areEquals(arr1, arr2)).toBeTrue();
+      expect(areEquals(arr1, arr2)).toBe(true);
     });
 
     it('should return false if one object differs by one property', () => {
       const arr1 = [{ id: 1, name: 'Alice' }];
       const arr2 = [{ id: 1, name: 'Bob' }];
 
-      expect(areEquals(arr1, arr2)).toBeFalse();
+      expect(areEquals(arr1, arr2)).toBe(false);
     });
 
     it('should return false if array lengths differ', () => {
       const arr1 = [{ id: 1 }];
       const arr2 = [{ id: 1 }, { id: 2 }];
 
-      expect(areEquals(arr1, arr2)).toBeFalse();
+      expect(areEquals(arr1, arr2)).toBe(false);
     });
 
     it('should return true for empty arrays', () => {
-      expect(areEquals([], [])).toBeTrue();
+      expect(areEquals([], [])).toBe(true);
     });
 
     it('should return true if arrays have same values as primitives instead of objects', () => {
       const arr1 = [1, 2, 3];
       const arr2 = [1, 2, 3];
 
-      expect(areEquals(arr1, arr2)).toBeTrue();
+      expect(areEquals(arr1, arr2)).toBe(true);
     });
 
     it('should return false when object has an extra key not in other array', () => {
       const arr1 = [{ id: 1, name: 'Alice' }];
       const arr2 = [{ id: 1 }];
 
-      expect(areEquals(arr1, arr2)).toBeFalse();
+      expect(areEquals(arr1, arr2)).toBe(false);
     });
 
     it('should handle numeric and string key comparisons correctly', () => {
       const arr1 = [{ id: 1 }];
       const arr2 = [{ id: '1' }]; // string vs number
 
-      expect(areEquals(arr1, arr2)).toBeFalse();
+      expect(areEquals(arr1, arr2)).toBe(false);
     });
 
     it('should return true when order differs but all objects are identical', () => {
-      const arr1 = [{ id: 1, x: 2 }, { id: 2, x: 4 }];
-      const arr2 = [{ id: 2, x: 4 }, { id: 1, x: 2 }];
+      const arr1 = [
+        { id: 1, x: 2 },
+        { id: 2, x: 4 },
+      ];
+      const arr2 = [
+        { id: 2, x: 4 },
+        { id: 1, x: 2 },
+      ];
 
-      expect(areEquals(arr1, arr2)).toBeTrue();
+      expect(areEquals(arr1, arr2)).toBe(true);
     });
 
     it('should return false when nested object references differ even with same structure', () => {
       const arr1 = [{ user: { id: 1, name: 'A' } }];
       const arr2 = [{ user: { id: 1, name: 'A' } }];
 
-      expect(areEquals(arr1, arr2)).toBeFalse();
+      expect(areEquals(arr1, arr2)).toBe(false);
     });
   });
 
   describe('isProfessional', () => {
-    const professionals: IUser[] = [{
-      id: 'professional-123',
-    }, {
-      id: 'pro-456',
-    }];
+    const professionals: IUser[] = [
+      {
+        id: 'professional-123',
+      },
+      {
+        id: 'pro-456',
+      },
+    ];
     it('should return true for id that include the professional', () => {
       const id = 'professional-123';
-      expect(isProfessional(id, professionals)).toBeTrue();
+      expect(isProfessional(id, professionals)).toBe(true);
     });
 
     it('should return false for id that does not include the professional', () => {
       const id = 'customer-789';
-      expect(isProfessional(id, professionals)).toBeFalse();
+      expect(isProfessional(id, professionals)).toBe(false);
     });
 
     it('should return false when professionals list is empty', () => {
       const id = 'professional-123';
-      expect(isProfessional(id, [])).toBeFalse();
+      expect(isProfessional(id, [])).toBe(false);
     });
 
     it('should return false when professionals list is undefined', () => {
       const id = 'professional-123';
-      expect(isProfessional(id)).toBeFalse();
+      expect(isProfessional(id)).toBe(false);
     });
   });
 });

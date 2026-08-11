@@ -30,7 +30,7 @@
       "account": "NL123456789",
       "btw": "NL123123123B01",
       "billingAddress": "Mock address",
-      "lastInvoiceNumber": 839.00,
+      "lastInvoiceNumber": 839.0,
       "manager": {
         "createdAt": "2023-04-08T18:25:34.534018",
         "createdBy": "anonymousUser",
@@ -207,10 +207,7 @@
       },
       "id": 4
     },
-    "paymentTypes": [
-      "CASH",
-      "PAY_NL"
-    ],
+    "paymentTypes": ["CASH", "PAY_NL"],
     "timeZone": "Europe/Berlin",
     "primary": true
   }

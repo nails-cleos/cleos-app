@@ -1,8 +1,13 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DashboardComponent } from './dashboard.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../services/auth-user.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '../services/auth-user.service';
 import { signal } from '@angular/core';
 import { IDashboard } from './dashboard';
 import { ICurrencyAll } from '../currency/currency';
@@ -18,22 +23,24 @@ import { ReservationStore } from '../store/reservation.store';
 describe('DashboardComponent', () => {
   let component: DashboardComponent;
   let fixture: ComponentFixture<DashboardComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let dashboardStoreSpy: {
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal<boolean>>;
-    getEvents: jasmine.Spy;
-    getCards: jasmine.Spy;
-    clean: jasmine.Spy;
+    getEvents: Mock;
+    getCards: Mock;
+    clean: Mock;
   };
   let reservationStoreSpy: {
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal<boolean>>;
-    loadPage: jasmine.Spy;
-    delete: jasmine.Spy;
+    loadPage: Mock;
+    delete: Mock;
   };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -41,7 +48,12 @@ describe('DashboardComponent', () => {
   const mockMiniCardSummaries = [
     { title: 'currency false', isCurrency: false },
     { title: 'currency true', isCurrency: true },
-    { title: 'currency with values', isCurrency: true, value: 23, previousPeriodValue: 20 },
+    {
+      title: 'currency with values',
+      isCurrency: true,
+      value: 23,
+      previousPeriodValue: 20,
+    },
   ];
 
   const mockChartSummaries = [{ title: 'chart' }];
@@ -70,36 +82,38 @@ describe('DashboardComponent', () => {
     notes: [],
   };
 
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     history.replaceState({}, '');
     dashboardStoreSpy = {
       data: signal(undefined),
       error: signal(undefined),
       isLoading: signal(false),
-      getEvents: jasmine.createSpy('getEvents'),
-      getCards: jasmine.createSpy('getCards'),
-      clean: jasmine.createSpy('clean'),
+      getEvents: vi.fn().mockName('getEvents'),
+      getCards: vi.fn().mockName('getCards'),
+      clean: vi.fn().mockName('clean'),
     };
     reservationStoreSpy = {
       data: signal(undefined),
       error: signal(undefined),
       isLoading: signal(false),
-      loadPage: jasmine.createSpy('loadPage'),
-      delete: jasmine.createSpy('delete'),
+      loadPage: vi.fn().mockName('loadPage'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
     await TestBed.configureTestingModule({
-      imports: [DashboardComponent, TranslateModule.forRoot()],
+      imports: [DashboardComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
@@ -133,9 +147,15 @@ describe('DashboardComponent', () => {
     expect(component.currency).toBe(currency);
 
     expect(component.miniCardData.length).toBe(3);
-    expect(component.miniCardData[0].isCurrency).toEqual(mockMiniCardSummaries[0].isCurrency);
-    expect(component.miniCardData[1].isCurrency).toEqual(mockMiniCardSummaries[1].isCurrency);
-    expect(component.miniCardData[2].isCurrency).toEqual(mockMiniCardSummaries[2].isCurrency);
+    expect(component.miniCardData[0].isCurrency).toEqual(
+      mockMiniCardSummaries[0].isCurrency,
+    );
+    expect(component.miniCardData[1].isCurrency).toEqual(
+      mockMiniCardSummaries[1].isCurrency,
+    );
+    expect(component.miniCardData[2].isCurrency).toEqual(
+      mockMiniCardSummaries[2].isCurrency,
+    );
     expect(component.miniCardData[2].value).toEqual('€23.00');
     expect(component.miniCardData[2].previousPeriodValue).toEqual('€20.00');
   });
@@ -143,7 +163,11 @@ describe('DashboardComponent', () => {
   it('should load dashboard primary room', () => {
     const roomName = 'Test Room';
     const record: Record<string, IDashboard> = {};
-    record[roomName] = { chartSummaries: mockChartSummaries, currency, primary: true };
+    record[roomName] = {
+      chartSummaries: mockChartSummaries,
+      currency,
+      primary: true,
+    };
     dashboardStoreSpy.data.set(record);
 
     fixture.detectChanges();
@@ -193,12 +217,14 @@ describe('DashboardComponent', () => {
     const today = getNowTimeZone();
 
     component.calendarSummary = {
-      reservations: [{
-        reservationId: 'r1',
-        title: 'Today reservation',
-        start: today.getTime() / 1000,
-        state: States.completed,
-      }],
+      reservations: [
+        {
+          reservationId: 'r1',
+          title: 'Today reservation',
+          start: today.getTime() / 1000,
+          state: States.completed,
+        },
+      ],
       unavailable: [],
       birthdays: [],
       transactions: [],
@@ -207,7 +233,7 @@ describe('DashboardComponent', () => {
 
     component['createEvents']();
 
-    expect(component.activeDayIsOpen).toBeTrue();
+    expect(component.activeDayIsOpen).toBe(true);
   });
 
   it('should create birthday all-day event', () => {
@@ -216,11 +242,13 @@ describe('DashboardComponent', () => {
     component.calendarSummary = {
       reservations: [],
       unavailable: [],
-      birthdays: [{
-        userId: 'u1',
-        title: 'Birthday',
-        date: today.toDateString(),
-      }],
+      birthdays: [
+        {
+          userId: 'u1',
+          title: 'Birthday',
+          date: today.toDateString(),
+        },
+      ],
       transactions: [],
       notes: [],
     } as any;
@@ -230,7 +258,7 @@ describe('DashboardComponent', () => {
     expect(component.calendar.calendarEvents.length).toBe(1);
 
     const event = component.calendar.calendarEvents[0];
-    expect(event.allDay).toBeTrue();
+    expect(event.allDay).toBe(true);
     expect(event.meta.state).toBe('BIRTHDAY');
   });
 
@@ -240,12 +268,14 @@ describe('DashboardComponent', () => {
       unavailable: [],
       birthdays: [],
       transactions: [],
-      notes: [{
-        noteId: 'n1',
-        title: 'Repeated note',
-        date: Date.now() / 1000,
-        repeat: FrequencyEnum.everyDay,
-      }],
+      notes: [
+        {
+          noteId: 'n1',
+          title: 'Repeated note',
+          date: Date.now() / 1000,
+          repeat: FrequencyEnum.everyDay,
+        },
+      ],
     } as any;
 
     component['createEvents']();
@@ -274,13 +304,13 @@ describe('DashboardComponent', () => {
 
     expect(component.charts.length).toBe(0);
     expect(component.miniCardData.length).toBe(4);
-    component.miniCardData.forEach(card => {
+    component.miniCardData.forEach((card) => {
       expect(card.error?.status).toBe('NO_CONTENT');
     });
 
     expect(component.miniCardData.length).toBe(4);
 
-    component.miniCardData.forEach(card => {
+    component.miniCardData.forEach((card) => {
       expect(card.error).toBeTruthy();
       expect(card.error?.status).toBe('NO_CONTENT');
       expect(card.title).toContain('DASHBOARD.MINI_CARD');
@@ -357,7 +387,7 @@ describe('DashboardComponent', () => {
     const events = component.calendar.calendarEvents;
 
     expect(events.length).toBeGreaterThan(0);
-    expect(events.some(e => e.meta.state === 'UNAVAILABLE')).toBeTrue();
+    expect(events.some((e) => e.meta.state === 'UNAVAILABLE')).toBe(true);
   });
 
   it('should set activeDayIsOpen when unavailable is today', () => {
@@ -382,7 +412,7 @@ describe('DashboardComponent', () => {
 
     component['createEvents'](false);
 
-    expect(component.activeDayIsOpen).toBeTrue();
+    expect(component.activeDayIsOpen).toBe(true);
   });
 
   it('should create transaction all-day event', () => {
@@ -417,20 +447,34 @@ describe('DashboardComponent', () => {
     expect(event.meta.total).toBe(150);
 
     // all-day events have same start & end day
-    expect(event.allDay).toBeTrue();
+    expect(event.allDay).toBe(true);
 
     // year normalized to current year
     expect(event.start.getFullYear()).toBe(getNowTimeZone().getFullYear());
 
     // route correctness
-    expect(event.meta.route.join('/')).toContain('accounts/acc-1/transactions/tx-123');
+    expect(event.meta.route.join('/')).toContain(
+      'accounts/acc-1/transactions/tx-123',
+    );
   });
 
   it('should create multiple transaction events', () => {
     component.calendarSummary = {
       transactions: [
-        { title: 'T1', createdAt: new Date().toISOString(), accountId: 'a1', transactionId: 't1', total: 10 },
-        { title: 'T2', createdAt: new Date().toISOString(), accountId: 'a2', transactionId: 't2', total: 20 },
+        {
+          title: 'T1',
+          createdAt: new Date().toISOString(),
+          accountId: 'a1',
+          transactionId: 't1',
+          total: 10,
+        },
+        {
+          title: 'T2',
+          createdAt: new Date().toISOString(),
+          accountId: 'a2',
+          transactionId: 't2',
+          total: 20,
+        },
       ],
       unavailable: [],
       reservations: [],
@@ -470,7 +514,7 @@ describe('DashboardComponent', () => {
     const event = events[0];
 
     expect(event.title).toBe('Single note');
-    expect(event.allDay).toBeTrue();
+    expect(event.allDay).toBe(true);
     expect(event.meta.state).toBe('NOTE');
     expect(event.meta.route.join('/')).toContain('notes/n1');
   });
@@ -480,8 +524,16 @@ describe('DashboardComponent', () => {
     start.setDate(5);
 
     // Simulate calendar month boundaries
-    component.calendar.calendarStart = new Date(start.getFullYear(), start.getMonth(), 1);
-    component.calendar.calendarEnd = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+    component.calendar.calendarStart = new Date(
+      start.getFullYear(),
+      start.getMonth(),
+      1,
+    );
+    component.calendar.calendarEnd = new Date(
+      start.getFullYear(),
+      start.getMonth() + 1,
+      0,
+    );
 
     component.calendarSummary = {
       reservations: [],
@@ -508,7 +560,7 @@ describe('DashboardComponent', () => {
     const event = events[0];
     expect(event.title).toBe('Non recurring note');
     expect(event.meta.state).toBe('NOTE');
-    expect(event.allDay).toBeTrue();
+    expect(event.allDay).toBe(true);
   });
 
   it('should register recurring note and create events after execute()', () => {
@@ -546,24 +598,24 @@ describe('DashboardComponent', () => {
     const event = events[0];
     expect(event.title).toBe('Recurring note');
     expect(event.meta.state).toBe('NOTE');
-    expect(event.allDay).toBeTrue();
+    expect(event.allDay).toBe(true);
   });
 
   it('Should change to dark mode', () => {
-    authUserSignal.update(prev => ({
+    authUserSignal.update((prev) => ({
       ...prev,
       isDarkMode: true,
     }));
     fixture.detectChanges();
-    expect(component['isDarkMode']()).toBeTrue();
+    expect(component['isDarkMode']()).toBe(true);
   });
 
   it('Should change to light mode', () => {
-    authUserSignal.update(prev => ({
+    authUserSignal.update((prev) => ({
       ...prev,
       isDarkMode: false,
     }));
     fixture.detectChanges();
-    expect(component['isDarkMode']()).toBeFalse();
+    expect(component['isDarkMode']()).toBe(false);
   });
 });

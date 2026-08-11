@@ -1,5 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import {
   MatDialogActions,
   MatDialogClose,
@@ -14,18 +19,30 @@ import { MatRadioButton, MatRadioGroup } from '@angular/material/radio';
 
 type CalendarForm = {
   radio: FormControl<string>;
-}
+};
 
 @Component({
   selector: 'app-calendar-dialog',
   templateUrl: './calendar-dialog.component.html',
   styleUrls: ['./calendar-dialog.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatRadioGroup,
-    MatRadioButton, MatDialogActions, MatDialogClose],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatRadioGroup,
+    MatRadioButton,
+    MatDialogActions,
+    MatDialogClose,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarDialogComponent {
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly dialogRef = inject(MatDialogRef<CalendarDialogComponent>);
 
   form: FormGroup<CalendarForm> = this.formBuilder.group<CalendarForm>({
