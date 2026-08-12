@@ -11,6 +11,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { IReservationSummary, States } from '../reservation/reservation';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
+  backendFormatDate,
   getDurationOrUndefined,
   getEnd,
   getEndWithDuration,
@@ -319,7 +320,7 @@ export class DashboardComponent {
     effect(() => {
       this.viewMonth();
       untracked(() => {
-        const date = this.viewDate();
+        const date = backendFormatDate(this.viewDate());
         this.calendar.resetEvents();
         this.dashboardStore.getEvents(date);
         this.dashboardStore.getCards(date);

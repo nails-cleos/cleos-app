@@ -10,6 +10,7 @@ import {
 import { CalendarDatePipe, CalendarEvent } from 'angular-calendar';
 import {
   addPeriod,
+  backendFormatDate,
   createNewDate,
   dateToTimestamp,
   DEFAULT_LOCALE,
@@ -137,7 +138,7 @@ export class DashboardEventComponent {
     });
 
     effect(() => {
-      const date = this.viewDate();
+      const date = backendFormatDate(this.viewDate());
       this.calendar.resetEvents();
       this.dashboardStore.getMyEvent(date);
     });

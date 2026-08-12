@@ -24,13 +24,13 @@ export class DashboardService {
 
   private http: HttpClient = inject(HttpClient);
 
-  getCards = (date: Date): Observable<ICardSummary[]> =>
+  getCards = (date: string): Observable<ICardSummary[]> =>
     this.getSummaryData<ICardSummary[]>(date, 'cards');
 
-  getEvents = (date: Date): Observable<IEventSummary[]> =>
+  getEvents = (date: string): Observable<IEventSummary[]> =>
     this.getSummaryData<IEventSummary[]>(date, 'events');
 
-  getMyEvent = (date: Date): Observable<IRoomEvents> =>
+  getMyEvent = (date: string): Observable<IRoomEvents> =>
     this.getSummaryData<IRoomEvents>(date, 'me', 'events');
 
   updateEvent = (
@@ -75,8 +75,8 @@ export class DashboardService {
       toUrl(this.urlV1, 'years', `${year}`, 'quarters', `${quarter}`),
     );
 
-  private getSummaryData = <T>(date: Date, ...url: string[]): Observable<T> =>
+  private getSummaryData = <T>(date: string, ...url: string[]): Observable<T> =>
     this.http.get<T>(toUrl(this.urlV1, ...url), {
-      params: new HttpParams().set('date', date.toISOString().slice(0, 10)),
+      params: new HttpParams().set('date', date),
     });
 }

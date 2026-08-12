@@ -46,7 +46,7 @@ export class Note {
         currentNote?.professional,
       )?.id,
       repeat: fieldChange(noteForm.repeat, currentNote?.repeat),
-      date: backendFormatDate(noteForm.date.value),
+      date: backendFormatDate(noteForm.date.value!),
     };
   }
 }

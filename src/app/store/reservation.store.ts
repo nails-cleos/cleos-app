@@ -21,7 +21,7 @@ import {
 } from '../reservation/reservation';
 import { Pagination } from '../interfaces/pagination';
 import { HttpErrorResponse } from '@angular/common/http';
-import { newDateTimestamp } from '../util/dates';
+import { backendFormatDate, newDateTimestamp } from '../util/dates';
 import { NavigationService } from '../services/navigation.service';
 import { IReview } from '../me/reservation/list/review';
 import { Role } from '../interfaces/token';
@@ -215,7 +215,7 @@ export const ReservationStore = signalStore(
         }
         if (isDashboard) {
           if (state && [States.started, States.completed].includes(state)) {
-            dashboardStore.getMyEvent(date ?? new Date());
+            dashboardStore.getMyEvent(backendFormatDate(date ?? new Date()));
           }
           navigationService.navigate(['dashboard', 'events']);
         } else {

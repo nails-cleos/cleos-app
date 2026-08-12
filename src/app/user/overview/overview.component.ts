@@ -191,26 +191,17 @@ export class OverviewComponent {
   }
 
   notification() {
-    let message: string;
-    if (this.upcoming.length === 1) {
-      const date = formatDateTime(
-        newDateTimestamp(this.upcoming[0]),
-        this.language,
+    let message = this.translateService.instant(
+      'WHATSAPP.SEND.FOLLOWINGS.TITLE',
+    );
+    this.upcoming.forEach((r) => {
+      const date = formatDateTime(newDateTimestamp(r), this.language);
+      message += this.translateService.instant(
+        'WHATSAPP.SEND.FOLLOWINGS.VALUE',
+        { date },
       );
-      message = this.translateService.instant('WHATSAPP.SEND.APPROVE', {
-        date,
-      });
-    } else {
-      message = this.translateService.instant('WHATSAPP.SEND.FOLLOWINGS.TITLE');
-      this.upcoming.forEach((r) => {
-        const date = formatDateTime(newDateTimestamp(r), this.language);
-        message += this.translateService.instant(
-          'WHATSAPP.SEND.FOLLOWINGS.VALUE',
-          { date },
-        );
-      });
-      message += this.translateService.instant('WHATSAPP.SEND.ATTENTION');
-    }
+    });
+    message += this.translateService.instant('WHATSAPP.SEND.ATTENTION');
     const userPhone = this.customer?.phone;
     window.open(
       `https://api.whatsapp.com/send?phone=+${userPhone}&text=${message}`,

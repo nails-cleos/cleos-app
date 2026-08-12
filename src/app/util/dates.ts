@@ -579,13 +579,10 @@ export const formatDateTwoDigit = (
     timeZone,
   });
 
-export const backendFormatDate = (date?: Date): string | undefined => {
-  if (date) {
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed in JS
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${date?.getFullYear()}-${month}-${day}`;
-  }
-  return date;
+export const backendFormatDate = (date: Date): string => {
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed in JS
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date?.getFullYear()}-${month}-${day}`;
 };
 
 export const exportFormatDate = (

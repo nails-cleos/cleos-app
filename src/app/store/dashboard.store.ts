@@ -117,7 +117,7 @@ export const DashboardStore = signalStore(
           patchState(store, { error: undefined, subErrors: undefined });
         },
 
-        getEvents(date: Date): void {
+        getEvents(date: string): void {
           getEventsSubscription?.unsubscribe();
           patchState(store, {
             data: cleanEventMap(store.data()),
@@ -134,7 +134,7 @@ export const DashboardStore = signalStore(
           });
         },
 
-        getCards(date: Date): void {
+        getCards(date: string): void {
           getCardsSubscription?.unsubscribe();
           patchState(store, {
             data: cleanCardMap(store.data()),
@@ -151,7 +151,7 @@ export const DashboardStore = signalStore(
           });
         },
 
-        getMyEvent(date: Date): void {
+        getMyEvent(date: string): void {
           getMyEventSubscription?.unsubscribe();
           patchState(store, { dashboard: undefined, isLoading: true });
 
