@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TotalSummaryItemComponent } from './total-summary-item.component';
-import { ICurrencyAll } from '../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('TotalSummaryItemComponent', () => {
   let component: TotalSummaryItemComponent;
@@ -30,10 +31,12 @@ describe('TotalSummaryItemComponent', () => {
     expect(component).toBeTruthy();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.total-summary-item__value').textContent).toContain('$1,000.00');
+    expect(
+      compiled.querySelector('.total-summary-item__value').textContent,
+    ).toContain('$1,000.00');
     expect(component.label()).toBe('Gross');
     expect(component.value()).toBe(1000);
-    expect(component.isResult()).toBeFalse();
+    expect(component.isResult()).toBe(false);
     expect(component.currencyCode()).toBeUndefined();
   });
 
@@ -43,7 +46,7 @@ describe('TotalSummaryItemComponent', () => {
 
     const compiled = fixture.nativeElement;
     expect(compiled.querySelector('.total-summary-item--result')).toBeTruthy();
-    expect(component.isResult()).toBeTrue();
+    expect(component.isResult()).toBe(true);
   });
 
   it('should display the correct currency code when provided', () => {
@@ -51,7 +54,9 @@ describe('TotalSummaryItemComponent', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('.total-summary-item__value').textContent).toContain('€1,000.00');
+    expect(
+      compiled.querySelector('.total-summary-item__value').textContent,
+    ).toContain('€1,000.00');
     expect(component.currencyCode()).toBe('EUR');
   });
 });

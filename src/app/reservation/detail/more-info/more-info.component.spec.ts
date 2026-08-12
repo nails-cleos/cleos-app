@@ -1,48 +1,60 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MoreInfoComponent } from './more-info.component';
 import { of } from 'rxjs';
-import { TranslateModule } from '@ngx-translate/core';
 import { IReservationAll, ITracking } from '../../reservation';
-import { DEFAULT_LOCALE, getCurrentTimeZone, getNowTimeZone } from '../../../util/dates';
-import { IRoomAll } from '../../../room/room';
-import { ICurrencyAll } from '../../../currency/currency';
-import { IReview } from '../../../me/reservation/list/review';
+import {
+  DEFAULT_LOCALE,
+  getCurrentTimeZone,
+  getNowTimeZone,
+} from '@app/util/dates';
+import { IRoomAll } from '@app/room/room';
+import { ICurrencyAll } from '@app/currency/currency';
+import { IReview } from '@app/me/reservation/list/review';
 import { addHours } from 'date-fns';
-import { IPaymentAll } from '../../../interfaces/payment';
+import { IPaymentAll } from '@app/interfaces/payment';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { ToastService } from '../../../services/toast.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { PaymentStore } from '../../../store/payment.store';
+import { ToastService } from '@app/services/toast.service';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 import { signal } from '@angular/core';
-import { TrackingStore } from '../../../store/tracking.store';
-import { ReservationStore } from '../../../store/reservation.store';
+import { TrackingStore } from '@app/store/tracking.store';
+import { ReservationStore } from '@app/store/reservation.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('MoreInfoComponent', () => {
   let component: MoreInfoComponent;
   let fixture: ComponentFixture<MoreInfoComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let reservationStoreSpy: {
     review: ReturnType<typeof signal>;
-    loadReview: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadReview: Mock;
+    clean: Mock;
   };
   let trackingStoreSpy: {
     selected: ReturnType<typeof signal>;
-    getByReservationId: jasmine.Spy;
-    executeByReservationId: jasmine.Spy;
-    updateByReservationId: jasmine.Spy;
+    getByReservationId: Mock;
+    executeByReservationId: Mock;
+    updateByReservationId: Mock;
   };
   let paymentStoreSpy: {
     data: ReturnType<typeof signal>;
-    recreate: jasmine.Spy;
-    getPaymentByResourceId: jasmine.Spy;
-    isLoading: jasmine.Spy;
+    recreate: Mock;
+    getPaymentByResourceId: Mock;
+    isLoading: Mock;
   };
-  let clipboardSpy: jasmine.SpyObj<Clipboard>;
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let dialogSpy: jasmine.Spy<any>;
+  let clipboardSpy: Pick<Clipboard, 'copy'> & {
+    copy: ReturnType<typeof vi.fn>;
+  };
+
+  let toastServiceSpy: {
+    show: Mock;
+  };
+  let dialogSpy: Mock;
 
   const mockCurrency: ICurrencyAll = {
     id: 'currency-id',
@@ -67,33 +79,39 @@ describe('MoreInfoComponent', () => {
   } as IReservationAll;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       review: signal(undefined),
-      loadReview: jasmine.createSpy('loadReview'),
-      clean: jasmine.createSpy('clean'),
+      loadReview: vi.fn().mockName('loadReview'),
+      clean: vi.fn().mockName('clean'),
     };
     trackingStoreSpy = {
       selected: signal(undefined),
-      getByReservationId: jasmine.createSpy('getByReservationId'),
-      executeByReservationId: jasmine.createSpy('executeByReservationId'),
-      updateByReservationId: jasmine.createSpy('updateByReservationId'),
+      getByReservationId: vi.fn().mockName('getByReservationId'),
+      executeByReservationId: vi.fn().mockName('executeByReservationId'),
+      updateByReservationId: vi.fn().mockName('updateByReservationId'),
     };
     paymentStoreSpy = {
       data: signal(undefined),
-      recreate: jasmine.createSpy('recreate'),
-      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
-      isLoading: jasmine.createSpy('isLoading'),
+      recreate: vi.fn().mockName('recreate'),
+      getPaymentByResourceId: vi.fn().mockName('getPaymentByResourceId'),
+      isLoading: vi.fn().mockName('isLoading'),
     };
 
-    clipboardSpy = jasmine.createSpyObj('Clipboard', ['copy']);
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    clipboardSpy = {
+      copy: vi.fn().mockName('Clipboard.copy'),
+    };
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [MoreInfoComponent, TranslateModule.forRoot()],
+      imports: [MoreInfoComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TrackingStore, useValue: trackingStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
@@ -107,7 +125,9 @@ describe('MoreInfoComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    dialogSpy = spyOn(component['dialog'], 'open');
+    dialogSpy = vi
+      .spyOn(component['dialog'], 'open')
+      .mockReturnValue(undefined as any);
   });
 
   it('should create', () => {
@@ -122,11 +142,16 @@ describe('MoreInfoComponent', () => {
       fixture.detectChanges();
 
       expect(trackingStoreSpy.getByReservationId).toHaveBeenCalledWith(id);
-      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(id, 'reservation');
+      expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(
+        id,
+        'reservation',
+      );
       expect(reservationStoreSpy.loadReview).toHaveBeenCalledWith(id);
     });
     it('should initialize paymentsSignal', () => {
-      const payments = [{ id: 'payment-1', reservation: mockReservation } as IPaymentAll];
+      const payments = [
+        { id: 'payment-1', reservation: mockReservation } as IPaymentAll,
+      ];
       paymentStoreSpy.data.set({ payments, remainingAmount: 0 });
       fixture.detectChanges();
 
@@ -149,7 +174,10 @@ describe('MoreInfoComponent', () => {
   });
 
   it('should return undefined when tracking is not complete', () => {
-    const tracking: ITracking = { reservation: mockReservation, startedTimestamp: getNowTimeZone().getTime() / 1000 };
+    const tracking: ITracking = {
+      reservation: mockReservation,
+      startedTimestamp: getNowTimeZone().getTime() / 1000,
+    };
     trackingStoreSpy.selected.set(tracking);
     fixture.detectChanges();
 
@@ -204,27 +232,43 @@ describe('MoreInfoComponent', () => {
 
     fixture.detectChanges();
 
-    dialogSpy.and.callFake(() => {
+    dialogSpy.mockImplementation(() => {
       return {
-        afterClosed: () => of({ started: started.toISOString(), completed: now.toISOString() }),
+        afterClosed: () =>
+          of({ started: started.toISOString(), completed: now.toISOString() }),
       };
     });
 
     component.update();
 
-    expect(trackingStoreSpy.updateByReservationId).toHaveBeenCalledWith(id, started.toISOString(), now.toISOString());
+    expect(trackingStoreSpy.updateByReservationId).toHaveBeenCalledWith(
+      id,
+      started.toISOString(),
+      now.toISOString(),
+    );
   });
 
   it('should call resend', () => {
-    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL' } as IPaymentAll;
+    const payment = {
+      id: 'payment-1',
+      reservation: mockReservation,
+      type: 'IDEAL',
+    } as IPaymentAll;
 
     component.resend(payment);
 
-    expect(paymentStoreSpy.recreate).toHaveBeenCalledWith(payment.id, payment.type);
+    expect(paymentStoreSpy.recreate).toHaveBeenCalledWith(
+      payment.id,
+      payment.type,
+    );
   });
 
   it('should not call copy when payment link is missing', () => {
-    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL' } as IPaymentAll;
+    const payment = {
+      id: 'payment-1',
+      reservation: mockReservation,
+      type: 'IDEAL',
+    } as IPaymentAll;
 
     component.copy(payment);
 
@@ -234,7 +278,12 @@ describe('MoreInfoComponent', () => {
 
   it('should call copy', () => {
     const link = 'link';
-    const payment = { id: 'payment-1', reservation: mockReservation, type: 'IDEAL', link } as IPaymentAll;
+    const payment = {
+      id: 'payment-1',
+      reservation: mockReservation,
+      type: 'IDEAL',
+      link,
+    } as IPaymentAll;
 
     component.copy(payment);
 

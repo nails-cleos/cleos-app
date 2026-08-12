@@ -2,16 +2,29 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'SUMMARY.QUARTER.RESULT' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'SUMMARY.QUARTER.RESULT' | translate
+        }}</span>
       </div>
     </div>
 
     <div class="quarter-summary-toolbar">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <input
+          matInput
+          [matDatepicker]="dp"
+          [formControl]="getForm.date"
+          readonly
+          (click)="dp.open()"
+        />
         <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)" touchUi>
+        <mat-datepicker
+          #dp
+          startView="multi-year"
+          (yearSelected)="setYear($event, dp)"
+          touchUi
+        >
         </mat-datepicker>
       </mat-form-field>
 
@@ -31,23 +44,33 @@
             @if (primaryRoom) {
               <mat-option [value]="'All'">All</mat-option>
             }
-            @for (quarterSummary of quarterSummaryMap | keyvalue; track quarterSummary) {
-              <mat-option [value]="quarterSummary.key">{{ quarterSummary.key.roomName }}</mat-option>
+            @for (
+              quarterSummary of quarterSummaryMap | keyvalue;
+              track quarterSummary
+            ) {
+              <mat-option [value]="quarterSummary.key">{{
+                quarterSummary.key.roomName
+              }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
       }
 
       <div class="app-detail-actions quarter-summary-actions">
-        <button mat-stroked-button
-                [routerLink]="['/', language, 'dashboard', 'monthly', 'summary']">
+        <button
+          mat-stroked-button
+          [routerLink]="['/', language, 'dashboard', 'monthly', 'summary']"
+        >
           <mat-icon>calendar_month</mat-icon>
           <span>{{ 'SUMMARY.MONTHLY.RESULT' | translate }}</span>
         </button>
 
-        <button mat-stroked-button type="button"
-                [disabled]="!monthSummaries().length"
-                (click)="exportQuarterSummary()">
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="!monthSummaries().length"
+          (click)="exportQuarterSummary()"
+        >
           <mat-icon>file_download</mat-icon>
           <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
         </button>
@@ -61,32 +84,42 @@
   @if (currentQuarter && currentYear) {
     @if (quarterSummaryMap?.size) {
       <section class="app-surface-section">
-        <app-quarter [showCash]="currentShowCash"
-                     [year]="currentYear"
-                     [quarter]="currentQuarter"
-                     [currency]="currency"
-                     [measure]="isHandset() ? 'short' : 'long'"
-                     [monthSummaries]="monthSummaries()">
+        <app-quarter
+          [showCash]="currentShowCash"
+          [year]="currentYear"
+          [quarter]="currentQuarter"
+          [currency]="currency"
+          [measure]="isHandset() ? 'short' : 'long'"
+          [monthSummaries]="monthSummaries()"
+        >
         </app-quarter>
       </section>
 
       <section class="app-surface-section">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'SUMMARY.QUARTER.RESULT' | translate }}</span>
+            <span class="app-surface-eyebrow">{{
+              'SUMMARY.QUARTER.RESULT' | translate
+            }}</span>
           </div>
         </div>
 
-        <app-total-summary [summaryTotals]="quarterSummaryTotals()"
-                           [showCash]="currentShowCash"
-                           [currency]="currency">
+        <app-total-summary
+          [summaryTotals]="quarterSummaryTotals()"
+          [showCash]="currentShowCash"
+          [currency]="currency"
+        >
         </app-total-summary>
       </section>
     } @else {
       <section class="app-surface-section quarter-summary-empty">
-        <div class="app-detail-body"
-             [innerHTML]="'SUMMARY.QUARTER.ERROR.NO_CONTENT' | translate:{quarter: currentQuarter, year: currentYear}">
-        </div>
+        <div
+          class="app-detail-body"
+          [innerHTML]="
+            'SUMMARY.QUARTER.ERROR.NO_CONTENT'
+              | translate: { quarter: currentQuarter, year: currentYear }
+          "
+        ></div>
       </section>
     }
   }

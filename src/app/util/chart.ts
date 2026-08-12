@@ -1,4 +1,9 @@
-import { ChartConfiguration, ChartOptions, ChartType, TooltipItem } from 'chart.js';
+import {
+  ChartConfiguration,
+  ChartOptions,
+  ChartType,
+  TooltipItem,
+} from 'chart.js';
 import { IChart } from '../dashboard/dashboard';
 import { ICurrency } from '../currency/currency';
 import { numberFormat } from './numbers';
@@ -36,7 +41,14 @@ export const createChart = (
       options = barChartDefaultOptions(chart.sum, isDark, locale, timeZone);
       break;
     case 'LINE_CHART_CURRENCY':
-      options = lineChartDefaultOptions(chart.sum, isDark, locale, timeZone, currency, chart.footer);
+      options = lineChartDefaultOptions(
+        chart.sum,
+        isDark,
+        locale,
+        timeZone,
+        currency,
+        chart.footer,
+      );
       break;
     case 'LINE_CHART':
       options = lineChartDefaultOptions(chart.sum, isDark, locale, timeZone);
@@ -59,24 +71,27 @@ export const createChart = (
   if (chart.dataSet && chart.dataSet.length) {
     chart.dataSet.forEach((value, i) => {
       const color = colors[i % 10];
-      dataSet = [...dataSet, {
-        data: value.data,
-        label: value.label,
-        type: value.type,
-        pointRadius: value.pointRadius || 3,
-        pointHoverRadius: (value.pointRadius || 3) + 1,
-        backgroundColor: color.backgroundColor,
-        hoverBackgroundColor: color.hoverBackgroundColor,
-        borderDash: value.borderDash ? value.borderDash : [],
-        borderColor: color.borderColor,
-        hoverBorderColor: color.hoverBorderColor,
-        pointBackgroundColor: color.pointBackgroundColor,
-        pointBorderColor: color.pointBorderColor,
-        pointHoverBackgroundColor: color.pointHoverBackgroundColor,
-        pointHoverBorderColor: color.pointHoverBorderColor,
-        tension: 0.5,
-        fill: false,
-      }];
+      dataSet = [
+        ...dataSet,
+        {
+          data: value.data,
+          label: value.label,
+          type: value.type,
+          pointRadius: value.pointRadius || 3,
+          pointHoverRadius: (value.pointRadius || 3) + 1,
+          backgroundColor: color.backgroundColor,
+          hoverBackgroundColor: color.hoverBackgroundColor,
+          borderDash: value.borderDash ? value.borderDash : [],
+          borderColor: color.borderColor,
+          hoverBorderColor: color.hoverBorderColor,
+          pointBackgroundColor: color.pointBackgroundColor,
+          pointBorderColor: color.pointBorderColor,
+          pointHoverBackgroundColor: color.pointHoverBackgroundColor,
+          pointHoverBorderColor: color.pointHoverBorderColor,
+          tension: 0.5,
+          fill: false,
+        },
+      ];
     });
   }
 
@@ -183,8 +198,10 @@ const barChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
+            label: (tooltipItem: any) =>
+              label(tooltipItem, currency, sum, locale, timeZone),
+            footer: (tooltipItems: any) =>
+              footer(tooltipItems, currency, sum, locale),
           },
         },
       },
@@ -214,8 +231,10 @@ const barChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale),
+            label: (tooltipItem: any) =>
+              label(tooltipItem, currency, sum, locale, timeZone),
+            footer: (tooltipItems: any) =>
+              footer(tooltipItems, currency, sum, locale),
           },
         },
       },
@@ -260,8 +279,10 @@ const lineChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems: any) => footer(tooltipItems, currency, sum, locale, footerTitle),
+            label: (tooltipItem: any) =>
+              label(tooltipItem, currency, sum, locale, timeZone),
+            footer: (tooltipItems: any) =>
+              footer(tooltipItems, currency, sum, locale, footerTitle),
           },
         },
       },
@@ -287,8 +308,10 @@ const lineChartDefaultOptions = (
         },
         tooltip: {
           callbacks: {
-            label: (tooltipItem: any) => label(tooltipItem, currency, sum, locale, timeZone),
-            footer: (tooltipItems) => footer(tooltipItems, currency, sum, locale, footerTitle),
+            label: (tooltipItem: any) =>
+              label(tooltipItem, currency, sum, locale, timeZone),
+            footer: (tooltipItems) =>
+              footer(tooltipItems, currency, sum, locale, footerTitle),
           },
         },
       },
@@ -297,28 +320,68 @@ const lineChartDefaultOptions = (
   return { ...options, maintainAspectRatio: false };
 };
 
-const footer = (tooltipItems: any, currency?: ICurrency, sum?: boolean, locale?: string, title?: string) => {
-  const total = sum ?
-    tooltipItems.reduce((a: number, b: any) => a + (b.dataset.borderDash.length ? 0 : b.parsed.y), 0) :
-    tooltipItems[tooltipItems.length - 1].formattedValue;
-  return tooltipItems.length > 1 ? createTooltip(title || 'Total', total, currency, locale) : '';
+const footer = (
+  tooltipItems: any,
+  currency?: ICurrency,
+  sum?: boolean,
+  locale?: string,
+  title?: string,
+) => {
+  const total = sum
+    ? tooltipItems.reduce(
+        (a: number, b: any) =>
+          a + (b.dataset.borderDash.length ? 0 : b.parsed.y),
+        0,
+      )
+    : tooltipItems[tooltipItems.length - 1].formattedValue;
+  return tooltipItems.length > 1
+    ? createTooltip(title || 'Total', total, currency, locale)
+    : '';
 };
 
-const label = (tooltipItem: any, currency?: ICurrency, sum?: boolean, locale?: string, timeZone?: string) => {
+const label = (
+  tooltipItem: any,
+  currency?: ICurrency,
+  sum?: boolean,
+  locale?: string,
+  timeZone?: string,
+) => {
   if (!sum && tooltipItem.datasetIndex) {
-    const previous = Number(tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[tooltipItem.dataIndex]);
+    const previous = Number(
+      tooltipItem.chart.data.datasets[tooltipItem.datasetIndex - 1].data[
+        tooltipItem.dataIndex
+      ],
+    );
 
-    return createTooltip(tooltipItem.dataset.label, Number(tooltipItem.raw) - previous, currency, locale);
+    return createTooltip(
+      tooltipItem.dataset.label,
+      Number(tooltipItem.raw) - previous,
+      currency,
+      locale,
+    );
   }
 
-  const addTooltip = !tooltipItem.dataset.borderDash.length || tooltipItem.dataset.borderDash.length &&
-    (newDateTimestamp(tooltipItem.label, timeZone) > getNowTimeZone(timeZone));
+  const addTooltip =
+    !tooltipItem.dataset.borderDash.length ||
+    (tooltipItem.dataset.borderDash.length &&
+      newDateTimestamp(tooltipItem.label, timeZone) > getNowTimeZone(timeZone));
 
-  return addTooltip ? createTooltip(tooltipItem.dataset.label, tooltipItem.raw, currency, locale) : '';
+  return addTooltip
+    ? createTooltip(
+        tooltipItem.dataset.label,
+        tooltipItem.raw,
+        currency,
+        locale,
+      )
+    : '';
 };
 
-const createTooltip = (title: string, value: string | number, currency?: ICurrency, locale?: string) =>
-  `${ title } ${ numberFormat(value, currency, locale) }`;
+const createTooltip = (
+  title: string,
+  value: string | number,
+  currency?: ICurrency,
+  locale?: string,
+) => `${title} ${numberFormat(value, currency, locale)}`;
 
 const barChartNoLabelOptions = (isDark?: boolean): ChartOptions<'bar'> => {
   let options: ChartOptions<'bar'>;
@@ -475,7 +538,8 @@ const externalTooltipHandler = (context: any) => {
   tooltipEl.style.left = positionX + tooltip.caretX + 'px';
   tooltipEl.style.top = positionY + tooltip.caretY + 'px';
   tooltipEl.style.font = tooltip.options.bodyFont.string;
-  tooltipEl.style.padding = tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
+  tooltipEl.style.padding =
+    tooltip.options.padding + 'px ' + tooltip.options.padding + 'px';
 };
 
 const barChartTimeOptions = (isDark?: boolean): ChartOptions<'bar'> => {
@@ -548,8 +612,10 @@ const pieChartPercentageOptions = (): ChartOptions<'pie'> => ({
 });
 
 const pieChatPercentageLabel = (tooltipItem: TooltipItem<'pie'>): string => {
-  const total = tooltipItem.dataset.data.reduce((a, b) => Number(a) + Number(b));
-  return `${ tooltipItem.label }: ${ (Number(tooltipItem.raw) * 100 / total).toFixed(2) }%`;
+  const total = tooltipItem.dataset.data.reduce(
+    (a, b) => Number(a) + Number(b),
+  );
+  return `${tooltipItem.label}: ${((Number(tooltipItem.raw) * 100) / total).toFixed(2)}%`;
 };
 
 const barChatTimeLabel = (tooltipItem: any): string => {
@@ -563,64 +629,148 @@ const barChatTimeLabel = (tooltipItem: any): string => {
   return label;
 };
 
-const chartArrayColors = (): any[] => ([{
-  hoverBackgroundColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
-    'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
-    'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
-  borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
-  backgroundColor: ['rgba(254, 205, 190, 0.8)', 'rgba(152, 109, 142, 0.8)', 'rgba(95, 147, 154, 0.8)',
-    'rgba(161, 202, 226, 0.8)', 'rgba(242, 213, 239, 0.8)', 'rgba(203, 239, 227, 0.8)', 'rgba(194, 213, 167, 0.8)',
-    'rgba(176, 171, 202, 0.8)', 'rgba(226, 169, 190, 0.8)', 'rgba(163, 214, 212, 0.8)'],
-  hoverBorderColor: ['rgb(254, 205, 190)', 'rgb(152, 109, 142)', 'rgb(95, 147, 154)',
-    'rgb(161, 202, 226)', 'rgb(242, 213, 239)', 'rgb(203, 239, 227)', 'rgb(194, 213, 167)',
-    'rgb(176, 171, 202)', 'rgb(226, 169, 190)', 'rgb(163, 214, 212)'],
-}, {
-  hoverBackgroundColor: ['rgba(254, 205, 190, 0.2)', 'rgba(152, 109, 142, 0.2)', 'rgba(95, 147, 154, 0.2)',
-    'rgba(161, 202, 226, 0.2)', 'rgba(242, 213, 239, 0.2)', 'rgba(203, 239, 227, 0.2)', 'rgba(194, 213, 167, 0.2)',
-    'rgba(176, 171, 202, 0.2)', 'rgba(226, 169, 190, 0.2)', 'rgba(163, 214, 212, 0.2)'],
-  borderColor: ['#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff', '#fff'],
-  backgroundColor: ['rgba(254, 205, 190, 0.4)', 'rgba(152, 109, 142, 0.4)', 'rgba(95, 147, 154, 0.4)',
-    'rgba(161, 202, 226, 0.4)', 'rgba(242, 213, 239, 0.4)', 'rgba(203, 239, 227, 0.4)', 'rgba(194, 213, 167, 0.4)',
-    'rgba(176, 171, 202, 0.4)', 'rgba(226, 169, 190, 0.4)', 'rgba(163, 214, 212, 0.4)'],
-  hoverBorderColor: ['rgba(254, 205, 190, 0.6)', 'rgba(152, 109, 142, 0.6)', 'rgba(95, 147, 154, 0.6)',
-    'rgba(161, 202, 226, 0.6)', 'rgba(242, 213, 239, 0.6)', 'rgba(203, 239, 227, 0.6)', 'rgba(194, 213, 167, 0.6)',
-    'rgba(176, 171, 202, 0.6)', 'rgba(226, 169, 190, 0.6)', 'rgba(163, 214, 212, 0.6)'],
-}]);
+const chartArrayColors = (): any[] => [
+  {
+    hoverBackgroundColor: [
+      'rgba(254, 205, 190, 0.6)',
+      'rgba(152, 109, 142, 0.6)',
+      'rgba(95, 147, 154, 0.6)',
+      'rgba(161, 202, 226, 0.6)',
+      'rgba(242, 213, 239, 0.6)',
+      'rgba(203, 239, 227, 0.6)',
+      'rgba(194, 213, 167, 0.6)',
+      'rgba(176, 171, 202, 0.6)',
+      'rgba(226, 169, 190, 0.6)',
+      'rgba(163, 214, 212, 0.6)',
+    ],
+    borderColor: [
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+    ],
+    backgroundColor: [
+      'rgba(254, 205, 190, 0.8)',
+      'rgba(152, 109, 142, 0.8)',
+      'rgba(95, 147, 154, 0.8)',
+      'rgba(161, 202, 226, 0.8)',
+      'rgba(242, 213, 239, 0.8)',
+      'rgba(203, 239, 227, 0.8)',
+      'rgba(194, 213, 167, 0.8)',
+      'rgba(176, 171, 202, 0.8)',
+      'rgba(226, 169, 190, 0.8)',
+      'rgba(163, 214, 212, 0.8)',
+    ],
+    hoverBorderColor: [
+      'rgb(254, 205, 190)',
+      'rgb(152, 109, 142)',
+      'rgb(95, 147, 154)',
+      'rgb(161, 202, 226)',
+      'rgb(242, 213, 239)',
+      'rgb(203, 239, 227)',
+      'rgb(194, 213, 167)',
+      'rgb(176, 171, 202)',
+      'rgb(226, 169, 190)',
+      'rgb(163, 214, 212)',
+    ],
+  },
+  {
+    hoverBackgroundColor: [
+      'rgba(254, 205, 190, 0.2)',
+      'rgba(152, 109, 142, 0.2)',
+      'rgba(95, 147, 154, 0.2)',
+      'rgba(161, 202, 226, 0.2)',
+      'rgba(242, 213, 239, 0.2)',
+      'rgba(203, 239, 227, 0.2)',
+      'rgba(194, 213, 167, 0.2)',
+      'rgba(176, 171, 202, 0.2)',
+      'rgba(226, 169, 190, 0.2)',
+      'rgba(163, 214, 212, 0.2)',
+    ],
+    borderColor: [
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+      '#fff',
+    ],
+    backgroundColor: [
+      'rgba(254, 205, 190, 0.4)',
+      'rgba(152, 109, 142, 0.4)',
+      'rgba(95, 147, 154, 0.4)',
+      'rgba(161, 202, 226, 0.4)',
+      'rgba(242, 213, 239, 0.4)',
+      'rgba(203, 239, 227, 0.4)',
+      'rgba(194, 213, 167, 0.4)',
+      'rgba(176, 171, 202, 0.4)',
+      'rgba(226, 169, 190, 0.4)',
+      'rgba(163, 214, 212, 0.4)',
+    ],
+    hoverBorderColor: [
+      'rgba(254, 205, 190, 0.6)',
+      'rgba(152, 109, 142, 0.6)',
+      'rgba(95, 147, 154, 0.6)',
+      'rgba(161, 202, 226, 0.6)',
+      'rgba(242, 213, 239, 0.6)',
+      'rgba(203, 239, 227, 0.6)',
+      'rgba(194, 213, 167, 0.6)',
+      'rgba(176, 171, 202, 0.6)',
+      'rgba(226, 169, 190, 0.6)',
+      'rgba(163, 214, 212, 0.6)',
+    ],
+  },
+];
 
-const chartColors = (): any[] => ([{
-  backgroundColor: 'rgba(254, 205, 190, 0.6)',
-  borderColor: 'rgba(254, 205, 190, 1)',
-  pointBackgroundColor: 'rgba(254, 205, 190, 1)',
-  pointBorderColor: '#fff',
-  pointHoverBackgroundColor: '#fff',
-  pointHoverBorderColor: 'rgba(254, 205, 190, 0.8)',
-  hoverBackgroundColor: 'rgba(254, 205, 190, 0.8)',
-  hoverBorderColor: 'rgba(254, 205, 190, 1)',
-}, {
-  backgroundColor: 'rgba(152, 109, 142, 0.6)',
-  borderColor: 'rgba(152, 109, 142, 1)',
-  pointBackgroundColor: 'rgba(152, 109, 142, 1)',
-  pointBorderColor: '#fff',
-  pointHoverBackgroundColor: '#fff',
-  pointHoverBorderColor: 'rgba(152, 109, 142, 0.8)',
-  hoverBackgroundColor: 'rgba(152, 109, 142, 0.8)',
-  hoverBorderColor: 'rgba(152, 109, 142, 1)',
-}, {
-  backgroundColor: 'rgba(95, 147, 154, 0.6)',
-  borderColor: 'rgba(95, 147, 154, 1)',
-  pointBackgroundColor: 'rgba(95, 147, 154, 1)',
-  pointBorderColor: '#fff',
-  pointHoverBackgroundColor: '#fff',
-  pointHoverBorderColor: 'rgba(95, 147, 154, 0.8)',
-  hoverBackgroundColor: 'rgba(95, 147, 154, 0.8)',
-  hoverBorderColor: 'rgba(95, 147, 154, 1)',
-}, {
-  backgroundColor: 'rgba(161, 202, 226, 0.6)',
-  borderColor: 'rgba(161, 202, 226, 1)',
-  pointBackgroundColor: 'rgba(161, 202, 226, 1)',
-  pointBorderColor: '#fff',
-  pointHoverBackgroundColor: '#fff',
-  pointHoverBorderColor: 'rgba(161, 202, 226, 0.8)',
-  hoverBackgroundColor: 'rgba(161, 202, 226, 0.8)',
-  hoverBorderColor: 'rgba(161, 202, 226, 1)',
-}]);
+const chartColors = (): any[] => [
+  {
+    backgroundColor: 'rgba(254, 205, 190, 0.6)',
+    borderColor: 'rgba(254, 205, 190, 1)',
+    pointBackgroundColor: 'rgba(254, 205, 190, 1)',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: 'rgba(254, 205, 190, 0.8)',
+    hoverBackgroundColor: 'rgba(254, 205, 190, 0.8)',
+    hoverBorderColor: 'rgba(254, 205, 190, 1)',
+  },
+  {
+    backgroundColor: 'rgba(152, 109, 142, 0.6)',
+    borderColor: 'rgba(152, 109, 142, 1)',
+    pointBackgroundColor: 'rgba(152, 109, 142, 1)',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: 'rgba(152, 109, 142, 0.8)',
+    hoverBackgroundColor: 'rgba(152, 109, 142, 0.8)',
+    hoverBorderColor: 'rgba(152, 109, 142, 1)',
+  },
+  {
+    backgroundColor: 'rgba(95, 147, 154, 0.6)',
+    borderColor: 'rgba(95, 147, 154, 1)',
+    pointBackgroundColor: 'rgba(95, 147, 154, 1)',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: 'rgba(95, 147, 154, 0.8)',
+    hoverBackgroundColor: 'rgba(95, 147, 154, 0.8)',
+    hoverBorderColor: 'rgba(95, 147, 154, 1)',
+  },
+  {
+    backgroundColor: 'rgba(161, 202, 226, 0.6)',
+    borderColor: 'rgba(161, 202, 226, 1)',
+    pointBackgroundColor: 'rgba(161, 202, 226, 1)',
+    pointBorderColor: '#fff',
+    pointHoverBackgroundColor: '#fff',
+    pointHoverBorderColor: 'rgba(161, 202, 226, 0.8)',
+    hoverBackgroundColor: 'rgba(161, 202, 226, 0.8)',
+    hoverBorderColor: 'rgba(161, 202, 226, 1)',
+  },
+];

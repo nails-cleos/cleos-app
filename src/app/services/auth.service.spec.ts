@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { AuthService } from './auth.service';
@@ -8,7 +9,9 @@ import { IUserAll } from '../user/user';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'post'> & {
+    post: ReturnType<typeof vi.fn>;
+  };
 
   const mockApiResponse: Token = {
     tokenAccess: 'mockTokenAccess',
@@ -21,12 +24,11 @@ describe('AuthService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['post']);
+    httpSpy = {
+      post: vi.fn().mockName('HttpClient.post'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        AuthService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [AuthService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(AuthService);
   });
@@ -39,12 +41,16 @@ describe('AuthService', () => {
     const token = 'mockToken';
     const code = 'mockCode';
     const theme = 'dark';
-    httpSpy.post.and.returnValue(of(mockApiResponse));
+    httpSpy.post.mockReturnValue(of(mockApiResponse));
 
     service.login(token, code, theme).subscribe((result) => {
       expect(result).toEqual(mockApiResponse);
     });
 
-    expect(httpSpy.post).toHaveBeenCalledWith('v1/auth/login', { token, code, theme });
+    expect(httpSpy.post).toHaveBeenCalledWith('v1/auth/login', {
+      token,
+      code,
+      theme,
+    });
   });
 });

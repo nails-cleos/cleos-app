@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+} from '@angular/core';
 import { ICommon } from '../interfaces/common';
 import { IUnavailable } from './unavailable';
 import { UnavailableStore } from '../store/unavailable.store';
@@ -9,7 +14,8 @@ import { closest } from '../util/numbers';
 
 @Component({
   selector: 'app-unavailable-create-page',
-  template: '<app-unavailable [config]="config" [params]="params()" (submitData)="submit($event)" />',
+  template:
+    '<app-unavailable [config]="config" [params]="params()" (submitData)="submit($event)" />',
   imports: [UnavailableComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -32,12 +38,15 @@ export class UnavailableCreatePageComponent {
       if (room) {
         showDuration = true;
         const time = getTimeNumber(date);
-        const hour = time ? `${ time.hour }`.padStart(2, '0') : '12';
-        const minute = time ? `${ closest(time.minute) }`.padStart(2, '0') : '00';
-        startTime = `${ hour }:${ minute }`;
+        const hour = time ? `${time.hour}`.padStart(2, '0') : '12';
+        const minute = time ? `${closest(time.minute)}`.padStart(2, '0') : '00';
+        startTime = `${hour}:${minute}`;
       }
       return {
-        date, startTime, showDuration, room,
+        date,
+        startTime,
+        showDuration,
+        room,
       };
     }
     return undefined;
@@ -48,6 +57,9 @@ export class UnavailableCreatePageComponent {
   }
 
   submit(unavailable: IUnavailable) {
-    this.unavailableStore.create(unavailable, this.authUserService.authUser()?.isRoomAdmin ?? false);
+    this.unavailableStore.create(
+      unavailable,
+      this.authUserService.authUser()?.isRoomAdmin ?? false,
+    );
   }
 }

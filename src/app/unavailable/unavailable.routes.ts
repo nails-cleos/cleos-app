@@ -8,9 +8,7 @@ import { UnavailableCreatePageComponent } from './unavailable-create-page.compon
 import { UnavailableDetailsPageComponent } from './unavailable-details-page.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('unavailable'),
-];
+const providers = [provideFeatureTranslations('unavailable')];
 
 const children: Routes = [
   {

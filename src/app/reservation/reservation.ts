@@ -8,7 +8,12 @@ import { IPayment, PaymentPercentage } from '../interfaces/payment';
 import { IReview } from '../me/reservation/list/review';
 import { IAdditionalAll } from '../additional/additional';
 import { addHours, isSameDay } from 'date-fns';
-import { DEFAULT_LOCALE, createNewDate, getCurrentTimeZone, getNowTimeZone } from '../util/dates';
+import {
+  DEFAULT_LOCALE,
+  createNewDate,
+  getCurrentTimeZone,
+  getNowTimeZone,
+} from '../util/dates';
 import { INoteAll } from '../note/note';
 import { valueChange } from '../util/validators';
 import { MeReservationForms, ReservationForms } from './reservation-form.types';
@@ -223,7 +228,7 @@ export enum States {
   completed = 'COMPLETED',
   partiallyCompleted = 'PARTIALLY_COMPLETED',
   cancelled = 'CANCELLED',
-  cancelledPaymentRequired = 'CANCELLED_PAYMENT_REQUIRED'
+  cancelledPaymentRequired = 'CANCELLED_PAYMENT_REQUIRED',
 }
 
 export enum CancelOption {
@@ -231,7 +236,7 @@ export enum CancelOption {
   account = 'ACCOUNT',
   chargeAndAccount = 'CHARGE_AND_ACCOUNT',
   chargeAndRefund = 'CHARGE_AND_REFUND',
-  none = 'NONE'
+  none = 'NONE',
 }
 
 export const MAX_RESERVATION_MONTH = 12;
@@ -255,13 +260,19 @@ export class Reservation {
       ...(currentReservation && { id: currentReservation.id }),
       customerId: customerForm.customer.value?.id,
       treatmentId: currentReservation
-        ? valueChange(treatmentForm.treatment.value?.id, currentReservation.treatment.id)
+        ? valueChange(
+            treatmentForm.treatment.value?.id,
+            currentReservation.treatment.id,
+          )
         : treatmentForm.treatment.value?.id,
       roomId: currentReservation
         ? valueChange(officeForm.room.value?.id, currentReservation.room.id)
         : officeForm.room.value?.id,
       professionalId: currentReservation
-        ? valueChange(officeForm.professional.value?.id, currentReservation.professional.id)
+        ? valueChange(
+            officeForm.professional.value?.id,
+            currentReservation.professional.id,
+          )
         : officeForm.professional.value?.id,
       ...(!currentReservation && { discountId: treatmentForm.discount.value }),
       ...(start && {
@@ -293,7 +304,10 @@ export class Reservation {
       ...(currentReservation && { id: currentReservation.id }),
       customerId,
       treatmentId: currentReservation
-        ? valueChange(treatmentForm.treatment.value?.id, currentReservation.treatment.id)
+        ? valueChange(
+            treatmentForm.treatment.value?.id,
+            currentReservation.treatment.id,
+          )
         : treatmentForm.treatment.value?.id,
       roomId: officeForm.room.value?.id,
       professionalId: officeForm.professional.value?.id,

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PriceExtrasComponent } from './price-extras.component';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PriceExtrasComponent', () => {
   let component: PriceExtrasComponent;

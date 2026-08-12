@@ -1,11 +1,18 @@
-<form (ngSubmit)="doAction()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+<form
+  (ngSubmit)="doAction()"
+  [formGroup]="form"
+  novalidate
+  (keydown.enter)="$event.preventDefault()"
+>
   <div class="app-surface-dialog-shell">
     <div class="app-surface-dialog-header">
       <div class="app-surface-dialog-title-wrap">
         <div class="app-surface-dialog-badge" aria-hidden="true">
           <mat-icon>schedule</mat-icon>
         </div>
-        <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.TRACKING.UPDATE' | translate }}</h1>
+        <h1 mat-dialog-title class="app-surface-dialog-title">
+          {{ 'RESERVATION.TRACKING.UPDATE' | translate }}
+        </h1>
       </div>
     </div>
 
@@ -16,34 +23,72 @@
         <legend>{{ 'RESERVATION.TRACKING.STARTED' | translate }}</legend>
         <mat-form-field appearance="outline" class="date-field">
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-          <input (focus)="startedPicker.open()" [formControl]="getForm.startedDate" [matDatepicker]="startedPicker"
-                 matInput>
-          <mat-datepicker-toggle [for]="startedPicker" matSuffix></mat-datepicker-toggle>
+          <input
+            (focus)="startedPicker.open()"
+            [formControl]="getForm.startedDate"
+            [matDatepicker]="startedPicker"
+            matInput
+          />
+          <mat-datepicker-toggle
+            [for]="startedPicker"
+            matSuffix
+          ></mat-datepicker-toggle>
           <mat-datepicker #startedPicker touchUi></mat-datepicker>
         </mat-form-field>
         <mat-form-field appearance="outline" class="time-field">
           <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.startedTime" [format]="24" [timepicker]="sTime" matInput name="startedTime"
-                 readonly/>
-          <span matPrefix><mat-icon (click)="sTime.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-          <app-timepicker #sTime (timeSet)="timeChange($event, getForm.startedDate)"></app-timepicker>
+          <input
+            [formControl]="getForm.startedTime"
+            [format]="24"
+            [timepicker]="sTime"
+            matInput
+            name="startedTime"
+            readonly
+          />
+          <span matPrefix
+            ><mat-icon (click)="sTime.open()" matPrefix>schedule</mat-icon>
+            &nbsp;</span
+          >
+          <app-timepicker
+            #sTime
+            (timeSet)="timeChange($event, getForm.startedDate)"
+          ></app-timepicker>
         </mat-form-field>
       </fieldset>
       <fieldset class="date-time-fields">
         <legend>{{ 'RESERVATION.TRACKING.COMPLETED' | translate }}</legend>
         <mat-form-field appearance="outline" class="date-field">
           <mat-label>{{ 'RESERVATION.DATE.FIELD' | translate }}</mat-label>
-          <input (focus)="completedPicker.open()" [formControl]="getForm.completedDate" [matDatepicker]="completedPicker"
-                 matInput>
-          <mat-datepicker-toggle [for]="completedPicker" matSuffix></mat-datepicker-toggle>
+          <input
+            (focus)="completedPicker.open()"
+            [formControl]="getForm.completedDate"
+            [matDatepicker]="completedPicker"
+            matInput
+          />
+          <mat-datepicker-toggle
+            [for]="completedPicker"
+            matSuffix
+          ></mat-datepicker-toggle>
           <mat-datepicker #completedPicker touchUi></mat-datepicker>
         </mat-form-field>
         <mat-form-field appearance="outline" class="time-field">
           <mat-label>{{ 'RESERVATION.START.FIELD' | translate }}</mat-label>
-          <input [formControl]="getForm.completedTime" [format]="24" [timepicker]="cTime" matInput name="completedTime"
-                 readonly/>
-          <span matPrefix><mat-icon (click)="cTime.open()" matPrefix>schedule</mat-icon> &nbsp;</span>
-          <app-timepicker #cTime (timeSet)="timeChange($event, getForm.completedDate)"></app-timepicker>
+          <input
+            [formControl]="getForm.completedTime"
+            [format]="24"
+            [timepicker]="cTime"
+            matInput
+            name="completedTime"
+            readonly
+          />
+          <span matPrefix
+            ><mat-icon (click)="cTime.open()" matPrefix>schedule</mat-icon>
+            &nbsp;</span
+          >
+          <app-timepicker
+            #cTime
+            (timeSet)="timeChange($event, getForm.completedDate)"
+          ></app-timepicker>
         </mat-form-field>
       </fieldset>
     </div>
@@ -52,8 +97,18 @@
 
     <div mat-dialog-actions class="app-surface-dialog-actions">
       <div class="app-surface-dialog-spacer"></div>
-      <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-      <button [disabled]="form.invalid" cdkFocusInitial color="primary" mat-flat-button type="submit">Ok</button>
+      <button (click)="onNoClick()" mat-stroked-button type="button">
+        {{ 'COMMON.BUTTON.CANCEL' | translate }}
+      </button>
+      <button
+        [disabled]="form.invalid"
+        cdkFocusInitial
+        color="primary"
+        mat-flat-button
+        type="submit"
+      >
+        Ok
+      </button>
     </div>
   </div>
 </form>

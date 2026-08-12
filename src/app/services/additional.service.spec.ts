@@ -1,17 +1,27 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { of } from 'rxjs';
 
 import { AdditionalService } from './additional.service';
 import { IAdditional, IAdditionalAll } from '../additional/additional';
-import { paginated, Pagination, skipLoadingOverlay } from '../interfaces/pagination';
+import {
+  paginated,
+  Pagination,
+  skipLoadingOverlay,
+} from '../interfaces/pagination';
 import { ISorted } from '../util/drag-drop-sorting/drag-drop-sorting.component';
 import { IApiResponse } from '../interfaces/common';
 import { createFilter } from '../util/service-helper';
 
 describe('AdditionalService', () => {
   let service: AdditionalService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockAdditional: IAdditional = {
     id: '1',
@@ -45,7 +55,12 @@ describe('AdditionalService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
       providers: [
         AdditionalService,
@@ -64,14 +79,17 @@ describe('AdditionalService', () => {
     const size = 10;
     const sort = 'name';
     const direction = 'asc';
-    httpSpy.get.and.returnValue(of(mockPagination));
+    httpSpy.get.mockReturnValue(of(mockPagination));
 
-    service.getAdditionalPage(sort, direction, page, size).subscribe((result) => {
-      expect(result).toEqual(mockPagination);
-    });
+    service
+      .getAdditionalPage(sort, direction, page, size)
+      .subscribe((result) => {
+        expect(result).toEqual(mockPagination);
+      });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/pages', {
-      params: createFilter(page, size, sort, direction), ...paginated(),
+      params: createFilter(page, size, sort, direction),
+      ...paginated(),
     });
   });
 
@@ -79,40 +97,45 @@ describe('AdditionalService', () => {
     const roomId = 'roomId';
     const groupId = 'groupId';
     const additionalList = [mockAdditionalAll];
-    httpSpy.get.and.returnValue(of(additionalList));
+    httpSpy.get.mockReturnValue(of(additionalList));
 
     service.getAllAdditionalByGroupId(roomId, groupId).subscribe((result) => {
       expect(result).toEqual(additionalList);
     });
 
     expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/groups', {
-      params: new HttpParams().set('roomId', roomId).set('groupId', groupId), ...skipLoadingOverlay(),
+      params: new HttpParams().set('roomId', roomId).set('groupId', groupId),
+      ...skipLoadingOverlay(),
     });
   });
 
   it('should fetch all additional list', () => {
     const mockAdditionalList = [mockAdditionalAll];
-    httpSpy.get.and.returnValue(of(mockAdditionalList));
+    httpSpy.get.mockReturnValue(of(mockAdditionalList));
 
     service.getAdditionalList().subscribe((result) => {
       expect(result).toEqual(mockAdditionalList);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional', { ...skipLoadingOverlay() });
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional', {
+      ...skipLoadingOverlay(),
+    });
   });
 
   it('should fetch single additional by id', () => {
-    httpSpy.get.and.returnValue(of(mockAdditionalAll));
+    httpSpy.get.mockReturnValue(of(mockAdditionalAll));
 
     service.getAdditional('1').subscribe((result) => {
       expect(result).toEqual(mockAdditionalAll);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/1', { ...skipLoadingOverlay() });
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/additional/1', {
+      ...skipLoadingOverlay(),
+    });
   });
 
   it('should create new additional', () => {
-    httpSpy.post.and.returnValue(of(mockApiResponse));
+    httpSpy.post.mockReturnValue(of(mockApiResponse));
 
     service.createAdditional(mockAdditional).subscribe((result) => {
       expect(result).toEqual(mockApiResponse);
@@ -122,7 +145,7 @@ describe('AdditionalService', () => {
   });
 
   it('should delete additional by id', () => {
-    httpSpy.delete.and.returnValue(of(void 0));
+    httpSpy.delete.mockReturnValue(of(void 0));
 
     service.deleteAdditional('1');
 
@@ -130,18 +153,21 @@ describe('AdditionalService', () => {
   });
 
   it('should update additional by id', () => {
-    httpSpy.patch.and.returnValue(of(mockApiResponse));
+    httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
     service.updateAdditional('1', mockAdditional).subscribe((result) => {
       expect(result).toEqual(mockApiResponse);
     });
 
-    expect(httpSpy.patch).toHaveBeenCalledWith('v1/additional/1', mockAdditional);
+    expect(httpSpy.patch).toHaveBeenCalledWith(
+      'v1/additional/1',
+      mockAdditional,
+    );
   });
 
   it('should sort additionals', () => {
     const mockSortedList: ISorted[] = [{ key: '1', order: 0 }];
-    httpSpy.patch.and.returnValue(of(void 0));
+    httpSpy.patch.mockReturnValue(of(void 0));
 
     service.sortAdditional(mockSortedList);
 

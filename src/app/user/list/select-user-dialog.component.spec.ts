@@ -1,20 +1,25 @@
+import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { IUserAll } from '../user';
-import { TranslateModule } from '@ngx-translate/core';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
-import { Role } from '../../interfaces/token';
+import { Role } from '@app/interfaces/token';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
-
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('SelectUserDialogComponent', () => {
   let component: SelectUserDialogComponent;
   let fixture: ComponentFixture<SelectUserDialogComponent>;
 
   let usersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<SelectUserDialogComponent>>;
+  let userStoreSpy: {
+    clean: Mock;
+    loadDisabledUsers: Mock;
+  };
+  let dialogRefSpy: Pick<MatDialogRef<SelectUserDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockUser: IUserAll = {
     id: 'user-123',
@@ -37,15 +42,21 @@ describe('SelectUserDialogComponent', () => {
   beforeEach(async () => {
     usersSignal = signal<IUserAll[] | undefined>(undefined);
 
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadDisabledUsers']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
+    userStoreSpy = {
+      clean: vi.fn().mockName('UserStore.clean'),
+      loadDisabledUsers: vi.fn().mockName('UserStore.loadDisabledUsers'),
+    };
     Object.assign(userStoreSpy, {
       users: usersSignal.asReadonly(),
     });
 
     await TestBed.configureTestingModule({
-      imports: [SelectUserDialogComponent, TranslateModule.forRoot()],
+      imports: [SelectUserDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
           useFactory: () => ({ newUser: mockUser }),

@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TotalSummaryComponent } from './total-summary.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { By } from '@angular/platform-browser';
 import { ISummaryTotals, Total } from '../dashboard';
-import { ICurrencyAll } from '../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('TotalSummaryComponent', () => {
   let component: TotalSummaryComponent;
@@ -26,7 +27,8 @@ describe('TotalSummaryComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TotalSummaryComponent, TranslateModule.forRoot()],
+      imports: [TotalSummaryComponent],
+      providers: [provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryComponent);
@@ -41,7 +43,7 @@ describe('TotalSummaryComponent', () => {
   });
 
   it('should initialize showCash to false', () => {
-    expect(component.showCash()).toBeFalse();
+    expect(component.showCash()).toBe(false);
   });
 
   it('should accept summaryTotals input', () => {
@@ -59,7 +61,7 @@ describe('TotalSummaryComponent', () => {
     fixture.componentRef.setInput('showCash', true);
     fixture.detectChanges();
 
-    expect(component.showCash()).toBeTrue();
+    expect(component.showCash()).toBe(true);
   });
 
   describe('Template rendering', () => {
@@ -74,7 +76,9 @@ describe('TotalSummaryComponent', () => {
     });
 
     it('should render three rows in main section', () => {
-      const rows = fixture.debugElement.queryAll(By.css('.app-surface-item:first-child .total-summary-row'));
+      const rows = fixture.debugElement.queryAll(
+        By.css('.app-surface-item:first-child .total-summary-row'),
+      );
       expect(rows.length).toBe(3);
     });
 
@@ -82,7 +86,9 @@ describe('TotalSummaryComponent', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      const operations = fixture.debugElement.queryAll(
+        By.css('.app-surface-item'),
+      );
       expect(operations.length).toBe(1);
     });
 
@@ -90,10 +96,14 @@ describe('TotalSummaryComponent', () => {
       fixture.componentRef.setInput('showCash', true);
       fixture.detectChanges();
 
-      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      const operations = fixture.debugElement.queryAll(
+        By.css('.app-surface-item'),
+      );
       expect(operations.length).toBe(2);
 
-      const cashRows = fixture.debugElement.queryAll(By.css('.app-surface-item:nth-child(2) .total-summary-row'));
+      const cashRows = fixture.debugElement.queryAll(
+        By.css('.app-surface-item:nth-child(2) .total-summary-row'),
+      );
       expect(cashRows.length).toBe(3);
     });
 
@@ -101,16 +111,22 @@ describe('TotalSummaryComponent', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      const operations = fixture.debugElement.queryAll(
+        By.css('.app-surface-item'),
+      );
       expect(operations.length).toBe(1);
-      expect(operations[0].nativeElement.textContent).toContain('SUMMARY.INCOME');
+      expect(operations[0].nativeElement.textContent).toContain(
+        'SUMMARY.INCOME',
+      );
     });
 
     it('should render the cash operation when showCash is true', () => {
       fixture.componentRef.setInput('showCash', true);
       fixture.detectChanges();
 
-      const operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      const operations = fixture.debugElement.queryAll(
+        By.css('.app-surface-item'),
+      );
       expect(operations.length).toBe(2);
       expect(operations[1].nativeElement.textContent).toContain('SUMMARY.CASH');
     });
@@ -121,7 +137,9 @@ describe('TotalSummaryComponent', () => {
       fixture.componentRef.setInput('showCash', false);
       fixture.detectChanges();
 
-      let operations = fixture.debugElement.queryAll(By.css('.app-surface-item'));
+      let operations = fixture.debugElement.queryAll(
+        By.css('.app-surface-item'),
+      );
       expect(operations.length).toBe(1);
 
       fixture.componentRef.setInput('showCash', true);

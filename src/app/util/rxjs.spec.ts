@@ -1,33 +1,43 @@
-import { fakeAsync, tick } from '@angular/core/testing';
-
+import { describe, expect, it, vi } from 'vitest';
 import { genericRetryStrategy } from './rxjs';
 
 describe('genericRetryStrategy', () => {
-  it('should rethrow excluded status codes', (done: DoneFn) => {
+  it('should rethrow excluded status codes', async () => {
     const error = { status: 400, statusText: 'Bad Request' };
     const delaySelector = genericRetryStrategy({});
 
-    delaySelector(error, 0).subscribe({
-      next: () => done.fail('Expected stream to error'),
-      error: err => {
-        expect(err).toBe(error);
-        done();
-      },
-    });
+    await expect(
+      new Promise((_, reject) => {
+        delaySelector(error, 0).subscribe({
+          next: () => reject(new Error('Expected stream to error')),
+          error: (err) => reject(err),
+        });
+      }),
+    ).rejects.toBe(error);
   });
 
-  it('should delay retries based on attempt number and scaling duration', fakeAsync(() => {
-    const delaySelector = genericRetryStrategy({ scalingDuration: 50, excludedStatusCodes: [418] });
-    let emitted = false;
+  it('should delay retries based on attempt number and scaling duration', () => {
+    vi.useFakeTimers();
 
-    delaySelector({ status: 500 }, 2).subscribe(() => {
-      emitted = true;
-    });
+    try {
+      const delaySelector = genericRetryStrategy({
+        scalingDuration: 50,
+        excludedStatusCodes: [418],
+      });
 
-    tick(149);
-    expect(emitted).toBeFalse();
+      let emitted = false;
 
-    tick(1);
-    expect(emitted).toBeTrue();
-  }));
+      delaySelector({ status: 500 }, 2).subscribe(() => {
+        emitted = true;
+      });
+
+      vi.advanceTimersByTime(149);
+      expect(emitted).toBe(false);
+
+      vi.advanceTimersByTime(1);
+      expect(emitted).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
 });

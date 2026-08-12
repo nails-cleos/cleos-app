@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { IOffice, IOfficeAll } from '../office/office';
 import { Pagination } from '../interfaces/pagination';
@@ -24,11 +23,7 @@ const initialState = createStoreInitialState<OfficeData, IOfficeAll>();
 export const OfficeStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    officeService = inject(OfficeService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, officeService = inject(OfficeService)) => {
     let loadPageSubscription: Subscription | undefined;
     let loadMyOfficesSubscription: Subscription | undefined;
     let loadByIdSubscription: Subscription | undefined;
@@ -44,7 +39,8 @@ export const OfficeStore = signalStore(
       updateSubscription?.unsubscribe();
       deleteSubscription?.unsubscribe();
     };
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -64,10 +60,16 @@ export const OfficeStore = signalStore(
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription = officeService.getOfficesPage(page, sort, direction, size).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription = officeService
+          .getOfficesPage(page, sort, direction, size)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'pagination', value },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       loadMyOffices(): void {
@@ -75,7 +77,11 @@ export const OfficeStore = signalStore(
         patchState(store, { data: undefined, isLoading: true });
 
         loadMyOfficesSubscription = officeService.getAllMyOffices().subscribe({
-          next: (value) => patchState(store, { data: { kind: 'list', value: value }, isLoading: false }),
+          next: (value) =>
+            patchState(store, {
+              data: { kind: 'list', value: value },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -95,14 +101,18 @@ export const OfficeStore = signalStore(
         cleanCrudCreate(store);
 
         createSubscription = officeService.createOffice(office).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('OFFICE.CREATED', { name: response.name }),
-              path: `offices/${ response.id }`,
-              redirect: 'offices',
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) =>
+            patchState(store, {
+              response: {
+                messageKey: 'OFFICE.CREATED',
+                messageParams: {
+                  name: response.name,
+                },
+                path: `offices/${response.id}`,
+                redirect: 'offices',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -112,14 +122,18 @@ export const OfficeStore = signalStore(
         cleanCrudUpdate(store);
 
         updateSubscription = officeService.updateOffice(id, office).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('OFFICE.UPDATED.MESSAGE', { name: response.name }),
-              path: `offices/${ response.id }`,
-              redirect: 'offices',
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) =>
+            patchState(store, {
+              response: {
+                messageKey: 'OFFICE.UPDATED.MESSAGE',
+                messageParams: {
+                  name: response.name,
+                },
+                path: `offices/${response.id}`,
+                redirect: 'offices',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -129,15 +143,19 @@ export const OfficeStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = officeService.deleteOffice(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('OFFICE.DELETED.MESSAGE', { name }),
-              redirect: 'offices',
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'OFFICE.DELETED.MESSAGE',
+                messageParams: {
+                  name,
+                },
+                redirect: 'offices',
+                reload: true,
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },

@@ -5,6 +5,6 @@ import { newDateTimestamp } from '../util/dates';
   name: 'timeDetail',
 })
 export class TimeDetailPipe implements PipeTransform {
-
-  transform = (timestamp?: string | Date | number, timeZone?: string): Date => newDateTimestamp(timestamp, timeZone);
+  transform = (timestamp?: string | Date | number, timeZone?: string): Date =>
+    newDateTimestamp(timestamp, timeZone);
 }

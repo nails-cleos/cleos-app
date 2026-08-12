@@ -1,12 +1,10 @@
-import '../support/commands';
 import { breakpointToButtons, devices } from '../support/utils';
-import { DEFAULT_LOCALE } from '../../src/app/util/dates';
+import { DEFAULT_LOCALE } from '@app/util/dates';
 
 devices.forEach(({ name, width, height, breakpoints }) => {
   describe(`Discount with ${name}`, () => {
-    beforeEach(() => cy.viewport(width, height));
-
     beforeEach(() => {
+      cy.viewport(width, height);
       const email = 'nails.cleos@gmail.com';
       cy.mockAuthentication(email, 'ROLE_ADMIN');
       cy.mockNotifications();
@@ -26,10 +24,11 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         body: { name: discountName },
         alias: 'saveDiscounts',
       });
-      cy.intercept('POST', '**/api/v1/discounts').as('saveDiscounts');
       cy.openMenu(breakpoints, ['Admin settings', 'Discounts']);
       cy.wait('@getDiscounts');
-      cy.contains('.no-content', 'No discounts', { timeout: 15000 }).should('be.visible');
+      cy.contains('.no-content', 'No discounts', { timeout: 15000 }).should(
+        'be.visible',
+      );
       cy.get('button[id="add-button"]').click({ force: true });
       cy.url().should('include', '/discounts/add');
 
@@ -73,8 +72,14 @@ devices.forEach(({ name, width, height, breakpoints }) => {
             alias: 'updateDiscount',
           });
 
-          cy.buttonClickOnTable(breakpoints, discount.name, 'app-table-master-row', 'app-table-detail-row', 'edit',
-            breakpointToButtons(breakpoints, ['delete']));
+          cy.buttonClickOnTable(
+            breakpoints,
+            discount.name,
+            'app-table-master-row',
+            'app-table-detail-row',
+            'edit',
+            breakpointToButtons(breakpoints, ['delete']),
+          );
 
           cy.get('.app-surface-eyebrow').contains('Update discount');
           cy.get('.app-crud-title').contains(discount.name);
@@ -91,7 +96,9 @@ devices.forEach(({ name, width, height, breakpoints }) => {
           cy.get('#mat-input-2').click();
           cy.get('#mat-input-2').clear();
           cy.get('#mat-input-2').type('15');
-          cy.get('mat-form-field:nth-child(5) div.mat-mdc-form-field-bottom-align').click();
+          cy.get(
+            'mat-form-field:nth-child(5) div.mat-mdc-form-field-bottom-align',
+          ).click();
 
           cy.get('button[type="submit"]').click({ force: true });
 
@@ -107,7 +114,6 @@ devices.forEach(({ name, width, height, breakpoints }) => {
         });
       });
     });
-
 
     afterEach(() => cy.logout());
   });

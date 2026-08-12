@@ -7,9 +7,7 @@ import { UserCreatePageComponent } from './user-create-page.component';
 import { UserDetailsPageComponent } from './user-details-page.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('user'),
-];
+const providers = [provideFeatureTranslations('user')];
 
 const children: Routes = [
   {
@@ -18,9 +16,24 @@ const children: Routes = [
     canActivate: [authGuard],
     data: { roles: [Role.admin] },
   },
-  { path: 'add', component: UserCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: UserDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id/overview', component: OverviewComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  {
+    path: 'add',
+    component: UserCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: ':id',
+    component: UserDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: ':id/overview',
+    component: OverviewComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
 ];
 
 export const USER_ROUTES: Routes = [{ path: '', providers, children }];

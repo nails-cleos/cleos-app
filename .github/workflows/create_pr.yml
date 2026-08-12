@@ -42,7 +42,7 @@ jobs:
         uses: diillson/auto-pull-request@v1.0.1
         with:
           source_branch: ${{ github.ref_name }}
-          destination_branch: "develop"
+          destination_branch: 'develop'
           pr_title: ${{ steps.get_issue_title_label.outputs.issueTitle }}
           pr_body: |
             ## Check list
@@ -52,7 +52,7 @@ jobs:
             - [ ] Pull request is green
 
             Closes: #${{ env.ISSUE_NUMBER }}
-          pr_assignee: "lucasscarlatta"
+          pr_assignee: 'lucasscarlatta'
           pr_label: ${{ steps.get_issue_title_label.outputs.issueLabel }}
           pr_draft: false
           pr_allow_empty: true

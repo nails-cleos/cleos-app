@@ -1,5 +1,14 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { signal, WritableSignal } from '@angular/core';
-import { fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MessagingService } from './messaging.service';
 import { FirebaseService } from './firebase.service';
@@ -8,11 +17,23 @@ import { NotificationStore } from '../store/notification.store';
 
 describe('MessagingService', () => {
   let service: MessagingService;
-  let firebaseSpy: jasmine.SpyObj<FirebaseService>;
-  let envSpy: jasmine.SpyObj<EnvService>;
+
+  let firebaseSpy: Pick<
+    FirebaseService,
+    | 'updateToken'
+    | 'getMessagingToken'
+    | 'onMessageReceived'
+    | 'isAuthenticated'
+    | 'appCheckToken'
+  > & {
+    updateToken: ReturnType<typeof vi.fn>;
+    getMessagingToken: ReturnType<typeof vi.fn>;
+    onMessageReceived: ReturnType<typeof vi.fn>;
+  };
+  let envSpy: Pick<EnvService, 'firebase' | 'firebaseMessaging'>;
   let isAuthenticatedSignal: WritableSignal<boolean>;
   let notificationStoreSpy: {
-    subscribeNotification: jasmine.Spy;
+    subscribeNotification: Mock;
   };
 
   const mockUser = { id: 'user-123', email: 'test@example.com' };
@@ -20,27 +41,26 @@ describe('MessagingService', () => {
 
   beforeEach(() => {
     notificationStoreSpy = {
-      subscribeNotification: jasmine.createSpy('subscribeNotification'),
+      subscribeNotification: vi.fn().mockName('subscribeNotification'),
     };
     isAuthenticatedSignal = signal(true);
 
-    firebaseSpy = jasmine.createSpyObj('FirebaseService', [
-      'updateToken',
-      'getMessagingToken',
-      'onMessageReceived',
-    ], {
+    firebaseSpy = {
+      updateToken: vi.fn().mockName('FirebaseService.updateToken'),
+      getMessagingToken: vi.fn().mockName('FirebaseService.getMessagingToken'),
+      onMessageReceived: vi.fn().mockName('FirebaseService.onMessageReceived'),
       isAuthenticated: isAuthenticatedSignal.asReadonly(),
       appCheckToken: Promise.resolve('app-check-token'),
-    });
+    };
 
-    envSpy = jasmine.createSpyObj('EnvService', [], {
+    envSpy = {
       firebaseMessaging: '/firebase-messaging-sw.js',
-      firebase: { vapidKey: 'VAPID_KEY' },
-    });
+      firebase: { vapidKey: 'VAPID_KEY' } as any,
+    };
 
     // Mock onMessageReceived observable
-    firebaseSpy.onMessageReceived.and.returnValue(of({ msg: 'hello' }));
-    firebaseSpy.updateToken.and.returnValue(Promise.resolve());
+    firebaseSpy.onMessageReceived.mockReturnValue(of({ msg: 'hello' }));
+    firebaseSpy.updateToken.mockResolvedValue('');
 
     TestBed.configureTestingModule({
       providers: [
@@ -54,14 +74,17 @@ describe('MessagingService', () => {
     service = TestBed.inject(MessagingService);
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize message$ from firebase', (done) => {
-    service.message$.subscribe(msg => {
+  it('should initialize message$ from firebase', async () => {
+    service.message$.subscribe((msg) => {
       expect(msg).toEqual({ msg: 'hello' });
-      done();
     });
   });
 
@@ -69,8 +92,13 @@ describe('MessagingService', () => {
     it('should dispatch action and call firebase.updateToken when authenticated', async () => {
       await service.updateToken(mockUser, mockToken);
 
-      expect(notificationStoreSpy.subscribeNotification).toHaveBeenCalledWith(mockToken);
-      expect(firebaseSpy.updateToken).toHaveBeenCalledWith(mockUser.id, mockToken);
+      expect(notificationStoreSpy.subscribeNotification).toHaveBeenCalledWith(
+        mockToken,
+      );
+      expect(firebaseSpy.updateToken).toHaveBeenCalledWith(
+        mockUser.id,
+        mockToken,
+      );
     });
 
     it('should not dispatch or update token if not authenticated', async () => {
@@ -84,32 +112,46 @@ describe('MessagingService', () => {
   });
 
   describe('requestPermission', () => {
-    it('should call firebase.getMessagingToken and updateToken if permission granted', fakeAsync(() => {
+    it('should call firebase.getMessagingToken and updateToken if permission granted', async () => {
       const fakeSWReg = { scope: '__' } as any;
       const fakeToken = 'new-token';
 
-      // spy the global Notification.requestPermission
-      spyOn(Notification, 'requestPermission').and.returnValue(Promise.resolve('granted'));
-      spyOn(navigator.serviceWorker, 'register').and.returnValue(Promise.resolve(fakeSWReg));
-      firebaseSpy.getMessagingToken.and.returnValue(Promise.resolve(fakeToken));
+      const requestPermission = vi.fn().mockResolvedValue('granted');
+      const register = vi.fn().mockResolvedValue(fakeSWReg);
 
-      service.updateToken = jasmine.createSpy().and.callFake(() => {
-      }); // spy updateToken to avoid store dispatch racing
+      vi.stubGlobal('Notification', {
+        requestPermission,
+      });
 
-      service.requestPermission(mockUser);
+      Object.defineProperty(navigator, 'serviceWorker', {
+        configurable: true,
+        value: {
+          register,
+        },
+      });
 
-      // flush all promises
-      tick();
+      firebaseSpy.getMessagingToken.mockResolvedValue(fakeToken);
+
+      service.updateToken = vi.fn().mockResolvedValue(undefined);
+
+      await service.requestPermission(mockUser);
+
+      expect(requestPermission).toHaveBeenCalled();
+      expect(register).toHaveBeenCalled();
 
       expect(firebaseSpy.getMessagingToken).toHaveBeenCalledWith({
         serviceWorkerRegistration: fakeSWReg,
         vapidKey: envSpy.firebase.vapidKey,
       });
-      expect(service.updateToken).toHaveBeenCalledWith(mockUser, fakeToken);
-    }));
 
+      expect(service.updateToken).toHaveBeenCalledWith(mockUser, fakeToken);
+    });
     it('should not call updateToken if permission denied', async () => {
-      spyOn(Notification, 'requestPermission').and.returnValue(Promise.resolve('denied'));
+      const requestPermission = vi.fn().mockResolvedValue('denied');
+
+      vi.stubGlobal('Notification', {
+        requestPermission,
+      });
 
       await service.requestPermission(mockUser);
 
@@ -122,7 +164,12 @@ describe('MessagingService', () => {
         value: Promise.resolve(null),
         configurable: true,
       });
-      const permissionSpy = spyOn(Notification, 'requestPermission');
+
+      const permissionSpy = vi.fn();
+
+      vi.stubGlobal('Notification', {
+        requestPermission: permissionSpy,
+      });
 
       await service.requestPermission(mockUser);
 

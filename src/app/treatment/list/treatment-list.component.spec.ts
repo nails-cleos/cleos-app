@@ -1,31 +1,42 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ITreatmentGroupAll } from '../treatment';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE, Pagination } from '../../interfaces/pagination';
-import { TreatmentStore } from '../../store/treatment.store';
+import {
+  MOBILE_PAGE_SIZE,
+  PAGE_SIZE,
+  Pagination,
+} from '@app/interfaces/pagination';
+import { TreatmentStore } from '@app/store/treatment.store';
 import { TreatmentListComponent } from './treatment-list.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('TreatmentListComponent', () => {
   let component: TreatmentListComponent;
   let fixture: ComponentFixture<TreatmentListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let treatmentStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal<any>>;
     response: ReturnType<typeof signal<any>>;
-    clean: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadPage: Mock;
+    delete: Mock;
   };
 
   const mockTreatments: ITreatmentGroupAll[] = [
@@ -42,31 +53,39 @@ describe('TreatmentListComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     treatmentStoreSpy = {
       isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
       response: signal(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadPage: jasmine.createSpy('loadPage'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadPage: vi.fn().mockName('loadPage'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    breakpointObserverSpy.observe.and.returnValue(of({
-      matches: false,
-      breakpoints: {
-        [Breakpoints.XSmall]: false,
-        [Breakpoints.Small]: false,
-      },
-    }));
+    breakpointObserverSpy.observe.mockReturnValue(
+      of({
+        matches: false,
+        breakpoints: {
+          [Breakpoints.XSmall]: false,
+          [Breakpoints.Small]: false,
+        },
+      }),
+    );
 
     await TestBed.configureTestingModule({
-      imports: [TreatmentListComponent, TranslateModule.forRoot()],
+      imports: [TreatmentListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -104,13 +123,15 @@ describe('TreatmentListComponent', () => {
   });
 
   it('should set mobile page size when small breakpoint matches', () => {
-    breakpointObserverSpy.observe.and.returnValue(of({
-      matches: true,
-      breakpoints: {
-        [Breakpoints.XSmall]: true,
-        [Breakpoints.Small]: true,
-      },
-    }));
+    breakpointObserverSpy.observe.mockReturnValue(
+      of({
+        matches: true,
+        breakpoints: {
+          [Breakpoints.XSmall]: true,
+          [Breakpoints.Small]: true,
+        },
+      }),
+    );
 
     fixture = TestBed.createComponent(TreatmentListComponent);
     component = fixture.componentInstance;
@@ -121,22 +142,23 @@ describe('TreatmentListComponent', () => {
 
   it('should call delete when dialog returns a result', () => {
     const item = mockTreatments[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'TREATMENT.DELETED.TITLE',
           content: 'TREATMENT.DELETED.CONTENT',
           value: item,
           variant: 'warning',
         },
-      }));
+      }),
+    );
 
     expect(treatmentStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
   });

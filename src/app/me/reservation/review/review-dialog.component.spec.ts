@@ -1,27 +1,35 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReviewDialogComponent } from './review-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
-import { IReservationAll } from '../../../reservation/reservation';
-import { IAddress, IRoomAll, ServiceType } from '../../../room/room';
-import { IUserAll } from '../../../user/user';
-import { ICurrencyAll } from '../../../currency/currency';
-import { ITreatmentAll } from '../../../treatment/treatment';
-import { DEFAULT_LOCALE, getCurrentTimeZone } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { IReservationAll } from '@app/reservation/reservation';
+import { IAddress, IRoomAll, ServiceType } from '@app/room/room';
+import { IUserAll } from '@app/user/user';
+import { ICurrencyAll } from '@app/currency/currency';
+import { ITreatmentAll } from '@app/treatment/treatment';
+import { DEFAULT_LOCALE, getCurrentTimeZone } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ReviewDialogComponent', () => {
   let component: ReviewDialogComponent;
   let fixture: ComponentFixture<ReviewDialogComponent>;
 
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ReviewDialogComponent>>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
+  let dialogRefSpy: Pick<MatDialogRef<ReviewDialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     const customer: IUserAll = {
       id: 'customer-id',
@@ -82,8 +90,9 @@ describe('ReviewDialogComponent', () => {
     } as IReservationAll;
 
     await TestBed.configureTestingModule({
-      imports: [ReviewDialogComponent, TranslateModule.forRoot()],
+      imports: [ReviewDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },

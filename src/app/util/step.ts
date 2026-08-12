@@ -38,12 +38,11 @@ export class Step implements IStep {
   }
 }
 
-
 export const completeAndNext = (
   steps: IStep[],
   myStepper: MatStepper,
   goNext: boolean,
-  firebaseService?: FirebaseService,
+  firebaseService?: Pick<FirebaseService, 'logEvent'>,
 ): void => {
   setTimeout(() => {
     const step = getStep(steps, myStepper.selectedIndex - (goNext ? 0 : 1));
@@ -51,7 +50,7 @@ export const completeAndNext = (
       if (firebaseService) {
         firebaseService.logEvent('screen_view', {
           // eslint-disable-next-line camelcase
-          firebase_screen: `Customer reservation. Step: ${ step?.name }`,
+          firebase_screen: `Customer reservation. Step: ${step?.name}`,
           // eslint-disable-next-line camelcase
           firebase_screen_class: 'MeReservationComponent',
         });
@@ -74,10 +73,14 @@ export const goNextStep = (step: IStep): void => {
   return;
 };
 
-export const getIndex = (steps: IStep[], name: string): number | undefined => steps.find(s => s.name === name)?.order;
+export const getIndex = (steps: IStep[], name: string): number | undefined =>
+  steps.find((s) => s.name === name)?.order;
 
-export const getStepCall = (steps: IStep[], index: number, goNext: boolean = false): void => getStep(steps, index)
-  ?.call(goNext);
+export const getStepCall = (
+  steps: IStep[],
+  index: number,
+  goNext: boolean = false,
+): void => getStep(steps, index)?.call(goNext);
 
 export const getStepName = (steps: IStep[], index: number): string => {
   const step = getStep(steps, index);
@@ -110,9 +113,13 @@ export const getBackIndex = (steps: IStep[], current: number): number => {
   return index;
 };
 
-export const enableStep = (steps: IStep[], name: string, enable: boolean = true): number | undefined => {
+export const enableStep = (
+  steps: IStep[],
+  name: string,
+  enable: boolean = true,
+): number | undefined => {
   let index;
-  const step = steps.find(it => it.name === name);
+  const step = steps.find((it) => it.name === name);
   if (step) {
     step.enable = enable;
     steps[step.order] = step;
@@ -121,4 +128,5 @@ export const enableStep = (steps: IStep[], name: string, enable: boolean = true)
   return index;
 };
 
-const getStep = (steps: IStep[], index: number): IStep | undefined => steps.find(s => s.order === index);
+const getStep = (steps: IStep[], index: number): IStep | undefined =>
+  steps.find((s) => s.order === index);

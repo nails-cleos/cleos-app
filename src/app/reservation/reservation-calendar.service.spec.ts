@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 import { CalendarEvent } from 'angular-calendar';
@@ -7,7 +8,9 @@ import { FrequencyEnum } from '../util/helper';
 
 describe('ReservationCalendarService', () => {
   let service: ReservationCalendarService;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let translateSpy: Pick<TranslateService, 'instant'> & {
+    instant: ReturnType<typeof vi.fn>;
+  };
 
   const room: any = {
     id: 'room-1',
@@ -25,9 +28,13 @@ describe('ReservationCalendarService', () => {
   };
 
   beforeEach(() => {
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake((key: string, params?: Record<string, unknown>) =>
-      `${key}${params ? `:${JSON.stringify(params)}` : ''}`);
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+    };
+    translateSpy.instant.mockImplementation(
+      (key: string, params?: Record<string, unknown>) =>
+        `${key}${params ? `:${JSON.stringify(params)}` : ''}`,
+    );
 
     TestBed.configureTestingModule({
       providers: [
@@ -50,7 +57,9 @@ describe('ReservationCalendarService', () => {
   });
 
   it('should add recurring availability events to the data event', () => {
-    const addNotAvailableRecurring = jasmine.createSpy('addNotAvailableRecurring');
+    const addNotAvailableRecurring = vi
+      .fn()
+      .mockName('addNotAvailableRecurring');
     const dataEvent: any = {
       recurringEvent: { addNotAvailableRecurring },
     };
@@ -87,7 +96,13 @@ describe('ReservationCalendarService', () => {
         room,
         professional: { id: 'professional-1', displayName: 'Professional' },
         customer: { displayName: 'Customer' },
-        treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: 'PT1H', type: ServiceType.treatment },
+        treatment: {
+          id: 'treatment-1',
+          key: 'treatment-1',
+          name: 'Treatment',
+          duration: 'PT1H',
+          type: ServiceType.treatment,
+        },
         additional: [{ name: 'Extra', duration: 'PT30M' }],
       },
       {
@@ -97,48 +112,74 @@ describe('ReservationCalendarService', () => {
         room,
         professional: { id: 'professional-1', displayName: 'Professional' },
         customer: { displayName: 'Customer' },
-        treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: 'PT1H', type: ServiceType.treatment },
+        treatment: {
+          id: 'treatment-1',
+          key: 'treatment-1',
+          name: 'Treatment',
+          duration: 'PT1H',
+          type: ServiceType.treatment,
+        },
         additional: [],
       },
     ];
 
-    const events = service.buildReservationEvents(reservations as any, 'reservation-2', false);
+    const events = service.buildReservationEvents(
+      reservations as any,
+      'reservation-2',
+      false,
+    );
 
     expect(events.length).toBe(1);
     expect(events[0].id).toBe('reservation-1');
-    expect((events[0] as CalendarEvent).meta.isReservation).toBeTrue();
+    expect((events[0] as CalendarEvent).meta.isReservation).toBe(true);
   });
 
   it('should skip reservations without duration or in the past', () => {
     const pastTimestamp = Math.floor(Date.now() / 1000) - 7200;
-    const events = service.buildReservationEvents([
-      {
-        id: 'reservation-past',
-        timestamp: pastTimestamp,
-        state: 'CREATED',
-        room,
-        professional: { id: 'professional-1', displayName: 'Professional' },
-        customer: { displayName: 'Customer' },
-        treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: 'PT1H', type: ServiceType.treatment },
-        additional: [],
-      },
-      {
-        id: 'reservation-no-duration',
-        timestamp: Math.floor(Date.now() / 1000) + 7200,
-        state: 'CREATED',
-        room,
-        professional: { id: 'professional-1', displayName: 'Professional' },
-        customer: { displayName: 'Customer' },
-        treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: '' as any, type: ServiceType.treatment },
-        additional: [],
-      },
-    ] as any, undefined, false);
+    const events = service.buildReservationEvents(
+      [
+        {
+          id: 'reservation-past',
+          timestamp: pastTimestamp,
+          state: 'CREATED',
+          room,
+          professional: { id: 'professional-1', displayName: 'Professional' },
+          customer: { displayName: 'Customer' },
+          treatment: {
+            id: 'treatment-1',
+            key: 'treatment-1',
+            name: 'Treatment',
+            duration: 'PT1H',
+            type: ServiceType.treatment,
+          },
+          additional: [],
+        },
+        {
+          id: 'reservation-no-duration',
+          timestamp: Math.floor(Date.now() / 1000) + 7200,
+          state: 'CREATED',
+          room,
+          professional: { id: 'professional-1', displayName: 'Professional' },
+          customer: { displayName: 'Customer' },
+          treatment: {
+            id: 'treatment-1',
+            key: 'treatment-1',
+            name: 'Treatment',
+            duration: '' as any,
+            type: ServiceType.treatment,
+          },
+          additional: [],
+        },
+      ] as any,
+      undefined,
+      false,
+    );
 
     expect(events).toEqual([]);
   });
 
   it('should add unavailable events with the correct route prefix', () => {
-    const addFrequency = jasmine.createSpy('addFrequency');
+    const addFrequency = vi.fn().mockName('addFrequency');
     const dataEvent: any = {
       recurringEvent: { addFrequency },
     };
@@ -155,25 +196,35 @@ describe('ReservationCalendarService', () => {
       },
     ];
 
-    service.addUnavailableEvents(dataEvent, unavailableList as any, room.timeZone, false, () => undefined);
+    service.addUnavailableEvents(
+      dataEvent,
+      unavailableList as any,
+      room.timeZone,
+      false,
+      () => undefined,
+    );
 
     expect(addFrequency).toHaveBeenCalled();
-    expect(addFrequency.calls.mostRecent().args[5]).toBe('unavailable/block-agenda/');
+    expect(vi.mocked(addFrequency).mock.lastCall?.[5]).toBe(
+      'unavailable/block-agenda/',
+    );
   });
 
   it('should skip unavailable entries without duration and not all-day', () => {
-    const addFrequency = jasmine.createSpy('addFrequency');
+    const addFrequency = vi.fn().mockName('addFrequency');
 
     service.addUnavailableEvents(
       { recurringEvent: { addFrequency } } as any,
-      [{
-        id: 'unavailable-1',
-        timestamp: Math.floor(Date.now() / 1000) + 3600,
-        duration: undefined,
-        professional: { id: 'professional-1', displayName: 'Professional' },
-        repeat: FrequencyEnum.everyDay,
-        allDay: false,
-      }] as any,
+      [
+        {
+          id: 'unavailable-1',
+          timestamp: Math.floor(Date.now() / 1000) + 3600,
+          duration: undefined,
+          professional: { id: 'professional-1', displayName: 'Professional' },
+          repeat: FrequencyEnum.everyDay,
+          allDay: false,
+        },
+      ] as any,
       room.timeZone,
       false,
       () => undefined,
@@ -183,30 +234,32 @@ describe('ReservationCalendarService', () => {
   });
 
   it('should use the default unavailable route for non block agenda entries', () => {
-    const addFrequency = jasmine.createSpy('addFrequency');
+    const addFrequency = vi.fn().mockName('addFrequency');
 
     service.addUnavailableEvents(
       { recurringEvent: { addFrequency } } as any,
-      [{
-        id: 'unavailable-1',
-        description: '',
-        timestamp: Math.floor(Date.now() / 1000) + 3600,
-        duration: 'PT1H',
-        professional: { id: 'professional-1', displayName: 'Professional' },
-        repeat: FrequencyEnum.everyDay,
-        allDay: true,
-      }] as any,
+      [
+        {
+          id: 'unavailable-1',
+          description: '',
+          timestamp: Math.floor(Date.now() / 1000) + 3600,
+          duration: 'PT1H',
+          professional: { id: 'professional-1', displayName: 'Professional' },
+          repeat: FrequencyEnum.everyDay,
+          allDay: true,
+        },
+      ] as any,
       room.timeZone,
       false,
       () => undefined,
     );
 
-    expect(addFrequency.calls.mostRecent().args[5]).toBe('unavailable/');
+    expect(vi.mocked(addFrequency).mock.lastCall?.[5]).toBe('unavailable/');
   });
 
   it('should normalize all-day unavailable starts and wire the validation callback', () => {
-    const validateUnavailable = jasmine.createSpy('validateUnavailable');
-    const addFrequency = jasmine.createSpy('addFrequency');
+    const validateUnavailable = vi.fn().mockName('validateUnavailable');
+    const addFrequency = vi.fn().mockName('addFrequency');
     const dataEvent: any = {
       recurringEvent: { addFrequency },
     };
@@ -220,15 +273,21 @@ describe('ReservationCalendarService', () => {
       allDay: true,
     };
 
-    service.addUnavailableEvents(dataEvent, [unavailable] as any, room.timeZone, false, validateUnavailable);
+    service.addUnavailableEvents(
+      dataEvent,
+      [unavailable] as any,
+      room.timeZone,
+      false,
+      validateUnavailable,
+    );
 
-    const [, start, , , , , callback] = addFrequency.calls.mostRecent().args;
+    const [, start, , , , , callback] = vi.mocked(addFrequency).mock.lastCall!;
     expect(start.getHours()).toBe(0);
     expect(start.getMinutes()).toBe(0);
 
     callback(new Date('2026-04-11T00:00:00Z'), { id: 'recurring-1' });
     expect(validateUnavailable).toHaveBeenCalledWith(
-      jasmine.any(Date),
+      expect.any(Date),
       { id: 'recurring-1' },
       dataEvent,
     );
@@ -238,7 +297,12 @@ describe('ReservationCalendarService', () => {
     const start = new Date(Date.now() + 60 * 60 * 1000);
     const end = new Date(start.getTime() + 60 * 60 * 1000);
     const event = service.createUnavailableEvent(
-      { allDay: false, professionalId: 'professional-1', title: 'Unavailable', path: 'unavailable/' },
+      {
+        allDay: false,
+        professionalId: 'professional-1',
+        title: 'Unavailable',
+        path: 'unavailable/',
+      },
       start,
       end,
       room.timeZone,
@@ -251,12 +315,31 @@ describe('ReservationCalendarService', () => {
 
   it('should create reservation selection events with reservation meta', () => {
     const start = new Date(Date.now() + 60 * 60 * 1000);
-    const end = new Date(start.getTime() + (90 * 60 * 1000));
+    const end = new Date(start.getTime() + 90 * 60 * 1000);
     const event = service.createSelectionEvent({
-      treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: 'PT1H', price: 100, type: ServiceType.treatment },
+      treatment: {
+        id: 'treatment-1',
+        key: 'treatment-1',
+        name: 'Treatment',
+        duration: 'PT1H',
+        price: 100,
+        type: ServiceType.treatment,
+      },
       customer: { id: 'customer-1', displayName: 'Customer' } as any,
-      additional: [{ id: 'additional-1', name: 'Extra', duration: 'PT30M', key: 'additional-1', price: 15, type: ServiceType.additional } as any],
-      professional: { id: 'professional-1', displayName: 'Professional' } as any,
+      additional: [
+        {
+          id: 'additional-1',
+          name: 'Extra',
+          duration: 'PT30M',
+          key: 'additional-1',
+          price: 15,
+          type: ServiceType.additional,
+        } as any,
+      ],
+      professional: {
+        id: 'professional-1',
+        displayName: 'Professional',
+      } as any,
       start,
       end,
       state: 'CREATED',
@@ -266,7 +349,7 @@ describe('ReservationCalendarService', () => {
     });
 
     expect(event.id).toBe('event-1');
-    expect(event.meta.isReservation).toBeTrue();
+    expect(event.meta.isReservation).toBe(true);
     expect(event.meta.professionalId).toBe('professional-1');
     expect(event.meta.treatmentName).toBe('Treatment');
     expect(event.meta.additionalNames).toEqual(['Extra']);
@@ -276,7 +359,14 @@ describe('ReservationCalendarService', () => {
     const start = new Date(Date.now() + 60 * 60 * 1000);
     const end = new Date(start.getTime() + 60 * 60 * 1000);
     const event = service.createSelectionEvent({
-      treatment: { id: 'treatment-1', key: 'treatment-1', name: 'Treatment', duration: 'PT1H', price: 100, type: ServiceType.treatment },
+      treatment: {
+        id: 'treatment-1',
+        key: 'treatment-1',
+        name: 'Treatment',
+        duration: 'PT1H',
+        price: 100,
+        type: ServiceType.treatment,
+      },
       customer: { id: 'customer-1', displayName: 'Customer' } as any,
       additional: [],
       start,

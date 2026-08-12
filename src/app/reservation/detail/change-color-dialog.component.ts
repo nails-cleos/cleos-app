@@ -1,8 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IColorAll } from '../../color/color';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { IColorAll } from '@app/color/color';
 import { combineLatestWith } from 'rxjs';
-import { requireMatch } from '../../util/validators';
+import { requireMatch } from '@app/util/validators';
 import {
   MAT_DIALOG_DATA,
   MatDialogActions,
@@ -13,35 +25,60 @@ import {
 import { map, startWith } from 'rxjs/operators';
 import { TranslatePipe } from '@ngx-translate/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import { ColorStore } from '../../store/color.store';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
+import { ColorStore } from '@app/store/color.store';
 
 type ChangeColorForm = {
-  color: FormControl<IColorAll | undefined>,
-}
+  color: FormControl<IColorAll | undefined>;
+};
 
 type ChangeColorDialogData = {
-  treatmentId: string,
+  treatmentId: string;
   small: boolean;
-  colorId?: string,
-}
+  colorId?: string;
+};
 
 @Component({
   selector: 'app-change-color-dialog-component',
   templateUrl: './change-color-dialog.component.html',
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, TranslatePipe, MatAutocomplete, MatError,
-    MatAutocompleteTrigger, ReactiveFormsModule, MatDialogTitle, MatDialogContent, MatDialogActions],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChangeColorDialogComponent {
   private readonly colorStore = inject(ColorStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly dialogRef: MatDialogRef<ChangeColorDialogComponent> = inject(
-    MatDialogRef<ChangeColorDialogComponent>);
+    MatDialogRef<ChangeColorDialogComponent>,
+  );
   readonly data = inject<ChangeColorDialogData>(MAT_DIALOG_DATA);
 
   readonly colorsSignal = computed(() => {
@@ -58,7 +95,7 @@ export class ChangeColorDialogComponent {
   filteredColorSignal = toSignal(
     this.getForm.color.valueChanges.pipe(
       startWith(''),
-      map(value => typeof value === 'string' ? value : value?.name),
+      map((value) => (typeof value === 'string' ? value : value?.name)),
       combineLatestWith(toObservable(this.colorsSignal)),
       map(([name, colorList]) => {
         if (name) {
@@ -81,7 +118,9 @@ export class ChangeColorDialogComponent {
     effect(() => {
       const colors = this.colorsSignal();
       if (colors && this.data.colorId) {
-        this.getForm.color.setValue(colors.find(color => color.id === this.data.colorId));
+        this.getForm.color.setValue(
+          colors.find((color) => color.id === this.data.colorId),
+        );
       }
     });
   }
@@ -98,7 +137,7 @@ export class ChangeColorDialogComponent {
     this.dialogRef.close({ colorId: this.getForm.color.value?.id });
   }
 
-  displayFnColor = (color: IColorAll): string => color ? color.name : '';
+  displayFnColor = (color: IColorAll): string => (color ? color.name : '');
 
   keyDownHandler = (event: KeyboardEvent): void => {
     if (event.code === 'Backspace') {
@@ -106,6 +145,11 @@ export class ChangeColorDialogComponent {
     }
   };
 
-  private filterColor = (name: string, colors?: IColorAll[]): IColorAll[] | undefined => colors?.filter(
-    option => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filterColor = (
+    name: string,
+    colors?: IColorAll[],
+  ): IColorAll[] | undefined =>
+    colors?.filter(
+      (option) => option.name?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

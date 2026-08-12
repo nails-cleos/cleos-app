@@ -18,11 +18,15 @@ const SVG_ICONS = [
   ['PAY_NL', 'assets/payment_methods/paynl.svg'],
 ];
 
-export const provideAppIcons = () => provideAppInitializer(() => {
-  const matIconRegistry = inject(MatIconRegistry);
-  const domSanitizer = inject(DomSanitizer);
+export const provideAppIcons = () =>
+  provideAppInitializer(() => {
+    const matIconRegistry = inject(MatIconRegistry);
+    const domSanitizer = inject(DomSanitizer);
 
-  for (const [name, path] of SVG_ICONS) {
-    matIconRegistry.addSvgIcon(name, domSanitizer.bypassSecurityTrustResourceUrl(path));
-  }
-});
+    for (const [name, path] of SVG_ICONS) {
+      matIconRegistry.addSvgIcon(
+        name,
+        domSanitizer.bypassSecurityTrustResourceUrl(path),
+      );
+    }
+  });

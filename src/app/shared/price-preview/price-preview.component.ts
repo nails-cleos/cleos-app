@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { IPrice } from '../../treatment/treatment';
-import { CurrencySymbolPipe } from '../../pipes/currency-symbol.pipe';
+import { IPrice } from '@app/treatment/treatment';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { TranslatePipe } from '@ngx-translate/core';
 import { DecimalPipe } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
@@ -10,7 +10,14 @@ import { MatListItem, MatListItemIcon } from '@angular/material/list';
   selector: 'app-price-preview',
   templateUrl: './price-preview.component.html',
   styleUrls: ['./price-preview.component.scss'],
-  imports: [MatIcon, MatListItem, TranslatePipe, DecimalPipe, MatListItemIcon, CurrencySymbolPipe],
+  imports: [
+    MatIcon,
+    MatListItem,
+    TranslatePipe,
+    DecimalPipe,
+    MatListItemIcon,
+    CurrencySymbolPipe,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PricePreviewComponent {
@@ -38,7 +45,11 @@ export class PricePreviewComponent {
       return this.accountCreditAmount;
     }
 
-    if (toPaid !== undefined || this.penalty() !== undefined || this.accountCredit() !== undefined) {
+    if (
+      toPaid !== undefined ||
+      this.penalty() !== undefined ||
+      this.accountCredit() !== undefined
+    ) {
       return 0;
     }
 
@@ -67,7 +78,12 @@ export class PricePreviewComponent {
   }
 
   get hasBalanceSummary(): boolean {
-    return !!this.penalty() || this.accountCreditAmount > 0 || this.accountBalanceUsed > 0 || (this.toPaid() ?? 0) > 0;
+    return (
+      !!this.penalty() ||
+      this.accountCreditAmount > 0 ||
+      this.accountBalanceUsed > 0 ||
+      (this.toPaid() ?? 0) > 0
+    );
   }
 
   get currentTotal(): number {
@@ -103,7 +119,10 @@ export class PricePreviewComponent {
       return 0;
     }
 
-    const remainingAfterPaid = Math.max(this.targetAmount - this.currentPaidTotal, 0);
+    const remainingAfterPaid = Math.max(
+      this.targetAmount - this.currentPaidTotal,
+      0,
+    );
     return Math.min(balance, remainingAfterPaid);
   }
 }

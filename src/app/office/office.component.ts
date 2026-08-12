@@ -1,6 +1,20 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, Signal, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  Signal,
+  signal,
+} from '@angular/core';
 import { combineLatestWith } from 'rxjs';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { IUser } from '../user/user';
 import { requireMatch } from '../util/validators';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -10,11 +24,19 @@ import { IOffice, IOfficeAll, Office, OfficeForm } from './office';
 import { BackButtonDirective } from '../directives/back-button.directive';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ICommon, IError } from '../interfaces/common';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import {
+  MatAutocomplete,
+  MatAutocompleteTrigger,
+} from '@angular/material/autocomplete';
 import { OfficeStore } from '../store/office.store';
 import { NavigationService } from '../services/navigation.service';
 
@@ -22,8 +44,21 @@ import { NavigationService } from '../services/navigation.service';
   selector: 'app-office',
   templateUrl: './office.component.html',
   styleUrls: ['./office.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatOption, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe,
-    MatAutocomplete, MatError, MatAutocompleteTrigger, BackButtonDirective, BackButtonDirective],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatOption,
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatAutocomplete,
+    MatError,
+    MatAutocompleteTrigger,
+    BackButtonDirective,
+    BackButtonDirective,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OfficeComponent {
@@ -34,8 +69,11 @@ export class OfficeComponent {
   submitData = output<IOffice>();
 
   private readonly officeStore = inject(OfficeStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private subErrorsSignal = this.officeStore.subErrors;
 
@@ -60,7 +98,9 @@ export class OfficeComponent {
   filteredManagerSignal: Signal<IUser[] | undefined> = toSignal(
     this.getForm.manager.valueChanges.pipe(
       startWith(undefined),
-      map((value?: IUser | string) => !value || typeof value === 'string' ? value : value.displayName),
+      map((value?: IUser | string) =>
+        !value || typeof value === 'string' ? value : value.displayName,
+      ),
       combineLatestWith(toObservable(this.managers)),
       map(([name, managers]) => {
         if (!managers) {
@@ -68,7 +108,8 @@ export class OfficeComponent {
         }
 
         return name ? this.filter(name, managers) : managers.slice();
-      })),
+      }),
+    ),
   );
 
   constructor() {
@@ -119,11 +160,17 @@ export class OfficeComponent {
   }
 
   addManager() {
-    this.navigationService.navigate(['users', 'add'], { state: { role: Role.manager } });
+    this.navigationService.navigate(['users', 'add'], {
+      state: { role: Role.manager },
+    });
   }
 
-  displayFn = (user: IUser): string => user?.displayName ? user.displayName : '';
+  displayFn = (user: IUser): string =>
+    user?.displayName ? user.displayName : '';
 
-  private filter = (name: string, managers: IUser[]): IUser[] | undefined => managers?.filter(
-    option => option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0);
+  private filter = (name: string, managers: IUser[]): IUser[] | undefined =>
+    managers?.filter(
+      (option) =>
+        option.displayName?.toLowerCase().indexOf(name.toLowerCase()) === 0,
+    );
 }

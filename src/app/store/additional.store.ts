@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IAdditional, IAdditionalAll } from '../additional/additional';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
@@ -25,11 +24,7 @@ const initialState = createStoreInitialState<AdditionalData, IAdditionalAll>();
 export const AdditionalStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    additionalService = inject(AdditionalService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, additionalService = inject(AdditionalService)) => {
     let loadPageSubscription: Subscription | undefined;
     let loadListSubscription: Subscription | undefined;
     let loadAllByGroupIdSubscription: Subscription | undefined;
@@ -50,7 +45,8 @@ export const AdditionalStore = signalStore(
       deleteSubscription?.unsubscribe();
     };
 
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -70,30 +66,52 @@ export const AdditionalStore = signalStore(
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription = additionalService.getAdditionalPage(sort, direction, page, size).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
-          error: patchError,
-        });
+        loadPageSubscription = additionalService
+          .getAdditionalPage(sort, direction, page, size)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'pagination', value },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       loadList(): void {
         loadListSubscription?.unsubscribe();
-        patchState(store, { data: { kind: 'list', value: [] }, isLoading: true });
+        patchState(store, {
+          data: { kind: 'list', value: [] },
+          isLoading: true,
+        });
 
         loadListSubscription = additionalService.getAdditionalList().subscribe({
-          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
+          next: (value) =>
+            patchState(store, {
+              data: { kind: 'list', value },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
 
       loadAllByGroupId(roomId: string, groupId: string): void {
         loadAllByGroupIdSubscription?.unsubscribe();
-        patchState(store, { data: { kind: 'list', value: [] }, isLoading: true });
-
-        loadAllByGroupIdSubscription = additionalService.getAllAdditionalByGroupId(roomId, groupId).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
-          error: patchError,
+        patchState(store, {
+          data: { kind: 'list', value: [] },
+          isLoading: true,
         });
+
+        loadAllByGroupIdSubscription = additionalService
+          .getAllAdditionalByGroupId(roomId, groupId)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'list', value },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       loadById(id: string): void {
@@ -110,47 +128,66 @@ export const AdditionalStore = signalStore(
         createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        createSubscription = additionalService.createAdditional(additional).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('ADDITIONAL.CREATED', { name: response.name }),
-              path: `additional/${ response.id }`,
-              redirect: 'additional',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        createSubscription = additionalService
+          .createAdditional(additional)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'ADDITIONAL.CREATED',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `additional/${response.id}`,
+                  redirect: 'additional',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       update(id: string, additional: IAdditional): void {
         updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        updateSubscription = additionalService.updateAdditional(id, additional).subscribe({
-          next: (response: IAdditional) => patchState(store, {
-            response: {
-              message: translateService.instant('ADDITIONAL.UPDATED.MESSAGE', { name: response.name }),
-              path: `additional/${ response.id }`,
-              redirect: 'additional',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        updateSubscription = additionalService
+          .updateAdditional(id, additional)
+          .subscribe({
+            next: (response: IAdditional) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'ADDITIONAL.UPDATED.MESSAGE',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `additional/${response.id}`,
+                  redirect: 'additional',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       sort(additionalList: ISorted[]): void {
         sortSubscription?.unsubscribe();
-        patchState(store, { data: undefined, response: undefined, isLoading: true });
-
-        sortSubscription = additionalService.sortAdditional(additionalList).subscribe({
-          next: () => patchState(store, {
-            response: { message: 'ADDITIONAL.SORTED.MESSAGE' },
-            isLoading: false,
-          }),
-          error: patchError,
+        patchState(store, {
+          data: undefined,
+          response: undefined,
+          isLoading: true,
         });
+
+        sortSubscription = additionalService
+          .sortAdditional(additionalList)
+          .subscribe({
+            next: () =>
+              patchState(store, {
+                response: { message: 'ADDITIONAL.SORTED.MESSAGE' },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       delete(id: string, name: string): void {
@@ -158,14 +195,18 @@ export const AdditionalStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = additionalService.deleteAdditional(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('ADDITIONAL.DELETED.MESSAGE', { name }),
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'ADDITIONAL.DELETED.MESSAGE',
+                messageParams: {
+                  name,
+                },
+                reload: true,
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },

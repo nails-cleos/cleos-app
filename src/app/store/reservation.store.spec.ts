@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
@@ -11,45 +12,94 @@ import { DashboardStore } from './dashboard.store';
 describe('ReservationStore', () => {
   let store: InstanceType<typeof ReservationStore>;
 
-  let serviceSpy: jasmine.SpyObj<ReservationService>;
-  let navigationSpy: jasmine.SpyObj<NavigationService>;
-  let dashboardSpy: jasmine.SpyObj<typeof DashboardStore>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let serviceSpy: {
+    loadPage: Mock;
+    loadAllFiltered: Mock;
+    loadUpcoming: Mock;
+    loadAllByCustomer: Mock;
+    loadAllByRoom: Mock;
+    loadCalendar: Mock;
+    customerSearch: Mock;
+    getReservation: Mock;
+    loadHistory: Mock;
+    createReservation: Mock;
+    updateReservationById: Mock;
+    changeState: Mock;
+    deleteReservation: Mock;
+    createReview: Mock;
+    getReview: Mock;
+    updateReservationNote: Mock;
+    updateReservationDiscount: Mock;
+    updateReservationTimestamp: Mock;
+    updateReservationColor: Mock;
+    updateReservationCustomer: Mock;
+  };
+
+  let navigationSpy: {
+    navigate: Mock;
+  };
+
+  let dashboardSpy: {
+    getMyEvent: Mock;
+  };
+  let translateSpy: {
+    instant: Mock;
+  };
 
   beforeEach(() => {
-    serviceSpy = jasmine.createSpyObj<ReservationService>('ReservationService', [
-      'loadPage',
-      'loadAllFiltered',
-      'loadUpcoming',
-      'loadAllByCustomer',
-      'loadAllByRoom',
-      'loadCalendar',
-      'customerSearch',
-      'getReservation',
-      'loadHistory',
-      'createReservation',
-      'updateReservationById',
-      'changeState',
-      'deleteReservation',
-      'createReview',
-      'getReview',
-      'updateReservationNote',
-      'updateReservationDiscount',
-      'updateReservationTimestamp',
-      'updateReservationColor',
-      'updateReservationCustomer',
-    ]);
+    serviceSpy = {
+      loadPage: vi.fn().mockName('ReservationService.loadPage'),
+      loadAllFiltered: vi.fn().mockName('ReservationService.loadAllFiltered'),
+      loadUpcoming: vi.fn().mockName('ReservationService.loadUpcoming'),
+      loadAllByCustomer: vi
+        .fn()
+        .mockName('ReservationService.loadAllByCustomer'),
+      loadAllByRoom: vi.fn().mockName('ReservationService.loadAllByRoom'),
+      loadCalendar: vi.fn().mockName('ReservationService.loadCalendar'),
+      customerSearch: vi.fn().mockName('ReservationService.customerSearch'),
+      getReservation: vi.fn().mockName('ReservationService.getReservation'),
+      loadHistory: vi.fn().mockName('ReservationService.loadHistory'),
+      createReservation: vi
+        .fn()
+        .mockName('ReservationService.createReservation'),
+      updateReservationById: vi
+        .fn()
+        .mockName('ReservationService.updateReservationById'),
+      changeState: vi.fn().mockName('ReservationService.changeState'),
+      deleteReservation: vi
+        .fn()
+        .mockName('ReservationService.deleteReservation'),
+      createReview: vi.fn().mockName('ReservationService.createReview'),
+      getReview: vi.fn().mockName('ReservationService.getReview'),
+      updateReservationNote: vi
+        .fn()
+        .mockName('ReservationService.updateReservationNote'),
+      updateReservationDiscount: vi
+        .fn()
+        .mockName('ReservationService.updateReservationDiscount'),
+      updateReservationTimestamp: vi
+        .fn()
+        .mockName('ReservationService.updateReservationTimestamp'),
+      updateReservationColor: vi
+        .fn()
+        .mockName('ReservationService.updateReservationColor'),
+      updateReservationCustomer: vi
+        .fn()
+        .mockName('ReservationService.updateReservationCustomer'),
+    };
 
-    navigationSpy = jasmine.createSpyObj<NavigationService>('NavigationService', [
-      'navigate',
-    ]);
+    navigationSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+    };
 
-    dashboardSpy = jasmine.createSpyObj('DashboardStore', [
-      'getMyEvent',
-    ]);
+    dashboardSpy = {
+      getMyEvent: vi.fn().mockName('DashboardStore.getMyEvent'),
+    };
 
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
-    translateSpy.instant.and.callFake((k: string) => k);
+    translateSpy = {
+      instant: vi.fn().mockName('TranslateService.instant'),
+    };
+    translateSpy.instant.mockImplementation((k: string) => k);
 
     TestBed.configureTestingModule({
       providers: [
@@ -65,7 +115,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load page', () => {
-    serviceSpy.loadPage.and.returnValue(of({} as any));
+    serviceSpy.loadPage.mockReturnValue(of({} as any));
 
     store.loadPage({ page: 0, sort: 'id', direction: 'asc', size: 10 });
 
@@ -74,7 +124,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load availability', () => {
-    serviceSpy.customerSearch.and.returnValue(of([] as any));
+    serviceSpy.customerSearch.mockReturnValue(of([] as any));
 
     store.loadAvailability('r1', 't1', new Date(), 'p1');
 
@@ -82,7 +132,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load calendar', () => {
-    serviceSpy.loadCalendar.and.returnValue(of([] as any));
+    serviceSpy.loadCalendar.mockReturnValue(of([] as any));
 
     store.loadCalendar('r1', 7, [new Date()]);
 
@@ -90,7 +140,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load history', () => {
-    serviceSpy.loadHistory.and.returnValue(of([{ id: 'h1' }] as any));
+    serviceSpy.loadHistory.mockReturnValue(of([{ id: 'h1' }] as any));
 
     store.loadHistory('r1');
 
@@ -98,7 +148,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load reservation and navigate when no payment link', () => {
-    serviceSpy.getReservation.and.returnValue(of({ id: 'r1' } as any));
+    serviceSpy.getReservation.mockReturnValue(of({ id: 'r1' } as any));
 
     store.loadById('r1');
 
@@ -106,9 +156,9 @@ describe('ReservationStore', () => {
   });
 
   it('should open payment link when present', () => {
-    spyOn(window, 'open');
+    vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
-    serviceSpy.getReservation.and.returnValue(
+    serviceSpy.getReservation.mockReturnValue(
       of({ id: 'r1', paymentLink: 'http://pay' } as any),
     );
 
@@ -118,7 +168,7 @@ describe('ReservationStore', () => {
   });
 
   it('should create reservation and navigate per role', () => {
-    serviceSpy.createReservation.and.returnValue(
+    serviceSpy.createReservation.mockReturnValue(
       of([{ id: 'r1', timestamp: 1, timeZone: 'UTC' }] as any),
     );
 
@@ -129,7 +179,7 @@ describe('ReservationStore', () => {
   });
 
   it('should update reservation', () => {
-    serviceSpy.updateReservationById.and.returnValue(
+    serviceSpy.updateReservationById.mockReturnValue(
       of({ id: 'r1', timestamp: 1 } as any),
     );
 
@@ -139,9 +189,7 @@ describe('ReservationStore', () => {
   });
 
   it('should approve reservation via changeState', () => {
-    serviceSpy.changeState.and.returnValue(
-      of({ paymentLink: null } as any),
-    );
+    serviceSpy.changeState.mockReturnValue(of({ paymentLink: null } as any));
 
     store.approve('r1');
 
@@ -149,9 +197,9 @@ describe('ReservationStore', () => {
   });
 
   it('should handle payment link in state change', () => {
-    spyOn(window, 'open');
+    vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
-    serviceSpy.changeState.and.returnValue(
+    serviceSpy.changeState.mockReturnValue(
       of({ paymentLink: 'http://pay' } as any),
     );
 
@@ -161,17 +209,15 @@ describe('ReservationStore', () => {
   });
 
   it('should delete reservation', () => {
-    serviceSpy.deleteReservation.and.returnValue(of(void 0));
+    serviceSpy.deleteReservation.mockReturnValue(of(void 0));
 
     store.delete('r1', '1700', 'UTC');
 
-    expect(navigationSpy.navigate).toHaveBeenCalledWith(
-      jasmine.any(Array),
-    );
+    expect(navigationSpy.navigate).toHaveBeenCalledWith(expect.any(Array));
   });
 
   it('should create review', () => {
-    serviceSpy.createReview.and.returnValue(of({ id: 'r1' } as any));
+    serviceSpy.createReview.mockReturnValue(of({ id: 'r1' } as any));
 
     store.createReview({} as any);
 
@@ -179,7 +225,7 @@ describe('ReservationStore', () => {
   });
 
   it('should load review', () => {
-    serviceSpy.getReview.and.returnValue(of({ id: 'rev1' } as any));
+    serviceSpy.getReview.mockReturnValue(of({ id: 'rev1' } as any));
 
     store.loadReview('r1');
 
@@ -187,19 +233,20 @@ describe('ReservationStore', () => {
   });
 
   it('should handle error from loadPage', () => {
-    serviceSpy.loadPage.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 500,
-          error: { message: 'ERROR' },
-        }),
+    serviceSpy.loadPage.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 500,
+            error: { message: 'ERROR' },
+          }),
       ),
     );
 
     store.loadPage({ page: 0, sort: 'id', direction: 'asc', size: 10 });
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         status: 'SERVER_ERROR',
         message: 'COMMON.ERROR.TRY_LATER',
       }),
@@ -207,7 +254,7 @@ describe('ReservationStore', () => {
   });
 
   it('should clean store', () => {
-    serviceSpy.loadPage.and.returnValue(of({} as any));
+    serviceSpy.loadPage.mockReturnValue(of({} as any));
 
     store.loadPage({ page: 0, sort: 'id', direction: 'asc', size: 10 });
 

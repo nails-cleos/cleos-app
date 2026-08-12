@@ -1,11 +1,18 @@
 @let account = accountSignal();
 <div class="app-surface-canvas app-surface-shell app-surface-stack">
-  <app-balance [account]="account" [showAdd]="true" [showUser]="hasAdminRole()" [language]="language"></app-balance>
+  <app-balance
+    [account]="account"
+    [showAdd]="true"
+    [showUser]="hasAdminRole()"
+    [language]="language"
+  ></app-balance>
 
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'ACCOUNT.TRANSACTION.TITLE' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'ACCOUNT.TRANSACTION.TITLE' | translate
+        }}</span>
       </div>
     </div>
 
@@ -15,57 +22,149 @@
       @if (isLoading()) {
         <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
       } @else if (dataSourceSignal(); as dataSource) {
-        <table [dataSource]="dataSource" mat-table matSort matSortActive="timestamp" matSortDirection="desc"
-               matSortDisableClear multiTemplateDataRows>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
+          matSortDisableClear
+          multiTemplateDataRows
+        >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let transaction; let i = dataIndex;" mat-cell>
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            <td *matCellDef="let transaction; let i = dataIndex" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="timestamp">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.DATE' | translate }}
+            </th>
             <td *matCellDef="let transaction" mat-cell>
-              <div>{{ transaction.date | date:'short':undefined:language }}</div>
+              <div>
+                {{ transaction.date | date: 'short' : undefined : language }}
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amount">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</th>
-            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              <div>{{ transaction.amount | number:'1.2-2'| currency: account?.currency?.code }}</div>
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'COMMON.COLUMN.AMOUNT' | translate }}
+            </th>
+            <td
+              *matCellDef="let transaction"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <div>
+                {{
+                  transaction.amount
+                    | number: '1.2-2'
+                    | currency
+                      : $safeNavigationMigration(account?.currency?.code)
+                }}
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="amountGifted">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell mat-sort-header>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</th>
-            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              <div>{{ transaction.amountGifted | number:'1.2-2'| currency: account?.currency?.code }}</div>
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}
+            </th>
+            <td
+              *matCellDef="let transaction"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <div>
+                {{
+                  transaction.amountGifted
+                    | number: '1.2-2'
+                    | currency
+                      : $safeNavigationMigration(account?.currency?.code)
+                }}
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="payment.status">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
-            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
-              <div>{{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}</div>
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.COLUMN.STATUS' | translate }}
+            </th>
+            <td
+              *matCellDef="let transaction"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
+              <div>
+                {{
+                  'COMMON.STATUS.PAYMENT.' +
+                    (transaction.payment?.status || 'NONE') | translate
+                }}
+              </div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="payment.type">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.TYPE' | translate }}</th>
-            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.COLUMN.TYPE' | translate }}
+            </th>
+            <td
+              *matCellDef="let transaction"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               <div>{{ transaction.payment?.type }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="actions">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</th>
-            <td *matCellDef="let transaction" class="app-surface-hide-mobile" mat-cell>
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+            >
+              {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+            </th>
+            <td
+              *matCellDef="let transaction"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               @if (!transaction.deleted) {
-                <button mat-icon-button
-                        [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
-                        matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}" matTooltipPosition="left">
+                <button
+                  mat-icon-button
+                  [routerLink]="[
+                    '/',
+                    language,
+                    'accounts',
+                    $safeNavigationMigration(account?.id),
+                    'transactions',
+                    transaction.id,
+                  ]"
+                  matTooltip="{{ 'COMMON.BUTTON.VIEW' | translate }}"
+                  matTooltipPosition="left"
+                >
                   <mat-icon color="primary">receipt</mat-icon>
                 </button>
               }
@@ -73,44 +172,95 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let transaction" [attr.colspan]="displayedColumns.length" class="app-surface-hide-desktop" mat-cell>
-              <div [class.detail-expanded]="transaction === expandedTransaction" class="detail app-surface-hide-desktop">
+            <td
+              *matCellDef="let transaction"
+              [attr.colspan]="displayedColumns.length"
+              class="app-surface-hide-desktop"
+              mat-cell
+            >
+              <div
+                [class.detail-expanded]="transaction === expandedTransaction"
+                class="detail app-surface-hide-desktop"
+              >
                 <mat-list>
                   @if (transaction.payment?.description) {
-                    <div matListItemTitle>{{ 'COMMON.COLUMN.DESCRIPTION' | translate }}</div>
+                    <div matListItemTitle>
+                      {{ 'COMMON.COLUMN.DESCRIPTION' | translate }}
+                    </div>
                     <mat-list-item role="list">
-                      <div matListItemLine>{{ transaction.payment?.description }}</div>
+                      <div matListItemLine>
+                        {{ transaction.payment?.description }}
+                      </div>
                     </mat-list-item>
                   }
                   @if (transaction.amount) {
-                    <div matListItemTitle>{{ 'COMMON.COLUMN.AMOUNT' | translate }}</div>
+                    <div matListItemTitle>
+                      {{ 'COMMON.COLUMN.AMOUNT' | translate }}
+                    </div>
                     <mat-list-item>
-                      {{ transaction.amount | number:'1.2-2' | currency: account?.currency?.code }}
+                      {{
+                        transaction.amount
+                          | number: '1.2-2'
+                          | currency
+                            : $safeNavigationMigration(account?.currency?.code)
+                      }}
                     </mat-list-item>
                   }
                   @if (transaction.amountGifted) {
-                    <div matListItemTitle>{{ 'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED' | translate }}</div>
+                    <div matListItemTitle>
+                      {{
+                        'ACCOUNT.TRANSACTION.LIST.COLUMN.AMOUNT_GIFTED'
+                          | translate
+                      }}
+                    </div>
                     <mat-list-item>
-                      {{ transaction.amountGifted | number:'1.2-2' | currency: account?.currency?.code }}
+                      {{
+                        transaction.amountGifted
+                          | number: '1.2-2'
+                          | currency
+                            : $safeNavigationMigration(account?.currency?.code)
+                      }}
                     </mat-list-item>
                   }
                   @if (transaction.payment?.status) {
-                    <div matListItemTitle>{{ 'COMMON.COLUMN.STATUS' | translate }}</div>
+                    <div matListItemTitle>
+                      {{ 'COMMON.COLUMN.STATUS' | translate }}
+                    </div>
                     <mat-list-item>
-                      {{ 'COMMON.STATUS.PAYMENT.' + (transaction.payment?.status || 'NONE') | translate }}
+                      {{
+                        'COMMON.STATUS.PAYMENT.' +
+                          (transaction.payment?.status || 'NONE') | translate
+                      }}
                     </mat-list-item>
                   }
                   @if (transaction.payment?.type) {
-                    <div matListItemTitle>{{ 'COMMON.COLUMN.TYPE' | translate }}</div>
+                    <div matListItemTitle>
+                      {{ 'COMMON.COLUMN.TYPE' | translate }}
+                    </div>
                     <mat-list-item>
-                      {{ 'COMMON.PAYMENT.TYPE.' + (transaction.payment?.type || 'NONE') | translate }}
+                      {{
+                        'COMMON.PAYMENT.TYPE.' +
+                          (transaction.payment?.type || 'NONE') | translate
+                      }}
                     </mat-list-item>
                   }
                   @if (!transaction.deleted) {
-                    <div matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                    <div matListItemTitle>
+                      {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                    </div>
                     <mat-list-item role="list">
-                      <button [routerLink]="['/', language, 'accounts', account?.id, 'transactions', transaction.id]"
-                              color="primary" mat-icon-button>
+                      <button
+                        [routerLink]="[
+                          '/',
+                          language,
+                          'accounts',
+                          $safeNavigationMigration(account?.id),
+                          'transactions',
+                          transaction.id,
+                        ]"
+                        color="primary"
+                        mat-icon-button
+                      >
                         <mat-icon matListItemIcon>receipt</mat-icon>
                       </button>
                     </mat-list-item>
@@ -121,20 +271,43 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
               {{ 'ACCOUNT.TRANSACTION.LIST.ERROR.NO_CONTENT' | translate }}
             </td>
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr (click)="expandedTransaction = expandedTransaction === transaction ? null : transaction"
-              *matRowDef="let transaction; columns: displayedColumns;" class="row" mat-row></tr>
-          <tr *matRowDef="let row; columns: ['expandedDetail']" class="detail-row" mat-row></tr>
-          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <tr
+            (click)="
+              expandedTransaction =
+                expandedTransaction === transaction ? null : transaction
+            "
+            *matRowDef="let transaction; columns: displayedColumns"
+            class="row"
+            mat-row
+          ></tr>
+          <tr
+            *matRowDef="let row; columns: ['expandedDetail']"
+            class="detail-row"
+            mat-row
+          ></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
         </table>
 
         @if (resultsLength) {
-          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
         }
       }
     </div>

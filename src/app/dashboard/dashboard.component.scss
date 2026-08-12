@@ -127,8 +127,19 @@
   color: inherit;
 }
 
-:host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell,
-:host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell * {
+:host
+  ::ng-deep
+  .dashboard-calendar__surface
+  .cal-month-view
+  .cal-header
+  .cal-cell,
+:host
+  ::ng-deep
+  .dashboard-calendar__surface
+  .cal-month-view
+  .cal-header
+  .cal-cell
+  * {
   color: var(--app-surface-text);
 }
 
@@ -186,7 +197,12 @@
     min-width: 0;
   }
 
-  :host ::ng-deep .dashboard-calendar__surface .cal-month-view .cal-header .cal-cell {
+  :host
+    ::ng-deep
+    .dashboard-calendar__surface
+    .cal-month-view
+    .cal-header
+    .cal-cell {
     padding: 8px 2px;
     font-size: 0.66rem;
     font-weight: 700;

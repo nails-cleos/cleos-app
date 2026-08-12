@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { GeocodeService } from './geocode.service';
@@ -5,15 +6,16 @@ import { HttpClient } from '@angular/common/http';
 
 describe('GeocodeService', () => {
   let service: GeocodeService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'jsonp'> & {
+    jsonp: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['jsonp']);
+    httpSpy = {
+      jsonp: vi.fn().mockName('HttpClient.jsonp'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        GeocodeService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [GeocodeService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(GeocodeService);
   });

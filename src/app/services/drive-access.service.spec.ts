@@ -1,20 +1,20 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { DriveAccessService } from './drive-access.service';
 import { signal } from '@angular/core';
 import { AuthStore } from '../store/auth.store';
-
 describe('DriveAccessService', () => {
   let service: DriveAccessService;
 
   let authStoreSpy: {
     driveToken: ReturnType<typeof signal>;
-    getDriveToken: jasmine.Spy;
+    getDriveToken: Mock;
   };
 
   beforeEach(() => {
     authStoreSpy = {
       driveToken: signal(undefined),
-      getDriveToken: jasmine.createSpy('getDriveToken'),
+      getDriveToken: vi.fn().mockName('getDriveToken'),
     };
 
     TestBed.configureTestingModule({
@@ -38,7 +38,9 @@ describe('DriveAccessService', () => {
     authStoreSpy.driveToken.set('existing-token');
     (service as any).driveTokenSignal = signal('existing-token');
 
-    const spy = spyOn<any>(service, 'requestDriveAccess');
+    const spy = vi
+      .spyOn<any, any>(service, 'requestDriveAccess')
+      .mockReturnValue(undefined);
 
     service.requestAccessIfNeeded();
 
@@ -46,7 +48,9 @@ describe('DriveAccessService', () => {
   });
 
   it('should NOT request access when shouldRequest is false', () => {
-    const spy = spyOn<any>(service, 'requestDriveAccess');
+    const spy = vi
+      .spyOn<any, any>(service, 'requestDriveAccess')
+      .mockReturnValue(undefined);
 
     service.requestAccessIfNeeded(false);
 

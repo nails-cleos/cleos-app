@@ -14,9 +14,7 @@ import { MeReservationDetailsPageComponent } from './reservation/me/me-reservati
 import { provideFeatureTranslations } from '../shared/feature-providers';
 import { EmptyComponent } from '../util/empty.component';
 
-const providers = [
-  provideFeatureTranslations('me'),
-];
+const providers = [provideFeatureTranslations('me')];
 
 const children: Routes = [
   {
@@ -55,10 +53,30 @@ const children: Routes = [
     canActivate: [authGuard],
     data: { roles: [Role.customer] },
   },
-  { path: 'payment/:id', component: MePaymentComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'referrals', component: ReferralsComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'discounts', component: MeDiscountComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
-  { path: 'overview', component: OverviewComponent, canActivate: [authGuard], data: { roles: [Role.customer] } },
+  {
+    path: 'payment/:id',
+    component: MePaymentComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'referrals',
+    component: ReferralsComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'discounts',
+    component: MeDiscountComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
+  {
+    path: 'overview',
+    component: OverviewComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.customer] },
+  },
 ];
 
 export const ME_ROUTES: Routes = [{ path: '', providers, children }];

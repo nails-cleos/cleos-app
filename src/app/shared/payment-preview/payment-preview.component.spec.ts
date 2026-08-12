@@ -1,10 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentPreviewComponent } from './payment-preview.component';
 import { By } from '@angular/platform-browser';
-import { IPaymentOption } from '../../interfaces/payment';
-import { TranslateModule } from '@ngx-translate/core';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { MatIconRegistry } from '@angular/material/icon';
-import { matIconRegistryStub } from '../../util/app-material-registry-stub';
+import { matIconRegistryStub } from '@app/util/app-material-registry-stub';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('PaymentPreviewComponent', () => {
   let component: PaymentPreviewComponent;
@@ -24,8 +25,11 @@ describe('PaymentPreviewComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PaymentPreviewComponent, TranslateModule.forRoot()],
-      providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
+      imports: [PaymentPreviewComponent],
+      providers: [
+        provideTranslateService(),
+        { provide: MatIconRegistry, useValue: matIconRegistryStub },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentPreviewComponent);
@@ -40,7 +44,9 @@ describe('PaymentPreviewComponent', () => {
     fixture.componentRef.setInput('option', mockType);
     fixture.detectChanges();
 
-    const typeName = fixture.debugElement.query(By.css('[matListItemLine]')).nativeElement;
+    const typeName = fixture.debugElement.query(
+      By.css('[matListItemLine]'),
+    ).nativeElement;
     expect(typeName.textContent).toContain('Credit Card');
   });
 
@@ -50,8 +56,11 @@ describe('PaymentPreviewComponent', () => {
     fixture.componentRef.setInput('currencyIcon', 'euro');
     fixture.detectChanges();
 
-    const totalEl = fixture.debugElement.queryAll(By.css('span.bold'))
-      .find(el => el.nativeElement.textContent.includes('100'))?.nativeElement;
+    const totalEl = fixture.debugElement
+      .queryAll(By.css('span.bold'))
+      .find((el) =>
+        el.nativeElement.textContent.includes('100'),
+      )?.nativeElement;
 
     expect(totalEl).toBeTruthy();
     expect(totalEl.textContent).toContain('100');

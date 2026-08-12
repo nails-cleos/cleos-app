@@ -73,7 +73,7 @@
 .notification-enter {
   opacity: 0;
   transform: translateY(10px);
-  animation: notification-enter 320ms cubic-bezier(.2, .8, .2, 1) forwards;
+  animation: notification-enter 320ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
   animation-delay: var(--notification-enter-delay, 0ms);
 }
 
@@ -87,7 +87,12 @@
   padding-bottom: 0;
   overflow: hidden;
   pointer-events: none;
-  transition: transform 260ms ease, opacity 260ms ease, height 260ms ease, margin 260ms ease, padding 260ms ease;
+  transition:
+    transform 260ms ease,
+    opacity 260ms ease,
+    height 260ms ease,
+    margin 260ms ease,
+    padding 260ms ease;
 }
 
 @keyframes notification-enter {

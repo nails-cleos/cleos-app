@@ -10,22 +10,23 @@ import { skipLoadingOverlay } from '../interfaces/pagination';
   providedIn: 'root',
 })
 export class NoteService {
-
   private url = 'notes';
-  private urlV1 = `v1/${ this.url }`;
+  private urlV1 = `v1/${this.url}`;
 
   private http: HttpClient = inject(HttpClient);
 
-  getNote = (id: string): Observable<INoteAll | undefined> => this.http.get<INoteAll>(toUrl(this.urlV1, id),
-    { ...skipLoadingOverlay() });
+  getNote = (id: string): Observable<INoteAll | undefined> =>
+    this.http.get<INoteAll>(toUrl(this.urlV1, id), { ...skipLoadingOverlay() });
 
-  createNote = (note: INote): Observable<IApiResponse> => this.http.post<IApiResponse>(this.urlV1, note);
+  createNote = (note: INote): Observable<IApiResponse> =>
+    this.http.post<IApiResponse>(this.urlV1, note);
 
-  deleteNote = (id: string): Observable<void> => this.http.delete<void>(toUrl(this.urlV1, id));
+  deleteNote = (id: string): Observable<void> =>
+    this.http.delete<void>(toUrl(this.urlV1, id));
 
-  updateNote = (id: string, note: INote): Observable<IApiResponse> => this.http.patch<IApiResponse>(
-    toUrl(this.urlV1, id), note);
+  updateNote = (id: string, note: INote): Observable<IApiResponse> =>
+    this.http.patch<IApiResponse>(toUrl(this.urlV1, id), note);
 
-  completeNote = (id: string): Observable<IApiResponse> => this.http.patch<IApiResponse>(
-    toUrl(this.urlV1, id, 'complete'), null);
+  completeNote = (id: string): Observable<IApiResponse> =>
+    this.http.patch<IApiResponse>(toUrl(this.urlV1, id, 'complete'), null);
 }

@@ -7,14 +7,17 @@ import { ICurrency } from '../currency/currency';
   name: 'discount',
 })
 export class DiscountPipe implements PipeTransform {
-
-  transform = (type?: DiscountType, value?: number, currency?: string | ICurrency): string => {
+  transform = (
+    type?: DiscountType,
+    value?: number,
+    currency?: string | ICurrency,
+  ): string => {
     switch (type) {
       case DiscountType.percentage:
-        return `${ value }%`;
+        return `${value}%`;
       case DiscountType.money:
-        return `${ currencySymbol(currency) } ${ value }`;
+        return `${currencySymbol(currency)} ${value}`;
     }
-    return value ? `${ value }` : '';
+    return value ? `${value}` : '';
   };
 }

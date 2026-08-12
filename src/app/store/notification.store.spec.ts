@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -8,18 +9,35 @@ import { NotificationService } from '../services/notification.service';
 
 describe('NotificationStore', () => {
   let store: InstanceType<typeof NotificationStore>;
-  let notificationServiceSpy: jasmine.SpyObj<NotificationService>;
-  let routerSpy: jasmine.SpyObj<Router>;
+  let notificationServiceSpy: {
+    getNotificationsPage: Mock;
+    readNotification: Mock;
+    deleteNotification: Mock;
+    subscribeNotification: Mock;
+  };
+  let routerSpy: {
+    navigate: Mock;
+  };
 
   beforeEach(() => {
-    notificationServiceSpy = jasmine.createSpyObj<NotificationService>('NotificationService', [
-      'getNotificationsPage',
-      'readNotification',
-      'deleteNotification',
-      'subscribeNotification',
-    ]);
+    notificationServiceSpy = {
+      getNotificationsPage: vi
+        .fn()
+        .mockName('NotificationService.getNotificationsPage'),
+      readNotification: vi
+        .fn()
+        .mockName('NotificationService.readNotification'),
+      deleteNotification: vi
+        .fn()
+        .mockName('NotificationService.deleteNotification'),
+      subscribeNotification: vi
+        .fn()
+        .mockName('NotificationService.subscribeNotification'),
+    };
 
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    routerSpy = {
+      navigate: vi.fn().mockName('Router.navigate'),
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -34,7 +52,7 @@ describe('NotificationStore', () => {
 
   it('should load notifications page', () => {
     const page = { content: [] } as any;
-    notificationServiceSpy.getNotificationsPage.and.returnValue(of(page));
+    notificationServiceSpy.getNotificationsPage.mockReturnValue(of(page));
 
     store.loadPage({
       page: 0,
@@ -51,7 +69,7 @@ describe('NotificationStore', () => {
     );
 
     expect(store.data()).toEqual(page);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should read notification and navigate when navigation exists', () => {
@@ -60,14 +78,14 @@ describe('NotificationStore', () => {
       navigation: '/dashboard',
     } as any;
 
-    notificationServiceSpy.readNotification.and.returnValue(of(notification));
+    notificationServiceSpy.readNotification.mockReturnValue(of(notification));
 
     store.read('n1');
 
     expect(notificationServiceSpy.readNotification).toHaveBeenCalledWith('n1');
 
     expect(store.dataRead()).toEqual(notification);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
 
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/dashboard']);
   });
@@ -78,7 +96,7 @@ describe('NotificationStore', () => {
       navigation: null,
     } as any;
 
-    notificationServiceSpy.readNotification.and.returnValue(of(notification));
+    notificationServiceSpy.readNotification.mockReturnValue(of(notification));
 
     store.read('n1');
 
@@ -89,18 +107,20 @@ describe('NotificationStore', () => {
   it('should delete notification and store deleted data', () => {
     const notification = { id: 'n1' } as any;
 
-    notificationServiceSpy.deleteNotification.and.returnValue(of(void 0));
+    notificationServiceSpy.deleteNotification.mockReturnValue(of(void 0));
 
     store.delete(notification);
 
-    expect(notificationServiceSpy.deleteNotification).toHaveBeenCalledWith('n1');
+    expect(notificationServiceSpy.deleteNotification).toHaveBeenCalledWith(
+      'n1',
+    );
 
     expect(store.dataDeleted()).toEqual(notification);
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should subscribe to notifications', () => {
-    notificationServiceSpy.subscribeNotification.and.returnValue(of(void 0));
+    notificationServiceSpy.subscribeNotification.mockReturnValue(of(void 0));
 
     store.subscribeNotification('token-123');
 
@@ -108,33 +128,34 @@ describe('NotificationStore', () => {
       'token-123',
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should map HTTP errors into error state', () => {
-    notificationServiceSpy.readNotification.and.returnValue(
-      throwError(() =>
-        new HttpErrorResponse({
-          status: 500,
-          error: { message: 'NOTIFICATION.ERROR' },
-        }),
+    notificationServiceSpy.readNotification.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 500,
+            error: { message: 'NOTIFICATION.ERROR' },
+          }),
       ),
     );
 
     store.read('n1');
 
     expect(store.error()).toEqual(
-      jasmine.objectContaining({
+      expect.objectContaining({
         status: 'SERVER_ERROR',
         message: 'COMMON.ERROR.TRY_LATER',
       }),
     );
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should reset store on clean()', () => {
-    notificationServiceSpy.getNotificationsPage.and.returnValue(
+    notificationServiceSpy.getNotificationsPage.mockReturnValue(
       of({ content: [] } as any),
     );
 
@@ -153,7 +174,7 @@ describe('NotificationStore', () => {
   });
 
   it('should clear response and error', () => {
-    notificationServiceSpy.getNotificationsPage.and.returnValue(
+    notificationServiceSpy.getNotificationsPage.mockReturnValue(
       of({ content: [] } as any),
     );
 

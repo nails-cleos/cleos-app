@@ -4,7 +4,12 @@ import { ITreatmentAll } from '../treatment/treatment';
 import { IAdditionalAll } from '../additional/additional';
 import { IOffice, IOfficeAll } from '../office/office';
 import { AvailabilityForm, RoomForm } from './room-form.types';
-import { createDate, createNewDate, getTimeNumber, DEFAULT_LOCALE } from '../util/dates';
+import {
+  createDate,
+  createNewDate,
+  getTimeNumber,
+  DEFAULT_LOCALE,
+} from '../util/dates';
 import { createAddress, areEquals } from '../util/helper';
 import { isString } from '../interfaces/common';
 import { valueChange } from '../util/validators';
@@ -64,7 +69,7 @@ export interface IService {
 
 export enum ServiceType {
   treatment = 'TREATMENT',
-  additional = 'ADDITIONAL'
+  additional = 'ADDITIONAL',
 }
 
 export interface IRoomAll {
@@ -117,11 +122,11 @@ export interface ILocation {
 }
 
 export interface IRoomCustomer {
-  customerId?: string,
-  customerName?: string,
-  reservationId?: string,
-  days?: number,
-  lastTime?: number
+  customerId?: string;
+  customerName?: string;
+  reservationId?: string;
+  days?: number;
+  lastTime?: number;
 }
 
 export class Availability {
@@ -150,8 +155,14 @@ export class AvailabilityDate {
     return {
       startDate: this.createDateFromAvailability(availability.start, timeZone),
       endDate: this.createDateFromAvailability(availability.end, timeZone),
-      startLunchDate: this.createDateFromAvailability(availability.startLunch, timeZone),
-      endLunchDate: this.createDateFromAvailability(availability.endLunch, timeZone),
+      startLunchDate: this.createDateFromAvailability(
+        availability.startLunch,
+        timeZone,
+      ),
+      endLunchDate: this.createDateFromAvailability(
+        availability.endLunch,
+        timeZone,
+      ),
     };
   }
 
@@ -183,7 +194,8 @@ export class Room {
   ): IRoom {
     const room: IRoom = {
       officeId: valueChange(roomForm.office.value, currentRoom?.office)?.id,
-      currencyId: valueChange(roomForm.currency.value, currentRoom?.currency)?.id,
+      currencyId: valueChange(roomForm.currency.value, currentRoom?.currency)
+        ?.id,
       timeZone: roomForm.timeZone.value?.tzCode,
       primary,
       address: createAddress(
@@ -193,11 +205,15 @@ export class Room {
         roomForm.addressForm.controls.addressDescription.value,
       ),
       ...(roomForm.closeDate.value && {
-        closeDateString: createNewDate(roomForm.closeDate.value).toLocaleString(DEFAULT_LOCALE),
+        closeDateString: createNewDate(roomForm.closeDate.value).toLocaleString(
+          DEFAULT_LOCALE,
+        ),
       }),
     };
 
-    const newProfessionalIds = selectedProfessionals.map(({ id }) => id).filter(isString);
+    const newProfessionalIds = selectedProfessionals
+      .map(({ id }) => id)
+      .filter(isString);
     if (!areEquals(newProfessionalIds, currentProfessionalIds)) {
       room.professionalIds = newProfessionalIds;
     }

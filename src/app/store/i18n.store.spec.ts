@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -5,19 +6,22 @@ import { I18NStore } from './i18n.store';
 
 describe('I18NStore', () => {
   let store: InstanceType<typeof I18NStore>;
-  let translateSpy: jasmine.SpyObj<TranslateService>;
+  let translateSpy: {
+    getCurrentLang: Mock;
+    use: Mock;
+  };
 
   const STORAGE_KEY = 'I18N';
 
   beforeEach(() => {
     localStorage.clear();
 
-    translateSpy = jasmine.createSpyObj<TranslateService>('TranslateService', [
-      'getCurrentLang',
-      'use',
-    ]);
+    translateSpy = {
+      getCurrentLang: vi.fn().mockName('TranslateService.getCurrentLang'),
+      use: vi.fn().mockName('TranslateService.use'),
+    };
 
-    translateSpy.getCurrentLang.and.returnValue('en');
+    translateSpy.getCurrentLang.mockReturnValue('en');
 
     TestBed.configureTestingModule({
       providers: [
@@ -30,10 +34,7 @@ describe('I18NStore', () => {
   });
 
   it('should hydrate from localStorage when value exists', () => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ language: 'fr' }),
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ language: 'fr' }));
 
     store.hydrate();
 
@@ -41,7 +42,7 @@ describe('I18NStore', () => {
   });
 
   it('should fallback to TranslateService language when no storage exists', () => {
-    translateSpy.getCurrentLang.and.returnValue('de');
+    translateSpy.getCurrentLang.mockReturnValue('de');
 
     store.hydrate();
 
@@ -94,7 +95,7 @@ describe('I18NStore', () => {
   });
 
   it('should NOT call TranslateService.use if language equals current', () => {
-    translateSpy.getCurrentLang.and.returnValue('es');
+    translateSpy.getCurrentLang.mockReturnValue('es');
 
     store.setLanguage('es');
 

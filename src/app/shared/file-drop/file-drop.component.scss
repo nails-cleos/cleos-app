@@ -25,7 +25,10 @@
 }
 
 .file-drop-card {
-  border-color: var(--app-surface-card-border, rgba(32, 28, 25, 0.06)) !important;
+  border-color: var(
+    --app-surface-card-border,
+    rgba(32, 28, 25, 0.06)
+  ) !important;
   border-radius: 18px !important;
   background: var(--app-surface-card-bg, rgba(255, 255, 255, 0.96)) !important;
 
@@ -95,7 +98,7 @@
     }
 
     .info {
-      width: 100%
+      width: 100%;
     }
   }
 }

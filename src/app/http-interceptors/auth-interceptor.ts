@@ -10,12 +10,13 @@ const withAuthHeaders = (
   req: HttpRequest<unknown>,
   token: string,
   driveToken?: string,
-): HttpRequest<unknown> => req.clone({
-  setHeaders: {
-    'X-Authorization-Firebase': token,
-    ...(driveToken && { 'X-Google-Drive-Token': driveToken }),
-  },
-});
+): HttpRequest<unknown> =>
+  req.clone({
+    setHeaders: {
+      'X-Authorization-Firebase': token,
+      ...(driveToken && { 'X-Google-Drive-Token': driveToken }),
+    },
+  });
 
 export const authInterceptor = (
   req: HttpRequest<unknown>,
@@ -37,7 +38,9 @@ export const authInterceptor = (
     switchMap(() => {
       const restoredToken = tokenService.token();
       if (restoredToken) {
-        return next(withAuthHeaders(req, restoredToken, tokenService.driveToken()));
+        return next(
+          withAuthHeaders(req, restoredToken, tokenService.driveToken()),
+        );
       }
 
       return from(firebaseService.getIdToken()).pipe(

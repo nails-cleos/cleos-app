@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 
 @Component({
   selector: 'app-reservation-detail-skeleton',
@@ -46,5 +49,6 @@ export class ReservationDetailSkeletonComponent {
   noteCards = Array.from({ length: 2 }, (_, index) => index);
   metaChips = Array.from({ length: 3 }, (_, index) => index);
   extraRows = Array.from({ length: 2 }, (_, index) => index);
-  footerButtons = (): number[] => Array.from({ length: this.footerButtonCount() }, (_, index) => index);
+  footerButtons = (): number[] =>
+    Array.from({ length: this.footerButtonCount() }, (_, index) => index);
 }

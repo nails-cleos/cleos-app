@@ -1,50 +1,78 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick } from '@angular/core/testing';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { YearSummaryComponent } from './year-summary.component';
 import { BehaviorSubject } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule } from '@ngx-translate/core';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
 import { ActivatedRoute } from '@angular/router';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard';
+import {
+  IMonthlyExport,
+  IMonthlySummaryExpense,
+  IMonthlySummarySale,
+  ISummaryTotal,
+} from '../dashboard';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { By } from '@angular/platform-browser';
 import { YearComponent } from './year/year.component';
-import { DashboardStore } from '../../store/dashboard.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
   let fixture: ComponentFixture<YearSummaryComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   let dashboardStoreSpy: {
     yearSummaryMap: ReturnType<typeof signal>;
     yearExport: ReturnType<typeof signal>;
-    getYearSummary: jasmine.Spy;
-    exportYearSummary: jasmine.Spy;
-    clean: jasmine.Spy;
+    getYearSummary: Mock;
+    exportYearSummary: Mock;
+    clean: Mock;
   };
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let saveAsSpy: jasmine.Spy;
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let saveAsSpy: ReturnType<typeof vi.spyOn>;
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     dashboardStoreSpy = {
       yearSummaryMap: signal<any>(undefined),
       yearExport: signal<any>(undefined),
-      getYearSummary: jasmine.createSpy('getYearSummary'),
-      exportYearSummary: jasmine.createSpy('exportYearSummary'),
-      clean: jasmine.createSpy('clean'),
+      getYearSummary: vi.fn().mockName('getYearSummary'),
+      exportYearSummary: vi.fn().mockName('exportYearSummary'),
+      clean: vi.fn().mockName('clean'),
     };
     breakpoint$ = new BehaviorSubject({
       matches: false,
@@ -55,21 +83,26 @@ describe('YearSummaryComponent', () => {
       },
     });
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [YearSummaryComponent, TranslateModule.forRoot()],
+      imports: [YearSummaryComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -81,9 +114,7 @@ describe('YearSummaryComponent', () => {
     fixture = TestBed.createComponent(YearSummaryComponent);
     component = fixture.componentInstance;
 
-    saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
-      // no-op
-    });
+    saveAsSpy = vi.spyOn(fs, 'saveAs').mockImplementation(() => {});
   });
 
   afterEach(() => breakpoint$.complete());
@@ -93,7 +124,7 @@ describe('YearSummaryComponent', () => {
   });
 
   describe('exportToExcel method', () => {
-    it('should export to Excel with valid data', fakeAsync(() => {
+    it('should export to Excel with valid data', async () => {
       const mockMonthlyExport: IMonthlyExport = {
         month: 1,
         saleSummary: [],
@@ -104,62 +135,69 @@ describe('YearSummaryComponent', () => {
       component['sheetDataSignal'].set([mockMonthlyExport]);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
+      saveAsSpy.mockClear();
       component['exportToExcel']();
-      tick();
-      flushMicrotasks();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
       expect(component.sheetData.length).toBeGreaterThan(0);
-      expect(saveAsSpy).toHaveBeenCalled();
-    }));
+    });
 
-    it('should sort summaries by timestamp before export', fakeAsync(() => {
+    it('should sort summaries by timestamp before export', async () => {
       const mockMonthlyExport: IMonthlyExport = {
         month: 1,
         saleSummary: [
           {
-            timestamp: 200, id: 'sale-2', paths: ['path', 'to', 'sale-2'], total: {
-              payments: [
-                { gross: 121, net: 100, btw: 21 } as ISummaryTotal,
-              ],
+            timestamp: 200,
+            id: 'sale-2',
+            paths: ['path', 'to', 'sale-2'],
+            total: {
+              payments: [{ gross: 121, net: 100, btw: 21 } as ISummaryTotal],
             },
           } as IMonthlySummarySale,
           {
-            timestamp: 100, id: 'sale-1', paths: ['path', 'to', 'sale-1'], total: {
-              payments: [
-                { gross: 242, net: 200, btw: 21 } as ISummaryTotal,
-              ],
+            timestamp: 100,
+            id: 'sale-1',
+            paths: ['path', 'to', 'sale-1'],
+            total: {
+              payments: [{ gross: 242, net: 200, btw: 21 } as ISummaryTotal],
             },
           } as IMonthlySummarySale,
         ],
         expenseSummary: [
           {
-            timestamp: 400, id: 'expense-2', paths: ['path', 'to', 'expense-2'], total: {
-              payments: [
-                { gross: 60.5, net: 50, btw: 21 } as ISummaryTotal,
-              ],
+            timestamp: 400,
+            id: 'expense-2',
+            paths: ['path', 'to', 'expense-2'],
+            total: {
+              payments: [{ gross: 60.5, net: 50, btw: 21 } as ISummaryTotal],
             },
           } as IMonthlySummaryExpense,
           {
-            timestamp: 300, id: 'expense-1', paths: ['path', 'to', 'expense-1'], total: {
-              payments: [
-                { gross: 10.9, net: 10, btw: 9 } as ISummaryTotal,
-              ],
+            timestamp: 300,
+            id: 'expense-1',
+            paths: ['path', 'to', 'expense-1'],
+            total: {
+              payments: [{ gross: 10.9, net: 10, btw: 9 } as ISummaryTotal],
             },
           } as IMonthlySummaryExpense,
         ],
         cashSummary: [
           {
-            timestamp: 600, id: 'cash-2', paths: ['path', 'to', 'cash-2'], total: {
-              payments: [
-                { gross: 242, net: 242, btw: 0 } as ISummaryTotal,
-              ],
+            timestamp: 600,
+            id: 'cash-2',
+            paths: ['path', 'to', 'cash-2'],
+            total: {
+              payments: [{ gross: 242, net: 242, btw: 0 } as ISummaryTotal],
             },
           } as IMonthlySummarySale,
           {
-            timestamp: 500, id: 'cash-1', paths: ['path', 'to', 'cash-1'], total: {
-              payments: [
-                { gross: 121, net: 121, btw: 0 } as ISummaryTotal,
-              ],
+            timestamp: 500,
+            id: 'cash-1',
+            paths: ['path', 'to', 'cash-1'],
+            total: {
+              payments: [{ gross: 121, net: 121, btw: 0 } as ISummaryTotal],
             },
           } as IMonthlySummarySale,
         ],
@@ -169,29 +207,33 @@ describe('YearSummaryComponent', () => {
       component.getForm.date.setValue(new Date(2024, 0, 1));
       fixture.detectChanges();
 
+      saveAsSpy.mockClear();
       component['exportToExcel']();
-      tick();
-      flushMicrotasks();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
       const sheetData = component.sheetData;
       expect(sheetData[0].saleSummary[0].timestamp).toBe(200);
       expect(sheetData[0].saleSummary[1].timestamp).toBe(100);
       expect(sheetData[0].expenseSummary[0].timestamp).toBe(400);
       expect(sheetData[0].expenseSummary[1].timestamp).toBe(300);
-      expect(saveAsSpy).toHaveBeenCalled();
-    }));
+    });
 
-    it('should not export when sheetData is empty', () => {
+    it('should not export when sheetData is empty', async () => {
       component['sheetDataSignal'].set([]);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
+      saveAsSpy.mockClear();
       component['exportToExcel']();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).not.toHaveBeenCalled();
+      });
 
       expect(component.sheetData.length).toBe(0);
-      expect(saveAsSpy).not.toHaveBeenCalled();
     });
 
-    it('should call saveAs when exporting to excel', fakeAsync(() => {
+    it('should call saveAs when exporting to excel', async () => {
       const mockMonthlyExport = {
         month: 1,
         saleSummary: [],
@@ -203,20 +245,22 @@ describe('YearSummaryComponent', () => {
       const date = new Date(2024, 0, 1);
       component.getForm.date.setValue(date);
 
+      saveAsSpy.mockClear();
       component['exportToExcel']();
-      tick();
-      flushMicrotasks();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
-      expect(saveAsSpy).toHaveBeenCalledTimes(1);
-
-      const lastCallArgs = saveAsSpy.calls.mostRecent().args;
-      const fileName = lastCallArgs[1];
+      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall;
+      const fileName = lastCallArgs?.[1];
       expect(fileName).toBe('Report_2024.xlsx');
 
-      const blob = lastCallArgs[0];
-      expect(blob instanceof Blob).toBeTrue();
-      expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    }));
+      const blob = lastCallArgs?.[0];
+      expect(blob instanceof Blob).toBe(true);
+      expect(blob.type).toBe(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
   });
 
   describe('exportAction', () => {
@@ -224,7 +268,7 @@ describe('YearSummaryComponent', () => {
       component.getForm.date.setValue(new Date(2024, 0, 1));
       component['exportSignal'].set(true);
 
-      spyOn<any>(component, 'exportToExcel');
+      vi.spyOn<any, any>(component, 'exportToExcel').mockReturnValue(undefined);
 
       component.exportAction();
 
@@ -235,7 +279,7 @@ describe('YearSummaryComponent', () => {
       component['exportSignal'].set(false);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
-      spyOn<any>(component, 'getExportData');
+      vi.spyOn<any, any>(component, 'getExportData').mockReturnValue(undefined);
 
       component.exportAction();
 
@@ -245,8 +289,8 @@ describe('YearSummaryComponent', () => {
     it('should not call any method when date is null', () => {
       component.getForm.date.setValue(null as any);
 
-      spyOn<any>(component, 'exportToExcel');
-      spyOn<any>(component, 'getExportData');
+      vi.spyOn<any, any>(component, 'exportToExcel').mockReturnValue(undefined);
+      vi.spyOn<any, any>(component, 'getExportData').mockReturnValue(undefined);
 
       component.exportAction();
 
@@ -260,7 +304,9 @@ describe('YearSummaryComponent', () => {
       const date = new Date(2020, 5, 10);
       component.getForm.date.setValue(date);
 
-      const datepickerSpy = jasmine.createSpyObj('MatDatepicker', ['close']);
+      const datepickerSpy = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
 
       component.setYear(new Date(2024, 0, 1), datepickerSpy);
 
@@ -275,16 +321,32 @@ describe('YearSummaryComponent', () => {
       component.getForm.selectedRoom.setValue('All');
 
       const mockExport = new Map<any, any>([
-        ['room1', {
-          monthlyExport: [
-            { month: 1, saleSummary: [1], expenseSummary: [], cashSummary: [] },
-          ],
-        }],
-        ['room2', {
-          monthlyExport: [
-            { month: 1, saleSummary: [2], expenseSummary: [], cashSummary: [] },
-          ],
-        }],
+        [
+          'room1',
+          {
+            monthlyExport: [
+              {
+                month: 1,
+                saleSummary: [1],
+                expenseSummary: [],
+                cashSummary: [],
+              },
+            ],
+          },
+        ],
+        [
+          'room2',
+          {
+            monthlyExport: [
+              {
+                month: 1,
+                saleSummary: [2],
+                expenseSummary: [],
+                cashSummary: [],
+              },
+            ],
+          },
+        ],
       ]);
 
       component['createExportData'](mockExport as any);
@@ -299,8 +361,32 @@ describe('YearSummaryComponent', () => {
       component.getForm.selectedRoom.setValue(room);
 
       const mockExport = new Map<any, any>([
-        [{ roomId: '1' }, { monthlyExport: [{ month: 1, saleSummary: [], expenseSummary: [], cashSummary: [] }] }],
-        [{ roomId: '2' }, { monthlyExport: [{ month: 2, saleSummary: [], expenseSummary: [], cashSummary: [] }] }],
+        [
+          { roomId: '1' },
+          {
+            monthlyExport: [
+              {
+                month: 1,
+                saleSummary: [],
+                expenseSummary: [],
+                cashSummary: [],
+              },
+            ],
+          },
+        ],
+        [
+          { roomId: '2' },
+          {
+            monthlyExport: [
+              {
+                month: 2,
+                saleSummary: [],
+                expenseSummary: [],
+                cashSummary: [],
+              },
+            ],
+          },
+        ],
       ]);
 
       component['createExportData'](mockExport as any);
@@ -336,7 +422,10 @@ describe('YearSummaryComponent', () => {
         },
       ];
 
-      const result = component['getAllQuarterSummaries'](incoming as any, base as any);
+      const result = component['getAllQuarterSummaries'](
+        incoming as any,
+        base as any,
+      );
 
       expect(result[0].monthSummaries[0].total[0].net).toBe(15);
       expect(result[0].monthSummaries[0].total[0].btw).toBe(3);
@@ -346,7 +435,7 @@ describe('YearSummaryComponent', () => {
 
   describe('computed signals', () => {
     it('should return false for showCash by default', () => {
-      expect(component.showCash()).toBeFalse();
+      expect(component.showCash()).toBe(false);
     });
 
     it('should return userName from authUserSignal', () => {
@@ -363,20 +452,24 @@ describe('YearSummaryComponent', () => {
         currency: { code: 'EUR', icon: 'EUR' },
         timeZone: 'Europe/Amsterdam',
       };
-      const quarterSummaries = [{
-        quarter: 1,
-        monthSummaries: [{ month: 1, total: [] }],
-      }];
+      const quarterSummaries = [
+        {
+          quarter: 1,
+          monthSummaries: [{ month: 1, total: [] }],
+        },
+      ];
 
-      dashboardStoreSpy.yearSummaryMap.set(new Map([
-        [room, { quarterSummaries }],
-      ]));
+      dashboardStoreSpy.yearSummaryMap.set(
+        new Map([[room, { quarterSummaries }]]),
+      );
       fixture.detectChanges();
       TestBed.flushEffects();
       fixture.detectChanges();
 
-      let yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
-      expect(component.isHandset()).toBeFalse();
+      let yearComponent = fixture.debugElement.query(
+        By.directive(YearComponent),
+      ).componentInstance as YearComponent;
+      expect(component.isHandset()).toBe(false);
       expect(yearComponent.measure()).toBe('long');
 
       breakpoint$.next({
@@ -391,8 +484,9 @@ describe('YearSummaryComponent', () => {
       TestBed.flushEffects();
       fixture.detectChanges();
 
-      yearComponent = fixture.debugElement.query(By.directive(YearComponent)).componentInstance as YearComponent;
-      expect(component.isHandset()).toBeTrue();
+      yearComponent = fixture.debugElement.query(By.directive(YearComponent))
+        .componentInstance as YearComponent;
+      expect(component.isHandset()).toBe(true);
       expect(yearComponent.measure()).toBe('short');
     });
   });

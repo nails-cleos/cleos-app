@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { AuthUserService } from '../services/auth-user.service';
 import { NavigationService } from '../services/navigation.service';
 
@@ -18,7 +24,8 @@ export class ShortcutComponent {
   key = input<keyof typeof ShortcutEnum>();
 
   private readonly authUserService = inject(AuthUserService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly authUserSignal = this.authUserService.authUser;
 
   constructor() {
@@ -59,9 +66,7 @@ export class ShortcutComponent {
           break;
 
         case ShortcutEnum.reservation:
-          redirect = user.isCustomer
-            ? ['me', 'reservation']
-            : ['reservation'];
+          redirect = user.isCustomer ? ['me', 'reservation'] : ['reservation'];
           break;
       }
 

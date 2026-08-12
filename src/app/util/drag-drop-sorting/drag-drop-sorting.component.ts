@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+} from '@angular/core';
 import {
   CdkDrag,
   CdkDragDrop,
@@ -7,7 +12,7 @@ import {
   CdkDropList,
   moveItemInArray,
 } from '@angular/cdk/drag-drop';
-import { BackButtonDirective } from '../../directives/back-button.directive';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -49,8 +54,17 @@ export class ItemSorting implements ISorting {
   selector: 'app-drag-drop-sorting',
   templateUrl: './drag-drop-sorting.component.html',
   styleUrls: ['./drag-drop-sorting.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, BackButtonDirective, BackButtonDirective,
-    CdkDropList, CdkDrag, CdkDragPlaceholder, CdkDragHandle],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    BackButtonDirective,
+    BackButtonDirective,
+    CdkDropList,
+    CdkDrag,
+    CdkDragPlaceholder,
+    CdkDragHandle,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DragDropSortingComponent {
@@ -63,5 +77,6 @@ export class DragDropSortingComponent {
     this.sorted.emit(sorted);
   }
 
-  drop = (event: CdkDragDrop<ISorting[]>) => moveItemInArray(this.items(), event.previousIndex, event.currentIndex);
+  drop = (event: CdkDragDrop<ISorting[]>) =>
+    moveItemInArray(this.items(), event.previousIndex, event.currentIndex);
 }

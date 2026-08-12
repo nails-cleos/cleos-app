@@ -1,8 +1,10 @@
-<form (ngSubmit)="submit()"
-      [formGroup]="form"
-      class="app-surface-canvas app-surface-shell app-surface-stack statement-form"
-      novalidate
-      (keydown.enter)="$event.preventDefault()">
+<form
+  (ngSubmit)="submit()"
+  [formGroup]="form"
+  class="app-surface-canvas app-surface-shell app-surface-stack statement-form"
+  novalidate
+  (keydown.enter)="$event.preventDefault()"
+>
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
@@ -18,9 +20,20 @@
     <div class="app-surface-filter-grid statement-filter-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.MONTHLY.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <input
+          matInput
+          [matDatepicker]="dp"
+          [formControl]="getForm.date"
+          readonly
+          (click)="dp.open()"
+        />
         <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (monthSelected)="setMonthAndYear($event, dp)" touchUi>
+        <mat-datepicker
+          #dp
+          startView="multi-year"
+          (monthSelected)="setMonthAndYear($event, dp)"
+          touchUi
+        >
         </mat-datepicker>
       </mat-form-field>
 
@@ -29,10 +42,20 @@
       } @else {
         <mat-form-field appearance="outline">
           <mat-label>{{ 'COMMON.OFFICE.SEARCH' | translate }}</mat-label>
-          <input (keydown)="keyDownHandler($event)" [formControl]="getForm.office" [matAutocomplete]="autoOffice"
-                 autocomplete="off" matInput placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
-                 type="text" required>
-          <mat-autocomplete #autoOffice="matAutocomplete" [displayWith]="displayFnOffice">
+          <input
+            (keydown)="keyDownHandler($event)"
+            [formControl]="getForm.office"
+            [matAutocomplete]="autoOffice"
+            autocomplete="off"
+            matInput
+            placeholder="{{ 'COMMON.OFFICE.FIELD' | translate }}"
+            type="text"
+            required
+          />
+          <mat-autocomplete
+            #autoOffice="matAutocomplete"
+            [displayWith]="displayFnOffice"
+          >
             @for (office of filteredOfficeSignal(); track office.id) {
               <mat-option [value]="office">
                 {{ office.name }}
@@ -40,17 +63,25 @@
             }
           </mat-autocomplete>
           @if (getForm.office.hasError('required')) {
-            <mat-error [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COMMON.OFFICE.REQUIRED' | translate"
+            ></mat-error>
           } @else if (getForm.office.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'COMMON.OFFICE.INVALID' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'COMMON.OFFICE.INVALID' | translate"
+            ></mat-error>
           }
         </mat-form-field>
       }
     </div>
 
     @if (!form.invalid) {
-      <app-file-drop (fileSelected)="onSelectedFile($event)" [fileName]="fileName()" [animate]="false"
-                     [currentFile]="file()"></app-file-drop>
+      <app-file-drop
+        (fileSelected)="onSelectedFile($event)"
+        [fileName]="fileName()"
+        [animate]="false"
+        [currentFile]="file()"
+      ></app-file-drop>
     }
   </section>
 
@@ -59,7 +90,11 @@
       <mat-icon>arrow_back</mat-icon>
       <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
     </button>
-    <button [disabled]="form.invalid || !blob()" mat-stroked-button type="submit">
+    <button
+      [disabled]="form.invalid || !blob()"
+      mat-stroked-button
+      type="submit"
+    >
       <mat-icon>{{ getConfig.button.icon }}</mat-icon>
       <span>{{ getConfig.button.label | translate }}</span>
     </button>

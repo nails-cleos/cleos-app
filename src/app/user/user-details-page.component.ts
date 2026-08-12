@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { UserComponent } from './user.component';
 import { Role } from '../interfaces/token';
 import { IUser } from './user';
@@ -10,9 +16,9 @@ import { UserStore } from '../store/user.store';
   selector: 'app-user-details-page',
   template: `
     @if (user(); as user) {
-      <app-user [user]="user" [config]="config" (submitData)="submit($event)"/>
+      <app-user [user]="user" [config]="config" (submitData)="submit($event)" />
     } @else {
-      <app-skeleton [lines]="5" [boxes]="1"/>
+      <app-skeleton [lines]="5" [boxes]="1" />
     }
   `,
   imports: [UserComponent, SkeletonComponent],

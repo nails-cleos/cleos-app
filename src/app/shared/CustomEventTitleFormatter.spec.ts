@@ -1,21 +1,19 @@
-import { TranslateService } from '@ngx-translate/core';
 import { CustomEventTitleFormatter } from './CustomEventTitleFormatter';
-import { DEFAULT_LOCALE } from '../util/dates';
+import { describe, it, beforeEach, expect } from 'vitest';
+import { TestBed } from '@angular/core/testing';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CustomEventTitleFormatter', () => {
   let formatter: CustomEventTitleFormatter;
-  let translateService: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
-    translateService = jasmine.createSpyObj('TranslateService', [
-      'instant',
-      'getCurrentLang',
-    ]);
+    TestBed.configureTestingModule({
+      providers: [provideTranslateService()],
+    });
 
-    translateService.getCurrentLang.and.returnValue(DEFAULT_LOCALE);
-    translateService.instant.and.callFake((key: string) => key);
-
-    formatter = new CustomEventTitleFormatter(translateService);
+    formatter = TestBed.runInInjectionContext(
+      () => new CustomEventTitleFormatter(),
+    );
   });
 
   it('should return ALL_DAY label in month view when no end time', () => {
@@ -98,6 +96,8 @@ describe('CustomEventTitleFormatter', () => {
 
     const result = formatter.day(event);
 
-    expect(result).toContain('(19:00 - 20:00 GMT+09:00) <b>12:00 - 13:00</b>&nbsp; My event');
+    expect(result).toContain(
+      '(19:00 - 20:00 GMT+09:00) <b>12:00 - 13:00</b>&nbsp; My event',
+    );
   });
 });

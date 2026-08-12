@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IResponseSuccess, PageRequest } from '../interfaces/common';
 import { Pagination } from '../interfaces/pagination';
 import { IUnavailable, IUnavailableAll } from '../unavailable/unavailable';
@@ -16,16 +15,15 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import type { Subscription } from 'rxjs';
 
-const initialState = createStoreInitialState<Pagination<IUnavailableAll>, IUnavailableAll>();
+const initialState = createStoreInitialState<
+  Pagination<IUnavailableAll>,
+  IUnavailableAll
+>();
 
 export const UnavailableStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    unavailableService = inject(UnavailableService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, unavailableService = inject(UnavailableService)) => {
     let loadPageSubscription: Subscription | undefined;
     let loadByIdSubscription: Subscription | undefined;
     let createSubscription: Subscription | undefined;
@@ -41,10 +39,18 @@ export const UnavailableStore = signalStore(
       updateSubscription?.unsubscribe();
       deleteSubscription?.unsubscribe();
     };
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
-    const createResponse = (key: string, timestamp: number | undefined, path?: string): IResponseSuccess => ({
-      message: translateService.instant(key, { date: newDateTimestamp(timestamp) }),
+    const createResponse = (
+      messageKey: string,
+      timestamp: number | undefined,
+      path?: string,
+    ): IResponseSuccess => ({
+      messageKey,
+      messageParams: {
+        date: newDateTimestamp(timestamp),
+      },
       path,
       redirect: 'unavailable',
     });
@@ -67,8 +73,9 @@ export const UnavailableStore = signalStore(
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription =
-          unavailableService.getUnavailablePage(page, sort, direction, size).subscribe({
+        loadPageSubscription = unavailableService
+          .getUnavailablePage(page, sort, direction, size)
+          .subscribe({
             next: (data) => patchState(store, { data, isLoading: false }),
             error: patchError,
           });
@@ -88,66 +95,87 @@ export const UnavailableStore = signalStore(
         createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        createSubscription = unavailableService.createUnavailable(unavailable).subscribe({
-          next: (response) => patchState(store, {
-            response: createResponse(
-              'UNAVAILABLE.CREATED',
-              response.timestamp,
-              isRoomAdmin ? 'dashboard/events' : `unavailable/${ response.id }`,
-            ),
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        createSubscription = unavailableService
+          .createUnavailable(unavailable)
+          .subscribe({
+            next: (response) =>
+              patchState(store, {
+                response: createResponse(
+                  'UNAVAILABLE.CREATED',
+                  response.timestamp,
+                  isRoomAdmin
+                    ? 'dashboard/events'
+                    : `unavailable/${response.id}`,
+                ),
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       createBlockAgenda(unavailable: IUnavailable, isRoomAdmin: boolean): void {
         createBlockAgendaSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        createBlockAgendaSubscription = unavailableService.createBlockAgenda(unavailable).subscribe({
-          next: (response) => patchState(store, {
-            response: createResponse(
-              'UNAVAILABLE.CREATED',
-              response.timestamp,
-              isRoomAdmin ? 'dashboard/events' : `unavailable/block-agenda/${ response.id }`,
-            ),
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        createBlockAgendaSubscription = unavailableService
+          .createBlockAgenda(unavailable)
+          .subscribe({
+            next: (response) =>
+              patchState(store, {
+                response: createResponse(
+                  'UNAVAILABLE.CREATED',
+                  response.timestamp,
+                  isRoomAdmin
+                    ? 'dashboard/events'
+                    : `unavailable/block-agenda/${response.id}`,
+                ),
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       update(id: string, unavailable: IUnavailable, path: string): void {
         updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        updateSubscription = unavailableService.updateUnavailable(id, unavailable).subscribe({
-          next: (response) => patchState(store, {
-            response: createResponse('UNAVAILABLE.UPDATED.MESSAGE', response.timestamp, `${ path }/${ response.id }`),
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        updateSubscription = unavailableService
+          .updateUnavailable(id, unavailable)
+          .subscribe({
+            next: (response) =>
+              patchState(store, {
+                response: createResponse(
+                  'UNAVAILABLE.UPDATED.MESSAGE',
+                  response.timestamp,
+                  `${path}/${response.id}`,
+                ),
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       delete(id: string, timestamp: number, timeZone?: string): void {
         deleteSubscription?.unsubscribe();
         cleanCrudDelete(store);
 
-        deleteSubscription = unavailableService.deleteUnavailable(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('UNAVAILABLE.DELETED.MESSAGE', {
-                date: newDateTimestamp(timestamp, timeZone),
+        deleteSubscription = unavailableService
+          .deleteUnavailable(id)
+          .subscribe({
+            next: () =>
+              patchState(store, {
+                response: {
+                  messageKey: 'UNAVAILABLE.DELETED.MESSAGE',
+                  messageParams: {
+                    date: newDateTimestamp(timestamp, timeZone),
+                  },
+                  reload: true,
+                  toastType: 'warning',
+                },
+                isLoading: false,
               }),
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+            error: patchError,
+          });
       },
     };
   }),

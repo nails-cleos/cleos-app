@@ -1,16 +1,42 @@
-import { Component, computed, effect, ElementRef, HostListener, inject, signal, untracked } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { NavigationStart, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import {
+  NavigationStart,
+  Router,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+} from '@angular/router';
 import { IUser, User } from '../user/user';
 import { INotification } from '../notification/notification';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MessagingService } from '../services/messaging.service';
-import { getDisplayNameInitials, getLocale, getUserImage } from '../util/helper';
+import {
+  getDisplayNameInitials,
+  getLocale,
+  getUserImage,
+} from '../util/helper';
 import { NavigationService } from '../services/navigation.service';
 import { TokenService } from '../services/token.service';
 import { CookieService } from 'ngx-cookie-service';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { getThemeName, isDarkMode, resetTheme, Theme, THEME } from '../util/theme';
+import {
+  getThemeName,
+  isDarkMode,
+  resetTheme,
+  Theme,
+  THEME,
+} from '../util/theme';
 import { ThemeService } from 'ng2-charts';
 import { AuthUserService } from '../services/auth-user.service';
 import { SeoService } from '../services/seo.service';
@@ -25,15 +51,33 @@ import { ToastOptions } from '../shared/toast/toast.model';
 import { IResponseSuccess } from '../interfaces/common';
 import { EnvService } from '../services/env.service';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
-import { GLOBAL_FEEDBACK_SOURCE, GlobalFeedbackSource } from '../store/global-feedback-source';
+import {
+  GLOBAL_FEEDBACK_SOURCE,
+  GlobalFeedbackSource,
+} from '../store/global-feedback-source';
 import { MatIcon } from '@angular/material/icon';
-import { MatDivider, MatListItem, MatListItemIcon, MatNavList } from '@angular/material/list';
+import {
+  MatDivider,
+  MatListItem,
+  MatListItemIcon,
+  MatNavList,
+} from '@angular/material/list';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { DatePipe, UpperCasePipe } from '@angular/common';
 import { MatTooltip } from '@angular/material/tooltip';
-import { MatCard, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle } from '@angular/material/card';
+import {
+  MatCard,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle,
+} from '@angular/material/card';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
-import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/material/sidenav';
+import {
+  MatDrawer,
+  MatDrawerContainer,
+  MatDrawerContent,
+} from '@angular/material/sidenav';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatBadge } from '@angular/material/badge';
@@ -45,47 +89,81 @@ import { AuthStore } from '../store/auth.store';
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
-  imports: [MatIcon, MatListItem, MatIconButton, MatButton, TranslatePipe, RouterLink, DatePipe,
-    MatTooltip, MatListItemIcon, MatCard, MatCardHeader, MatCardTitle, MatCardSubtitle, MatCardContent,
-    MenuItemComponent, RouterLinkActive, RouterOutlet, ErrorComponent, MatProgressSpinner, MatDrawerContainer,
-    MatDrawer, AvatarComponent, UpperCasePipe, MatDivider, MatNavList, MatDrawerContent, MatToolbar, MatBadge],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    MatIcon,
+    MatListItem,
+    MatIconButton,
+    MatButton,
+    TranslatePipe,
+    RouterLink,
+    DatePipe,
+    MatTooltip,
+    MatListItemIcon,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardSubtitle,
+    MatCardContent,
+    MenuItemComponent,
+    RouterLinkActive,
+    RouterOutlet,
+    ErrorComponent,
+    MatProgressSpinner,
+    MatDrawerContainer,
+    MatDrawer,
+    AvatarComponent,
+    UpperCasePipe,
+    MatDivider,
+    MatNavList,
+    MatDrawerContent,
+    MatToolbar,
+    MatBadge,
+  ],
 })
 export class NavComponent {
   private readonly elementRef: ElementRef = inject(ElementRef);
   private readonly env: EnvService = inject(EnvService);
   private readonly tokenService: TokenService = inject(TokenService);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly router: Router = inject(Router);
   private readonly authStore = inject(AuthStore);
   private readonly notificationStore = inject(NotificationStore);
-  private readonly messagingService: MessagingService = inject(MessagingService);
+  private readonly messagingService: MessagingService =
+    inject(MessagingService);
   private readonly toastService: ToastService = inject(ToastService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly cookieService: CookieService = inject(CookieService);
-  private readonly overlayContainer: OverlayContainer = inject(OverlayContainer);
+  private readonly overlayContainer: OverlayContainer =
+    inject(OverlayContainer);
   private readonly themeService: ThemeService = inject(ThemeService);
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly seoService: SeoService = inject(SeoService);
   private readonly loadingService = inject(LoadingOverlayService);
-  private readonly feedbackSources = inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
+  private readonly feedbackSources =
+    inject(GLOBAL_FEEDBACK_SOURCE, { optional: true }) ?? [];
   private readonly userStore = inject(UserStore);
 
-  private breakpointObserver$ = this.breakpointObserver.observe(
-    [Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+    Breakpoints.Medium,
+  ]);
 
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-          [Breakpoints.Medium]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
+        [Breakpoints.Medium]: false,
       },
     },
-  );
+  });
 
   title = this.env.title;
 
@@ -93,11 +171,19 @@ export class NavComponent {
   private redirectSignal = this.authStore.redirect;
   private menuItemsSignal = this.authStore.menus;
   private notificationSignal = computed(() => this.notificationStore.data());
-  private dataDeletedSignal = computed(() => this.notificationStore.dataDeleted());
+  private dataDeletedSignal = computed(() =>
+    this.notificationStore.dataDeleted(),
+  );
   private dataReadSignal = computed(() => this.notificationStore.dataRead());
-  private messageSignal = toSignal(this.messagingService.message$ ?? of(undefined));
-  private readonly feedbackResponse = computed(() => this.findFeedbackSource(source => source.response()));
-  private readonly feedbackError = computed(() => this.findFeedbackSource(source => source.error()));
+  private messageSignal = toSignal(
+    this.messagingService.message$ ?? of(undefined),
+  );
+  private readonly feedbackResponse = computed(() =>
+    this.findFeedbackSource((source) => source.response()),
+  );
+  private readonly feedbackError = computed(() =>
+    this.findFeedbackSource((source) => source.error()),
+  );
 
   currentUserSignal = this.authStore.user;
 
@@ -109,11 +195,15 @@ export class NavComponent {
   isHandsetSignal = computed(() => this.breakpointsSignal()?.matches ?? false);
   showInformation = computed(() => !this.authUserSignal()?.isRoomAdmin);
   isAdmin = computed(() => this.authUserSignal()?.isAdmin ?? false);
-  isProfessional = computed(() => this.authUserSignal()?.isProfessional ?? false);
+  isProfessional = computed(
+    () => this.authUserSignal()?.isProfessional ?? false,
+  );
   isManager = computed(() => this.authUserSignal()?.isManager ?? false);
   menuItems = computed(() => this.menuItemsSignal() || []);
 
-  private readonly language = toSignal(this.navigationService.urlLanguage$, { initialValue: DEFAULT_LOCALE });
+  private readonly language = toSignal(this.navigationService.urlLanguage$, {
+    initialValue: DEFAULT_LOCALE,
+  });
 
   readonly languageSignal = computed(() => {
     const user = this.currentUserSignal();
@@ -121,7 +211,10 @@ export class NavComponent {
     return getLocale(user?.locale || this.language()).language;
   });
 
-  isDarkMode = signal(this.authUserSignal().isDarkMode || isDarkMode(this.cookieService.get(THEME) as Theme));
+  isDarkMode = signal(
+    this.authUserSignal().isDarkMode ||
+      isDarkMode(this.cookieService.get(THEME) as Theme),
+  );
   pageError = computed(() => {
     const error = this.feedbackError()?.value;
     return this.isBlockingPageError(error) ? error : undefined;
@@ -143,9 +236,11 @@ export class NavComponent {
 
   constructor() {
     this.authUserService.cookieConsent(this.translateService);
-    this.router.events.subscribe(event => {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
-        const feedbackError = this.findFeedbackSource(source => source.error());
+        const feedbackError = this.findFeedbackSource((source) =>
+          source.error(),
+        );
 
         if (this.isBlockingPageError(feedbackError?.value)) {
           feedbackError?.source.clearError();
@@ -179,9 +274,16 @@ export class NavComponent {
         URL.revokeObjectURL(url);
       }
 
-      if (response.message) {
+      const message = response.messageKey
+        ? this.translateService.instant(
+            response.messageKey,
+            response.messageParams,
+          )
+        : response.message;
+
+      if (message) {
         const options = this.getToastOptions(response);
-        this.toastService.show(response.message, response.toastType, 5000, options);
+        this.toastService.show(message, response.toastType, 5000, options);
         if (response.reload) {
           this.navigationService.reload();
         }
@@ -239,12 +341,12 @@ export class NavComponent {
       } as INotification;
 
       untracked(() => {
-        this.notifications.update(prev => {
+        this.notifications.update((prev) => {
           const next = [...prev, notification];
           return next.length > 9 ? next.slice(-9) : next;
         });
 
-        this.countNotifications.update(c => c + 1);
+        this.countNotifications.update((c) => c + 1);
         this.updateCount();
       });
     });
@@ -254,11 +356,16 @@ export class NavComponent {
       const redirectSignal = this.redirectSignal();
       const language = this.languageSignal();
       if (isAuthorized) {
-        this.notificationStore.loadPage({ page: 0, sort: 'date', direction: 'desc', size: PAGE_SIZE });
+        this.notificationStore.loadPage({
+          page: 0,
+          sort: 'date',
+          direction: 'desc',
+          size: PAGE_SIZE,
+        });
       } else {
         this.navigationService.resetConfig(language);
       }
-      if (this.router.url === `/${ language }`) {
+      if (this.router.url === `/${language}`) {
         if (isAuthorized && !redirectSignal) {
           this.authStore.authRedirect();
         } else {
@@ -277,8 +384,10 @@ export class NavComponent {
         this.workDay.set(notifications.workDay);
 
         if (notifications.page.number === 0) {
-          const updatedNotifications = notifications.page.content.map((it: INotification) =>
-            Object.assign({}, it, { notDate: newDateTimestamp(it.date) }));
+          const updatedNotifications = notifications.page.content.map(
+            (it: INotification) =>
+              Object.assign({}, it, { notDate: newDateTimestamp(it.date) }),
+          );
           this.notifications.set(updatedNotifications);
         }
 
@@ -297,17 +406,21 @@ export class NavComponent {
 
       untracked(() => {
         const currentNotifications = this.notifications();
-        const target = currentNotifications.find(it => it.id === readNotification.id);
+        const target = currentNotifications.find(
+          (it) => it.id === readNotification.id,
+        );
         const shouldDecreaseCounter = !target || !target.read;
 
         if (target) {
-          this.notifications.update(prev => prev.map(it => it.id === readNotification.id
-            ? { ...it, read: true }
-            : it));
+          this.notifications.update((prev) =>
+            prev.map((it) =>
+              it.id === readNotification.id ? { ...it, read: true } : it,
+            ),
+          );
         }
 
         if (shouldDecreaseCounter && this.countNotifications() > 0) {
-          this.countNotifications.update(prev => prev - 1);
+          this.countNotifications.update((prev) => prev - 1);
           this.updateCount();
         }
       });
@@ -324,12 +437,14 @@ export class NavComponent {
       }
 
       untracked(() => {
-        if (this.notifications().some(n => n.id === deleted.id)) {
-          this.notifications.update(prev => prev.filter(it => it.id !== deleted.id));
+        if (this.notifications().some((n) => n.id === deleted.id)) {
+          this.notifications.update((prev) =>
+            prev.filter((it) => it.id !== deleted.id),
+          );
         }
 
         if (!deleted.read && this.countNotifications() > 0) {
-          this.countNotifications.update(prev => prev - 1);
+          this.countNotifications.update((prev) => prev - 1);
         }
 
         this.updateCount();
@@ -346,7 +461,7 @@ export class NavComponent {
   }
 
   changeTheme() {
-    this.isDarkMode.update(prev => !prev);
+    this.isDarkMode.update((prev) => !prev);
     const theme = getThemeName(this.isDarkMode());
     this.resetTheme(theme);
     this.authUserService.updateMode(this.isDarkMode());
@@ -355,7 +470,8 @@ export class NavComponent {
       user.theme = theme;
       const redirectUrl = this.router.url;
       const message = this.translateService.instant(
-        `COMMON.PROFILE.UPDATED.DARK_MODE_${ this.isDarkMode().toString().toUpperCase() }`);
+        `COMMON.PROFILE.UPDATED.DARK_MODE_${this.isDarkMode().toString().toUpperCase()}`,
+      );
       this.userStore.updateMyUser(user, redirectUrl, message);
     }
   }
@@ -366,17 +482,19 @@ export class NavComponent {
       this.router.navigate([notification.navigation]);
     } else {
       if (this.countNotifications() > 0) {
-        this.countNotifications.update(prev => --prev);
+        this.countNotifications.update((prev) => --prev);
       }
       if (this.countNotifications() < 10) {
         this.plusNotification = undefined;
       }
-      this.notifications.update(prev => prev.map(value => {
-        if (value.id === notification.id) {
-          return Object.assign({}, value, { read: true });
-        }
-        return value;
-      }));
+      this.notifications.update((prev) =>
+        prev.map((value) => {
+          if (value.id === notification.id) {
+            return Object.assign({}, value, { read: true });
+          }
+          return value;
+        }),
+      );
       this.notificationStore.read(notification.id);
     }
   };
@@ -402,13 +520,22 @@ export class NavComponent {
   };
 
   private resetTheme = (theme?: Theme): void => {
-    this.cssClass = resetTheme(this.overlayContainer, this.cookieService, this.themeService, theme, this.cssClass);
+    this.cssClass = resetTheme(
+      this.overlayContainer,
+      this.cookieService,
+      this.themeService,
+      theme,
+      this.cssClass,
+    );
   };
 
   private getToastOptions = (res: IResponseSuccess): ToastOptions => {
     if (res.path) {
       // TODO if we change the href link we need to remove the language here.
-      return { actionType: 'link', action: `/${ this.languageSignal() }/${ res.path }` };
+      return {
+        actionType: 'link',
+        action: `/${this.languageSignal()}/${res.path}`,
+      };
     }
     return { actionType: 'none' };
   };
@@ -427,14 +554,16 @@ export class NavComponent {
   };
 
   toggleMenu = (menu: 'notifications' | 'workday' | 'settings'): void => {
-    this.activeMenu.update(current => current === menu ? null : menu);
+    this.activeMenu.update((current) => (current === menu ? null : menu));
   };
 
   closeActiveMenu = (): void => {
     this.activeMenu.set(null);
   };
 
-  @HostListener('document:click', ['$event']) onDocumentClick(event: MouseEvent): void {
+  @HostListener('document:click', ['$event']) onDocumentClick(
+    event: MouseEvent,
+  ): void {
     if (!this.elementRef.nativeElement.contains(event.target)) {
       this.closeActiveMenu();
     }

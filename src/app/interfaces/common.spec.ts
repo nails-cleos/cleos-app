@@ -1,7 +1,8 @@
 import { firstValueFrom, toArray } from 'rxjs';
 
 import { PAGE_SIZE } from './pagination';
-import { PageRequest, isString, success, successResponse } from './common';
+import { isString, PageRequest, success, successResponse } from './common';
+import { describe, expect, it } from 'vitest';
 
 describe('Common interface helpers', () => {
   it('should create page request with default page size', () => {
@@ -37,7 +38,14 @@ describe('Common interface helpers', () => {
       redirect: undefined,
     };
     const result = await firstValueFrom(
-      success(actionCreator, 'Saved', '/users', true, 'success', extraAction).pipe(toArray()),
+      success(
+        actionCreator,
+        'Saved',
+        '/users',
+        true,
+        'success',
+        extraAction,
+      ).pipe(toArray()),
     );
 
     expect(result).toEqual([
@@ -63,7 +71,9 @@ describe('Common interface helpers', () => {
     }) => ({ type: '[Test] Redirect', ...payload });
 
     const result = await firstValueFrom(
-      successResponse(actionCreator, 'Continue', '/auth', '/login').pipe(toArray()),
+      successResponse(actionCreator, 'Continue', '/auth', '/login').pipe(
+        toArray(),
+      ),
     );
 
     expect(result).toEqual([
@@ -79,8 +89,8 @@ describe('Common interface helpers', () => {
   });
 
   it('should detect strings', () => {
-    expect(isString('cleos')).toBeTrue();
-    expect(isString(10)).toBeFalse();
-    expect(isString({ value: 'x' })).toBeFalse();
+    expect(isString('cleos')).toBe(true);
+    expect(isString(10)).toBe(false);
+    expect(isString({ value: 'x' })).toBe(false);
   });
 });

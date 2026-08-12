@@ -141,18 +141,18 @@ export class ColorEvent implements EventColor {
 export enum SummaryType {
   payment = 'PAYMENT',
   expense = 'EXPENSE',
-  cash = 'CASH'
+  cash = 'CASH',
 }
 
 export enum ExpenseType {
   directCosts = 'DIRECT_COSTS',
   indirectCosts = 'INDIRECT_COSTS',
-  otherExpenses = 'OTHER_EXPENSES'
+  otherExpenses = 'OTHER_EXPENSES',
 }
 
 export enum AmountFormat {
   en = 'EN',
-  es = 'ES'
+  es = 'ES',
 }
 
 export interface ITotal {
@@ -166,7 +166,13 @@ export interface ITotalType {
   type: SummaryType;
   totals: Map<string, ITotal>;
 
-  withTotal(gross: number, net: number, btw: number, size: number, subType?: string): ITotalType;
+  withTotal(
+    gross: number,
+    net: number,
+    btw: number,
+    size: number,
+    subType?: string,
+  ): ITotalType;
 
   reset(subTypes?: string[]): ITotalType;
 }
@@ -181,12 +187,18 @@ export class TotalType implements ITotalType {
     if (!subTypes.length) {
       subTypes = [type.toString()];
     }
-    subTypes.forEach(it => {
+    subTypes.forEach((it) => {
       this.totals.set(it, new Total());
     });
   }
 
-  withTotal = (gross: number, net: number, btw: number, size: number, subType?: string): ITotalType => {
+  withTotal = (
+    gross: number,
+    net: number,
+    btw: number,
+    size: number,
+    subType?: string,
+  ): ITotalType => {
     const type = subType ?? this.type.toString();
     let total = this.totals.get(type);
     if (total) {
@@ -200,12 +212,11 @@ export class TotalType implements ITotalType {
     if (!subTypes.length) {
       subTypes = [this.type.toString()];
     }
-    subTypes.forEach(it => {
+    subTypes.forEach((it) => {
       this.totals.set(it, new Total());
     });
     return this;
   };
-
 }
 
 export interface ISummaryTotal extends ITotal {
@@ -279,8 +290,7 @@ export interface IYearRoomSummary extends ISummaryRoom {
   quarterSummaries: IQuarterSummary[];
 }
 
-export interface IQuarterRoomSummary extends ISummaryRoom, IQuarterSummary {
-}
+export interface IQuarterRoomSummary extends ISummaryRoom, IQuarterSummary {}
 
 export interface IMonthSummary {
   month: number;
@@ -328,20 +338,30 @@ export class MonthSummary implements IMonthSummary {
       totalWithoutGross,
       totalWithoutNet,
       totalWithoutBTW,
-    } = total.reduce((totals: any, next: ISummaryTotal) => {
-      const by = next.type === 'EXPENSE' ? -1 : 1;
-      totals.totalGross += next.gross * by;
-      totals.totalNet += next.net * by;
-      totals.totalBTW += next.btw * by;
+    } = total.reduce(
+      (totals: any, next: ISummaryTotal) => {
+        const by = next.type === 'EXPENSE' ? -1 : 1;
+        totals.totalGross += next.gross * by;
+        totals.totalNet += next.net * by;
+        totals.totalBTW += next.btw * by;
 
-      if (next.type !== 'CASH') {
-        totals.totalWithoutGross += next.gross * by;
-        totals.totalWithoutNet += next.net * by;
-        totals.totalWithoutBTW += next.btw * by;
-      }
+        if (next.type !== 'CASH') {
+          totals.totalWithoutGross += next.gross * by;
+          totals.totalWithoutNet += next.net * by;
+          totals.totalWithoutBTW += next.btw * by;
+        }
 
-      return totals;
-    }, { totalGross: 0, totalNet: 0, totalBTW: 0, totalWithoutGross: 0, totalWithoutNet: 0, totalWithoutBTW: 0 });
+        return totals;
+      },
+      {
+        totalGross: 0,
+        totalNet: 0,
+        totalBTW: 0,
+        totalWithoutGross: 0,
+        totalWithoutNet: 0,
+        totalWithoutBTW: 0,
+      },
+    );
     this.totalGross = totalGross;
     this.totalNet = totalNet;
     this.totalBTW = totalBTW;
@@ -357,7 +377,12 @@ export class Total implements ITotal {
   net: number;
   size: number;
 
-  constructor(gross: number = 0, btw: number = 0, net: number = 0, size: number = 0) {
+  constructor(
+    gross: number = 0,
+    btw: number = 0,
+    net: number = 0,
+    size: number = 0,
+  ) {
     this.btw = btw;
     this.gross = gross;
     this.net = net;
@@ -380,9 +405,13 @@ export class SummaryTotals implements ISummaryTotals {
   totalsWithoutCash: ITotal;
   totals: ITotal;
 
-
-  constructor(income: ITotal = new Total(), expense: ITotal = new Total(), cash: ITotal = new Total(),
-    totalsWithoutCash: ITotal = new Total(), totals: ITotal = new Total()) {
+  constructor(
+    income: ITotal = new Total(),
+    expense: ITotal = new Total(),
+    cash: ITotal = new Total(),
+    totalsWithoutCash: ITotal = new Total(),
+    totals: ITotal = new Total(),
+  ) {
     this.income = income;
     this.expense = expense;
     this.cash = cash;

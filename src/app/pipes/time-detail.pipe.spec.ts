@@ -1,4 +1,5 @@
 import { TimeDetailPipe } from './time-detail.pipe';
+import { describe, expect, it } from 'vitest';
 
 describe('TimeDetailPipe', () => {
   it('create an instance', () => {

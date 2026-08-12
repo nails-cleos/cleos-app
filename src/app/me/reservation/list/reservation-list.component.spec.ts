@@ -1,72 +1,94 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
 import { ReservationListComponent } from './reservation-list.component';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
-import { Price } from '../../../treatment/treatment';
-import { DiscountStore } from '../../../store/discount.store';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { Price } from '@app/treatment/treatment';
+import { DiscountStore } from '@app/store/discount.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { ReservationStore } from '../../../store/reservation.store';
-
+import { ReservationStore } from '@app/store/reservation.store';
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
   let fixture: ComponentFixture<ReservationListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let reservationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    loadAllByCustomer: jasmine.Spy;
-    createReview: jasmine.Spy;
-    clean: jasmine.Spy;
+    loadAllByCustomer: Mock;
+    createReview: Mock;
+    clean: Mock;
   };
 
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let discountStoreSpy: { clean: jasmine.Spy };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
+  let discountStoreSpy: {
+    clean: Mock;
+  };
 
   let breakpoints$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       isLoading: signal(false),
       data: signal(undefined),
       response: signal(undefined),
       error: signal(undefined),
-      loadAllByCustomer: jasmine.createSpy('loadAllByCustomer'),
-      createReview: jasmine.createSpy('createReview'),
-      clean: jasmine.createSpy('clean'),
+      loadAllByCustomer: vi.fn().mockName('loadAllByCustomer'),
+      createReview: vi.fn().mockName('createReview'),
+      clean: vi.fn().mockName('clean'),
     };
     breakpoints$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {},
     });
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    discountStoreSpy = { clean: jasmine.createSpy('clean') };
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    discountStoreSpy = { clean: vi.fn().mockName('clean') };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoints$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoints$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ReservationListComponent, TranslateModule.forRoot()],
+      imports: [ReservationListComponent],
       providers: [
+        provideTranslateService(),
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -91,8 +113,14 @@ describe('ReservationListComponent', () => {
 
   it('should initialize with correct default values', () => {
     expect(component.paginatorPageIndex()).toBe(0);
-    expect(component.displayedColumns)
-      .toEqual(['position', 'professional', 'timestamp', 'treatment', 'state', 'actions']);
+    expect(component.displayedColumns).toEqual([
+      'position',
+      'professional',
+      'timestamp',
+      'treatment',
+      'state',
+      'actions',
+    ]);
     expect(component.noContent()).toBe(true);
   });
 
@@ -102,7 +130,8 @@ describe('ReservationListComponent', () => {
 
   it('should compute resultsLength from reservationSignal', () => {
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: {
           totalElements: 42,
           content: [],
@@ -141,7 +170,7 @@ describe('ReservationListComponent', () => {
     reservationStoreSpy.isLoading.set(true);
     fixture.detectChanges();
 
-    expect(component.isLoading()).toBeTrue();
+    expect(component.isLoading()).toBe(true);
   });
 
   it('should update dataSource when customerReservation emits', () => {
@@ -167,7 +196,8 @@ describe('ReservationListComponent', () => {
     ];
 
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: {
           totalElements: 2,
           content: mockReservations,
@@ -183,7 +213,8 @@ describe('ReservationListComponent', () => {
 
   it('should set noContent to true when no upcoming reservations', () => {
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: {
           totalElements: 0,
           content: [],
@@ -198,29 +229,32 @@ describe('ReservationListComponent', () => {
 
   it('should set noContent to false when upcoming reservations exist', () => {
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: {
           totalElements: 1,
           content: [],
         },
-        upcoming: [{
-          id: '1',
-          state: 'completed',
-          timestamp: 1734012000000,
-          price: new Price(100, 0, 0, 0, 100),
-          treatment: { name: 'Treatment 1', price: 100, duration: 60 },
-          professional: { displayName: 'Dr. Smith' },
-          room: {
-            timeZone: 'UTC',
-            id: 'room-1',
-            address: { name: 'Address' },
-            currency: 'USD',
-            paymentTypes: ['CASH'],
+        upcoming: [
+          {
+            id: '1',
+            state: 'completed',
+            timestamp: 1734012000000,
+            price: new Price(100, 0, 0, 0, 100),
+            treatment: { name: 'Treatment 1', price: 100, duration: 60 },
+            professional: { displayName: 'Dr. Smith' },
+            room: {
+              timeZone: 'UTC',
+              id: 'room-1',
+              address: { name: 'Address' },
+              currency: 'USD',
+              paymentTypes: ['CASH'],
+            },
+            office: { id: 'office-1', name: 'Office' },
+            payments: [],
+            additional: [],
           },
-          office: { id: 'office-1', name: 'Office' },
-          payments: [],
-          additional: [],
-        }],
+        ],
       },
     });
     fixture.detectChanges();
@@ -266,7 +300,8 @@ describe('ReservationListComponent', () => {
     ];
 
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: { totalElements: 0, content: [] },
         upcoming: mockUpcoming,
       },
@@ -337,7 +372,8 @@ describe('ReservationListComponent', () => {
     };
 
     reservationStoreSpy.data.set({
-      kind: 'customerReservation', value: {
+      kind: 'customerReservation',
+      value: {
         reservations: mockReservations,
         upcoming: [],
       },

@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { CatalogueService } from './catalogue.service';
@@ -8,7 +9,13 @@ import { skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('CatalogueService', () => {
   let service: CatalogueService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete' | 'put'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    put: ReturnType<typeof vi.fn>;
+  };
 
   const mockCatalogue: ICatalogueAll = {
     contentType: '',
@@ -23,12 +30,15 @@ describe('CatalogueService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete', 'put']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+      put: vi.fn().mockName('HttpClient.put'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        CatalogueService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [CatalogueService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(CatalogueService);
   });
@@ -39,21 +49,23 @@ describe('CatalogueService', () => {
 
   describe('getAllCatalogues', () => {
     it('should get all catalogues', () => {
-      httpSpy.get.and.returnValue(of([mockCatalogue]));
+      httpSpy.get.mockReturnValue(of([mockCatalogue]));
 
-      service.getAllCatalogues().subscribe(result => {
+      service.getAllCatalogues().subscribe((result) => {
         expect(result).toEqual([mockCatalogue]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues', { ...skipLoadingOverlay() });
+      expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues', {
+        ...skipLoadingOverlay(),
+      });
     });
   });
 
   describe('getAll', () => {
     it('should get all catalogs', () => {
-      httpSpy.get.and.returnValue(of([mockCatalogue]));
+      httpSpy.get.mockReturnValue(of([mockCatalogue]));
 
-      service.getAllCatalogs().subscribe(result => {
+      service.getAllCatalogs().subscribe((result) => {
         expect(result).toEqual([mockCatalogue]);
       });
 
@@ -63,9 +75,9 @@ describe('CatalogueService', () => {
     });
 
     it('should get all home catalogs', () => {
-      httpSpy.get.and.returnValue(of([mockCatalogue]));
+      httpSpy.get.mockReturnValue(of([mockCatalogue]));
 
-      service.getAllHome().subscribe(result => {
+      service.getAllHome().subscribe((result) => {
         expect(result).toEqual([mockCatalogue]);
       });
 
@@ -76,30 +88,38 @@ describe('CatalogueService', () => {
   });
 
   it('should fetch single catalogue by id', () => {
-    httpSpy.get.and.returnValue(of(mockCatalogue));
+    httpSpy.get.mockReturnValue(of(mockCatalogue));
 
     service.getCatalogue('1').subscribe((result) => {
       expect(result).toEqual(mockCatalogue);
     });
 
-    expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues/1', { ...skipLoadingOverlay() });
+    expect(httpSpy.get).toHaveBeenCalledWith('v1/catalogues/1', {
+      ...skipLoadingOverlay(),
+    });
   });
 
   describe('createCatalogue', () => {
     it('should create catalogue with FormData and image', () => {
-      const mockDataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
-      const mockApiResponse = { id: 'response-123', name: 'Catalogue created successfully' };
-      httpSpy.post.and.returnValue(of(mockApiResponse));
+      const mockDataUrl =
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
+      const mockApiResponse = {
+        id: 'response-123',
+        name: 'Catalogue created successfully',
+      };
+      httpSpy.post.mockReturnValue(of(mockApiResponse));
 
-      service.createCatalogue(mockCatalogue as ICatalogue, mockDataUrl).subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .createCatalogue(mockCatalogue as ICatalogue, mockDataUrl)
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.post).toHaveBeenCalledWith(
         'v1/catalogues',
-        jasmine.any(FormData),
-        jasmine.objectContaining({
-          headers: jasmine.any(Object),
+        expect.any(FormData),
+        expect.objectContaining({
+          headers: expect.any(Object),
         }),
       );
     });
@@ -107,9 +127,9 @@ describe('CatalogueService', () => {
 
   describe('deleteCatalogue', () => {
     it('should delete catalogue by id', () => {
-      httpSpy.delete.and.returnValue(of(mockCatalogue));
+      httpSpy.delete.mockReturnValue(of(mockCatalogue));
 
-      service.deleteCatalogue('1').subscribe(result => {
+      service.deleteCatalogue('1').subscribe((result) => {
         expect(result).toEqual(mockCatalogue as ICatalogue);
       });
 
@@ -119,19 +139,25 @@ describe('CatalogueService', () => {
 
   describe('updateCatalogue', () => {
     it('should update catalogue with FormData and image', () => {
-      const mockDataUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
-      const mockApiResponse = { id: 'response-123', name: 'Catalogue updated successfully' };
-      httpSpy.patch.and.returnValue(of(mockApiResponse));
+      const mockDataUrl =
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQE=';
+      const mockApiResponse = {
+        id: 'response-123',
+        name: 'Catalogue updated successfully',
+      };
+      httpSpy.patch.mockReturnValue(of(mockApiResponse));
 
-      service.updateCatalogue('1', mockCatalogue as ICatalogue, mockDataUrl).subscribe(result => {
-        expect(result).toEqual(mockApiResponse);
-      });
+      service
+        .updateCatalogue('1', mockCatalogue as ICatalogue, mockDataUrl)
+        .subscribe((result) => {
+          expect(result).toEqual(mockApiResponse);
+        });
 
       expect(httpSpy.patch).toHaveBeenCalledWith(
         'v1/catalogues/1',
-        jasmine.any(FormData),
-        jasmine.objectContaining({
-          headers: jasmine.any(Object),
+        expect.any(FormData),
+        expect.objectContaining({
+          headers: expect.any(Object),
         }),
       );
     });
@@ -165,7 +191,7 @@ describe('CatalogueService', () => {
           image: undefined,
         },
       ];
-      httpSpy.put.and.returnValue(of(undefined));
+      httpSpy.put.mockReturnValue(of(undefined));
 
       service.updateCatalogueOrder(cataloguesAll).subscribe();
 
@@ -177,7 +203,7 @@ describe('CatalogueService', () => {
     });
 
     it('should handle empty catalogues array', () => {
-      httpSpy.put.and.returnValue(of(undefined));
+      httpSpy.put.mockReturnValue(of(undefined));
 
       service.updateCatalogueOrder([]).subscribe();
 

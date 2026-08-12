@@ -6,16 +6,23 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { ProfileComponent } from './profile/profile.component';
 import { provideFeatureTranslations } from '../shared/feature-providers';
 
-const providers = [
-  provideFeatureTranslations('auth'),
-];
+const providers = [provideFeatureTranslations('auth')];
 
 const children: Routes = [
   { path: '', component: AuthComponent, data: { error: 'error' } },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   {
-    path: 'profile', component: ProfileComponent, canActivate: [authGuard], data: {
-      roles: [Role.admin, Role.manager, Role.professional, Role.customer, Role.roomAdmin],
+    path: 'profile',
+    component: ProfileComponent,
+    canActivate: [authGuard],
+    data: {
+      roles: [
+        Role.admin,
+        Role.manager,
+        Role.professional,
+        Role.customer,
+        Role.roomAdmin,
+      ],
     },
   },
 ];

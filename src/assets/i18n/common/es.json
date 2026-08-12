@@ -444,15 +444,15 @@
   },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ 𝑷𝑹𝑶𝑿𝑰𝑴𝑨 𝑪𝑰𝑻𝑨 ♡%0A{{date}}%0A{{treatment}}%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ 𝑵𝒐𝒔 𝒗𝒆𝒎𝒐𝒔! ♡",
-      "TODAY": "♕𝑹𝒆𝒄𝒐𝒓𝒅𝒂𝒕𝒐𝒓𝒊𝒐 𝒅𝒆 𝒕𝒖𝒓𝒏𝒐♕%0Aℍ𝕠𝕝𝕒!!! ℍ𝕠𝕪 {{date}} ℍ𝕤 𝕥𝕖𝕟é𝕤 𝕥𝕦 𝕤𝕖𝕤𝕚ó𝕟 𝕕𝕖 𝕦ñ𝕒𝕤 ♡♡♡  ℂ𝕠𝕟𝕗í𝕣𝕞𝕒𝕞𝕖 𝕢𝕦𝕖 𝕒𝕤𝕚𝕤𝕥𝕚𝕣á𝕤 𝕡𝕠𝕣 𝕗𝕒𝕧𝕠𝕣.%0A%0A{{treatment}}%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ 𝑵𝒐𝒔 𝒗𝒆𝒎𝒐𝒔! ♡%0A❀ 𝔹𝕖𝕤𝕚𝕥𝕠 ❀",
+      "APPROVE": "♡ Próxima cita ♡%0A%0A📅 {{date}} %0A💅🏻 {{treatment}}%0A%0A⚠️ Las cancelaciones con menos de 24 horas de antelación conllevan un cargo del 50% del tratamiento.%0A%0A♡ ¡Nos vemos pronto! ♡",
+      "TODAY": "♕𝑹𝒆𝒄𝒐𝒓𝒅𝒂𝒕𝒐𝒓𝒊𝒐 𝒅𝒆 𝒕𝒖𝒓𝒏𝒐♕%0Aℍ𝕠𝕝𝕒!!! ℍ𝕠𝕪 {{date}} ℍ𝕤 𝕥𝕖𝕟é𝕤 𝕥𝕦 𝕤𝕖𝕤𝕚ó𝕟 𝕕𝕖 𝕦ñ𝕒𝕤 ♡♡♡  ℂ𝕠𝕟𝕗í𝕣𝕞𝕒𝕞𝕖 𝕢𝕦𝕖 𝕒𝕤𝕚𝕤𝕥𝕚𝕣á𝕤 𝕡𝕠𝕣 𝕗𝕒𝕧𝕠𝕣.%0A%0A{{treatment}}%0A%0A⚠️ Las cancelaciones con menos de 24 horas de antelación conllevan un cargo del 50% del tratamiento.%0A%0A♡ ¡Nos vemos pronto! ♡%0A❀ 𝔹𝕖𝕤𝕚𝕥𝕠 ❀",
       "COFFEE": "♡ RECORDATORIO ♡%0A%0A𝑴𝒂ñ𝒂𝒏𝒂 {{date}}, 𝑪𝒍𝒆𝒐𝒔 𝒕𝒆 𝒆𝒔𝒑𝒆𝒓𝒂!♡",
-      "TOMORROW": "♡ RECORDATORIO ♡%0A%0A𝑴𝒂ñ𝒂𝒏𝒂 {{date}}, 𝑪𝒍𝒆𝒐𝒔 𝒕𝒆 𝒆𝒔𝒑𝒆𝒓𝒂!%0A{{treatment}}%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ 𝑵𝒐𝒔 𝒗𝒆𝒎𝒐𝒔! ♡",
+      "TOMORROW": "♡ RECORDATORIO ♡%0A%0A𝑴𝒂ñ𝒂𝒏𝒂 {{date}}, 𝑪𝒍𝒆𝒐𝒔 𝒕𝒆 𝒆𝒔𝒑𝒆𝒓𝒂!%0A{{treatment}}%0A%0A⚠️ Las cancelaciones con menos de 24 horas de antelación conllevan un cargo del 50% del tratamiento.%0A%0A♡ ¡Nos vemos pronto! ♡",
       "FOLLOWINGS": {
         "TITLE": "𝑻𝒖𝒔 𝒓𝒆𝒔𝒆𝒓𝒗𝒂𝒔%0A",
         "VALUE": "%0A♡ {{date}}"
       },
-      "ATTENTION": "%0A%0A⚠️ ʟᴀ ᴄɪᴛᴀ ᴘᴜᴇᴅᴇ ꜱᴇʀ ᴄᴀɴᴄᴇʟᴀᴅᴀ, ꜱɪɴ ᴄᴀʀɢᴏ, ʜᴀꜱᴛᴀ 24ʜꜱ ᴀɴᴛᴇꜱ. ᴅᴇ ʟᴏ ᴄᴏɴᴛʀᴀʀɪᴏ ᴅᴇʙᴇʀᴀ ᴀʙᴏɴᴀʀ ᴀʟ ᴍᴇɴᴏꜱ ᴇʟ 50% ᴅᴇʟ ᴛʀᴀᴛᴀᴍɪᴇɴᴛᴏ. %0Aᴍᴜᴄʜᴀꜱ ɢʀᴀᴄɪᴀꜱ ᴘᴏʀ ᴄᴏᴍᴘʀᴇɴᴅᴇʀ!%0A%0A♡ 𝑵𝒐𝒔 𝒗𝒆𝒎𝒐𝒔! ♡"
+      "ATTENTION": "%0A%0A⚠️ Las cancelaciones con menos de 24 horas de antelación conllevan un cargo del 50% del tratamiento.%0A%0A♡ ¡Nos vemos pronto! ♡"
     }
   },
   "APP": {

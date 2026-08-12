@@ -1,8 +1,13 @@
 <div>
   @for (id of ratingArr; track id; let i = $index) {
     @if (canEdit()) {
-      <button [id]="'star_' + i" mat-icon-button (click)="onClick(i + 1)"
-              (mouseleave)="onHover(-1)" (mouseover)="onHover(i + 1)">
+      <button
+        [id]="'star_' + i"
+        mat-icon-button
+        (click)="onClick(i + 1)"
+        (mouseleave)="onHover(-1)"
+        (mouseover)="onHover(i + 1)"
+      >
         <mat-icon [fontSet]="fontSet(i)" [color]="setColor(i)">star</mat-icon>
       </button>
     } @else {
@@ -16,7 +21,7 @@
   text
 </p>
 @if (ratingSignal() > 0 && hoverSignal() < 1) {
-  <p [innerHTML]="rate() | translate:{rating: ratingSignal(), total: 5}"></p>
+  <p [innerHTML]="rate() | translate: { rating: ratingSignal(), total: 5 }"></p>
 }
 @if (hoverSignal() > 0) {
   <p>{{ 'REVIEW.RATING.' + hoverSignal() | translate }}</p>

@@ -7,34 +7,58 @@ import { TransactionDetailComponent } from './transaction/detail/transaction-det
 import { TransactionViewComponent } from './transaction/view/transaction-view.component';
 import { TransactionComponent } from './transaction/transaction.component';
 
-const providers = [
-  provideFeatureTranslations('account'),
-];
+const providers = [provideFeatureTranslations('account')];
 
 const children: Routes = [
   {
     path: 'customers/:customerId',
     component: AccountComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional] },
+    data: {
+      roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional],
+    },
   },
   {
     path: ':id/transactions/add',
     component: TransactionComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer] },
+    data: {
+      roles: [
+        Role.admin,
+        Role.roomAdmin,
+        Role.manager,
+        Role.professional,
+        Role.customer,
+      ],
+    },
   },
   {
     path: ':id/transactions/view',
     component: TransactionViewComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer] },
+    data: {
+      roles: [
+        Role.admin,
+        Role.roomAdmin,
+        Role.manager,
+        Role.professional,
+        Role.customer,
+      ],
+    },
   },
   {
     path: ':id/transactions/:transactionId',
     component: TransactionDetailComponent,
     canActivate: [authGuard],
-    data: { roles: [Role.admin, Role.roomAdmin, Role.manager, Role.professional, Role.customer] },
+    data: {
+      roles: [
+        Role.admin,
+        Role.roomAdmin,
+        Role.manager,
+        Role.professional,
+        Role.customer,
+      ],
+    },
   },
 ];
 

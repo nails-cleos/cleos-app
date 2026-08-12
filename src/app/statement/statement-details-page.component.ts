@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
 import { StatementComponent } from './statement.component';
 import { DocumentStore } from '../store/document.store';
 import { ICommon } from '../interfaces/common';
@@ -8,9 +15,13 @@ import { SkeletonComponent } from '../shared/skeleton/skeleton.component';
   selector: 'app-statement-details-page',
   template: `
     @if (statement(); as statement) {
-      <app-statement [statement]="statement" [config]="config" (submitData)="submit($event)"/>
+      <app-statement
+        [statement]="statement"
+        [config]="config"
+        (submitData)="submit($event)"
+      />
     } @else {
-      <app-skeleton/>
+      <app-skeleton />
     }
   `,
   imports: [StatementComponent, SkeletonComponent],
@@ -33,7 +44,12 @@ export class StatementDetailsPageComponent {
     });
   }
 
-  submit(data: { officeId: string; blob: Blob, fileName: string }) {
-    this.documentStore.uploadStatement(data.officeId, data.blob, data.fileName, this.id());
+  submit(data: { officeId: string; blob: Blob; fileName: string }) {
+    this.documentStore.uploadStatement(
+      data.officeId,
+      data.blob,
+      data.fileName,
+      this.id(),
+    );
   }
 }

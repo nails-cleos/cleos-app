@@ -7,7 +7,6 @@ import { toUrl } from '../util/helper';
   providedIn: 'root',
 })
 export class StatementService {
-
   private url = 'statements';
   private urlV1 = `v1/${this.url}`;
   private officeUrl = 'offices';
@@ -27,6 +26,10 @@ export class StatementService {
     formData.append('file', file, file.name);
 
     const headers = new HttpHeaders().set('Upload', 'true');
-    return this.http.post<void>(toUrl(this.urlV1, this.officeUrl, officeId), formData, { headers });
+    return this.http.post<void>(
+      toUrl(this.urlV1, this.officeUrl, officeId),
+      formData,
+      { headers },
+    );
   };
 }

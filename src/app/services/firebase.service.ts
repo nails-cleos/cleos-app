@@ -10,7 +10,10 @@ import {
   User,
   UserCredential,
 } from 'firebase/auth';
-import { fetchSignInMethodsForEmail, sendPasswordResetEmail } from '@firebase/auth';
+import {
+  fetchSignInMethodsForEmail,
+  sendPasswordResetEmail,
+} from '@firebase/auth';
 import { Observable } from 'rxjs';
 import { GetTokenOptions } from '@firebase/messaging';
 import { FirebaseSdkService } from './firebase.config';
@@ -19,7 +22,6 @@ import { FirebaseSdkService } from './firebase.config';
   providedIn: 'root',
 })
 export class FirebaseService {
-
   private readonly sdk: FirebaseSdkService = inject(FirebaseSdkService);
 
   private _user = signal<User | null>(null);
@@ -57,7 +59,9 @@ export class FirebaseService {
   }
 
   signUp(email: string, password: string): Promise<User> {
-    return createUserWithEmailAndPassword(this.sdk.auth, email, password).then((cred) => cred.user);
+    return createUserWithEmailAndPassword(this.sdk.auth, email, password).then(
+      (cred) => cred.user,
+    );
   }
 
   signIn(email: string, password: string): Promise<UserCredential> {
@@ -72,7 +76,13 @@ export class FirebaseService {
     return signInWithPopup(this.sdk.auth, provider);
   }
 
-  updateProfile({ displayName, photoURL }: { displayName?: string | null; photoURL?: string | null; }): Promise<void> {
+  updateProfile({
+    displayName,
+    photoURL,
+  }: {
+    displayName?: string | null;
+    photoURL?: string | null;
+  }): Promise<void> {
     const user = this.currentUser;
     if (!user) {
       return Promise.reject(new Error('No current user'));
@@ -111,11 +121,17 @@ export class FirebaseService {
   }
 
   onMessageReceived(): Observable<any> {
-    return new Observable(
-      (subscriber) => this.sdk.onMessage(this.sdk.messaging, (payload) => subscriber.next(payload)));
+    return new Observable((subscriber) =>
+      this.sdk.onMessage(this.sdk.messaging, (payload) =>
+        subscriber.next(payload),
+      ),
+    );
   }
 
   logEvent(name: string, params?: Record<string, any>): void {
-    this.sdk.logEvent(this.sdk.analytics, name, params);
+    const analytics = this.sdk.analytics;
+    if (analytics) {
+      this.sdk.logEvent(analytics, name, params);
+    }
   }
 }

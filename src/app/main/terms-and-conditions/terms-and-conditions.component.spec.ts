@@ -1,19 +1,31 @@
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
+import { provideHttpClient, withXhr } from '@angular/common/http';
+import {
+  HttpTestingController,
+  provideHttpClientTesting,
+} from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
-import { EnvService } from '../../services/env.service';
+import { EnvService } from '@app/services/env.service';
 import { TermsAndConditionsComponent } from './terms-and-conditions.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('TermsAndConditionsComponent', () => {
   let component: TermsAndConditionsComponent;
   let fixture: ComponentFixture<TermsAndConditionsComponent>;
   let navigationServiceSpy: {
     urlLanguage$: BehaviorSubject<any>;
-    navigate: jasmine.Spy;
-    scrollToAnchor: jasmine.Spy;
+    navigate: Mock;
+    scrollToAnchor: Mock;
   };
 
   let urlLanguage$: BehaviorSubject<string>;
@@ -34,10 +46,10 @@ describe('TermsAndConditionsComponent', () => {
   const termsContainer = (): HTMLElement =>
     fixture.nativeElement.querySelector('.section-style') as HTMLElement;
 
-  const flushTermsFile = (url: string, body: string): void => {
+  const flushTermsFile = async (url: string, body: string): Promise<void> => {
     httpMock.expectOne(url).flush(body);
     fixture.detectChanges();
-    tick();
+    await Promise.resolve();
     fixture.detectChanges();
   };
 
@@ -45,18 +57,18 @@ describe('TermsAndConditionsComponent', () => {
     urlLanguage$ = new BehaviorSubject(DEFAULT_LOCALE);
     navigationServiceSpy = {
       urlLanguage$: urlLanguage$,
-      navigate: jasmine.createSpy('navigate'),
-      scrollToAnchor: jasmine.createSpy('scrollToAnchor'),
+      navigate: vi.fn().mockName('navigate'),
+      scrollToAnchor: vi.fn().mockName('scrollToAnchor'),
     };
 
-    navigationServiceSpy.navigate.and.returnValue(Promise.resolve(true));
+    navigationServiceSpy.navigate.mockResolvedValue(true);
 
     await TestBed.configureTestingModule({
       imports: [TermsAndConditionsComponent],
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: EnvService, useValue: envMock },
-        provideHttpClient(),
+        provideHttpClient(withXhr()),
         provideHttpClientTesting(),
       ],
     }).compileComponents();
@@ -68,18 +80,18 @@ describe('TermsAndConditionsComponent', () => {
     httpMock?.verify();
   });
 
-  it('should create and configure meta tags', fakeAsync(() => {
+  it('should create and configure meta tags', async () => {
     createComponent();
 
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="general">General</section></main></div>',
     );
 
     expect(component).toBeTruthy();
-  }));
+  });
 
-  it('should load spanish terms file for /es route', fakeAsync(() => {
+  it('should load spanish terms file for /es route', async () => {
     urlLanguage$.next('es');
     createComponent();
 
@@ -90,9 +102,9 @@ describe('TermsAndConditionsComponent', () => {
 
     expect(termsContainer().innerHTML).toContain('Contenido es');
     httpMock.expectNone(`assets/legal/terms.${DEFAULT_LOCALE}.html`);
-  }));
+  });
 
-  it('should fallback to english terms file when locale file is missing', fakeAsync(() => {
+  it('should fallback to english terms file when locale file is missing', async () => {
     urlLanguage$.next('es');
     createComponent();
 
@@ -101,18 +113,18 @@ describe('TermsAndConditionsComponent', () => {
       statusText: 'Not Found',
     });
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       '<div class="layout"><main class="content"><section id="general">Fallback {{LANGUAGE}}</section></main></div>',
     );
 
     expect(termsContainer().innerHTML).toContain('Fallback es');
-  }));
+  });
 
-  it('should navigate to in-page fragment when clicking sidebar anchors', fakeAsync(() => {
+  it('should navigate to in-page fragment when clicking sidebar anchors', async () => {
     createComponent();
 
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="go-general" href="#general">General</a></nav></aside>
@@ -121,32 +133,41 @@ describe('TermsAndConditionsComponent', () => {
       `,
     );
 
-    navigationServiceSpy.navigate.calls.reset();
-    navigationServiceSpy.scrollToAnchor.calls.reset();
-    (fixture.nativeElement.querySelector('#go-general') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-    }));
-    tick();
+    navigationServiceSpy.navigate.mockClear();
+    navigationServiceSpy.scrollToAnchor.mockClear();
+    (
+      fixture.nativeElement.querySelector('#go-general') as HTMLAnchorElement
+    ).dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await Promise.resolve();
 
     expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
       ['home', 'term-and-conditions'],
       { fragment: 'general', replaceUrl: true },
-      jasmine.any(Function),
+      expect.any(Function),
     );
-    const callback =
-      navigationServiceSpy.navigate.calls.mostRecent().args[2] as () => void;
+    const callback = vi.mocked(navigationServiceSpy.navigate).mock
+      .lastCall?.[2] as () => void;
 
     callback();
 
-    expect(navigationServiceSpy.scrollToAnchor).toHaveBeenCalledOnceWith(jasmine.any(HTMLElement), 'general');
-  }));
+    expect(navigationServiceSpy.scrollToAnchor).toHaveBeenCalledTimes(1);
 
-  it('should ignore unsafe javascript links in content', fakeAsync(() => {
+    expect(navigationServiceSpy.scrollToAnchor).toHaveBeenCalledWith(
+      expect.any(HTMLElement),
+      'general',
+    );
+  });
+
+  it('should ignore unsafe javascript links in content', async () => {
     createComponent();
 
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
       <div class="layout">
         <aside class="sidebar"><nav><a id="unsafe-link" href="javascript:void(0)">Unsafe</a></nav></aside>
@@ -155,21 +176,25 @@ describe('TermsAndConditionsComponent', () => {
       `,
     );
 
-    navigationServiceSpy.navigate.calls.reset();
-    (fixture.nativeElement.querySelector('#unsafe-link') as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-    }));
-    tick();
+    navigationServiceSpy.navigate.mockClear();
+    (
+      fixture.nativeElement.querySelector('#unsafe-link') as HTMLAnchorElement
+    ).dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await Promise.resolve();
 
     expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should ignore mailto links in dynamic html', fakeAsync(() => {
+  it('should ignore mailto links in dynamic html', async () => {
     createComponent();
 
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -180,25 +205,27 @@ describe('TermsAndConditionsComponent', () => {
     `,
     );
 
-    navigationServiceSpy.navigate.calls.reset();
+    navigationServiceSpy.navigate.mockClear();
 
-    const link = fixture.nativeElement.querySelector('#mailto-link') as HTMLAnchorElement;
+    const link = fixture.nativeElement.querySelector(
+      '#mailto-link',
+    ) as HTMLAnchorElement;
 
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'target', { value: link });
 
     component.onHostClick(event);
 
-    tick();
+    await Promise.resolve();
 
     expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
-  }));
+  });
 
-  it('should ignore external http links', fakeAsync(() => {
+  it('should ignore external http links', async () => {
     createComponent();
 
     flushTermsFile(
-      `assets/legal/terms.${ DEFAULT_LOCALE }.html`,
+      `assets/legal/terms.${DEFAULT_LOCALE}.html`,
       `
     <div class="layout">
       <aside class="sidebar">
@@ -209,17 +236,19 @@ describe('TermsAndConditionsComponent', () => {
     `,
     );
 
-    navigationServiceSpy.navigate.calls.reset();
+    navigationServiceSpy.navigate.mockClear();
 
-    const link = fixture.nativeElement.querySelector('#external-link') as HTMLAnchorElement;
+    const link = fixture.nativeElement.querySelector(
+      '#external-link',
+    ) as HTMLAnchorElement;
 
     const event = new MouseEvent('click', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'target', { value: link });
 
     component.onHostClick(event);
 
-    tick();
+    await Promise.resolve();
 
     expect(navigationServiceSpy.navigate).not.toHaveBeenCalled();
-  }));
+  });
 });

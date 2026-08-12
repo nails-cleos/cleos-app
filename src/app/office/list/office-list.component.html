@@ -6,34 +6,53 @@
       @if (isLoading()) {
         <app-table-skeleton [columns]="tableColumns"></app-table-skeleton>
       } @else if (dataSourceSignal(); as dataSource) {
-        <table [dataSource]="dataSource" mat-table matSort matSortActive="name" matSortDirection="asc"
-               matSortDisableClear
-               multiTemplateDataRows>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
+          matSortDisableClear
+          multiTemplateDataRows
+        >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let office; let i = dataIndex;" mat-cell>
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            <td *matCellDef="let office; let i = dataIndex" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="name">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.COLUMN.NAME' | translate }}
+            </th>
             <td *matCellDef="let office" mat-cell>
               <div>{{ office.name }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="manager">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-                mat-sort-header>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}
             </th>
-            <td *matCellDef="let office" class="app-surface-hide-mobile" mat-cell>
+            <td
+              *matCellDef="let office"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               <div>{{ office.manager?.displayName }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="subject">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'OFFICE.SUBJECT.FIELD' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'OFFICE.SUBJECT.FIELD' | translate }}
+            </th>
             <td *matCellDef="let office" mat-cell>
               <div>{{ office.subject }}</div>
             </td>
@@ -41,20 +60,40 @@
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
-              <button [routerLink]="['/', language, 'offices', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'OFFICE.TITLE' | translate }}" matTooltipPosition="right" type="button">
+              <span class="app-surface-hide-mobile">{{
+                'COMMON.COLUMN.ACTIONS' | translate
+              }}</span>
+              <button
+                [routerLink]="['/', language, 'offices', 'add']"
+                mat-icon-button
+                id="add-button"
+                matTooltip="{{ 'OFFICE.TITLE' | translate }}"
+                matTooltipPosition="right"
+                type="button"
+              >
                 <mat-icon color="primary">add_business</mat-icon>
               </button>
             </th>
-            <td *matCellDef="let office" class="app-surface-hide-mobile" mat-cell>
+            <td
+              *matCellDef="let office"
+              class="app-surface-hide-mobile"
+              mat-cell
+            >
               @if (!office.deleted) {
-                <button (click)="edit(office)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}" matTooltipPosition="left">
+                <button
+                  (click)="edit(office)"
+                  mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.EDIT' | translate }}"
+                  matTooltipPosition="left"
+                >
                   <mat-icon color="primary">edit</mat-icon>
                 </button>
-                <button (click)="delete(office)" mat-icon-button
-                        matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}" matTooltipPosition="right">
+                <button
+                  (click)="delete(office)"
+                  mat-icon-button
+                  matTooltip="{{ 'COMMON.BUTTON.DELETE' | translate }}"
+                  matTooltipPosition="right"
+                >
                   <mat-icon color="warn">delete</mat-icon>
                 </button>
               }
@@ -62,20 +101,41 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let office" [attr.colspan]="displayedColumns.length" mat-cell>
-              <div [class.detail-expanded]="office === expanded" class="detail app-surface-hide-desktop">
+            <td
+              *matCellDef="let office"
+              [attr.colspan]="displayedColumns.length"
+              mat-cell
+            >
+              <div
+                [class.detail-expanded]="office === expanded"
+                class="detail app-surface-hide-desktop"
+              >
                 <mat-list>
                   <mat-list-item role="list">
-                    <div matListItemTitle>{{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}</div>
-                    <div matListItemLine>{{ office?.manager?.displayName }}</div>
+                    <div matListItemTitle>
+                      {{ 'OFFICE.LIST.COLUMN.MANAGER' | translate }}
+                    </div>
+                    <div matListItemLine>
+                      {{ office?.manager?.displayName }}
+                    </div>
                   </mat-list-item>
-                  <div mat-subheader>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <div mat-subheader>
+                    {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                  </div>
                   <mat-list-item role="list">
                     @if (!office.deleted) {
-                      <button (click)="edit(office)" color="primary" mat-icon-button>
+                      <button
+                        (click)="edit(office)"
+                        color="primary"
+                        mat-icon-button
+                      >
                         <mat-icon matListItemIcon>edit</mat-icon>
                       </button>
-                      <button (click)="delete(office)" color="warn" mat-icon-button>
+                      <button
+                        (click)="delete(office)"
+                        color="warn"
+                        mat-icon-button
+                      >
                         <mat-icon matListItemIcon>delete</mat-icon>
                       </button>
                     }
@@ -86,26 +146,46 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
               {{ 'OFFICE.LIST.ERROR.NO_CONTENT' | translate }}
             </td>
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr *matRowDef="let office; columns: displayedColumns;" class="app-surface-hide-mobile" mat-row></tr>
-          <tr (click)="expanded = expanded === office ? null : office"
-              *matRowDef="let office; columns: displayedColumns;"
-              class="app-surface-hide-desktop app-table-master-row"
-              mat-row></tr>
-          <tr *matRowDef="let row; columns: ['expandedDetail']"
-              [class.app-table-detail-row--expanded]="row === expanded"
-              class="app-surface-hide-desktop app-table-detail-row"
-              mat-row></tr>
+          <tr
+            *matRowDef="let office; columns: displayedColumns"
+            class="app-surface-hide-mobile"
+            mat-row
+          ></tr>
+          <tr
+            (click)="expanded = expanded === office ? null : office"
+            *matRowDef="let office; columns: displayedColumns"
+            class="app-surface-hide-desktop app-table-master-row"
+            mat-row
+          ></tr>
+          <tr
+            *matRowDef="let row; columns: ['expandedDetail']"
+            [class.app-table-detail-row--expanded]="row === expanded"
+            class="app-surface-hide-desktop app-table-detail-row"
+            mat-row
+          ></tr>
 
-          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
         </table>
         @if (resultsLength) {
-          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
         }
       }
     </div>

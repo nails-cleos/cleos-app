@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { IApiResponse } from '../interfaces/common';
 import { INote, INoteAll } from '../note/note';
 import { NoteService } from '../services/note.service';
@@ -19,11 +18,7 @@ const initialState = createStoreInitialState<INote, INoteAll>();
 export const NoteStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    noteService = inject(NoteService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, noteService = inject(NoteService)) => {
     let loadByIdSubscription: Subscription | undefined;
     let createSubscription: Subscription | undefined;
     let updateSubscription: Subscription | undefined;
@@ -37,7 +32,8 @@ export const NoteStore = signalStore(
       deleteSubscription?.unsubscribe();
       completeSubscription?.unsubscribe();
     };
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -68,14 +64,18 @@ export const NoteStore = signalStore(
         cleanCrudCreate(store);
 
         createSubscription = noteService.createNote(note).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('NOTE.CREATED.MESSAGE', { description: response.name }),
-              path: `notes/${ response.id }`,
-              redirect: 'reservation/calendar',
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) =>
+            patchState(store, {
+              response: {
+                messageKey: 'NOTE.CREATED.MESSAGE',
+                messageParams: {
+                  description: response.name,
+                },
+                path: `notes/${response.id}`,
+                redirect: 'reservation/calendar',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -85,14 +85,18 @@ export const NoteStore = signalStore(
         cleanCrudUpdate(store);
 
         updateSubscription = noteService.updateNote(id, note).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('NOTE.UPDATED.MESSAGE', { description: response.name }),
-              path: `notes/${ response.id }`,
-              redirect: 'reservation/calendar',
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) =>
+            patchState(store, {
+              response: {
+                messageKey: 'NOTE.UPDATED.MESSAGE',
+                messageParams: {
+                  description: response.name,
+                },
+                path: `notes/${response.id}`,
+                redirect: 'reservation/calendar',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -102,13 +106,17 @@ export const NoteStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = noteService.deleteNote(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('NOTE.UPDATED.MESSAGE', { description }),
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'NOTE.DELETED.MESSAGE',
+                messageParams: {
+                  description,
+                },
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -118,14 +126,18 @@ export const NoteStore = signalStore(
         cleanCrudUpdate(store);
 
         completeSubscription = noteService.completeNote(id).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('NOTE.COMPLETED.MESSAGE', { description: response.name }),
-              path: `notes/${ response.id }`,
-              redirect: 'reservation/calendar',
-            },
-            isLoading: false,
-          }),
+          next: (response: IApiResponse) =>
+            patchState(store, {
+              response: {
+                messageKey: 'NOTE.COMPLETED.MESSAGE',
+                messageParams: {
+                  description: response.name,
+                },
+                path: `notes/${response.id}`,
+                redirect: 'reservation/calendar',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },

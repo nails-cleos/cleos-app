@@ -1,12 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DialogComponent } from './dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DialogComponent', () => {
   let component: DialogComponent;
   let fixture: ComponentFixture<DialogComponent>;
-  let mockDialogRef: jasmine.SpyObj<MatDialogRef<DialogComponent>>;
+  let mockDialogRef: Pick<MatDialogRef<DialogComponent>, 'close'> & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockData = {
     title: 'Test Title',
@@ -17,11 +20,14 @@ describe('DialogComponent', () => {
   };
 
   beforeEach(async () => {
-    mockDialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    mockDialogRef = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [DialogComponent, TranslateModule.forRoot()],
+      imports: [DialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } }, // Create fresh copy each time
       ],
@@ -48,7 +54,7 @@ describe('DialogComponent', () => {
   it('should render the dialog title', () => {
     const compiled = fixture.nativeElement;
     const titleElement = compiled.querySelector('h1[mat-dialog-title]');
-    expect(titleElement.textContent).toBe(mockData.title);
+    expect(titleElement.textContent.trim()).toBe(mockData.title);
   });
 
   it('should render the dialog content', () => {
@@ -59,25 +65,33 @@ describe('DialogComponent', () => {
 
   it('should show both buttons when both hideNoButton and hideOkButton are false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = compiled.querySelectorAll('.app-surface-dialog-actions button');
+    const buttons = compiled.querySelectorAll(
+      '.app-surface-dialog-actions button',
+    );
     expect(buttons.length).toBe(2);
   });
 
   it('should show No button when hideNoButton is false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
+    const buttons = Array.from(
+      compiled.querySelectorAll('.app-surface-dialog-actions button'),
+    ) as HTMLButtonElement[];
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.NO'),
+    );
     expect(noButton).toBeTruthy();
   });
 
-
   it('should show Yes button when hideOkButton is false', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
-    const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.YES'));
+    const buttons = Array.from(
+      compiled.querySelectorAll('.app-surface-dialog-actions button'),
+    ) as HTMLButtonElement[];
+    const yesButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.YES'),
+    );
     expect(yesButton).toBeTruthy();
   });
-
 
   it('should pass correct value to mat-dialog-close directive', () => {
     const testValue = 'test-value';
@@ -91,8 +105,12 @@ describe('DialogComponent', () => {
 
   it('should call dialogRef.close when No button is clicked', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
+    const buttons = Array.from(
+      compiled.querySelectorAll('.app-surface-dialog-actions button'),
+    ) as HTMLButtonElement[];
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.NO'),
+    );
     expect(noButton).toBeTruthy();
     noButton?.click();
 
@@ -101,18 +119,28 @@ describe('DialogComponent', () => {
 
   it('should have cdkFocusInitial directive on No button', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
+    const buttons = Array.from(
+      compiled.querySelectorAll('.app-surface-dialog-actions button'),
+    ) as HTMLButtonElement[];
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.NO'),
+    );
     expect(noButton).toBeTruthy();
-    expect(noButton?.hasAttribute('cdkfocusinitial')).toBeTrue();
+    expect(noButton?.hasAttribute('cdkfocusinitial')).toBe(true);
   });
 
   it('should display translated button texts', () => {
     const compiled = fixture.nativeElement;
-    const buttons = Array.from(compiled.querySelectorAll('.app-surface-dialog-actions button')) as HTMLButtonElement[];
+    const buttons = Array.from(
+      compiled.querySelectorAll('.app-surface-dialog-actions button'),
+    ) as HTMLButtonElement[];
 
-    const noButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.NO'));
-    const yesButton = buttons.find(btn => btn.textContent?.includes('COMMON.BUTTON.YES'));
+    const noButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.NO'),
+    );
+    const yesButton = buttons.find((btn) =>
+      btn.textContent?.includes('COMMON.BUTTON.YES'),
+    );
 
     expect(noButton?.textContent?.trim()).toContain('COMMON.BUTTON.NO');
     expect(yesButton?.textContent?.trim()).toContain('COMMON.BUTTON.YES');
@@ -128,7 +156,7 @@ describe('DialogComponent', () => {
     component.data.variant = 'warning';
     fixture.detectChanges();
 
-    expect(component.isWarning).toBeTrue();
+    expect(component.isWarning).toBe(true);
     expect(component.icon).toBe('warning_amber');
     expect(component.confirmColor).toBe('warn');
   });

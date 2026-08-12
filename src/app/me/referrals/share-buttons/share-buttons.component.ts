@@ -14,12 +14,17 @@ export class ShareButtonsComponent {
   url = input<string>('');
 
   shareOnWhatsApp(): void {
-    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(this.message()));
+    window.open(
+      'https://api.whatsapp.com/send?text=' +
+        encodeURIComponent(this.message()),
+    );
     return;
   }
 
   shareOnMessenger(): void {
-    window.open('fb-messenger://share/?link=' + encodeURIComponent(this.message()));
+    window.open(
+      'fb-messenger://share/?link=' + encodeURIComponent(this.message()),
+    );
     return;
   }
 

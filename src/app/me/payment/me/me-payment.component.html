@@ -2,35 +2,85 @@
   <div class="card-container">
     <div class="card-content">
       @let payment = paymentSignal();
-      <form (ngSubmit)="update()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+      <form
+        (ngSubmit)="update()"
+        [formGroup]="form"
+        novalidate
+        (keydown.enter)="$event.preventDefault()"
+      >
         <mat-card appearance="outlined">
           <mat-card-header>
             <mat-card-title
-              [innerHTML]="'COMMON.PAYMENT.TO_PAY' | translate: {amount: payment?.amount | number:'1.2-2', symbol: payment?.reservation?.room?.currency | currencySymbol}">
+              [innerHTML]="
+                'COMMON.PAYMENT.TO_PAY'
+                  | translate
+                    : {
+                        amount:
+                          $safeNavigationMigration(payment?.amount)
+                          | number: '1.2-2',
+                        symbol:
+                          $safeNavigationMigration(
+                            payment?.reservation?.room?.currency
+                          ) | currencySymbol,
+                      }
+              "
+            >
             </mat-card-title>
             <mat-card-subtitle>
               @if (payment?.reservation) {
-                <button mat-icon-button [routerLink]="['/', language, 'reservation', payment?.reservation?.id]"
-                        type="button">
-                  <mat-icon>visibility</mat-icon>
-                </button>&nbsp;
-                <span [innerHTML]="'ME.PAYMENT.RESERVATION' | translate: {reservationId: payment?.reservation?.id}">
+                <button
+                  mat-icon-button
+                  [routerLink]="[
+                    '/',
+                    language,
+                    'reservation',
+                    $safeNavigationMigration(payment?.reservation?.id),
+                  ]"
+                  type="button"
+                >
+                  <mat-icon>visibility</mat-icon></button
+                >&nbsp;
+                <span
+                  [innerHTML]="
+                    'ME.PAYMENT.RESERVATION'
+                      | translate
+                        : {
+                            reservationId: $safeNavigationMigration(
+                              payment?.reservation?.id
+                            ),
+                          }
+                  "
+                >
                 </span>
               }
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
             <div class="inner-container">
-              <app-bank [firstTime]="true" [form]="form" [options]="options()"></app-bank>
+              <app-bank
+                [firstTime]="true"
+                [form]="form"
+                [options]="options()"
+              ></app-bank>
             </div>
           </mat-card-content>
           <mat-card-actions class="app-surface-actions">
             <div class="app-detail-actions">
-              <button [form]="form" appBackButton mat-stroked-button type="button">
+              <button
+                [form]="form"
+                appBackButton
+                mat-stroked-button
+                type="button"
+              >
                 <mat-icon>keyboard_return</mat-icon>
                 <span>{{ 'COMMON.BUTTON.BACK' | translate }}</span>
               </button>
-              <button [disabled]="form.invalid" mat-stroked-button class="icon-button" type="submit">
+              <button
+                [disabled]="form.invalid"
+                mat-stroked-button
+                class="icon-button"
+                type="submit"
+              >
                 {{ 'COMMON.BUTTON.PAYMENT' | translate }}
               </button>
             </div>

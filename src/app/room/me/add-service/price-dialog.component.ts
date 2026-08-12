@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import {
   MAT_DIALOG_DATA,
@@ -9,7 +15,12 @@ import {
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { ServiceType } from '../../room';
-import { MatError, MatFormField, MatInput, MatLabel } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 
@@ -27,19 +38,35 @@ type PriceForm = {
   selector: 'app-price-dialog',
   templateUrl: 'price-dialog.component.html',
   styleUrls: ['./price-dialog.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, MatError, ReactiveFormsModule,
-    MatDialogTitle, MatDialogContent, MatDialogActions],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatError,
+    ReactiveFormsModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PriceDialogComponent {
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
-  private readonly dialogRef: MatDialogRef<PriceDialogComponent> = inject(MatDialogRef<PriceDialogComponent>);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
+  private readonly dialogRef: MatDialogRef<PriceDialogComponent> = inject(
+    MatDialogRef<PriceDialogComponent>,
+  );
 
   readonly data = inject<PriceDialogData>(MAT_DIALOG_DATA);
 
   form: FormGroup<PriceForm> = this.formBuilder.group<PriceForm>({
-    price: this.formBuilder.control(this.data.currentPrice ?? 0,
-      { validators: [Validators.required, Validators.min(1)] }),
+    price: this.formBuilder.control(this.data.currentPrice ?? 0, {
+      validators: [Validators.required, Validators.min(1)],
+    }),
   });
 
   get getForm(): PriceForm {

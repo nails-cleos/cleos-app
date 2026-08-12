@@ -1,26 +1,45 @@
-<form (ngSubmit)="submit()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+<form
+  (ngSubmit)="submit()"
+  [formGroup]="form"
+  novalidate
+  (keydown.enter)="$event.preventDefault()"
+>
   <div class="app-surface-dialog-shell">
     <div class="app-surface-dialog-header">
       <div class="app-surface-dialog-title-wrap">
         <div class="app-surface-dialog-badge" aria-hidden="true">
           <mat-icon>payments</mat-icon>
         </div>
-        <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'ROOM.ME.SERVICES.ADD' | translate }}</h1>
+        <h1 mat-dialog-title class="app-surface-dialog-title">
+          {{ 'ROOM.ME.SERVICES.ADD' | translate }}
+        </h1>
       </div>
     </div>
 
     <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
     <div mat-dialog-content class="app-surface-dialog-content">
-      <p class="app-surface-dialog-copy">{{ 'ROOM.ME.SERVICES.PRICE.TEXT' | translate: { name: data.name } }}</p>
+      <p class="app-surface-dialog-copy">
+        {{ 'ROOM.ME.SERVICES.PRICE.TEXT' | translate: { name: data.name } }}
+      </p>
 
       <mat-form-field appearance="outline">
         <mat-label>{{ 'ROOM.ME.SERVICES.PRICE.FIELD' | translate }}</mat-label>
-        <input [formControl]="getForm.price" matInput min="1" required type="number">
+        <input
+          [formControl]="getForm.price"
+          matInput
+          min="1"
+          required
+          type="number"
+        />
         @if (getForm.price.hasError('required')) {
-          <mat-error [innerHTML]="'ROOM.ME.SERVICES.PRICE.REQUIRED' | translate"></mat-error>
+          <mat-error
+            [innerHTML]="'ROOM.ME.SERVICES.PRICE.REQUIRED' | translate"
+          ></mat-error>
         } @else if (getForm.price.hasError('min')) {
-          <mat-error>{{ 'ROOM.ME.SERVICES.PRICE.GREATER' | translate }}</mat-error>
+          <mat-error>{{
+            'ROOM.ME.SERVICES.PRICE.GREATER' | translate
+          }}</mat-error>
         }
       </mat-form-field>
     </div>
@@ -29,10 +48,20 @@
 
     <div mat-dialog-actions class="app-surface-dialog-actions">
       <div class="app-surface-dialog-spacer"></div>
-      <button (click)="onNoClick()" cdkFocusInitial mat-stroked-button type="button">
+      <button
+        (click)="onNoClick()"
+        cdkFocusInitial
+        mat-stroked-button
+        type="button"
+      >
         {{ 'COMMON.BUTTON.CANCEL' | translate }}
       </button>
-      <button [disabled]="form.invalid" color="primary" mat-flat-button type="submit">
+      <button
+        [disabled]="form.invalid"
+        color="primary"
+        mat-flat-button
+        type="submit"
+      >
         Ok
       </button>
     </div>

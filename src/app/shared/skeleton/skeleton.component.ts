@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-skeleton',
@@ -36,31 +36,34 @@ import { Component, input } from '@angular/core';
       </section>
     </div>
   `,
-  styles: [`
-    .app-skeleton-header {
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-    }
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: [
+    `
+      .app-skeleton-header {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+      }
 
-    .app-skeleton-actions {
-      margin-top: 24px;
-    }
+      .app-skeleton-actions {
+        margin-top: 24px;
+      }
 
-    .app-skeleton-actions__button {
-      width: 168px;
-      max-width: 100%;
-      height: 44px;
-      border-radius: 999px;
-    }
+      .app-skeleton-actions__button {
+        width: 168px;
+        max-width: 100%;
+        height: 44px;
+        border-radius: 999px;
+      }
 
-    .app-skeleton-subtitle {
-      width: min(320px, 100%);
-      height: 16px;
-      margin-top: 12px;
-      border-radius: 999px;
-    }
-  `],
+      .app-skeleton-subtitle {
+        width: min(320px, 100%);
+        height: 16px;
+        margin-top: 12px;
+        border-radius: 999px;
+      }
+    `,
+  ],
 })
 export class SkeletonComponent {
   showTitle = input<boolean>(true);

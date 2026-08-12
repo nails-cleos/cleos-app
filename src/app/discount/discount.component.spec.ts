@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DiscountComponent } from './discount.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../services/toast.service';
 import { DiscountType, IDiscountAll } from './discount';
 import { ICurrency } from '../currency/currency';
@@ -9,16 +9,26 @@ import { signal } from '@angular/core';
 import { DiscountStore } from '../store/discount.store';
 import { ICommon } from '../interfaces/common';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('DiscountComponent', () => {
   let component: DiscountComponent;
   let fixture: ComponentFixture<DiscountComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let discountStoreSpy: {
     subErrors: ReturnType<typeof signal>;
   };
-  let toastServiceSpy: jasmine.SpyObj<ToastService>;
+
+  let toastServiceSpy: {
+    show: Mock;
+  };
 
   const mockCurrency: ICurrency = {
     id: '1',
@@ -42,17 +52,22 @@ describe('DiscountComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     discountStoreSpy = {
       subErrors: signal<any>(undefined),
     };
-    toastServiceSpy = jasmine.createSpyObj('ToastService', ['show']);
+    toastServiceSpy = {
+      show: vi.fn().mockName('ToastService.show'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [DiscountComponent, TranslateModule.forRoot()],
+      imports: [DiscountComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
@@ -87,16 +102,19 @@ describe('DiscountComponent', () => {
     discountStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
-    expect(component.getForm.currency.hasError('incorrect')).toBeTrue();
-    expect(component.getForm.type.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
+    expect(component.getForm.currency.hasError('incorrect')).toBe(true);
+    expect(component.getForm.type.hasError('incorrect')).toBe(true);
     expect(component.errors()['name']).toBe('Name required');
     expect(component.errors()['currency']).toBe('Currency invalid');
     expect(component.errors()['type']).toBe('Type required');
   });
 
   it('should filter groups correctly using filteredCurrencySignal', () => {
-    fixture.componentRef.setInput('currencies', [mockCurrency, { id: '2', name: 'USD', code: 'USD', icon: 'dollar' }]);
+    fixture.componentRef.setInput('currencies', [
+      mockCurrency,
+      { id: '2', name: 'USD', code: 'USD', icon: 'dollar' },
+    ]);
     (component.getForm.currency as any).setValue('U');
     fixture.detectChanges();
 
@@ -106,7 +124,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should not dispatch when form invalid on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     // ensure form invalid
@@ -119,7 +137,7 @@ describe('DiscountComponent', () => {
   });
 
   it('should update form values correctly on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
 
     const nameControl = component.getForm.name;
@@ -142,13 +160,15 @@ describe('DiscountComponent', () => {
 
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'New Name',
-      description: 'New Description',
-      type: DiscountType.percentage,
-      currencyId: mockCurrency.id,
-      amount: 15,
-    }));
+    expect(emitSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New Name',
+        description: 'New Description',
+        type: DiscountType.percentage,
+        currencyId: mockCurrency.id,
+        amount: 15,
+      }),
+    );
   });
 
   it('displayFnCurrency should return group name', () => {

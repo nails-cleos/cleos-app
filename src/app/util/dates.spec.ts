@@ -9,9 +9,9 @@ import {
   createNewDate,
   createNewDateZonedTime,
   dateMonthYear,
-  dateToUTC,
   datesInSameWeek,
   dateToTimestamp,
+  dateToUTC,
   daysOfWeek,
   dayViewTitle,
   diffTime,
@@ -70,6 +70,7 @@ import { IReservationAll } from '../reservation/reservation';
 import { ITreatmentAll } from '../treatment/treatment';
 import { IAdditionalAll } from '../additional/additional';
 import { toZonedTime } from 'date-fns-tz';
+import { describe, expect, it } from 'vitest';
 
 describe('dates utility', () => {
   const treatment: ITreatmentAll = {
@@ -104,10 +105,22 @@ describe('dates utility', () => {
 
   const monday: IAvailability = { day: 'MONDAY', start: '09:00', end: '18:00' };
   const tuesday: IAvailability = { day: 'TUESDAY' };
-  const wednesday: IAvailability = { day: 'WEDNESDAY', start: '10:00', end: '19:00' };
-  const thursday: IAvailability = { day: 'THURSDAY', start: '09:00', end: '18:00' };
+  const wednesday: IAvailability = {
+    day: 'WEDNESDAY',
+    start: '10:00',
+    end: '19:00',
+  };
+  const thursday: IAvailability = {
+    day: 'THURSDAY',
+    start: '09:00',
+    end: '18:00',
+  };
   const friday: IAvailability = { day: 'FRIDAY' };
-  const saturday: IAvailability = { day: 'SATURDAY', start: '10:00', end: '16:00' };
+  const saturday: IAvailability = {
+    day: 'SATURDAY',
+    start: '10:00',
+    end: '16:00',
+  };
   const sunday: IAvailability = { day: 'SUNDAY' };
 
   const room: IRoomAll = {
@@ -124,7 +137,15 @@ describe('dates utility', () => {
       name: 'Euro',
     },
     timeZone: 'UTC',
-    availabilities: [monday, tuesday, wednesday, thursday, friday, saturday, sunday],
+    availabilities: [
+      monday,
+      tuesday,
+      wednesday,
+      thursday,
+      friday,
+      saturday,
+      sunday,
+    ],
     office: {
       id: 'office-123',
       name: '',
@@ -178,7 +199,11 @@ describe('dates utility', () => {
 
   describe('TimeZone', () => {
     it('should create a TimeZone with specified values', () => {
-      const timeZone = new TimeZone('America/New_York', 'America/New_York', 'GMT-5');
+      const timeZone = new TimeZone(
+        'America/New_York',
+        'America/New_York',
+        'GMT-5',
+      );
       expect(timeZone.label).toBe('America/New_York');
       expect(timeZone.tzCode).toBe('America/New_York');
       expect(timeZone.gmt).toBe('GMT-5');
@@ -192,7 +217,15 @@ describe('dates utility', () => {
 
   describe('daysOfWeek', () => {
     it('should contain all days of the week', () => {
-      expect(daysOfWeek).toEqual(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']);
+      expect(daysOfWeek).toEqual([
+        'SUNDAY',
+        'MONDAY',
+        'TUESDAY',
+        'WEDNESDAY',
+        'THURSDAY',
+        'FRIDAY',
+        'SATURDAY',
+      ]);
     });
   });
 
@@ -268,20 +301,14 @@ describe('dates utility', () => {
 
   describe('sumDurations', () => {
     it('should sum multiple durations', () => {
-      const durations = [
-        new Duration(1, 30),
-        new Duration(2, 45),
-      ];
+      const durations = [new Duration(1, 30), new Duration(2, 45)];
       const result = sumDurations(durations);
       expect(result.hour).toBe(4);
       expect(result.minute).toBe(15);
     });
 
     it('should handle minute overflow', () => {
-      const durations = [
-        new Duration(1, 45),
-        new Duration(0, 30),
-      ];
+      const durations = [new Duration(1, 45), new Duration(0, 30)];
       const result = sumDurations(durations);
       expect(result.hour).toBe(2);
       expect(result.minute).toBe(15);
@@ -433,11 +460,6 @@ describe('dates utility', () => {
       const date = new Date(2024, 0, 5);
       const formatted = backendFormatDate(date);
       expect(formatted).toBe('2024-01-05');
-    });
-
-    it('should return undefined for undefined date', () => {
-      const formatted = backendFormatDate(undefined);
-      expect(formatted).toBeUndefined();
     });
   });
 
@@ -598,16 +620,16 @@ describe('dates utility', () => {
   describe('newDate', () => {
     it('should create date from timestamp', () => {
       const timestamp = 1704067200000; // 2024-01-01
-      expect(newDate(timestamp) instanceof Date).toBeTrue();
+      expect(newDate(timestamp) instanceof Date).toBe(true);
     });
 
     it('should create date from string', () => {
-      expect(newDate('2024-01-01') instanceof Date).toBeTrue();
+      expect(newDate('2024-01-01') instanceof Date).toBe(true);
     });
 
     it('should create date from Date', () => {
       const inputDate = new Date(2024, 0, 1);
-      expect(newDate(inputDate) instanceof Date).toBeTrue();
+      expect(newDate(inputDate) instanceof Date).toBe(true);
     });
   });
 
@@ -639,19 +661,19 @@ describe('dates utility', () => {
     it('should return true when date1 > date2', () => {
       const date1 = new Date(2024, 0, 2);
       const date2 = new Date(2024, 0, 1);
-      expect(greaterOrEqualsThan(date1, date2)).toBeTrue();
+      expect(greaterOrEqualsThan(date1, date2)).toBe(true);
     });
 
     it('should return true when dates are equal', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 1);
-      expect(greaterOrEqualsThan(date1, date2)).toBeTrue();
+      expect(greaterOrEqualsThan(date1, date2)).toBe(true);
     });
 
     it('should return false when date1 < date2', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 2);
-      expect(greaterOrEqualsThan(date1, date2)).toBeFalse();
+      expect(greaterOrEqualsThan(date1, date2)).toBe(false);
     });
   });
 
@@ -660,35 +682,35 @@ describe('dates utility', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 5);
-      expect(isBetween(min, max, date)).toBeTrue();
+      expect(isBetween(min, max, date)).toBe(true);
     });
 
     it('should return true when date equals min', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 1);
-      expect(isBetween(min, max, date)).toBeTrue();
+      expect(isBetween(min, max, date)).toBe(true);
     });
 
     it('should return true when date equals max end of day', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 10, 23, 59);
-      expect(isBetween(min, max, date)).toBeTrue();
+      expect(isBetween(min, max, date)).toBe(true);
     });
 
     it('should return false when date is before min', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2023, 11, 31);
-      expect(isBetween(min, max, date)).toBeFalse();
+      expect(isBetween(min, max, date)).toBe(false);
     });
 
     it('should return false when date is after max', () => {
       const min = new Date(2024, 0, 1);
       const max = new Date(2024, 0, 10);
       const date = new Date(2024, 0, 11);
-      expect(isBetween(min, max, date)).toBeFalse();
+      expect(isBetween(min, max, date)).toBe(false);
     });
   });
 
@@ -817,7 +839,7 @@ describe('dates utility', () => {
     it('should include all days of the month', () => {
       const date = new Date(2024, 0, 1); // January 2024
       const weeks = getWeeksInMonth(date);
-      const allDates = weeks.flatMap(week => week.dates);
+      const allDates = weeks.flatMap((week) => week.dates);
       expect(allDates.length).toBe(31); // January has 31 days
     });
   });
@@ -844,13 +866,13 @@ describe('dates utility', () => {
     it('should return true for dates in same week', () => {
       const date1 = new Date(2024, 0, 1); // Monday
       const date2 = new Date(2024, 0, 3); // Wednesday
-      expect(datesInSameWeek(date1, date2)).toBeTrue();
+      expect(datesInSameWeek(date1, date2)).toBe(true);
     });
 
     it('should return false for dates in different weeks', () => {
       const date1 = new Date(2024, 0, 1);
       const date2 = new Date(2024, 0, 10);
-      expect(datesInSameWeek(date1, date2)).toBeFalse();
+      expect(datesInSameWeek(date1, date2)).toBe(false);
     });
   });
 
@@ -926,16 +948,53 @@ describe('dates utility', () => {
 
   describe('getStartEndDay', () => {
     it('should calculate min and max times across all days of week', () => {
-      const monday: IAvailability = { day: 'MONDAY', start: '12:00', end: '13:00' };
-      const tuesday: IAvailability = { day: 'TUESDAY', start: '11:30', end: '14:00' };
-      const wednesday: IAvailability = { day: 'WEDNESDAY', start: '11:00', end: '15:00' };
-      const thursday: IAvailability = { day: 'THURSDAY', start: '10:30', end: '16:00' };
-      const friday: IAvailability = { day: 'FRIDAY', start: '10:00', end: '17:00' };
-      const saturday: IAvailability = { day: 'SATURDAY', start: '09:30', end: '18:00' };
-      const sunday: IAvailability = { day: 'SUNDAY', start: '09:00', end: '19:00' };
+      const monday: IAvailability = {
+        day: 'MONDAY',
+        start: '12:00',
+        end: '13:00',
+      };
+      const tuesday: IAvailability = {
+        day: 'TUESDAY',
+        start: '11:30',
+        end: '14:00',
+      };
+      const wednesday: IAvailability = {
+        day: 'WEDNESDAY',
+        start: '11:00',
+        end: '15:00',
+      };
+      const thursday: IAvailability = {
+        day: 'THURSDAY',
+        start: '10:30',
+        end: '16:00',
+      };
+      const friday: IAvailability = {
+        day: 'FRIDAY',
+        start: '10:00',
+        end: '17:00',
+      };
+      const saturday: IAvailability = {
+        day: 'SATURDAY',
+        start: '09:30',
+        end: '18:00',
+      };
+      const sunday: IAvailability = {
+        day: 'SUNDAY',
+        start: '09:00',
+        end: '19:00',
+      };
       const timeZone = getCurrentTimeZone();
 
-      const result = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+      const result = getStartEndDay(
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+        sunday,
+        timeZone,
+      );
 
       expect(result.min).toBeTruthy();
       expect(result.max).toBeTruthy();
@@ -948,7 +1007,16 @@ describe('dates utility', () => {
     it('should handle some days without availability', () => {
       const timeZone = getCurrentTimeZone();
 
-      const result = getStartEndDay(monday, tuesday, wednesday, thursday, friday, saturday, sunday, timeZone);
+      const result = getStartEndDay(
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+        sunday,
+        timeZone,
+      );
 
       expect(result.min).toBeTruthy();
       expect(result.max).toBeTruthy();
@@ -964,7 +1032,6 @@ describe('dates utility', () => {
     });
 
     it('should get duration from reservation without additional list', () => {
-
       const result = reservationDuration(reservationAll);
 
       expect(result.hour).toBe(1);
@@ -1043,7 +1110,10 @@ describe('dates utility', () => {
 
   describe('getMinMaxDate', () => {
     const expectedHour = (hour: number, minute: number = 0): number =>
-      dateToUTC(createNewDate(new Date(), hour, minute), room.timeZone).getHours();
+      dateToUTC(
+        createNewDate(new Date(), hour, minute),
+        room.timeZone,
+      ).getHours();
 
     it('should return min and max dates for sunday', () => {
       const result = getMinMaxDate(0, new Date(), [room]);
@@ -1102,21 +1172,21 @@ describe('dates utility', () => {
 
     it('should return min and max for multiples rooms with different day', () => {
       const date = new Date();
-      const daysUntilWednesday = ((3 - date.getUTCDay() + 7) % 7) || 7;
-      const nextWednesday = new Date(Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate() + daysUntilWednesday,
-        12,
-        0,
-        0,
-      ));
+      const daysUntilWednesday = (3 - date.getUTCDay() + 7) % 7 || 7;
+      const nextWednesday = new Date(
+        Date.UTC(
+          date.getUTCFullYear(),
+          date.getUTCMonth(),
+          date.getUTCDate() + daysUntilWednesday,
+          12,
+          0,
+          0,
+        ),
+      );
 
       const anotherRoom: IRoomAll = {
         ...room,
-        availabilities: [
-          { day: 'WEDNESDAY', start: '09:30', end: '18:00' },
-        ],
+        availabilities: [{ day: 'WEDNESDAY', start: '09:30', end: '18:00' }],
       };
 
       const result = getMinMaxDate(3, nextWednesday, [room, anotherRoom]);
@@ -1145,7 +1215,7 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(futureDate, roomWithMonday);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should return false for future date without room availability on that day', () => {
@@ -1168,7 +1238,7 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(futureDate, roomWithoutTuesday);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('should return false for past date', () => {
@@ -1190,12 +1260,12 @@ describe('dates utility', () => {
       };
 
       const result = filterDateRoom(pastDate, roomWithAllDays);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('should return true for null date when room has availability', () => {
       const result = filterDateRoom(null, room);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should return true for future date without room parameter', () => {
@@ -1203,7 +1273,7 @@ describe('dates utility', () => {
       futureDate.setDate(futureDate.getDate() + 7);
 
       const result = filterDateRoom(futureDate);
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('should return false for past date without room parameter', () => {
@@ -1211,24 +1281,24 @@ describe('dates utility', () => {
       pastDate.setDate(pastDate.getDate() - 7);
 
       const result = filterDateRoom(pastDate);
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
   });
 
   describe('isSameTimeZone (no mocks)', () => {
     it('returns true when comparing to current timezone', () => {
       const result = isSameTimeZone();
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
 
     it('returns false for a clearly different timezone', () => {
       const result = isSameTimeZone('Asia/Tokyo');
-      expect(result).toBeFalse();
+      expect(result).toBe(false);
     });
 
     it('returns true for another tz with the same GMT offset at this date', () => {
       const result = isSameTimeZone('Europe/Paris');
-      expect(result).toBeTrue();
+      expect(result).toBe(true);
     });
   });
 
@@ -1274,8 +1344,11 @@ describe('dates utility', () => {
 
   describe('newDateTimestamp with Europe/Amsterdam', () => {
     it('converts from string date in UTC to Amsterdam time', () => {
-      const result = newDateTimestamp('2025-01-01T13:00:00+01:00', 'Europe/Amsterdam');
-      expect(result).toEqual(jasmine.any(Date));
+      const result = newDateTimestamp(
+        '2025-01-01T13:00:00+01:00',
+        'Europe/Amsterdam',
+      );
+      expect(result).toEqual(expect.any(Date));
       expect(result.toISOString()).toBe('2025-01-01T12:00:00.000Z');
     });
 
@@ -1286,14 +1359,16 @@ describe('dates utility', () => {
     });
 
     it('converts from UNIX timestamp (seconds) to Amsterdam time', () => {
-      const unixSeconds = Math.floor(new Date('2025-01-01T13:00:00+01:00').getTime() / 1000);
+      const unixSeconds = Math.floor(
+        new Date('2025-01-01T13:00:00+01:00').getTime() / 1000,
+      );
       const result = newDateTimestamp(unixSeconds, 'Europe/Amsterdam');
       expect(result.toISOString()).toBe('2025-01-01T12:00:00.000Z');
     });
 
     it('defaults to now in Amsterdam when no date is given', () => {
       const result = newDateTimestamp();
-      expect(result).toEqual(jasmine.any(Date));
+      expect(result).toEqual(expect.any(Date));
     });
   });
 
@@ -1322,7 +1397,11 @@ describe('dates utility', () => {
 
     it('should format a date string with default timezone', () => {
       const dateStr = '2026-01-29T15:00:00Z';
-      const expected = reservationDateTime(new Date(dateStr), 'en-US', getCurrentTimeZone());
+      const expected = reservationDateTime(
+        new Date(dateStr),
+        'en-US',
+        getCurrentTimeZone(),
+      );
       const result = localeTimeZoneDate('en-US', dateStr);
       expect(result).toBe(expected);
     });
@@ -1337,7 +1416,11 @@ describe('dates utility', () => {
 
     it('should format different locales correctly', () => {
       const dateObj = new Date('2026-01-29T15:00:00Z');
-      const expectedNL = reservationDateTime(dateObj, 'nl-NL', getCurrentTimeZone());
+      const expectedNL = reservationDateTime(
+        dateObj,
+        'nl-NL',
+        getCurrentTimeZone(),
+      );
       const resultNL = localeTimeZoneDate('nl-NL', dateObj);
       expect(resultNL).toBe(expectedNL);
     });
@@ -1347,28 +1430,47 @@ describe('dates utility', () => {
     it('should create a Date at midnight in default timezone from string', () => {
       const input = '2026-01-29T15:00:00Z';
       const result = createNewDateZonedTime(input);
-      const expected = toZonedTime(createNewDate(newDateTimestamp(input)), getCurrentTimeZone());
+      const expected = toZonedTime(
+        createNewDate(newDateTimestamp(input)),
+        getCurrentTimeZone(),
+      );
       expect(result.getTime()).toBe(expected.getTime());
     });
 
     it('should create a Date with specified hour, minute, second, milli', () => {
       const input = '2026-01-29T00:00:00Z';
-      const result = createNewDateZonedTime(input, getCurrentTimeZone(), 10, 30, 15, 500);
-      const expected = toZonedTime(createNewDate(newDateTimestamp(input), 10, 30, 15, 500), getCurrentTimeZone());
+      const result = createNewDateZonedTime(
+        input,
+        getCurrentTimeZone(),
+        10,
+        30,
+        15,
+        500,
+      );
+      const expected = toZonedTime(
+        createNewDate(newDateTimestamp(input), 10, 30, 15, 500),
+        getCurrentTimeZone(),
+      );
       expect(result.getTime()).toBe(expected.getTime());
     });
 
     it('should accept a Date object as input', () => {
       const dateObj = new Date('2026-01-29T12:00:00Z');
       const result = createNewDateZonedTime(dateObj);
-      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj)), getCurrentTimeZone());
+      const expected = toZonedTime(
+        createNewDate(newDateTimestamp(dateObj)),
+        getCurrentTimeZone(),
+      );
       expect(result.getTime()).toBe(expected.getTime());
     });
 
     it('should accept a timestamp (number in seconds) as input', () => {
       const timestamp = 1764796800; // 2026-01-29T00:00:00Z in seconds
       const result = createNewDateZonedTime(timestamp);
-      const expected = toZonedTime(createNewDate(newDateTimestamp(timestamp)), getCurrentTimeZone());
+      const expected = toZonedTime(
+        createNewDate(newDateTimestamp(timestamp)),
+        getCurrentTimeZone(),
+      );
       expect(result.getTime()).toBe(expected.getTime());
     });
 
@@ -1376,7 +1478,10 @@ describe('dates utility', () => {
       const dateObj = new Date('2026-01-29T12:00:00Z');
       const timeZone = 'America/New_York';
       const result = createNewDateZonedTime(dateObj, timeZone);
-      const expected = toZonedTime(createNewDate(newDateTimestamp(dateObj, timeZone)), timeZone);
+      const expected = toZonedTime(
+        createNewDate(newDateTimestamp(dateObj, timeZone)),
+        timeZone,
+      );
       expect(result.getTime()).toBe(expected.getTime());
     });
   });

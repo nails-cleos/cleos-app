@@ -22,8 +22,16 @@
   --app-avatar-placeholder-border: 1px solid var(--app-surface-card-border);
   --app-avatar-background: var(--app-surface-card-bg);
   --app-avatar-placeholder-background:
-    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white), transparent 24%),
-    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white), color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089));
+    radial-gradient(
+      circle at 30% 25%,
+      color-mix(in srgb, var(--accent-color, #dcc8c2) 28%, white),
+      transparent 24%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent-color, #dcc8c2) 72%, white),
+      color-mix(in srgb, var(--primary-color, #b5ac9e) 78%, #d5b089)
+    );
   --app-avatar-font-size: 2.25rem;
   flex: 0 0 112px;
 }
@@ -119,7 +127,11 @@
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--accent-color, #dcc8c2) 20%, var(--app-surface-card-bg));
+  background: color-mix(
+    in srgb,
+    var(--accent-color, #dcc8c2) 20%,
+    var(--app-surface-card-bg)
+  );
   border: 1px solid var(--app-surface-card-border);
 }
 
@@ -276,18 +288,34 @@
 
 :host-context(.dark-theme) .overview-avatar {
   --app-avatar-placeholder-background:
-    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--accent-color, #ceb4ac) 22%, white), transparent 24%),
-    linear-gradient(145deg, color-mix(in srgb, var(--accent-color, #ceb4ac) 38%, #3a312b), color-mix(in srgb, var(--primary-color, #9d9282) 34%, #241f1a));
+    radial-gradient(
+      circle at 30% 25%,
+      color-mix(in srgb, var(--accent-color, #ceb4ac) 22%, white),
+      transparent 24%
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--accent-color, #ceb4ac) 38%, #3a312b),
+      color-mix(in srgb, var(--primary-color, #9d9282) 34%, #241f1a)
+    );
 }
 
 :host-context(.dark-theme) .overview-stat-card__icon {
-  background: color-mix(in srgb, var(--accent-color, #ceb4ac) 16%, var(--app-surface-card-bg));
+  background: color-mix(
+    in srgb,
+    var(--accent-color, #ceb4ac) 16%,
+    var(--app-surface-card-bg)
+  );
   border: 1px solid var(--app-surface-card-border);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 :host-context(.dark-theme) .overview-stat-card__plus-button {
-  background: linear-gradient(180deg, var(--app-detail-action-hover-top), var(--app-detail-action-hover-bottom));
+  background: linear-gradient(
+    180deg,
+    var(--app-detail-action-hover-top),
+    var(--app-detail-action-hover-bottom)
+  );
   color: var(--app-detail-action-text) !important;
   border: 1px solid var(--app-detail-action-border-hover);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24);

@@ -1,36 +1,55 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject, of } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IReservation } from '../../../reservation/reservation';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../../interfaces/pagination';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { IReservation } from '@app/reservation/reservation';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
 import { ReservationTableComponent } from './reservation-table.component';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../../services/auth-user.service';
-import { IUser } from '../../../user/user';
-import { IRoom } from '../../../room/room';
-import { ITreatment } from '../../../treatment/treatment';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
+import { IUser } from '@app/user/user';
+import { IRoom } from '@app/room/room';
+import { ITreatment } from '@app/treatment/treatment';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
-import { ReservationStore } from '../../../store/reservation.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { ReservationStore } from '@app/store/reservation.store';
 
 describe('ReservationTableComponent', () => {
   let component: ReservationTableComponent;
   let fixture: ComponentFixture<ReservationTableComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let reservationStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     error: ReturnType<typeof signal>;
-    loadPage: jasmine.Spy;
-    delete: jasmine.Spy;
+    loadPage: Mock;
+    delete: Mock;
   };
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
 
   const customer: IUser = {
     id: 'customer1',
@@ -67,15 +86,16 @@ describe('ReservationTableComponent', () => {
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     reservationStoreSpy = {
       isLoading: signal(false),
       data: signal({ kind: 'pagination', value: mockPagination }),
       error: signal(undefined),
-      loadPage: jasmine.createSpy('loadPage'),
-      delete: jasmine.createSpy('delete'),
+      loadPage: vi.fn().mockName('loadPage'),
+      delete: vi.fn().mockName('delete'),
     };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -85,21 +105,29 @@ describe('ReservationTableComponent', () => {
       },
     });
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [ReservationTableComponent, TranslateModule.forRoot()],
+      imports: [ReservationTableComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: ReservationStore, useValue: reservationStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
@@ -165,49 +193,54 @@ describe('ReservationTableComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.componentRef.setInput('professionalId', professional.id);
     fixture.componentRef.setInput('all', true);
     fixture.componentRef.setInput('roomId', room.id);
     fixture.detectChanges();
 
-    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith(
-      {
-        page: 1,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        roomId: room.id,
-        all: true,
-        professionalId: professional.id,
-      },
-    );
+    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 1,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      roomId: room.id,
+      all: true,
+      professionalId: professional.id,
+    });
   });
 
   it('should dispatch getReservationPage first time', () => {
     fixture.detectChanges();
 
-    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith(
-      {
-        page: 0,
-        sort: 'timestamp',
-        direction: 'desc',
-        size: PAGE_SIZE,
-        roomId: undefined,
-        professionalId: undefined,
-        all: false,
-      },
-    );
+    expect(reservationStoreSpy.loadPage).toHaveBeenCalledWith({
+      page: 0,
+      sort: 'timestamp',
+      direction: 'desc',
+      size: PAGE_SIZE,
+      roomId: undefined,
+      professionalId: undefined,
+      all: false,
+    });
   });
 
   it('should dispatch deleteReservation when dialog returns a result', () => {
     const item = mockReservation[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(reservationStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.timestamp!, item.room!.timeZone!);
+    expect(reservationStoreSpy.delete).toHaveBeenCalledWith(
+      item.id!,
+      item.timestamp!,
+      item.room!.timeZone!,
+    );
   });
 });

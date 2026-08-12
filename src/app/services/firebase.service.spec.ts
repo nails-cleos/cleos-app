@@ -1,48 +1,86 @@
-import { fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
 import { FirebaseService } from './firebase.service';
 import { FirebaseSdkService } from './firebase.config';
+interface FirebaseSdkMock {
+  auth: {
+    currentUser: any;
+    authStateReady: ReturnType<typeof vi.fn>;
+    signOut: ReturnType<typeof vi.fn>;
+  };
+  messaging: unknown;
+  database: unknown;
+  analytics: unknown;
+  appCheck: unknown;
+
+  getToken: ReturnType<typeof vi.fn>;
+  onMessage: ReturnType<typeof vi.fn>;
+  logEvent: ReturnType<typeof vi.fn>;
+  ref: ReturnType<typeof vi.fn>;
+  update: ReturnType<typeof vi.fn>;
+  onIdTokenChanged: ReturnType<typeof vi.fn>;
+}
 
 describe('FirebaseService', () => {
   let service: FirebaseService;
+  let sdkSpy: FirebaseSdkMock;
 
-  const mockUser: any = {
+  const mockUser = {
     uid: '123',
     email: 'test@example.com',
     displayName: 'Test User',
-    getIdToken: jasmine.createSpy('getIdToken').and.resolveTo('token123'),
-    getIdTokenResult: jasmine.createSpy('getIdTokenResult').and.resolveTo({ token: 'idToken123' }),
-  };
 
-  const mockSdk: any = {
-    auth: {
-      currentUser: mockUser,
-      authStateReady: jasmine.createSpy().and.resolveTo(),
-      signOut: jasmine.createSpy().and.resolveTo(),
-    },
-    messaging: {},
-    database: {},
-    analytics: {},
-    appCheck: {},
+    getIdToken: vi.fn().mockName('getIdToken').mockResolvedValue('token123'),
 
-    getToken: jasmine.createSpy(),
-    onMessage: jasmine.createSpy(),
-    logEvent: jasmine.createSpy(),
-    ref: jasmine.createSpy(),
-    update: jasmine.createSpy(),
-    onIdTokenChanged: jasmine.createSpy(),
+    getIdTokenResult: vi.fn().mockName('getIdTokenResult').mockResolvedValue({
+      token: 'idToken123',
+      authTime: '',
+      issuedAtTime: '',
+      expirationTime: '',
+      signInProvider: null,
+      signInSecondFactor: null,
+      claims: {},
+    }),
   };
 
   beforeEach(() => {
-    mockSdk.onIdTokenChanged.and.callFake((_: any, callback: any) => {
-      callback(mockUser);
-      return () => {
-      };
-    });
+    sdkSpy = {
+      auth: {
+        currentUser: mockUser,
+        authStateReady: vi.fn().mockResolvedValue(undefined),
+        signOut: vi.fn().mockResolvedValue(undefined),
+      },
+
+      messaging: {},
+      database: {},
+      analytics: {},
+      appCheck: {},
+
+      getToken: vi.fn(),
+      onMessage: vi.fn(),
+      logEvent: vi.fn(),
+      ref: vi.fn(),
+      update: vi.fn(),
+
+      onIdTokenChanged: vi.fn(),
+    };
+
+    sdkSpy.onIdTokenChanged.mockImplementation(
+      (_auth: unknown, callback: (user: any) => void) => {
+        callback(mockUser);
+
+        return () => {};
+      },
+    );
 
     TestBed.configureTestingModule({
       providers: [
         FirebaseService,
-        { provide: FirebaseSdkService, useValue: mockSdk },
+        {
+          provide: FirebaseSdkService,
+          useValue: sdkSpy,
+        },
       ],
     });
 
@@ -54,13 +92,13 @@ describe('FirebaseService', () => {
   });
 
   it('should return true for isAuthenticated when user exists', () => {
-    expect(service.isAuthenticated()).toBeTrue();
+    expect(service.isAuthenticated()).toBe(true);
   });
 
   it('should return false for isAuthenticated when user does not exist', () => {
     (service as any)._user.set(null);
 
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
   });
 
   it('should get idTokenResult', async () => {
@@ -71,54 +109,56 @@ describe('FirebaseService', () => {
   });
 
   it('should get appCheckToken', async () => {
-    mockSdk.getToken.and.resolveTo('appCheckToken123');
+    sdkSpy.getToken.mockResolvedValue('appCheckToken123');
 
     const token = await service.appCheckToken;
 
     expect(token).toBe('appCheckToken123');
-    expect(mockSdk.getToken).toHaveBeenCalledWith(mockSdk.appCheck);
+    expect(sdkSpy.getToken).toHaveBeenCalledWith(sdkSpy.appCheck);
   });
 
   it('should update FCM token in database', async () => {
     const refMock = {};
-    mockSdk.ref.and.returnValue(refMock);
-    mockSdk.update.and.resolveTo();
+
+    sdkSpy.ref.mockReturnValue(refMock);
+    sdkSpy.update.mockResolvedValue(undefined);
 
     await service.updateToken('uid123', 'token123');
 
-    expect(mockSdk.ref).toHaveBeenCalledWith(mockSdk.database, 'fcmTokens/');
-    expect(mockSdk.update).toHaveBeenCalledWith(refMock, {
+    expect(sdkSpy.ref).toHaveBeenCalledWith(sdkSpy.database, 'fcmTokens/');
+
+    expect(sdkSpy.update).toHaveBeenCalledWith(refMock, {
       uid123: 'token123',
     });
   });
 
   it('should return messaging token', async () => {
-    mockSdk.getToken.and.resolveTo('messagingToken123');
+    sdkSpy.getToken.mockResolvedValue('messagingToken123');
 
     const token = await service.getMessagingToken({} as any);
 
     expect(token).toBe('messagingToken123');
-    expect(mockSdk.getToken).toHaveBeenCalledWith(mockSdk.messaging, {} as any);
+
+    expect(sdkSpy.getToken).toHaveBeenCalledWith(sdkSpy.messaging, {});
   });
 
-  it('should emit messages from onMessageReceived', (done) => {
-    mockSdk.onMessage.and.callFake((_: any, callback: any) => {
+  it('should emit messages from onMessageReceived', () => {
+    sdkSpy.onMessage.mockImplementation((_messaging, callback) => {
       callback({ data: 'msg' });
-      return () => {
-      }; // unsubscribe fn
+
+      return () => {};
     });
 
-    service.onMessageReceived().subscribe((msg: any) => {
-      expect(msg.data).toBe('msg');
-      done();
+    service.onMessageReceived().subscribe((message) => {
+      expect(message.data).toBe('msg');
     });
   });
 
   it('should log analytics events', () => {
     service.logEvent('test_event', { param: 1 });
 
-    expect(mockSdk.logEvent).toHaveBeenCalledWith(
-      mockSdk.analytics,
+    expect(sdkSpy.logEvent).toHaveBeenCalledWith(
+      sdkSpy.analytics,
       'test_event',
       { param: 1 },
     );
@@ -127,18 +167,15 @@ describe('FirebaseService', () => {
   it('should sign out', async () => {
     await service.signOut();
 
-    expect(mockSdk.auth.signOut).toHaveBeenCalled();
+    expect(sdkSpy.auth.signOut).toHaveBeenCalled();
   });
 
-  it('should get ID token', fakeAsync(async () => {
+  it('should get ID token', async () => {
     const token = await service.getIdToken();
-
-    flush();
-    tick();
 
     expect(token).toBe('token123');
     expect(mockUser.getIdToken).toHaveBeenCalled();
-  }));
+  });
 
   it('should return null ID token if no user', async () => {
     (service as any)._user.set(null);
@@ -159,24 +196,29 @@ describe('FirebaseService', () => {
   it('should reject updateProfile if no user', async () => {
     (service as any)._user.set(null);
 
-    await expectAsync(
-      service.updateProfile({ displayName: 'New Name' }),
-    ).toBeRejectedWithError('No current user');
+    await expect(
+      service.updateProfile({
+        displayName: 'New Name',
+      }),
+    ).rejects.toThrowError('No current user');
   });
 
   it('should reject sendVerificationEmail if no user', async () => {
     (service as any)._user.set(null);
 
-    await expectAsync(
-      service.sendVerificationEmail(),
-    ).toBeRejectedWithError('No current user');
+    await expect(service.sendVerificationEmail()).rejects.toThrowError(
+      'No current user',
+    );
   });
 
   it('should update the user signal from the id token listener', () => {
-    const listener = mockSdk.onIdTokenChanged.calls.mostRecent().args[1];
-    listener(null);
+    const callback = sdkSpy.onIdTokenChanged.mock.lastCall?.[1];
+
+    expect(callback).toBeDefined();
+
+    callback!(null);
 
     expect(service.user()).toBeNull();
-    expect(service.isAuthenticated()).toBeFalse();
+    expect(service.isAuthenticated()).toBe(false);
   });
 });

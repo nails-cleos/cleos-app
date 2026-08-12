@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FabMenuComponent } from './fab-menu.component';
 import { ElementRef } from '@angular/core';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('FabMenuComponent', () => {
   let component: FabMenuComponent;
@@ -15,9 +16,7 @@ describe('FabMenuComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [FabMenuComponent],
-      providers: [
-        { provide: ElementRef, useValue: mockElementRef },
-      ],
+      providers: [{ provide: ElementRef, useValue: mockElementRef }],
     }).compileComponents();
 
     fixture = TestBed.createComponent(FabMenuComponent);
@@ -30,31 +29,33 @@ describe('FabMenuComponent', () => {
   });
 
   it('should initialize with menuOpen as false', () => {
-    expect(component.menuOpen).toBeFalse();
+    expect(component.menuOpen).toBe(false);
   });
 
   describe('toggleMenu', () => {
     it('should toggle menuOpen from false to true', () => {
-      expect(component.menuOpen).toBeFalse();
+      expect(component.menuOpen).toBe(false);
       component.toggleMenu();
-      expect(component.menuOpen).toBeTrue();
+      expect(component.menuOpen).toBe(true);
     });
 
     it('should toggle menuOpen from true to false', () => {
       component.menuOpen = true;
       component.toggleMenu();
-      expect(component.menuOpen).toBeFalse();
+      expect(component.menuOpen).toBe(false);
     });
   });
 
   describe('handleMenuItemClick', () => {
     it('should emit fabMenuItemSelected and close the menu', () => {
-      const emitSpy = spyOn(component.fabMenuItemSelected, 'emit');
+      const emitSpy = vi
+        .spyOn(component.fabMenuItemSelected, 'emit')
+        .mockReturnValue(undefined);
       component.menuOpen = true;
 
       component.handleMenuItemClick({ id: 'item1' });
 
-      expect(component.menuOpen).toBeFalse();
+      expect(component.menuOpen).toBe(false);
       expect(emitSpy).toHaveBeenCalledWith('item1');
     });
   });
@@ -68,7 +69,7 @@ describe('FabMenuComponent', () => {
 
       component.clickOutsideMenu(event);
 
-      expect(component.menuOpen).toBeFalse();
+      expect(component.menuOpen).toBe(false);
     });
 
     it('should not close the menu if click occurs inside element', () => {
@@ -77,11 +78,14 @@ describe('FabMenuComponent', () => {
       const event = new MouseEvent('click', { bubbles: true });
 
       // Spy on nativeElement.contains
-      spyOn(component['elementRef'].nativeElement, 'contains').and.returnValue(true);
+      vi.spyOn(
+        component['elementRef'].nativeElement,
+        'contains',
+      ).mockReturnValue(true);
 
       component.clickOutsideMenu(event);
 
-      expect(component.menuOpen).toBeTrue();
+      expect(component.menuOpen).toBe(true);
     });
   });
 });

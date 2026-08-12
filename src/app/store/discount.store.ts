@@ -1,8 +1,13 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
-import { TranslateService } from '@ngx-translate/core';
 import { Pagination } from '../interfaces/pagination';
-import { DiscountType, IDiscount, IDiscountAll, IReferral, IUserDiscount } from '../discount/discount';
+import {
+  DiscountType,
+  IDiscount,
+  IDiscountAll,
+  IReferral,
+  IUserDiscount,
+} from '../discount/discount';
 import { IApiResponse, PageRequest } from '../interfaces/common';
 import { DiscountService } from '../services/discount.service';
 import {
@@ -33,11 +38,7 @@ const initialState: DiscountStoreState = {
 export const DiscountStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    discountService = inject(DiscountService),
-    translateService = inject(TranslateService),
-  ) => {
+  withMethods((store, discountService = inject(DiscountService)) => {
     let loadPageSubscription: Subscription | undefined;
     let loadMyPageSubscription: Subscription | undefined;
     let loadReferralsSubscription: Subscription | undefined;
@@ -60,7 +61,8 @@ export const DiscountStore = signalStore(
       sendToCustomersSubscription?.unsubscribe();
     };
 
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -80,9 +82,14 @@ export const DiscountStore = signalStore(
         loadPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadPageSubscription =
-          discountService.getDiscountsPage(page, sort, direction, size).subscribe({
-            next: (value) => patchState(store, { data: { kind: 'paginationDiscount', value }, isLoading: false }),
+        loadPageSubscription = discountService
+          .getDiscountsPage(page, sort, direction, size)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'paginationDiscount', value },
+                isLoading: false,
+              }),
             error: patchError,
           });
       },
@@ -91,9 +98,14 @@ export const DiscountStore = signalStore(
         loadMyPageSubscription?.unsubscribe();
         patchState(store, { data: undefined, isLoading: true });
 
-        loadMyPageSubscription =
-          discountService.getMyDiscountsPage(page, sort, direction, size).subscribe({
-            next: (value) => patchState(store, { data: { kind: 'pagination', value }, isLoading: false }),
+        loadMyPageSubscription = discountService
+          .getMyDiscountsPage(page, sort, direction, size)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'pagination', value },
+                isLoading: false,
+              }),
             error: patchError,
           });
       },
@@ -103,7 +115,8 @@ export const DiscountStore = signalStore(
         patchState(store, { referrals: undefined, isLoading: true });
 
         loadReferralsSubscription = discountService.getMyReferrals().subscribe({
-          next: (referrals) => patchState(store, { referrals, isLoading: false }),
+          next: (referrals) =>
+            patchState(store, { referrals, isLoading: false }),
           error: patchError,
         });
       },
@@ -120,46 +133,67 @@ export const DiscountStore = signalStore(
 
       loadUserDiscounts(customerId: string): void {
         loadUserDiscountsSubscription?.unsubscribe();
-        patchState(store, { data: { kind: 'list', value: [] }, isLoading: true });
-
-        loadUserDiscountsSubscription = discountService.getUserDiscountByCustomerId(customerId).subscribe({
-          next: (value) => patchState(store, { data: { kind: 'list', value }, isLoading: false }),
-          error: patchError,
+        patchState(store, {
+          data: { kind: 'list', value: [] },
+          isLoading: true,
         });
+
+        loadUserDiscountsSubscription = discountService
+          .getUserDiscountByCustomerId(customerId)
+          .subscribe({
+            next: (value) =>
+              patchState(store, {
+                data: { kind: 'list', value },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       create(discount: IDiscount): void {
         createSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        createSubscription = discountService.createDiscount(discount).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('DISCOUNT.CREATED', { name: response.name }),
-              path: `discounts/${ response.id }`,
-              redirect: 'discounts',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        createSubscription = discountService
+          .createDiscount(discount)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'DISCOUNT.CREATED',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `discounts/${response.id}`,
+                  redirect: 'discounts',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       update(id: string, discount: IDiscount): void {
         updateSubscription?.unsubscribe();
         cleanCrudUpdate(store);
 
-        updateSubscription = discountService.updateDiscount(id, discount).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('DISCOUNT.UPDATED.MESSAGE', { name: response.name }),
-              path: `discounts/${ response.id }`,
-              redirect: 'discounts',
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        updateSubscription = discountService
+          .updateDiscount(id, discount)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'DISCOUNT.UPDATED.MESSAGE',
+                  messageParams: {
+                    name: response.name,
+                  },
+                  path: `discounts/${response.id}`,
+                  redirect: 'discounts',
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
 
       delete(id: string, name: string): void {
@@ -167,14 +201,18 @@ export const DiscountStore = signalStore(
         cleanCrudDelete(store);
 
         deleteSubscription = discountService.deleteDiscount(id).subscribe({
-          next: () => patchState(store, {
-            response: {
-              message: translateService.instant('DISCOUNT.DELETED.MESSAGE', { name }),
-              reload: true,
-              toastType: 'warning',
-            },
-            isLoading: false,
-          }),
+          next: () =>
+            patchState(store, {
+              response: {
+                messageKey: 'DISCOUNT.DELETED.MESSAGE',
+                messageParams: {
+                  name,
+                },
+                reload: true,
+                toastType: 'warning',
+              },
+              isLoading: false,
+            }),
           error: patchError,
         });
       },
@@ -183,21 +221,29 @@ export const DiscountStore = signalStore(
         sendToCustomersSubscription?.unsubscribe();
         cleanCrudCreate(store);
 
-        sendToCustomersSubscription = discountService.sendDiscounts(id, customersDiscount).subscribe({
-          next: (response: IApiResponse) => patchState(store, {
-            response: {
-              message: translateService.instant('DISCOUNT.SEND', { name: response.name }),
-            },
-            isLoading: false,
-          }),
-          error: patchError,
-        });
+        sendToCustomersSubscription = discountService
+          .sendDiscounts(id, customersDiscount)
+          .subscribe({
+            next: (response: IApiResponse) =>
+              patchState(store, {
+                response: {
+                  messageKey: 'DISCOUNT.SEND',
+                  messageParams: {
+                    name: response.name,
+                  },
+                },
+                isLoading: false,
+              }),
+            error: patchError,
+          });
       },
     };
   }),
 );
 
-export const discountIcon = (discount: Pick<IDiscountAll, 'type' | 'currency'>): string => {
+export const discountIcon = (
+  discount: Pick<IDiscountAll, 'type' | 'currency'>,
+): string => {
   switch (discount.type) {
     case DiscountType.money:
       return discount.currency?.icon ?? 'euro';

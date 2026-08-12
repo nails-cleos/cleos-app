@@ -165,7 +165,7 @@
       "TRANSFER": {
         "FIELD": "Transfer reference"
       },
-      "UPDATE":{
+      "UPDATE": {
         "MESSAGE": "Payment(s) updated"
       },
       "SPLIT": {

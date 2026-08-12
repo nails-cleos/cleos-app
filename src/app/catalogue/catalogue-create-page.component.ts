@@ -21,7 +21,7 @@ export class CatalogueCreatePageComponent {
     this.catalogueStore.clean();
   }
 
-  submit(data: { catalogue: ICatalogue, resizedImageDataUrl: string; }) {
+  submit(data: { catalogue: ICatalogue; resizedImageDataUrl: string }) {
     this.catalogueStore.create(data.catalogue, data.resizedImageDataUrl);
   }
 }

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { beforeEach, describe, expect, it } from 'vitest';
 import { BalanceComponent } from './balance.component';
 import { IAccountAll } from '../account';
 
@@ -35,17 +35,17 @@ describe('BalanceComponent', () => {
 
     it('should accept showAdd input', () => {
       fixture.componentRef.setInput('showAdd', true);
-      expect(component.showAdd()).toBeTrue();
+      expect(component.showAdd()).toBe(true);
     });
 
     it('should accept showView input', () => {
       fixture.componentRef.setInput('showView', false);
-      expect(component.showView()).toBeFalse();
+      expect(component.showView()).toBe(false);
     });
 
     it('should accept showUser input', () => {
       fixture.componentRef.setInput('showUser', true);
-      expect(component.showUser()).toBeTrue();
+      expect(component.showUser()).toBe(true);
     });
 
     it('should accept language input', () => {

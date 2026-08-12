@@ -13,17 +13,24 @@
   box-shadow:
     0 18px 40px rgb(15 23 42 / 0.18),
     0 6px 18px rgb(15 23 42 / 0.1);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--app-surface-card-bg) 96%, var(--primary-lighter-color) 4%),
-      color-mix(in srgb, var(--app-surface-card-bg) 92%, var(--accent-lighter-color) 8%)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 96%,
+      var(--primary-lighter-color) 4%
+    ),
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 92%,
+      var(--accent-lighter-color) 8%
+    )
+  );
   color: var(--toast-text);
   backdrop-filter: blur(14px);
   margin-bottom: 12px;
   overflow: hidden;
-  animation: slideIn 220ms cubic-bezier(.2, .8, .2, 1) both;
+  animation: slideIn 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @keyframes slideIn {
@@ -60,7 +67,11 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--app-surface-card-bg) 58%, var(--primary-lighter-color) 42%);
+  background: color-mix(
+    in srgb,
+    var(--app-surface-card-bg) 58%,
+    var(--primary-lighter-color) 42%
+  );
 }
 
 .toast-icon mat-icon {
@@ -79,7 +90,11 @@
   line-height: 1.1;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--primary-darker-color) 78%, var(--toast-text) 22%);
+  color: color-mix(
+    in srgb,
+    var(--primary-darker-color) 78%,
+    var(--toast-text) 22%
+  );
   margin-bottom: 4px;
 }
 
@@ -122,58 +137,102 @@
 
 .toast-success {
   color: var(--toast-success);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--toast-success-soft) 34%, var(--app-surface-card-bg) 66%),
-      color-mix(in srgb, var(--app-surface-card-bg) 94%, var(--primary-lighter-color) 6%)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(
+      in srgb,
+      var(--toast-success-soft) 34%,
+      var(--app-surface-card-bg) 66%
+    ),
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 94%,
+      var(--primary-lighter-color) 6%
+    )
+  );
 }
 
 .toast-success .toast-icon {
-  background: color-mix(in srgb, var(--toast-success-soft) 56%, var(--app-surface-card-bg) 44%);
+  background: color-mix(
+    in srgb,
+    var(--toast-success-soft) 56%,
+    var(--app-surface-card-bg) 44%
+  );
 }
 
 .toast-error {
   color: var(--toast-error);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--toast-error-soft) 34%, var(--app-surface-card-bg) 66%),
-      color-mix(in srgb, var(--app-surface-card-bg) 94%, var(--accent-lighter-color) 6%)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(
+      in srgb,
+      var(--toast-error-soft) 34%,
+      var(--app-surface-card-bg) 66%
+    ),
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 94%,
+      var(--accent-lighter-color) 6%
+    )
+  );
 }
 
 .toast-error .toast-icon {
-  background: color-mix(in srgb, var(--toast-error-soft) 56%, var(--app-surface-card-bg) 44%);
+  background: color-mix(
+    in srgb,
+    var(--toast-error-soft) 56%,
+    var(--app-surface-card-bg) 44%
+  );
 }
 
 .toast-warning {
   color: var(--toast-warning);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--toast-warning-soft) 36%, var(--app-surface-card-bg) 64%),
-      color-mix(in srgb, var(--app-surface-card-bg) 94%, var(--primary-lighter-color) 6%)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(
+      in srgb,
+      var(--toast-warning-soft) 36%,
+      var(--app-surface-card-bg) 64%
+    ),
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 94%,
+      var(--primary-lighter-color) 6%
+    )
+  );
 }
 
 .toast-warning .toast-icon {
-  background: color-mix(in srgb, var(--toast-warning-soft) 58%, var(--app-surface-card-bg) 42%);
+  background: color-mix(
+    in srgb,
+    var(--toast-warning-soft) 58%,
+    var(--app-surface-card-bg) 42%
+  );
 }
 
 .toast-info {
   color: var(--toast-info);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--toast-info-soft) 34%, var(--app-surface-card-bg) 66%),
-      color-mix(in srgb, var(--app-surface-card-bg) 94%, var(--accent-lighter-color) 6%)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(
+      in srgb,
+      var(--toast-info-soft) 34%,
+      var(--app-surface-card-bg) 66%
+    ),
+    color-mix(
+      in srgb,
+      var(--app-surface-card-bg) 94%,
+      var(--accent-lighter-color) 6%
+    )
+  );
 }
 
 .toast-info .toast-icon {
-  background: color-mix(in srgb, var(--toast-info-soft) 56%, var(--app-surface-card-bg) 44%);
+  background: color-mix(
+    in srgb,
+    var(--toast-info-soft) 56%,
+    var(--app-surface-card-bg) 44%
+  );
 }
 
 .toast-content,

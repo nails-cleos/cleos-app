@@ -6,14 +6,21 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { withCrudStoreMethods, withCrudStoreState } from './crud-signal-store';
 import { Pagination } from '../interfaces/pagination';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 type TestEntity = {
   name: string;
 };
 
 type TestData =
-  | { kind: 'pagination'; value?: Pagination<TestEntity> }
-  | { kind: 'list'; value?: TestEntity[] };
+  | {
+      kind: 'pagination';
+      value?: Pagination<TestEntity>;
+    }
+  | {
+      kind: 'list';
+      value?: TestEntity[];
+    };
 
 type TestResponse = {
   id: string;
@@ -31,46 +38,48 @@ type TestSortArgs = {
 }[];
 
 class TestCrudApi {
-  loadPage = jasmine.createSpy('loadPage');
-  loadById = jasmine.createSpy('loadById');
-  create = jasmine.createSpy('create');
-  update = jasmine.createSpy('update');
-  delete = jasmine.createSpy('delete');
-  sort = jasmine.createSpy('sort');
+  loadPage = vi.fn().mockName('loadPage');
+  loadById = vi.fn().mockName('loadById');
+  create = vi.fn().mockName('create');
+  update = vi.fn().mockName('update');
+  delete = vi.fn().mockName('delete');
+  sort = vi.fn().mockName('sort');
 }
 
 const TestCrudStore = signalStore(
   withCrudStoreState<TestEntity, TestData, TestEntity>(),
-  withCrudStoreMethods<TestEntity, TestResponse, TestResponse, TestDeleteArgs>(() => {
-    const api = inject(TestCrudApi);
+  withCrudStoreMethods<TestEntity, TestResponse, TestResponse, TestDeleteArgs>(
+    () => {
+      const api = inject(TestCrudApi);
 
-    return {
-      placeholder: { name: 'placeholder' },
-      loadPage: (request) => api.loadPage(request),
-      loadById: (id) => api.loadById(id),
-      create: (entity) => api.create(entity),
-      update: (id, entity) => api.update(id, entity),
-      delete: (args) => api.delete(args),
-      sort: (items) => api.sort(items),
-      createResponse: (response) => ({
-        message: `created:${ response.name }`,
-        path: `items/${ response.id }`,
-      }),
-      updateResponse: (response) => ({
-        message: `updated:${ response.name }`,
-        path: `items/${ response.id }`,
-      }),
-      deleteResponse: (args) => ({
-        message: `deleted:${ args.name }`,
-        reload: true,
-        toastType: 'warning',
-      }),
-      sortResponse: () => ({
-        message: 'sorted',
-        reload: true,
-      }),
-    };
-  }),
+      return {
+        placeholder: { name: 'placeholder' },
+        loadPage: (request) => api.loadPage(request),
+        loadById: (id) => api.loadById(id),
+        create: (entity) => api.create(entity),
+        update: (id, entity) => api.update(id, entity),
+        delete: (args) => api.delete(args),
+        sort: (items) => api.sort(items),
+        createResponse: (response) => ({
+          message: `created:${response.name}`,
+          path: `items/${response.id}`,
+        }),
+        updateResponse: (response) => ({
+          message: `updated:${response.name}`,
+          path: `items/${response.id}`,
+        }),
+        deleteResponse: (args) => ({
+          message: `deleted:${args.name}`,
+          reload: true,
+          toastType: 'warning',
+        }),
+        sortResponse: () => ({
+          message: 'sorted',
+          reload: true,
+        }),
+      };
+    },
+  ),
 );
 
 describe('crud-signal-store', () => {
@@ -79,10 +88,7 @@ describe('crud-signal-store', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        TestCrudApi,
-        TestCrudStore,
-      ],
+      providers: [TestCrudApi, TestCrudStore],
     });
 
     store = TestBed.inject(TestCrudStore);
@@ -91,7 +97,7 @@ describe('crud-signal-store', () => {
 
   it('should keep selected undefined while loadById request is pending', () => {
     const selected$ = new Subject<TestEntity | undefined>();
-    api.loadById.and.returnValue(selected$.asObservable());
+    api.loadById.mockReturnValue(selected$.asObservable());
 
     store.loadById('123');
 
@@ -106,10 +112,22 @@ describe('crud-signal-store', () => {
   it('should ignore stale loadPage responses after a newer request starts', () => {
     const firstPage$ = new Subject<Pagination<TestEntity>>();
     const secondPage$ = new Subject<Pagination<TestEntity>>();
-    const firstPage = { content: [{ name: 'first' }], totalElements: 1, totalPages: 1, number: 0 };
-    const secondPage = { content: [{ name: 'second' }], totalElements: 1, totalPages: 1, number: 1 };
+    const firstPage = {
+      content: [{ name: 'first' }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+    };
+    const secondPage = {
+      content: [{ name: 'second' }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 1,
+    };
 
-    api.loadPage.and.returnValues(firstPage$.asObservable(), secondPage$.asObservable());
+    api.loadPage
+      .mockReturnValueOnce(firstPage$.asObservable())
+      .mockReturnValueOnce(secondPage$.asObservable());
 
     store.loadPage({ page: 0, sort: 'name', direction: 'asc', size: 10 });
     store.loadPage({ page: 1, sort: 'name', direction: 'asc', size: 10 });
@@ -121,14 +139,16 @@ describe('crud-signal-store', () => {
     secondPage$.next(secondPage);
     secondPage$.complete();
     expect(store.data()).toEqual({ kind: 'pagination', value: secondPage });
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should ignore stale loadById responses after a newer request starts', () => {
     const firstSelected$ = new Subject<TestEntity | undefined>();
     const secondSelected$ = new Subject<TestEntity | undefined>();
 
-    api.loadById.and.returnValues(firstSelected$.asObservable(), secondSelected$.asObservable());
+    api.loadById
+      .mockReturnValueOnce(firstSelected$.asObservable())
+      .mockReturnValueOnce(secondSelected$.asObservable());
 
     store.loadById('first');
     store.loadById('second');
@@ -140,15 +160,15 @@ describe('crud-signal-store', () => {
     secondSelected$.next({ name: 'second' });
     secondSelected$.complete();
     expect(store.selected()).toEqual({ name: 'second' });
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should patch response and clear loading on create success', () => {
-    api.create.and.returnValue(of({ id: '1', name: 'Blue' }));
+    api.create.mockReturnValue(of({ id: '1', name: 'Blue' }));
 
     store.create({ name: 'Blue' });
 
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
     expect(store.response()).toEqual({
       message: 'created:Blue',
       path: 'items/1',
@@ -157,21 +177,30 @@ describe('crud-signal-store', () => {
   });
 
   it('should map http errors into error and subErrors state', () => {
-    api.create.and.returnValue(throwError(() => new HttpErrorResponse({
-      status: 400,
-      error: {
-        message: 'VALIDATION.ERROR',
-        subErrors: [{ field: 'name', message: 'Name required' }],
-      },
-    })));
+    api.create.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 400,
+            error: {
+              message: 'VALIDATION.ERROR',
+              subErrors: [{ field: 'name', message: 'Name required' }],
+            },
+          }),
+      ),
+    );
 
     store.create({ name: '' });
 
-    expect(store.isLoading()).toBeFalse();
-    expect(store.error()).toEqual(jasmine.objectContaining({
-      message: 'VALIDATION.ERROR',
-    }));
-    expect(store.subErrors()).toEqual([{ field: 'name', message: 'Name required' }]);
+    expect(store.isLoading()).toBe(false);
+    expect(store.error()).toEqual(
+      expect.objectContaining({
+        message: 'VALIDATION.ERROR',
+      }),
+    );
+    expect(store.subErrors()).toEqual([
+      { field: 'name', message: 'Name required' },
+    ]);
     expect(store.response()).toBeUndefined();
   });
 
@@ -182,20 +211,27 @@ describe('crud-signal-store', () => {
       totalPages: 1,
       number: 0,
     };
-    api.loadPage.and.returnValue(of(page));
-    api.create.and.returnValue(throwError(() => new HttpErrorResponse({
-      status: 500,
-      error: {},
-    })));
+    api.loadPage.mockReturnValue(of(page));
+    api.create.mockReturnValue(
+      throwError(
+        () =>
+          new HttpErrorResponse({
+            status: 500,
+            error: {},
+          }),
+      ),
+    );
 
     store.loadPage({ page: 0, sort: 'name', direction: 'asc', size: 10 });
     store.create({ name: 'x' });
 
     expect(store.data()).toEqual({ kind: 'pagination', value: page });
-    expect(store.error()).toEqual(jasmine.objectContaining({
-      status: 'SERVER_ERROR',
-      message: 'COMMON.ERROR.TRY_LATER',
-    }));
+    expect(store.error()).toEqual(
+      expect.objectContaining({
+        status: 'SERVER_ERROR',
+        message: 'COMMON.ERROR.TRY_LATER',
+      }),
+    );
 
     store.clearError();
     expect(store.error()).toBeUndefined();
@@ -205,12 +241,12 @@ describe('crud-signal-store', () => {
     expect(store.data()).toBeUndefined();
     expect(store.selected()).toBeUndefined();
     expect(store.response()).toBeUndefined();
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should patch a sort response on sort success', () => {
     const items: TestSortArgs = [{ order: 1, key: 'a' }];
-    api.sort.and.returnValue(of(void 0));
+    api.sort.mockReturnValue(of(void 0));
 
     store.sort(items);
 
@@ -219,11 +255,11 @@ describe('crud-signal-store', () => {
       message: 'sorted',
       reload: true,
     });
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should patch response on update success', () => {
-    api.update.and.returnValue(of({ id: '1', name: 'Updated' }));
+    api.update.mockReturnValue(of({ id: '1', name: 'Updated' }));
 
     store.update('1', { name: 'Updated' });
 
@@ -235,12 +271,11 @@ describe('crud-signal-store', () => {
     });
 
     expect(store.selected()).toBeUndefined();
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
-
   it('should patch response on delete success', () => {
-    api.delete.and.returnValue(of(void 0));
+    api.delete.mockReturnValue(of(void 0));
 
     store.delete({
       id: '1',
@@ -260,17 +295,16 @@ describe('crud-signal-store', () => {
 
     expect(store.data()).toBeUndefined();
     expect(store.selected()).toBeUndefined();
-    expect(store.isLoading()).toBeFalse();
+    expect(store.isLoading()).toBe(false);
   });
 
   it('should ignore previous create response after a newer create request starts', () => {
     const firstCreate$ = new Subject<TestResponse>();
     const secondCreate$ = new Subject<TestResponse>();
 
-    api.create.and.returnValues(
-      firstCreate$.asObservable(),
-      secondCreate$.asObservable(),
-    );
+    api.create
+      .mockReturnValueOnce(firstCreate$.asObservable())
+      .mockReturnValueOnce(secondCreate$.asObservable());
 
     store.create({ name: 'first' });
     store.create({ name: 'second' });

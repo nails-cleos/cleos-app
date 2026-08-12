@@ -8,7 +8,7 @@ export type BottomSheetReferralData = {
   referralMax?: number;
   referrals: number;
   referralsUsed: number;
-}
+};
 
 @Component({
   selector: 'app-bottom-sheet-referral',
@@ -18,21 +18,31 @@ export type BottomSheetReferralData = {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetReferralComponent {
-  private readonly data = inject<BottomSheetReferralData>(MAT_BOTTOM_SHEET_DATA);
+  private readonly data = inject<BottomSheetReferralData>(
+    MAT_BOTTOM_SHEET_DATA,
+  );
   referralMax = this.data.referralMax || 5;
   referrals = 0;
   referralsUsed = 0;
 
   constructor() {
-    const max = this.data.referrals > this.data.referralsUsed ? this.data.referrals : this.data.referralsUsed;
+    const max =
+      this.data.referrals > this.data.referralsUsed
+        ? this.data.referrals
+        : this.data.referralsUsed;
     this.delay(this.data, 0, max);
   }
 
-  private delay = (data: BottomSheetReferralData, count: number, max: number): void => {
+  private delay = (
+    data: BottomSheetReferralData,
+    count: number,
+    max: number,
+  ): void => {
     setTimeout(() => {
       count++;
       this.referrals = count > data.referrals ? data.referrals : count;
-      this.referralsUsed = count > data.referralsUsed ? data.referralsUsed : count;
+      this.referralsUsed =
+        count > data.referralsUsed ? data.referralsUsed : count;
       if (count < max) {
         this.delay(data, count, max);
       }

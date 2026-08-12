@@ -1,8 +1,9 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogComponent } from './catalog.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
-import { CatalogueStore } from '../../store/catalogue.store';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CatalogComponent', () => {
   let component: CatalogComponent;
@@ -10,20 +11,21 @@ describe('CatalogComponent', () => {
 
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadCatalogs: jasmine.Spy;
+    clean: Mock;
+    loadCatalogs: Mock;
   };
 
   beforeEach(async () => {
     catalogueStoreSpy = {
       data: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadCatalogs: jasmine.createSpy('loadCatalogs'),
+      clean: vi.fn().mockName('clean'),
+      loadCatalogs: vi.fn().mockName('loadCatalogs'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [CatalogComponent, TranslateModule.forRoot()],
+      imports: [CatalogComponent],
       providers: [
+        provideTranslateService(),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
       ],
     }).compileComponents();
@@ -39,7 +41,7 @@ describe('CatalogComponent', () => {
   });
 
   it('should add catalogues with image', () => {
-    spyOn(window.URL, 'createObjectURL').and.returnValue('blob:fake-url');
+    vi.spyOn(window.URL, 'createObjectURL').mockReturnValue('blob:fake-url');
 
     const fakeBase64 = 'ZmFrZUJhc2U2NA==';
     const fakeItem = { blob: fakeBase64, contentType: 'text/plain' };

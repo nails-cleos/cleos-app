@@ -1,20 +1,32 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, viewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  viewChild,
+} from '@angular/core';
 import { IUser, IUserAll, User } from '../user';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, MatSortHeader } from '@angular/material/sort';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
-import { createMatTableState } from 'src/app/util/mat-table-state';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
+import { createMatTableState } from '@app/util/mat-table-state';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { Role } from '../../interfaces/token';
-import { executeDialogNoWidth, snakeToCamel } from '../../util/helper';
+import { Role } from '@app/interfaces/token';
+import { executeDialogNoWidth, snakeToCamel } from '@app/util/helper';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { RoleIconKey, RoleIconName } from '../../util/icon';
+import { RoleIconKey, RoleIconName } from '@app/util/icon';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SelectUserDialogComponent } from './select-user-dialog.component';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import {
@@ -44,63 +56,118 @@ import {
 } from '@angular/material/list';
 import { MatFormField, MatInput, MatLabel } from '@angular/material/input';
 import { LowerCasePipe, NgClass } from '@angular/common';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
-import { UserStore } from '../../store/user.store';
-import { NavigationService } from '../../services/navigation.service';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
+import { UserStore } from '@app/store/user.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 type UsersForm = {
   filter: FormControl<string | undefined>;
-}
+};
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatList, MatListItem, MatListSubheaderCssMatStyler,
-    MatIconButton, MatButton, ReactiveFormsModule, TranslatePipe, NgClass, RouterLink, MatTable, MatSort, MatColumnDef,
-    MatHeaderCellDef, MatHeaderCell, MatCellDef, MatCell, MatSortHeader, MatTooltip, MatListItemIcon, MatFooterCellDef,
-    MatFooterCell, MatHeaderRowDef, MatHeaderRow, MatRowDef, MatRow, MatFooterRow, MatFooterRowDef, MatPaginator,
-    MatDivider, LowerCasePipe, MatListItemTitle, TableSkeletonComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatList,
+    MatListItem,
+    MatListSubheaderCssMatStyler,
+    MatIconButton,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    NgClass,
+    RouterLink,
+    MatTable,
+    MatSort,
+    MatColumnDef,
+    MatHeaderCellDef,
+    MatHeaderCell,
+    MatCellDef,
+    MatCell,
+    MatSortHeader,
+    MatTooltip,
+    MatListItemIcon,
+    MatFooterCellDef,
+    MatFooterCell,
+    MatHeaderRowDef,
+    MatHeaderRow,
+    MatRowDef,
+    MatRow,
+    MatFooterRow,
+    MatFooterRowDef,
+    MatPaginator,
+    MatDivider,
+    LowerCasePipe,
+    MatListItemTitle,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserListComponent {
-  private readonly breakpointObserver: BreakpointObserver = inject(BreakpointObserver);
+  private readonly breakpointObserver: BreakpointObserver =
+    inject(BreakpointObserver);
   private readonly userStore = inject(UserStore);
-  private readonly translateService: TranslateService = inject(TranslateService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
   private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
 
-  private breakpointObserver$ = this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small]);
+  private breakpointObserver$ = this.breakpointObserver.observe([
+    Breakpoints.XSmall,
+    Breakpoints.Small,
+  ]);
 
   private paginator = viewChild(MatPaginator);
   private sort = viewChild(MatSort);
-  private tableState = createMatTableState(this.paginator, this.sort, 'displayName', 'asc');
+  readonly tableState = createMatTableState(
+    this.paginator,
+    this.sort,
+    'displayName',
+    'asc',
+  );
 
-  private breakpointsSignal = toSignal(
-    this.breakpointObserver$, {
-      initialValue: {
-        matches: false,
-        breakpoints: {
-          [Breakpoints.XSmall]: false,
-          [Breakpoints.Small]: false,
-        },
+  private breakpointsSignal = toSignal(this.breakpointObserver$, {
+    initialValue: {
+      matches: false,
+      breakpoints: {
+        [Breakpoints.XSmall]: false,
+        [Breakpoints.Small]: false,
       },
     },
-  );
+  });
 
   paginatorPageIndex = this.tableState.pageIndex;
   isLoading = computed(() => this.userStore.isLoading());
-  dataSourceSignal = computed(() => this.userStore.data()?.content?.map((user: IUserAll) => {
-    if (user.authorities) {
-      const missing = this.allRole.filter(au => !user.authorities.some(u => u.authority === au));
-      return Object.assign({}, user, { missing });
-    }
-    return user;
-  }));
+  dataSourceSignal = computed(() =>
+    this.userStore.data()?.content?.map((user: IUserAll) => {
+      if (user.authorities) {
+        const missing = this.allRole.filter(
+          (au) => !user.authorities.some((u) => u.authority === au),
+        );
+        return Object.assign({}, user, { missing });
+      }
+      return user;
+    }),
+  );
 
-  resultsLengthSignal = computed(() => this.userStore.data()?.totalElements || 0);
-  pageSizeSignal = computed(() => this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE);
+  resultsLengthSignal = computed(
+    () => this.userStore.data()?.totalElements || 0,
+  );
+  pageSizeSignal = computed(() =>
+    this.breakpointsSignal()?.matches ? MOBILE_PAGE_SIZE : PAGE_SIZE,
+  );
   smallScreen = computed(() => this.breakpointsSignal()?.matches ?? false);
 
   tableColumns: TableSkeletonColumn[] = [
@@ -122,7 +189,12 @@ export class UserListComponent {
 
   private selectedFilter = toSignal(this.getForm.filter.valueChanges);
 
-  private allRole: Role[] = [Role.customer, Role.professional, Role.manager, Role.admin];
+  private allRole: Role[] = [
+    Role.customer,
+    Role.professional,
+    Role.manager,
+    Role.admin,
+  ];
 
   constructor() {
     this.userStore.clean();
@@ -135,24 +207,29 @@ export class UserListComponent {
         filter,
       });
     });
-    this.tableState.resetOn(this.userStore.response, () => this.userStore.clean());
+    this.tableState.resetOn(this.userStore.response, () =>
+      this.userStore.clearResponse(),
+    );
   }
 
   get getForm(): UsersForm {
     return this.form.controls;
   }
 
-  edit = (selected: IUserAll): void => this.userStore.selectAndNavigate(selected);
+  edit = (selected: IUserAll): void =>
+    this.userStore.selectAndNavigate(selected);
 
   delete = (user: IUserAll): void => {
     this.noExpanded(user);
     const title = this.translateService.instant('USER.DELETED.TITLE');
-    const content = this.translateService.instant('USER.DELETED.CONTENT', { displayName: user.displayName });
+    const content = this.translateService.instant('USER.DELETED.CONTENT', {
+      displayName: user.displayName,
+    });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user, variant: 'warning' },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.userStore.delete(result.id, result.displayName);
       }
@@ -162,12 +239,15 @@ export class UserListComponent {
   sendInvite = (user: IUserAll): void => {
     this.noExpanded(user);
     const title = this.translateService.instant('USER.ACTIVATION_RESEND.TITLE');
-    const content = this.translateService.instant('USER.ACTIVATION_RESEND.CONTENT', { displayName: user.displayName });
+    const content = this.translateService.instant(
+      'USER.ACTIVATION_RESEND.CONTENT',
+      { displayName: user.displayName },
+    );
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.userStore.resendToken(result.id);
       }
@@ -177,12 +257,14 @@ export class UserListComponent {
   restore = (user: IUserAll): void => {
     this.noExpanded(user);
     const title = this.translateService.instant('USER.RESTORE.TITLE');
-    const content = this.translateService.instant('USER.RESTORE.CONTENT', { displayName: user.displayName });
+    const content = this.translateService.instant('USER.RESTORE.CONTENT', {
+      displayName: user.displayName,
+    });
     const dialogRef = this.dialog.open(DialogComponent, {
       data: { title, content, value: user },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         const restoreUser: IUser = new User();
         restoreUser.id = result.id;
@@ -199,11 +281,17 @@ export class UserListComponent {
       newUser: user,
     };
 
-    executeDialogNoWidth(this.dialog, SelectUserDialogComponent, data, result => {
-      if (result) {
-        this.userStore.mergeUsers(result.id, user.id);
-      }
-    }, true);
+    executeDialogNoWidth(
+      this.dialog,
+      SelectUserDialogComponent,
+      data,
+      (result) => {
+        if (result) {
+          this.userStore.mergeUsers(result.id, user.id);
+        }
+      },
+      true,
+    );
   };
 
   getIcon = (name: any): any => {

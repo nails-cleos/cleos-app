@@ -1,17 +1,23 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReservationCloneDialogComponent } from './reservation-clone-dialog.component';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { addMonths } from 'date-fns';
-import { getCurrentTimeZone, getNowTimeZone } from '../../util/dates';
+import { getCurrentTimeZone, getNowTimeZone } from '@app/util/dates';
 import { MAX_RESERVATION_MONTH } from '../reservation';
-import { IRoomAll } from '../../room/room';
-import { TranslateModule } from '@ngx-translate/core';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
+import { IRoomAll } from '@app/room/room';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('ReservationCloneDialogComponent', () => {
   let component: ReservationCloneDialogComponent;
   let fixture: ComponentFixture<ReservationCloneDialogComponent>;
-  let dialogRef: jasmine.SpyObj<MatDialogRef<ReservationCloneDialogComponent>>;
+  let dialogRef: Pick<
+    MatDialogRef<ReservationCloneDialogComponent>,
+    'close'
+  > & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockRoom: IRoomAll = {
     id: 'room-id',
@@ -40,11 +46,14 @@ describe('ReservationCloneDialogComponent', () => {
   };
 
   beforeEach(async () => {
-    dialogRef = jasmine.createSpyObj('MatDialogRef', ['close']);
+    dialogRef = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [ReservationCloneDialogComponent, TranslateModule.forRoot()],
+      imports: [ReservationCloneDialogComponent],
       providers: [
+        provideTranslateService(),
         { provide: MAT_DIALOG_DATA, useValue: dialogData },
         { provide: MatDialogRef, useValue: dialogRef },
         provideAppDateAdapter(),
@@ -64,12 +73,14 @@ describe('ReservationCloneDialogComponent', () => {
   it('should initialize the form', () => {
     expect(component.getForm.date.value).toBeNull();
     expect(component.getForm.time.value).toBe('09:00');
-    expect(component.getForm.date.valid).toBeFalse();
+    expect(component.getForm.date.valid).toBe(false);
   });
 
   it('should compute maxCalendarDate correctly', () => {
     const expected = addMonths(getNowTimeZone(), MAX_RESERVATION_MONTH);
-    expect(component.maxCalendarDate.toDateString()).toEqual(expected.toDateString());
+    expect(component.maxCalendarDate.toDateString()).toEqual(
+      expected.toDateString(),
+    );
   });
 
   it('should set minDate and maxDate signals from availability', () => {
@@ -110,7 +121,7 @@ describe('ReservationCloneDialogComponent', () => {
 
     const result = component.myFilter(nextMonday);
 
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
   });
 
   it('myFilter should not delegate to filterDateRoom', () => {
@@ -124,6 +135,6 @@ describe('ReservationCloneDialogComponent', () => {
 
     const result = component.myFilter(nextTuesday);
 
-    expect(result).toBeFalse();
+    expect(result).toBe(false);
   });
 });

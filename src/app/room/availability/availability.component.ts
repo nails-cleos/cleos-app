@@ -1,13 +1,31 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output } from '@angular/core';
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { Availability, IAvailability, IAvailabilityDate } from '../room';
-import { createDate, getCurrentTimeZone, getTime } from '../../util/dates';
+import { createDate, getCurrentTimeZone, getTime } from '@app/util/dates';
 import { TranslatePipe } from '@ngx-translate/core';
-import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { TimepickerComponent } from '../../shared/clock-timepicker/timepicker.component';
-import { TimepickerDirective } from '../../shared/clock-timepicker/timepicker.directive';
+import { TimepickerComponent } from '@app/shared/clock-timepicker/timepicker.component';
+import { TimepickerDirective } from '@app/shared/clock-timepicker/timepicker.directive';
 import { MatCheckbox } from '@angular/material/checkbox';
 import { AvailabilityForm } from '../room-form.types';
 
@@ -15,8 +33,20 @@ import { AvailabilityForm } from '../room-form.types';
   selector: 'app-availability',
   templateUrl: './availability.component.html',
   styleUrls: ['./availability.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, TranslatePipe, MatError, MatPrefix,
-    ReactiveFormsModule, TimepickerComponent, TimepickerDirective, MatCheckbox],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    MatError,
+    MatPrefix,
+    ReactiveFormsModule,
+    TimepickerComponent,
+    TimepickerDirective,
+    MatCheckbox,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AvailabilityComponent {
@@ -64,6 +94,8 @@ export class AvailabilityComponent {
   }
 
   create(): void {
-    return this.availability.emit(Availability.fromForm(this.getForm, this.day(), this.checked));
+    return this.availability.emit(
+      Availability.fromForm(this.getForm, this.day(), this.checked),
+    );
   }
 }

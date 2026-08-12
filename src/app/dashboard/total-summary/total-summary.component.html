@@ -4,22 +4,54 @@
   <div class="app-surface-item app-crud-loading">
     <div class="total-summary-operation__header">
       <div class="total-summary-operation__spacer"></div>
-      <div class="total-summary-operation__title">{{ 'SUMMARY.INCOME' | translate }}</div>
+      <div class="total-summary-operation__title">
+        {{ 'SUMMARY.INCOME' | translate }}
+      </div>
       <div class="total-summary-operation__operator">-</div>
-      <div class="total-summary-operation__title">{{ 'SUMMARY.EXPENSE' | translate }}</div>
+      <div class="total-summary-operation__title">
+        {{ 'SUMMARY.EXPENSE' | translate }}
+      </div>
       <div class="total-summary-operation__operator">=</div>
-      <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL' | translate }}</div>
+      <div class="total-summary-operation__title">
+        {{ 'SUMMARY.TOTAL' | translate }}
+      </div>
     </div>
 
     <div class="total-summary-operation__body">
       @for (row of primaryOperation(); track row.key) {
         <div class="total-summary-row">
-          <div class="total-summary-row__label">{{ row.label | translate }}</div>
-          <div class="total-summary-row__value">{{ valueOf(row.left, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          <div class="total-summary-row__label">
+            {{ row.label | translate }}
+          </div>
+          <div class="total-summary-row__value">
+            {{
+              valueOf(row.left, row.key)
+                | currency
+                  : $safeNavigationMigration(currentCurrency?.code)
+                  : 'symbol'
+                  : '1.2-2'
+            }}
+          </div>
           <div class="total-summary-row__operator">-</div>
-          <div class="total-summary-row__value">{{ valueOf(row.right, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          <div class="total-summary-row__value">
+            {{
+              valueOf(row.right, row.key)
+                | currency
+                  : $safeNavigationMigration(currentCurrency?.code)
+                  : 'symbol'
+                  : '1.2-2'
+            }}
+          </div>
           <div class="total-summary-row__operator">=</div>
-          <div class="total-summary-row__result">{{ valueOf(row.result, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+          <div class="total-summary-row__result">
+            {{
+              valueOf(row.result, row.key)
+                | currency
+                  : $safeNavigationMigration(currentCurrency?.code)
+                  : 'symbol'
+                  : '1.2-2'
+            }}
+          </div>
         </div>
       }
     </div>
@@ -29,22 +61,54 @@
     <div class="app-surface-item app-crud-loading">
       <div class="total-summary-operation__header">
         <div class="total-summary-operation__spacer"></div>
-        <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL' | translate }}</div>
+        <div class="total-summary-operation__title">
+          {{ 'SUMMARY.TOTAL' | translate }}
+        </div>
         <div class="total-summary-operation__operator">+</div>
-        <div class="total-summary-operation__title">{{ 'SUMMARY.CASH' | translate }}</div>
+        <div class="total-summary-operation__title">
+          {{ 'SUMMARY.CASH' | translate }}
+        </div>
         <div class="total-summary-operation__operator">=</div>
-        <div class="total-summary-operation__title">{{ 'SUMMARY.TOTAL_CASH' | translate }}</div>
+        <div class="total-summary-operation__title">
+          {{ 'SUMMARY.TOTAL_CASH' | translate }}
+        </div>
       </div>
 
       <div class="total-summary-operation__body">
         @for (row of cashOperation(); track row.key) {
           <div class="total-summary-row">
-            <div class="total-summary-row__label">{{ row.label | translate }}</div>
-            <div class="total-summary-row__value">{{ valueOf(row.left, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+            <div class="total-summary-row__label">
+              {{ row.label | translate }}
+            </div>
+            <div class="total-summary-row__value">
+              {{
+                valueOf(row.left, row.key)
+                  | currency
+                    : $safeNavigationMigration(currentCurrency?.code)
+                    : 'symbol'
+                    : '1.2-2'
+              }}
+            </div>
             <div class="total-summary-row__operator">+</div>
-            <div class="total-summary-row__value">{{ valueOf(row.right, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+            <div class="total-summary-row__value">
+              {{
+                valueOf(row.right, row.key)
+                  | currency
+                    : $safeNavigationMigration(currentCurrency?.code)
+                    : 'symbol'
+                    : '1.2-2'
+              }}
+            </div>
             <div class="total-summary-row__operator">=</div>
-            <div class="total-summary-row__result">{{ valueOf(row.result, row.key) | currency: currentCurrency?.code: 'symbol': '1.2-2' }}</div>
+            <div class="total-summary-row__result">
+              {{
+                valueOf(row.result, row.key)
+                  | currency
+                    : $safeNavigationMigration(currentCurrency?.code)
+                    : 'symbol'
+                    : '1.2-2'
+              }}
+            </div>
           </div>
         }
       </div>

@@ -39,9 +39,7 @@
               "base": "dist/cleos"
             },
             "index": "src/index.html",
-            "polyfills": [
-              "zone.js"
-            ],
+            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
@@ -70,10 +68,7 @@
             "namedChunks": false,
             "browser": "src/main.ts",
             "stylePreprocessorOptions": {
-              "includePaths": [
-                "src",
-                "node_modules"
-              ]
+              "includePaths": ["src", "node_modules"]
             }
           },
           "configurations": {
@@ -204,49 +199,10 @@
           }
         },
         "test": {
-          "builder": "@angular/build:karma",
+          "builder": "@angular/build:unit-test",
           "options": {
-            "main": "src/test.ts",
-            "polyfills": [
-              "zone.js"
-            ],
             "tsConfig": "tsconfig.spec.json",
-            "karmaConfig": "karma.conf.js",
-            "codeCoverage": true,
-            "codeCoverageExclude": [
-              "src/app/**/*.actions.ts",
-              "src/app/**/*.reducers.ts",
-              "src/app/**/*.effects.ts",
-              "src/app/**/*.selectors.ts",
-              "src/app/**/*-stub.component.ts"
-            ],
-            "assets": [
-              "src/favicon.ico",
-              "src/assets",
-              "src/manifest.json",
-              "src/firebase-messaging-sw.js",
-              "src/sitemap.xml",
-              "src/browserconfig.xml",
-              "src/robots.txt",
-              {
-                "glob": "*.txt",
-                "input": "src/.well-known/pki-validation",
-                "output": ".well-known/pki-validation"
-              }
-            ],
-            "styles": [
-              "node_modules/cookieconsent/build/cookieconsent.min.css",
-              "src/global.scss"
-            ],
-            "scripts": [
-              "node_modules/cookieconsent/build/cookieconsent.min.js"
-            ],
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "src",
-                "node_modules"
-              ]
-            }
+            "runnerConfig": "vitest.config.ts"
           }
         },
         "lint": {
@@ -347,8 +303,6 @@
   },
   "cli": {
     "analytics": false,
-    "schematicCollections": [
-      "@schematics/angular"
-    ]
+    "schematicCollections": ["@schematics/angular"]
   }
 }

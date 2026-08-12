@@ -27,7 +27,7 @@ $status-dark: (
   success-text: #008b00,
   success-contrast: #c3f69d,
   in-process-bg: rgba(#844f29, 0.4),
-  payment-provider-bg: rgb(0, 158, 227, 0.4)
+  payment-provider-bg: rgb(0, 158, 227, 0.4),
 );
 
 $status-light: (
@@ -48,7 +48,7 @@ $status-light: (
   in-process-bg: rgba(#a06c3f, 0.4),
   payment-provider-bg: rgb(0, 158, 227),
   neutral-bg: gray,
-  neutral-bg-soft: darkgray
+  neutral-bg-soft: darkgray,
 );
 
 @function status-dark($token) {

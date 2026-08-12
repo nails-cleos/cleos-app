@@ -2,14 +2,21 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'COMMON.SEARCH.TITLE' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'COMMON.SEARCH.TITLE' | translate
+        }}</span>
       </div>
     </div>
     <div class="app-surface-filter-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COMMON.LABEL.FILTER' | translate }}</mat-label>
         <label>
-          <input [formControl]="getForm.filter" autocomplete="off" matInput type="text">
+          <input
+            [formControl]="getForm.filter"
+            autocomplete="off"
+            matInput
+            type="text"
+          />
         </label>
       </mat-form-field>
     </div>
@@ -20,59 +27,100 @@
       @let resultsLength = resultsLengthSignal();
       @let pageSize = pageSizeSignal();
       @if (isLoading()) {
-        <app-table-skeleton [columns]="tableColumns" [showPaginator]="true"></app-table-skeleton>
+        <app-table-skeleton
+          [columns]="tableColumns"
+          [showPaginator]="true"
+        ></app-table-skeleton>
       } @else if (dataSourceSignal(); as dataSource) {
-        <table [dataSource]="dataSource" mat-table matSort matSortActive="displayName" matSortDirection="asc"
-               matSortDisableClear multiTemplateDataRows>
+        <table
+          [dataSource]="dataSource"
+          mat-table
+          matSort
+          [matSortActive]="tableState.sortActive()"
+          [matSortDirection]="tableState.sortDirection()"
+          matSortDisableClear
+          multiTemplateDataRows
+        >
           <ng-container matColumnDef="position">
             <th *matHeaderCellDef mat-header-cell>#</th>
-            <td *matCellDef="let user; let i = dataIndex;" mat-cell>
-              <div>{{ (paginatorPageIndex() * pageSize) + i + 1 }}</div>
+            <td *matCellDef="let user; let i = dataIndex" mat-cell>
+              <div>{{ paginatorPageIndex() * pageSize + i + 1 }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="displayName">
-            <th *matHeaderCellDef mat-header-cell mat-sort-header>{{ 'COMMON.COLUMN.NAME' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell mat-sort-header>
+              {{ 'COMMON.COLUMN.NAME' | translate }}
+            </th>
             <td *matCellDef="let user" mat-cell>
               <div>{{ user.displayName }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="email">
-            <th *matHeaderCellDef class="app-surface-hide-mobile" mat-header-cell
-                mat-sort-header>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}
+            <th
+              *matHeaderCellDef
+              class="app-surface-hide-mobile"
+              mat-header-cell
+              mat-sort-header
+            >
+              {{ 'USER.LIST.COLUMN.EMAIL' | translate }}
             </th>
-            <td *matCellDef="let user" class="app-surface-cell-wrap app-surface-hide-mobile" mat-cell>
+            <td
+              *matCellDef="let user"
+              class="app-surface-cell-wrap app-surface-hide-mobile"
+              mat-cell
+            >
               <div>{{ user.email }}</div>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="status">
-            <th *matHeaderCellDef mat-header-cell>{{ 'COMMON.COLUMN.STATUS' | translate }}</th>
+            <th *matHeaderCellDef mat-header-cell>
+              {{ 'COMMON.COLUMN.STATUS' | translate }}
+            </th>
             <td *matCellDef="let user" mat-cell>
               <div>
                 @if (!user.deleted) {
                   <div>
                     @if (user.enabled && user.verified && user.uid) {
-                      <mat-icon matTooltip="{{ 'USER.LIST.STATUS.ENABLED' | translate }}" matTooltipPosition="left">
+                      <mat-icon
+                        matTooltip="{{
+                          'USER.LIST.STATUS.ENABLED' | translate
+                        }}"
+                        matTooltipPosition="left"
+                      >
                         verified_user
                       </mat-icon>
                     }
                     @if (!user.uid) {
-                      <mat-icon color="warn" matTooltip="{{ 'USER.LIST.STATUS.NOT_CREATED' | translate }}"
-                                matTooltipPosition="left">
+                      <mat-icon
+                        color="warn"
+                        matTooltip="{{
+                          'USER.LIST.STATUS.NOT_CREATED' | translate
+                        }}"
+                        matTooltipPosition="left"
+                      >
                         gpp_bad
                       </mat-icon>
                     }
                     @if (user.uid && (!user.enabled || !user.verified)) {
-                      <mat-icon matTooltip="{{ 'USER.LIST.STATUS.DISABLED' | translate }}" matTooltipPosition="left">
+                      <mat-icon
+                        matTooltip="{{
+                          'USER.LIST.STATUS.DISABLED' | translate
+                        }}"
+                        matTooltipPosition="left"
+                      >
                         gpp_maybe
                       </mat-icon>
                     }
                   </div>
                 } @else {
-                  <mat-icon color="primary" matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
-                            matTooltipPosition="left">delete_outline
+                  <mat-icon
+                    color="primary"
+                    matTooltip="{{ 'USER.LIST.STATUS.DELETED' | translate }}"
+                    matTooltipPosition="left"
+                    >delete_outline
                   </mat-icon>
                 }
               </div>
@@ -81,9 +129,17 @@
 
           <ng-container matColumnDef="actions">
             <th *matHeaderCellDef mat-header-cell>
-              <span class="app-surface-hide-mobile">{{ 'COMMON.COLUMN.ACTIONS' | translate }}</span>
-              <button [routerLink]="['/', language, 'users', 'add']" mat-icon-button id="add-button"
-                      matTooltip="{{ 'USER.TITLE' | translate }}" matTooltipPosition="right" type="button">
+              <span class="app-surface-hide-mobile">{{
+                'COMMON.COLUMN.ACTIONS' | translate
+              }}</span>
+              <button
+                [routerLink]="['/', language, 'users', 'add']"
+                mat-icon-button
+                id="add-button"
+                matTooltip="{{ 'USER.TITLE' | translate }}"
+                matTooltipPosition="right"
+                type="button"
+              >
                 <mat-icon color="primary">person_add</mat-icon>
               </button>
             </th>
@@ -93,13 +149,25 @@
                   <button (click)="edit(user)" mat-icon-button>
                     <mat-icon color="primary">edit</mat-icon>
                   </button>
-                  <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
+                  <button
+                    [routerLink]="['/', language, 'users', user.id, 'overview']"
+                    mat-icon-button
+                  >
                     <mat-icon color="primary">analytics</mat-icon>
                   </button>
                   <button (click)="book(user)" mat-icon-button>
                     <mat-icon color="accent">today</mat-icon>
                   </button>
-                  <button [routerLink]="['/', language, 'accounts', 'customers', user.id]" mat-icon-button>
+                  <button
+                    [routerLink]="[
+                      '/',
+                      language,
+                      'accounts',
+                      'customers',
+                      user.id,
+                    ]"
+                    mat-icon-button
+                  >
                     <mat-icon color="primary">account_circle</mat-icon>
                   </button>
                   @if (!user.enabled && !user.verified && user.uid) {
@@ -125,27 +193,46 @@
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td *matCellDef="let user" [attr.colspan]="displayedColumns.length" mat-cell>
-              <div [class.detail-expanded]="user === expandedUser"
-                   class="detail app-table-detail-fill">
+            <td
+              *matCellDef="let user"
+              [attr.colspan]="displayedColumns.length"
+              mat-cell
+            >
+              <div
+                [class.detail-expanded]="user === expandedUser"
+                class="detail app-table-detail-fill"
+              >
                 <mat-list>
                   <mat-list-item class="app-surface-hide-desktop" role="list">
-                    <span class="app-surface-hide-desktop" matListItemTitle>{{ 'USER.LIST.COLUMN.DISPLAY_NAME' | translate }}</span>
+                    <span class="app-surface-hide-desktop" matListItemTitle>{{
+                      'USER.LIST.COLUMN.DISPLAY_NAME' | translate
+                    }}</span>
                     <span matListItemLine>{{ user.displayName }}</span>
                   </mat-list-item>
                   <mat-list-item class="app-surface-hide-desktop" role="list">
-                    <span class="app-surface-hide-desktop" matListItemTitle>{{ 'USER.LIST.COLUMN.EMAIL' | translate }}</span>
+                    <span class="app-surface-hide-desktop" matListItemTitle>{{
+                      'USER.LIST.COLUMN.EMAIL' | translate
+                    }}</span>
                     <span matListItemLine>{{ user.email }}</span>
                   </mat-list-item>
-                  <span class="app-surface-hide-mobile" mat-subheader>{{ 'USER.LIST.COLUMN.DETAIL.TITLE' | translate }}</span>
+                  <span class="app-surface-hide-mobile" mat-subheader>{{
+                    'USER.LIST.COLUMN.DETAIL.TITLE' | translate
+                  }}</span>
                   @if (!user.deleted) {
                     <div class="flex-container app-surface-hide-mobile">
                       <div class="flex-child">
                         @for (it of user.authorities; track it) {
                           <mat-list-item>
-                            <mat-icon matListItemIcon>{{ getIcon(it.authority) }}</mat-icon>
-                            <div matListItemTitle>{{ 'COMMON.ROLES.' + it.authority | translate }}
-                              <button (click)="removeRole(user, it.authority)" color="warn" mat-icon-button>
+                            <mat-icon matListItemIcon>{{
+                              getIcon(it.authority)
+                            }}</mat-icon>
+                            <div matListItemTitle>
+                              {{ 'COMMON.ROLES.' + it.authority | translate }}
+                              <button
+                                (click)="removeRole(user, it.authority)"
+                                color="warn"
+                                mat-icon-button
+                              >
                                 <mat-icon>person_remove</mat-icon>
                               </button>
                             </div>
@@ -156,22 +243,42 @@
                       <div class="flex-child">
                         @for (role of user.missing; track role) {
                           <mat-list-item>
-                            <mat-icon matListItemIcon>{{ getIcon(role) }}</mat-icon>
-                            <button (click)="addRole(user, role)" color="primary" mat-button>
-                              {{ 'COMMON.BUTTON.ADD' | translate }} {{ 'COMMON.ROLES.' + role | translate | lowercase }}
+                            <mat-icon matListItemIcon>{{
+                              getIcon(role)
+                            }}</mat-icon>
+                            <button
+                              (click)="addRole(user, role)"
+                              color="primary"
+                              mat-button
+                            >
+                              {{ 'COMMON.BUTTON.ADD' | translate }}
+                              {{
+                                'COMMON.ROLES.' + role | translate | lowercase
+                              }}
                             </button>
                           </mat-list-item>
                         }
                       </div>
                     </div>
                   }
-                  <div class="app-surface-hide-desktop" matListItemTitle>{{ 'COMMON.COLUMN.ACTIONS' | translate }}</div>
+                  <div class="app-surface-hide-desktop" matListItemTitle>
+                    {{ 'COMMON.COLUMN.ACTIONS' | translate }}
+                  </div>
                   @if (!user.deleted) {
                     <div class="app-surface-hide-desktop">
                       <button (click)="edit(user)" mat-icon-button>
                         <mat-icon color="primary">edit</mat-icon>
                       </button>
-                      <button [routerLink]="['/', language, 'users', user.id, 'overview']" mat-icon-button>
+                      <button
+                        [routerLink]="[
+                          '/',
+                          language,
+                          'users',
+                          user.id,
+                          'overview',
+                        ]"
+                        mat-icon-button
+                      >
                         <mat-icon color="primary">analytics</mat-icon>
                       </button>
                       <button (click)="book(user)" mat-icon-button>
@@ -204,29 +311,52 @@
           </ng-container>
 
           <ng-container matColumnDef="noContent">
-            <td *matFooterCellDef [attr.colspan]="displayedColumns.length" class="no-content bold" mat-footer-cell>
-              {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{ getForm.filter }}'
+            <td
+              *matFooterCellDef
+              [attr.colspan]="displayedColumns.length"
+              class="no-content bold"
+              mat-footer-cell
+            >
+              {{ 'USER.LIST.ERROR.NO_CONTENT' | translate }} '{{
+                getForm.filter.value
+              }}'
             </td>
           </ng-container>
 
           <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
-          <tr (click)="expandedUser = expandedUser === user ? null : user"
-              *matRowDef="let user; columns: displayedColumns;"
-              [ngClass]="{'deadLine': user.deleted}" class="app-surface-hide-mobile app-table-master-row" mat-row></tr>
-          <tr (click)="expandedUser = expandedUser === user ? null : user"
-              *matRowDef="let user; columns: displayedColumns;"
-              [ngClass]="{'deadLine': user.deleted}" class="app-surface-hide-desktop app-table-master-row" mat-row></tr>
-          <tr *matRowDef="let row; columns: ['expandedDetail']"
-              [class.app-table-detail-row--expanded]="row === expandedUser"
-              class="app-table-detail-row"
-              mat-row></tr>
+          <tr
+            (click)="expandedUser = expandedUser === user ? null : user"
+            *matRowDef="let user; columns: displayedColumns"
+            [ngClass]="{ deadLine: user.deleted }"
+            class="app-surface-hide-mobile app-table-master-row"
+            mat-row
+          ></tr>
+          <tr
+            (click)="expandedUser = expandedUser === user ? null : user"
+            *matRowDef="let user; columns: displayedColumns"
+            [ngClass]="{ deadLine: user.deleted }"
+            class="app-surface-hide-desktop app-table-master-row"
+            mat-row
+          ></tr>
+          <tr
+            *matRowDef="let row; columns: ['expandedDetail']"
+            [class.app-table-detail-row--expanded]="row === expandedUser"
+            class="app-table-detail-row"
+            mat-row
+          ></tr>
 
-          <tr *matFooterRowDef="['noContent']" [hidden]="resultsLength > 0" mat-footer-row></tr>
+          <tr
+            *matFooterRowDef="['noContent']"
+            [hidden]="resultsLength > 0"
+            mat-footer-row
+          ></tr>
         </table>
         @if (resultsLength) {
-          <mat-paginator [length]="resultsLength" [pageSize]="pageSize"></mat-paginator>
+          <mat-paginator
+            [length]="resultsLength"
+            [pageSize]="pageSize"
+          ></mat-paginator>
         }
-
       }
     </div>
   </section>

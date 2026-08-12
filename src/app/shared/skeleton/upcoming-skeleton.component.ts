@@ -11,6 +11,8 @@ export class UpcomingSkeletonComponent {
   tabCount = input(2);
   fieldCardCount = input(3);
 
-  tabs = (): number[] => Array.from({ length: this.tabCount() }, (_, index) => index);
-  fieldCards = (): number[] => Array.from({ length: this.fieldCardCount() }, (_, index) => index);
+  tabs = (): number[] =>
+    Array.from({ length: this.tabCount() }, (_, index) => index);
+  fieldCards = (): number[] =>
+    Array.from({ length: this.fieldCardCount() }, (_, index) => index);
 }

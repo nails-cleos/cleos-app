@@ -4,24 +4,40 @@
       <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>reviews</mat-icon>
       </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'ME.REVIEW.TITLE' | translate }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">
+        {{ 'ME.REVIEW.TITLE' | translate }}
+      </h1>
     </div>
   </div>
 
   <div class="app-surface-dialog-divider" aria-hidden="true"></div>
 
-  <div mat-dialog-content class="app-surface-dialog-content review-dialog-content">
+  <div
+    mat-dialog-content
+    class="app-surface-dialog-content review-dialog-content"
+  >
     @if (reservation) {
       <div class="upcoming">
         <table>
           <tr>
-            <td class="right">{{ 'ME.RESERVATION.UPCOMING.START' | translate }}</td>
-            <td class="left">{{ reservation.start | date:'short':reservation.room.timeZone:language }}</td>
+            <td class="right">
+              {{ 'ME.RESERVATION.UPCOMING.START' | translate }}
+            </td>
+            <td class="left">
+              {{
+                reservation.start
+                  | date: 'short' : reservation.room.timeZone : language
+              }}
+            </td>
           </tr>
           @if (end) {
             <tr>
-              <td class="right">{{ 'ME.RESERVATION.UPCOMING.END' | translate }}</td>
-              <td class="left">{{ end | date:'short':reservation.room.timeZone:language }}</td>
+              <td class="right">
+                {{ 'ME.RESERVATION.UPCOMING.END' | translate }}
+              </td>
+              <td class="left">
+                {{ end | date: 'short' : reservation.room.timeZone : language }}
+              </td>
             </tr>
           }
           <tr>
@@ -32,8 +48,13 @@
             <td class="right">{{ 'COMMON.ADDRESS.FIELD' | translate }}</td>
             <td class="left dialog-title">
               <a
-                [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + reservation.room.address.name"
-                rel="noreferrer" target="_blank">
+                [href]="
+                  'https://www.google.com/maps/dir/?api=1&z=15&destination=' +
+                  reservation.room.address.name
+                "
+                rel="noreferrer"
+                target="_blank"
+              >
                 {{ reservation.room.address.name }}
               </a>
             </td>
@@ -43,23 +64,42 @@
             <td class="left">{{ reservation.treatment.name }}</td>
           </tr>
           <tr>
-            <td class="right">{{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}</td>
-            <td class="left">$ {{ price.total | number:'1.2-2' }}</td>
+            <td class="right">
+              {{ 'ME.RESERVATION.TREATMENT.PRICE.FIELD' | translate }}
+            </td>
+            <td class="left">$ {{ price.total | number: '1.2-2' }}</td>
           </tr>
         </table>
       </div>
     }
     <mat-divider class="divider-padding"></mat-divider>
     @if (review) {
-      <app-rating [detail]="review.detail" [rating]="review.rating" [starCount]="starCount" color="primary"
-                  [canEdit]="false"></app-rating>
+      <app-rating
+        [detail]="review.detail"
+        [rating]="review.rating"
+        [starCount]="starCount"
+        color="primary"
+        [canEdit]="false"
+      ></app-rating>
     } @else {
-      <app-rating (ratingHover)="onRatingHover($event)" (ratingUpdated)="onRatingChanged($event)" [hover]="hover"
-                  [rating]="rating" [starCount]="starCount" color="primary" [canEdit]="true"></app-rating>
+      <app-rating
+        (ratingHover)="onRatingHover($event)"
+        (ratingUpdated)="onRatingChanged($event)"
+        [hover]="hover"
+        [rating]="rating"
+        [starCount]="starCount"
+        color="primary"
+        [canEdit]="true"
+      ></app-rating>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'ME.REVIEW.DETAIL' | translate }}</mat-label>
         <label>
-          <textarea #message [formControl]="detail" matInput maxlength="256"></textarea>
+          <textarea
+            #message
+            [formControl]="detail"
+            matInput
+            maxlength="256"
+          ></textarea>
         </label>
         <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
       </mat-form-field>
@@ -70,9 +110,17 @@
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
-    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
     @if (!review) {
-      <button (click)="doAction()" [disabled]="rating < 1" color="primary" mat-flat-button type="button">
+      <button
+        (click)="doAction()"
+        [disabled]="rating < 1"
+        color="primary"
+        mat-flat-button
+        type="button"
+      >
         {{ 'COMMON.BUTTON.ADD' | translate }}
       </button>
     }

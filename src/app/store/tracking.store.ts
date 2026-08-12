@@ -11,10 +11,7 @@ const initialState = createStoreInitialState<never, ITracking>();
 export const TrackingStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((
-    store,
-    trackingService = inject(TrackingService),
-  ) => {
+  withMethods((store, trackingService = inject(TrackingService)) => {
     let getByReservationIdSubscription: Subscription | undefined;
     let executeByReservationIdSubscription: Subscription | undefined;
     let updateByReservationIdSubscription: Subscription | undefined;
@@ -25,7 +22,8 @@ export const TrackingStore = signalStore(
       updateByReservationIdSubscription?.unsubscribe();
     };
 
-    const patchError = (err: HttpErrorResponse): void => patchCrudError(store, err);
+    const patchError = (err: HttpErrorResponse): void =>
+      patchCrudError(store, err);
 
     return {
       clean(): void {
@@ -45,29 +43,41 @@ export const TrackingStore = signalStore(
         getByReservationIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        getByReservationIdSubscription = trackingService.getTrackingByReservationId(reservationId).subscribe({
-          next: (selected) => patchState(store, { selected, isLoading: false }),
-          error: patchError,
-        });
+        getByReservationIdSubscription = trackingService
+          .getTrackingByReservationId(reservationId)
+          .subscribe({
+            next: (selected) =>
+              patchState(store, { selected, isLoading: false }),
+            error: patchError,
+          });
       },
 
       executeByReservationId(reservationId: string): void {
         executeByReservationIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        executeByReservationIdSubscription = trackingService.executeTrackingByReservationId(reservationId).subscribe({
-          next: (selected) => patchState(store, { selected, isLoading: false }),
-          error: patchError,
-        });
+        executeByReservationIdSubscription = trackingService
+          .executeTrackingByReservationId(reservationId)
+          .subscribe({
+            next: (selected) =>
+              patchState(store, { selected, isLoading: false }),
+            error: patchError,
+          });
       },
 
-      updateByReservationId(reservationId: string, started?: string, completed?: string): void {
+      updateByReservationId(
+        reservationId: string,
+        started?: string,
+        completed?: string,
+      ): void {
         updateByReservationIdSubscription?.unsubscribe();
         patchState(store, { selected: undefined, isLoading: true });
 
-        updateByReservationIdSubscription =
-          trackingService.updateTrackingByReservationId(reservationId, started, completed).subscribe({
-            next: (selected) => patchState(store, { selected, isLoading: false }),
+        updateByReservationIdSubscription = trackingService
+          .updateTrackingByReservationId(reservationId, started, completed)
+          .subscribe({
+            next: (selected) =>
+              patchState(store, { selected, isLoading: false }),
             error: patchError,
           });
       },

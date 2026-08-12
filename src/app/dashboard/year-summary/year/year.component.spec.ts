@@ -1,24 +1,29 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { YearComponent } from './year.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { IQuarterSummary } from '../../dashboard';
-import { DEFAULT_LOCALE } from '../../../util/dates';
-import { NavigationService } from '../../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('YearComponent', () => {
   let component: YearComponent;
   let fixture: ComponentFixture<YearComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
 
     await TestBed.configureTestingModule({
-      imports: [YearComponent, TranslateModule.forRoot()],
+      imports: [YearComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
     }).compileComponents();
@@ -42,19 +47,23 @@ describe('YearComponent', () => {
   });
 
   it('should build quarter rows from summaries', () => {
-    const quarterSummaries: IQuarterSummary[] = [{
-      quarter: 2,
-      monthSummaries: [{
-        month: 5,
-        total: [],
-        totalGross: 0,
-        totalNet: 0,
-        totalBTW: 0,
-        totalWithoutGross: 0,
-        totalWithoutNet: 0,
-        totalWithoutBTW: 0,
-      }],
-    }];
+    const quarterSummaries: IQuarterSummary[] = [
+      {
+        quarter: 2,
+        monthSummaries: [
+          {
+            month: 5,
+            total: [],
+            totalGross: 0,
+            totalNet: 0,
+            totalBTW: 0,
+            totalWithoutGross: 0,
+            totalWithoutNet: 0,
+            totalWithoutBTW: 0,
+          },
+        ],
+      },
+    ];
 
     fixture.componentRef.setInput('quarterSummaries', quarterSummaries);
     fixture.detectChanges();
@@ -67,16 +76,22 @@ describe('YearComponent', () => {
   it('should navigate to quarter summary', () => {
     component.goToQuarter(3);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'quarter', 'summary'], {
-      state: { year: 2025, quarter: 3 },
-    });
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['dashboard', 'quarter', 'summary'],
+      {
+        state: { year: 2025, quarter: 3 },
+      },
+    );
   });
 
   it('should navigate to month summary', () => {
     component.goToMonth(11);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['dashboard', 'monthly', 'summary'], {
-      state: { date: '11-2025' },
-    });
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(
+      ['dashboard', 'monthly', 'summary'],
+      {
+        state: { date: '11-2025' },
+      },
+    );
   });
 });

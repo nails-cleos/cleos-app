@@ -24,7 +24,8 @@ export class MessagingService {
   updateToken(user: any, token: string) {
     if (this.firebaseService.isAuthenticated()) {
       this.notificationStore.subscribeNotification(token);
-      this.firebaseService.updateToken(user.id, token)
+      this.firebaseService
+        .updateToken(user.id, token)
         .then(() => console.warn('DB updated'))
         .catch(console.error);
     }

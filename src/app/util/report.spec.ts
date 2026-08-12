@@ -1,9 +1,15 @@
 import { createYearlyWorkbook } from './report';
 import { EnvService } from '../services/env.service';
 import { TranslateService } from '@ngx-translate/core';
-import { IMonthlyExport, IMonthlySummaryExpense, IMonthlySummarySale, ISummaryTotal } from '../dashboard/dashboard';
+import {
+  IMonthlyExport,
+  IMonthlySummaryExpense,
+  IMonthlySummarySale,
+  ISummaryTotal,
+} from '../dashboard/dashboard';
 import { States } from '../reservation/reservation';
 import { monthViewTitle } from './dates';
+import { describe, expect, it } from 'vitest';
 
 const buildSummaryTotal = (
   gross: number,
@@ -50,7 +56,10 @@ describe('report util', () => {
 
   const buildMonthlyExport = (): IMonthlyExport[] => {
     const payment = buildSummaryTotal(100, 80, 20, { type: 'INCOME' });
-    const saleTotal = buildSummaryTotal(100, 80, 20, { payments: [payment], type: 'INCOME' });
+    const saleTotal = buildSummaryTotal(100, 80, 20, {
+      payments: [payment],
+      type: 'INCOME',
+    });
     const saleSummary = {
       id: 'S1',
       paths: ['sales', 'S1'],
@@ -78,12 +87,14 @@ describe('report util', () => {
       supplyStore: 'Store',
     } as IMonthlySummaryExpense;
 
-    return [{
-      month: 1,
-      saleSummary: [saleSummary],
-      expenseSummary: [expenseSummary],
-      cashSummary: [],
-    }];
+    return [
+      {
+        month: 1,
+        saleSummary: [saleSummary],
+        expenseSummary: [expenseSummary],
+        cashSummary: [],
+      },
+    ];
   };
 
   it('should keep monthly and quarter sheets in yearly export', () => {
@@ -125,17 +136,17 @@ describe('report util', () => {
     expect(worksheet.getCell('A3').value).toBe(january);
 
     const totalRow = 15;
-    expect(worksheet.getCell(`A${ totalRow }`).value).toBe('Total');
+    expect(worksheet.getCell(`A${totalRow}`).value).toBe('Total');
 
-    expect((worksheet.getCell(`B${ totalRow }`).value as any).result).toBe(100);
-    expect((worksheet.getCell(`C${ totalRow }`).value as any).result).toBe(80);
-    expect((worksheet.getCell(`D${ totalRow }`).value as any).result).toBe(20);
-    expect((worksheet.getCell(`E${ totalRow }`).value as any).result).toBe(40);
-    expect((worksheet.getCell(`F${ totalRow }`).value as any).result).toBe(32);
-    expect((worksheet.getCell(`G${ totalRow }`).value as any).result).toBe(8);
-    expect((worksheet.getCell(`H${ totalRow }`).value as any).result).toBe(60);
-    expect((worksheet.getCell(`I${ totalRow }`).value as any).result).toBe(48);
-    expect((worksheet.getCell(`J${ totalRow }`).value as any).result).toBe(12);
+    expect((worksheet.getCell(`B${totalRow}`).value as any).result).toBe(100);
+    expect((worksheet.getCell(`C${totalRow}`).value as any).result).toBe(80);
+    expect((worksheet.getCell(`D${totalRow}`).value as any).result).toBe(20);
+    expect((worksheet.getCell(`E${totalRow}`).value as any).result).toBe(40);
+    expect((worksheet.getCell(`F${totalRow}`).value as any).result).toBe(32);
+    expect((worksheet.getCell(`G${totalRow}`).value as any).result).toBe(8);
+    expect((worksheet.getCell(`H${totalRow}`).value as any).result).toBe(60);
+    expect((worksheet.getCell(`I${totalRow}`).value as any).result).toBe(48);
+    expect((worksheet.getCell(`J${totalRow}`).value as any).result).toBe(12);
   });
 
   it('should set active tab to the selected month', () => {
@@ -149,7 +160,9 @@ describe('report util', () => {
     );
 
     const february = monthViewTitle(new Date(2024, 1, 1));
-    const expectedIndex = workbook.worksheets.findIndex(sheet => sheet.name === february);
+    const expectedIndex = workbook.worksheets.findIndex(
+      (sheet) => sheet.name === february,
+    );
 
     expect(workbook.views?.[0]?.activeTab).toBe(expectedIndex);
   });

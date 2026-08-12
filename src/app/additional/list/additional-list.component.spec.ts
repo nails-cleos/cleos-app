@@ -1,34 +1,55 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
 import { BehaviorSubject, of } from 'rxjs';
 
 import { IAdditional, IAdditionalAll } from '../additional';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
-import { AdditionalStore } from '../../store/additional.store';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
+import { AdditionalStore } from '@app/store/additional.store';
 import { AdditionalListComponent } from './additional-list.component';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalListComponent', () => {
   let component: AdditionalListComponent;
   let fixture: ComponentFixture<AdditionalListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let additionalStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadPage: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    loadPage: Mock;
+    clearResponse: Mock;
+    delete: Mock;
   };
 
   const mockAdditional: IAdditional[] = [
@@ -44,9 +65,10 @@ describe('AdditionalListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
       breakpoints: {
@@ -55,29 +77,36 @@ describe('AdditionalListComponent', () => {
       },
     });
 
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
     additionalStoreSpy = {
       isLoading: signal(false),
       data: signal<any>({ kind: 'pagination', value: mockPagination }),
       response: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadPage: jasmine.createSpy('loadPage'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      loadPage: vi.fn().mockName('loadPage'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      delete: vi.fn().mockName('delete'),
     };
 
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalListComponent, TranslateModule.forRoot()],
+      imports: [AdditionalListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -143,11 +172,16 @@ describe('AdditionalListComponent', () => {
   });
 
   it('should call loadPage when paginatorPageIndex changes', () => {
-    additionalStoreSpy.loadPage.calls.reset();
+    additionalStoreSpy.loadPage.mockClear();
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
     expect(additionalStoreSpy.loadPage).toHaveBeenCalledWith({
@@ -162,11 +196,16 @@ describe('AdditionalListComponent', () => {
     const paginator = component['paginator']();
 
     paginator!.pageIndex = 1;
-    paginator!.page.emit({ pageIndex: 1, previousPageIndex: 0, pageSize: PAGE_SIZE, length: 2 });
+    paginator!.page.emit({
+      pageIndex: 1,
+      previousPageIndex: 0,
+      pageSize: PAGE_SIZE,
+      length: 2,
+    });
     fixture.detectChanges();
 
-    additionalStoreSpy.clearResponse.calls.reset();
-    additionalStoreSpy.loadPage.calls.reset();
+    additionalStoreSpy.clearResponse.mockClear();
+    additionalStoreSpy.loadPage.mockClear();
 
     additionalStoreSpy.response.set({ success: true } as any);
     fixture.detectChanges();
@@ -184,17 +223,23 @@ describe('AdditionalListComponent', () => {
     const item = mockAdditional[0] as IAdditionalAll;
     component.edit(item);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['additional', item.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'additional',
+      item.id,
+    ]);
   });
 
   it('should call delete when dialog returns a result', () => {
     const item = mockAdditional[0];
-    dialogSpy.open.and.returnValue({
+    dialogSpy.open.mockReturnValue({
       afterClosed: () => of(item),
     } as any);
 
     component.delete(item);
 
-    expect(additionalStoreSpy.delete).toHaveBeenCalledWith(item.id!, item.name!);
+    expect(additionalStoreSpy.delete).toHaveBeenCalledWith(
+      item.id!,
+      item.name!,
+    );
   });
 });

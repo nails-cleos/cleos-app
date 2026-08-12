@@ -38,15 +38,15 @@ export interface INoteAll {
 }
 
 export class Note {
-  static fromForm(
-    noteForm: NoteForm,
-    currentNote?: INoteAll,
-  ): INote {
+  static fromForm(noteForm: NoteForm, currentNote?: INoteAll): INote {
     return {
       description: fieldChange(noteForm.description, currentNote?.description),
-      professionalId: valueChange(noteForm.professional.value, currentNote?.professional)?.id,
+      professionalId: valueChange(
+        noteForm.professional.value,
+        currentNote?.professional,
+      )?.id,
       repeat: fieldChange(noteForm.repeat, currentNote?.repeat),
-      date: backendFormatDate(noteForm.date.value),
+      date: backendFormatDate(noteForm.date.value!),
     };
   }
 }

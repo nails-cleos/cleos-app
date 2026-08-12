@@ -4,7 +4,9 @@
       <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>person_search</mat-icon>
       </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.CUSTOMER.CHANGE' | translate }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">
+        {{ 'RESERVATION.CUSTOMER.CHANGE' | translate }}
+      </h1>
     </div>
   </div>
 
@@ -16,18 +18,34 @@
         <mat-form-field appearance="outline">
           <mat-label>{{ 'RESERVATION.CUSTOMER.FIELD' | translate }}</mat-label>
           <label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.customer" [matAutocomplete]="autoCustomer"
-                   autocomplete="off" matInput required type="text">
+            <input
+              (keydown)="keyDownHandler($event)"
+              [formControl]="getForm.customer"
+              [matAutocomplete]="autoCustomer"
+              autocomplete="off"
+              matInput
+              required
+              type="text"
+            />
           </label>
-          <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayFnUser">
+          <mat-autocomplete
+            #autoCustomer="matAutocomplete"
+            [displayWith]="displayFnUser"
+          >
             @for (customer of filteredCustomerSignal(); track customer.id) {
-              <mat-option [value]="customer">{{ customer.displayName }}</mat-option>
+              <mat-option [value]="customer">{{
+                customer.displayName
+              }}</mat-option>
             }
           </mat-autocomplete>
           @if (getForm.customer.hasError('required')) {
-            <mat-error [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'RESERVATION.CUSTOMER.REQUIRED' | translate"
+            ></mat-error>
           } @else if (getForm.customer.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'RESERVATION.CUSTOMER.INVALID' | translate"
+            ></mat-error>
           }
         </mat-form-field>
       } @else {
@@ -40,8 +58,16 @@
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
-    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-flat-button type="button">
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
+    <button
+      (click)="doAction()"
+      color="primary"
+      [disabled]="form.invalid"
+      mat-flat-button
+      type="button"
+    >
       {{ 'RESERVATION.CUSTOMER.UPDATE' | translate }}
     </button>
   </div>

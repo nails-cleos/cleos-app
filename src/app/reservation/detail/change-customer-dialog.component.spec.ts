@@ -1,19 +1,27 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { TranslateModule } from '@ngx-translate/core';
 import { ChangeCustomerDialogComponent } from './change-customer-dialog.component';
-import { IUserAll } from '../../user/user';
+import { IUserAll } from '@app/user/user';
 import { signal, WritableSignal } from '@angular/core';
-import { UserStore } from '../../store/user.store';
-
+import { UserStore } from '@app/store/user.store';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('ChangeCustomerDialogComponent', () => {
   let component: ChangeCustomerDialogComponent;
   let fixture: ComponentFixture<ChangeCustomerDialogComponent>;
 
   let customersSignal: WritableSignal<IUserAll[] | undefined>;
 
-  let userStoreSpy: jasmine.SpyObj<InstanceType<typeof UserStore>>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ChangeCustomerDialogComponent>>;
+  let userStoreSpy: {
+    clean: Mock;
+    loadCustomers: Mock;
+  };
+  let dialogRefSpy: Pick<
+    MatDialogRef<ChangeCustomerDialogComponent>,
+    'close'
+  > & {
+    close: ReturnType<typeof vi.fn>;
+  };
 
   const mockChangeCustomer = {
     treatmentId: 'treatment1',
@@ -28,18 +36,24 @@ describe('ChangeCustomerDialogComponent', () => {
   beforeEach(async () => {
     customersSignal = signal<IUserAll[] | undefined>(undefined);
 
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-    userStoreSpy = jasmine.createSpyObj<InstanceType<typeof UserStore>>('UserStore', ['clean', 'loadCustomers']);
+    dialogRefSpy = {
+      close: vi.fn().mockName('MatDialogRef.close'),
+    };
+    userStoreSpy = {
+      clean: vi.fn().mockName('UserStore.clean'),
+      loadCustomers: vi.fn().mockName('UserStore.loadCustomers'),
+    };
     Object.assign(userStoreSpy, {
       customers: customersSignal.asReadonly(),
     });
 
     await TestBed.configureTestingModule({
-      imports: [ChangeCustomerDialogComponent, TranslateModule.forRoot()],
+      imports: [ChangeCustomerDialogComponent],
       providers: [
+        provideTranslateService(),
         {
           provide: MAT_DIALOG_DATA,
-          useFactory: () => (mockChangeCustomer),
+          useFactory: () => mockChangeCustomer,
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: UserStore, useValue: userStoreSpy },
@@ -79,7 +93,9 @@ describe('ChangeCustomerDialogComponent', () => {
 
     component.doAction();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledWith({ customerId: mockCustomers[0].id });
+    expect(dialogRefSpy.close).toHaveBeenCalledWith({
+      customerId: mockCustomers[0].id,
+    });
   });
 
   it('should close dialog on cancel', () => {

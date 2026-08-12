@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 
 import { InvoiceService } from './invoice.service';
@@ -9,7 +10,12 @@ import { Pagination, skipLoadingOverlay } from '../interfaces/pagination';
 
 describe('InvoiceService', () => {
   let service: InvoiceService;
-  let httpSpy: jasmine.SpyObj<HttpClient>;
+  let httpSpy: Pick<HttpClient, 'get' | 'post' | 'patch' | 'delete'> & {
+    get: ReturnType<typeof vi.fn>;
+    post: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+  };
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -50,12 +56,14 @@ describe('InvoiceService', () => {
   };
 
   beforeEach(() => {
-    httpSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'patch', 'delete']);
+    httpSpy = {
+      get: vi.fn().mockName('HttpClient.get'),
+      post: vi.fn().mockName('HttpClient.post'),
+      patch: vi.fn().mockName('HttpClient.patch'),
+      delete: vi.fn().mockName('HttpClient.delete'),
+    };
     TestBed.configureTestingModule({
-      providers: [
-        InvoiceService,
-        { provide: HttpClient, useValue: httpSpy },
-      ],
+      providers: [InvoiceService, { provide: HttpClient, useValue: httpSpy }],
     });
     service = TestBed.inject(InvoiceService);
   });
@@ -65,7 +73,7 @@ describe('InvoiceService', () => {
   });
 
   it('should fetch all office', () => {
-    httpSpy.get.and.returnValue(of([mockOffice]));
+    httpSpy.get.mockReturnValue(of([mockOffice]));
 
     service.getAllMyOffices().subscribe((result) => {
       expect(result).toEqual([mockOffice]);
@@ -80,35 +88,45 @@ describe('InvoiceService', () => {
       const start = '2023-01-01';
       const end = '2023-01-31';
       const types = ['type1', 'type2'];
-      httpSpy.get.and.returnValue(of([invoice]));
+      httpSpy.get.mockReturnValue(of([invoice]));
 
-      service.getOfficeToInvoice(officeId, start, end, types).subscribe((result) => {
-        expect(result).toEqual([invoice]);
-      });
+      service
+        .getOfficeToInvoice(officeId, start, end, types)
+        .subscribe((result) => {
+          expect(result).toEqual([invoice]);
+        });
 
       let params = new HttpParams().set('start', start).set('end', end);
-      types.forEach(type => {
+      types.forEach((type) => {
         params = params.append('types', type);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${ officeId }`, {
-        params: params, ...skipLoadingOverlay(),
-      });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        `v1/invoices/offices/${officeId}`,
+        {
+          params: params,
+          ...skipLoadingOverlay(),
+        },
+      );
     });
 
     it('should fetch all office to be invoiced without type', () => {
       const officeId = '1';
       const start = '2023-01-01';
       const end = '2023-01-31';
-      httpSpy.get.and.returnValue(of([invoice]));
+      httpSpy.get.mockReturnValue(of([invoice]));
 
       service.getOfficeToInvoice(officeId, start, end).subscribe((result) => {
         expect(result).toEqual([invoice]);
       });
 
-      expect(httpSpy.get).toHaveBeenCalledWith(`v1/invoices/offices/${ officeId }`, {
-        params: new HttpParams().set('start', start).set('end', end), ...skipLoadingOverlay(),
-      });
+      expect(httpSpy.get).toHaveBeenCalledWith(
+        `v1/invoices/offices/${officeId}`,
+        {
+          params: new HttpParams().set('start', start).set('end', end),
+          ...skipLoadingOverlay(),
+        },
+      );
     });
   });
 
@@ -118,16 +136,20 @@ describe('InvoiceService', () => {
       const blob = new Blob(['test content'], { type: 'application/pdf' });
       const fileName = 'invoice.pdf';
 
-      httpSpy.post.and.returnValue(of(void 0));
+      httpSpy.post.mockReturnValue(of(void 0));
 
       service.uploadInvoices(officeId, blob, fileName).subscribe();
 
       expect(httpSpy.post).toHaveBeenCalled();
 
-      const [url, body, options] = httpSpy.post.calls.mostRecent().args;
+      const lastCall = vi.mocked(httpSpy.post).mock.lastCall;
 
-      expect(url).toBe(`v1/invoices/offices/${ officeId }`);
-      expect(body instanceof FormData).toBeTrue();
+      expect(lastCall).toBeDefined();
+
+      const [url, body, options] = lastCall!;
+
+      expect(url).toBe(`v1/invoices/offices/${officeId}`);
+      expect(body instanceof FormData).toBe(true);
 
       const file = (body as FormData).get('file') as File;
       expect(file).toBeTruthy();
@@ -144,16 +166,20 @@ describe('InvoiceService', () => {
       const blob = new Blob(['test content'], { type: 'application/pdf' });
       const fileName = 'invoice.pdf';
 
-      httpSpy.post.and.returnValue(of(void 0));
+      httpSpy.post.mockReturnValue(of(void 0));
 
       service.uploadInvoices(officeId, blob, fileName).subscribe();
 
       expect(httpSpy.post).toHaveBeenCalled();
 
-      const [url, body, options] = httpSpy.post.calls.mostRecent().args;
+      const lastCall = vi.mocked(httpSpy.post).mock.lastCall;
 
-      expect(url).toBe(`v1/invoices/offices/${ officeId }`);
-      expect(body instanceof FormData).toBeTrue();
+      expect(lastCall).toBeDefined();
+
+      const [url, body, options] = lastCall!;
+
+      expect(url).toBe(`v1/invoices/offices/${officeId}`);
+      expect(body instanceof FormData).toBe(true);
 
       const file = (body as FormData).get('file') as File;
       expect(file).toBeTruthy();
@@ -175,16 +201,15 @@ describe('InvoiceService', () => {
         totalElements: 0,
       };
 
-      httpSpy.get.and.returnValue(of(response));
+      httpSpy.get.mockReturnValue(of(response));
 
-      service.getInvoicesPage('1', 0, 'date', 'asc', 10)
-        .subscribe(result => {
-          expect(result).toEqual(response);
-        });
+      service.getInvoicesPage('1', 0, 'date', 'asc', 10).subscribe((result) => {
+        expect(result).toEqual(response);
+      });
 
       expect(httpSpy.get).toHaveBeenCalledWith(
         'v1/invoices/offices/1/pages',
-        jasmine.objectContaining({ params: jasmine.any(HttpParams) }),
+        expect.objectContaining({ params: expect.any(HttpParams) }),
       );
     });
   });

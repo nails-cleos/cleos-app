@@ -2,15 +2,15 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
-      interval: daily
-      time: "07:00"
-      timezone: "Europe/Amsterdam"
+      interval: weekly
+      time: '07:00'
+      timezone: 'Europe/Amsterdam'
     commit-message:
-      prefix: "build"
+      prefix: 'build'
     labels:
-      - "area: build & ci"
-      - "target: patch"
-      - "action: merge"
+      - 'area: build & ci'
+      - 'target: patch'
+      - 'action: merge'
     open-pull-requests-limit: 5

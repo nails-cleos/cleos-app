@@ -1,37 +1,57 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuarterSummaryComponent } from './quarter-summary.component';
 import { of } from 'rxjs';
-import { AuthUserService, IAuthUser, initialAuthUser } from '../../services/auth-user.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import {
+  AuthUserService,
+  IAuthUser,
+  initialAuthUser,
+} from '@app/services/auth-user.service';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatDatepicker } from '@angular/material/datepicker';
-import { IMonthSummary, ISummaryRoom, ISummaryTotal, MonthSummary, SummaryTotals, Total } from '../dashboard';
-import { ICurrencyAll } from '../../currency/currency';
+import {
+  IMonthSummary,
+  ISummaryRoom,
+  ISummaryTotal,
+  MonthSummary,
+  SummaryTotals,
+  Total,
+} from '../dashboard';
+import { ICurrencyAll } from '@app/currency/currency';
 import fs from 'file-saver';
 import { signal } from '@angular/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { DashboardStore } from '../../store/dashboard.store';
-import { NavigationService } from '../../services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { DashboardStore } from '@app/store/dashboard.store';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
   let fixture: ComponentFixture<QuarterSummaryComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let dashboardStoreSpy: {
     quarterSummaryMap: ReturnType<typeof signal>;
-    getQuarterSummary: jasmine.Spy;
-    clean: jasmine.Spy;
+    getQuarterSummary: Mock;
+    clean: Mock;
   };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let authUserServiceSpy: jasmine.SpyObj<AuthUserService>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let saveAsSpy: jasmine.Spy;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let saveAsSpy: ReturnType<typeof vi.spyOn>;
 
   const mockCurrency: ICurrencyAll = {
     id: 'USD',
@@ -98,40 +118,53 @@ describe('QuarterSummaryComponent', () => {
     },
   ]);
 
-  const createMockQuarterSummaryMap = (): Map<ISummaryRoom, { monthSummaries: IMonthSummary[] }> => {
+  const createMockQuarterSummaryMap = (): Map<
+    ISummaryRoom,
+    {
+      monthSummaries: IMonthSummary[];
+    }
+  > => {
     const map = new Map();
     map.set(mockRoom, { monthSummaries: [mockMonthSummary] });
     return map;
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     dashboardStoreSpy = {
       quarterSummaryMap: signal<any>(undefined),
-      getQuarterSummary: jasmine.createSpy('getQuarterSummary'),
-      clean: jasmine.createSpy('clean'),
+      getQuarterSummary: vi.fn().mockName('getQuarterSummary'),
+      clean: vi.fn().mockName('clean'),
     };
 
-    const paramMapSpy = jasmine.createSpyObj<ParamMap>('ParamMap', ['get']);
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    authUserServiceSpy = jasmine.createSpyObj('AuthUserService', ['getUser', 'logout'], {
+    const paramMapSpy = {
+      get: vi.fn().mockName('ParamMap.get'),
+    };
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    authUserServiceSpy = {
       authUser: authUserSignal.asReadonly(),
-    });
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    };
+    activatedRouteSpy = {
       snapshot: {
         paramMap: paramMapSpy,
       },
-    });
+    };
 
-    breakpointObserverSpy.observe.and.returnValue(of({ matches: false, breakpoints: {} }));
+    breakpointObserverSpy.observe.mockReturnValue(
+      of({ matches: false, breakpoints: {} }),
+    );
 
-    paramMapSpy.get.and.returnValue('test');
+    paramMapSpy.get.mockReturnValue('test');
 
     await TestBed.configureTestingModule({
-      imports: [QuarterSummaryComponent, TranslateModule.forRoot()],
+      imports: [QuarterSummaryComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
@@ -145,12 +178,8 @@ describe('QuarterSummaryComponent', () => {
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
     component = fixture.componentInstance;
-  });
 
-  beforeEach(() => {
-    saveAsSpy = spyOn(fs as any, 'saveAs').and.callFake((blob: Blob, filename?: string) => {
-      // no-op
-    });
+    saveAsSpy = vi.spyOn(fs, 'saveAs').mockImplementation(() => {});
   });
 
   it('should create', () => {
@@ -163,14 +192,14 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should set user properties from authUser service', () => {
-      authUserSignal.update(prev => ({
+      authUserSignal.update((prev) => ({
         ...prev,
         showCash: true,
         displayName: 'Test User',
       }));
       fixture.detectChanges();
 
-      expect(component.showCash()).toBeTrue();
+      expect(component.showCash()).toBe(true);
     });
 
     it('should initialize with current date and quarter when no extras', () => {
@@ -180,10 +209,14 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should initialize with extras date and quarter when provided', () => {
-      history.pushState({
-        year: 2024,
-        quarter: 2,
-      }, '', '/...');
+      history.pushState(
+        {
+          year: 2024,
+          quarter: 2,
+        },
+        '',
+        '/...',
+      );
 
       fixture = TestBed.createComponent(QuarterSummaryComponent);
       component = fixture.componentInstance;
@@ -197,7 +230,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should set up breakpoint observer for handset detection', () => {
       fixture.detectChanges();
-      expect(component.isHandset()).toBeFalse();
+      expect(component.isHandset()).toBe(false);
     });
   });
 
@@ -247,7 +280,7 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should get summary when selectedQuarter changes', () => {
-      dashboardStoreSpy.getQuarterSummary.calls.reset();
+      dashboardStoreSpy.getQuarterSummary.mockClear();
       component.getForm.date.setValue(new Date(2024, 0, 1));
       component.getForm.selectedQuarter.setValue(2);
       fixture.detectChanges();
@@ -257,7 +290,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should not get summary when selectedQuarter is null', () => {
       component.getForm.date.setValue(new Date(2024, 0, 1));
-      spyOn<any>(component, 'getSummary');
+      vi.spyOn<any, any>(component, 'getSummary').mockReturnValue(undefined);
 
       (component.getForm.selectedQuarter as any).setValue(undefined);
 
@@ -266,7 +299,7 @@ describe('QuarterSummaryComponent', () => {
 
     it('should not get summary when date is null', () => {
       component.getForm.selectedQuarter.setValue(2);
-      spyOn<any>(component, 'getSummary');
+      vi.spyOn<any, any>(component, 'getSummary').mockReturnValue(undefined);
 
       (component.getForm.date as any).setValue(null);
 
@@ -276,7 +309,9 @@ describe('QuarterSummaryComponent', () => {
 
   describe('setYear', () => {
     it('should set year and close datepicker', () => {
-      const mockDatepicker = jasmine.createSpyObj<MatDatepicker<Date>>('MatDatepicker', ['close']);
+      const mockDatepicker = {
+        close: vi.fn().mockName('MatDatepicker.close'),
+      };
       const newDate = new Date(2024, 0, 1);
       component.getForm.date.setValue(new Date(2023, 5, 15));
 
@@ -369,17 +404,32 @@ describe('QuarterSummaryComponent', () => {
     it('should merge month summaries correctly', () => {
       const monthSummaries1 = [
         new MonthSummary(1, [
-          { ...mockSummaryTotal, type: 'INCOME', gross: 1000, net: 850, btw: 150 },
+          {
+            ...mockSummaryTotal,
+            type: 'INCOME',
+            gross: 1000,
+            net: 850,
+            btw: 150,
+          },
         ]),
       ];
 
       const monthSummaries2 = [
         new MonthSummary(1, [
-          { ...mockSummaryTotal, type: 'INCOME', gross: 500, net: 425, btw: 75 },
+          {
+            ...mockSummaryTotal,
+            type: 'INCOME',
+            gross: 500,
+            net: 425,
+            btw: 75,
+          },
         ]),
       ];
 
-      const result = component['getAllMonthSummaries'](monthSummaries2, monthSummaries1);
+      const result = component['getAllMonthSummaries'](
+        monthSummaries2,
+        monthSummaries1,
+      );
 
       expect(result).toBeTruthy();
       expect(result.length).toBe(1);
@@ -392,17 +442,32 @@ describe('QuarterSummaryComponent', () => {
     it('should handle missing totals in one of the summaries', () => {
       const monthSummaries1 = [
         new MonthSummary(1, [
-          { ...mockSummaryTotal, type: 'INCOME', gross: 1000, net: 850, btw: 150 },
+          {
+            ...mockSummaryTotal,
+            type: 'INCOME',
+            gross: 1000,
+            net: 850,
+            btw: 150,
+          },
         ]),
       ];
 
       const monthSummaries2 = [
         new MonthSummary(1, [
-          { ...mockSummaryTotal, type: 'EXPENSE', gross: 200, net: 170, btw: 30 },
+          {
+            ...mockSummaryTotal,
+            type: 'EXPENSE',
+            gross: 200,
+            net: 170,
+            btw: 30,
+          },
         ]),
       ];
 
-      const result = component['getAllMonthSummaries'](monthSummaries2, monthSummaries1);
+      const result = component['getAllMonthSummaries'](
+        monthSummaries2,
+        monthSummaries1,
+      );
 
       expect(result).toBeTruthy();
       expect(result[0].total.length).toBe(1);
@@ -429,13 +494,15 @@ describe('QuarterSummaryComponent', () => {
 
     it('should reset data before getting new summary', () => {
       component.monthSummaries.set([mockMonthSummary]);
-      component.quarterSummaryTotals.set(new SummaryTotals(
-        new Total(100, 10, 90),
-        new Total(),
-        new Total(),
-        new Total(),
-        new Total(),
-      ));
+      component.quarterSummaryTotals.set(
+        new SummaryTotals(
+          new Total(100, 10, 90),
+          new Total(),
+          new Total(),
+          new Total(),
+          new Total(),
+        ),
+      );
 
       component['getSummary'](2024, 2);
 
@@ -454,13 +521,15 @@ describe('QuarterSummaryComponent', () => {
     });
 
     it('should reset quarterSummaryTotals to new SummaryTotals', () => {
-      component.quarterSummaryTotals.set(new SummaryTotals(
-        new Total(100, 10, 90),
-        new Total(),
-        new Total(),
-        new Total(),
-        new Total(),
-      ));
+      component.quarterSummaryTotals.set(
+        new SummaryTotals(
+          new Total(100, 10, 90),
+          new Total(),
+          new Total(),
+          new Total(),
+          new Total(),
+        ),
+      );
 
       component['reset']();
 
@@ -491,38 +560,45 @@ describe('QuarterSummaryComponent', () => {
       component.getForm.selectedQuarter.setValue(2);
     });
 
-    it('should not export when monthSummaries is empty', () => {
+    it('should not export when monthSummaries is empty', async () => {
       component.monthSummaries.set([]);
 
+      saveAsSpy.mockClear();
       component.exportQuarterSummary();
-
-      expect(saveAsSpy).not.toHaveBeenCalled();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).not.toHaveBeenCalled();
+      });
     });
 
-    it('should not export when monthSummaries is []', () => {
+    it('should not export when monthSummaries is []', async () => {
       component.monthSummaries.set([]);
 
+      saveAsSpy.mockClear();
       component.exportQuarterSummary();
-
-      expect(saveAsSpy).not.toHaveBeenCalled();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).not.toHaveBeenCalled();
+      });
     });
 
-    it('should use current date when year is not set', fakeAsync(() => {
+    it('should use current date when year is not set', async () => {
       component.year.set(2025);
 
+      saveAsSpy.mockClear();
       component.exportQuarterSummary();
-      tick();
+      await vi.waitFor(() => {
+        expect(saveAsSpy).toHaveBeenCalledTimes(1);
+      });
 
-      expect(saveAsSpy).toHaveBeenCalledTimes(1);
-
-      const lastCallArgs = saveAsSpy.calls.mostRecent().args;
-      const fileName = lastCallArgs[1];
+      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall;
+      const fileName = lastCallArgs?.[1];
       expect(fileName).toBe('Report_Q2_2025.xlsx');
 
-      const blob = lastCallArgs[0];
-      expect(blob instanceof Blob).toBeTrue();
-      expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    }));
+      const blob = lastCallArgs?.[0];
+      expect(blob instanceof Blob).toBe(true);
+      expect(blob.type).toBe(
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      );
+    });
   });
 
   describe('Edge Cases', () => {
@@ -530,14 +606,18 @@ describe('QuarterSummaryComponent', () => {
       fixture.detectChanges();
       dashboardStoreSpy.quarterSummaryMap.set(undefined);
 
-      expect(() => component.getForm.selectedRoom.setValue(mockRoom)).not.toThrow();
+      expect(() =>
+        component.getForm.selectedRoom.setValue(mockRoom),
+      ).not.toThrow();
     });
 
     it('should handle empty quarterSummaryMap', () => {
       fixture.detectChanges();
       dashboardStoreSpy.quarterSummaryMap.set(new Map());
 
-      expect(() => component.getForm.selectedRoom.setValue(mockRoom)).not.toThrow();
+      expect(() =>
+        component.getForm.selectedRoom.setValue(mockRoom),
+      ).not.toThrow();
     });
 
     it('should handle multiple months in quarter summary', () => {
@@ -546,7 +626,9 @@ describe('QuarterSummaryComponent', () => {
       const monthSummary3 = new MonthSummary(3, [mockSummaryTotal]);
 
       const map = new Map();
-      map.set(mockRoom, { monthSummaries: [monthSummary1, monthSummary2, monthSummary3] });
+      map.set(mockRoom, {
+        monthSummaries: [monthSummary1, monthSummary2, monthSummary3],
+      });
 
       dashboardStoreSpy.quarterSummaryMap.set(map);
       component.getForm.selectedRoom.setValue(mockRoom);
@@ -554,20 +636,21 @@ describe('QuarterSummaryComponent', () => {
 
       expect(component.monthSummaries()?.length).toBe(3);
     });
-
   });
 
   describe('Responsive Behavior', () => {
     it('should detect handset breakpoint', () => {
-      breakpointObserverSpy.observe.and.returnValue(
+      breakpointObserverSpy.observe.mockReturnValue(
         of({ matches: true, breakpoints: { [Breakpoints.XSmall]: true } }),
       );
 
-      const responsiveFixture = TestBed.createComponent(QuarterSummaryComponent);
+      const responsiveFixture = TestBed.createComponent(
+        QuarterSummaryComponent,
+      );
       const responsiveComponent = responsiveFixture.componentInstance;
       responsiveFixture.detectChanges();
 
-      expect(responsiveComponent.isHandset()).toBeTrue();
+      expect(responsiveComponent.isHandset()).toBe(true);
     });
 
     it('should observe multiple breakpoints', () => {

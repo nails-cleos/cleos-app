@@ -1,25 +1,52 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import {
+  CdkDrag,
+  CdkDragDrop,
+  CdkDropList,
+  moveItemInArray,
+  transferArrayItem,
+} from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 
 import { IService, IServicePrice, ServicePrice, ServiceType } from '../../room';
-import { IGroupService } from '../../../treatment/treatment';
-import { createTreatmentGroupService, executeDialogNoWidth } from '../../../util/helper';
-import { CurrencySymbolPipe } from '../../../pipes/currency-symbol.pipe';
-import { BackButtonDirective } from '../../../directives/back-button.directive';
+import { IGroupService } from '@app/treatment/treatment';
+import {
+  createTreatmentGroupService,
+  executeDialogNoWidth,
+} from '@app/util/helper';
+import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { TranslatePipe } from '@ngx-translate/core';
 import { KeyValuePipe } from '@angular/common';
-import { RoomStore } from '../../../store/room.store';
+import { RoomStore } from '@app/store/room.store';
 
 @Component({
   selector: 'app-add-service',
   templateUrl: './add-service.component.html',
   styleUrls: ['./add-service.component.scss'],
-  imports: [MatIcon, MatButton, TranslatePipe, KeyValuePipe, BackButtonDirective,
-    CurrencySymbolPipe, CurrencySymbolPipe, BackButtonDirective, CdkDropList, CdkDrag],
+  imports: [
+    MatIcon,
+    MatButton,
+    TranslatePipe,
+    KeyValuePipe,
+    BackButtonDirective,
+    CurrencySymbolPipe,
+    CurrencySymbolPipe,
+    BackButtonDirective,
+    CdkDropList,
+    CdkDrag,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AddServiceComponent {
@@ -55,7 +82,7 @@ export class AddServiceComponent {
       const currency = services.currency.code;
 
       this.additional.set(
-        services.additionalList.map(s => ({
+        services.additionalList.map((s) => ({
           ...s,
           currency,
           type: ServiceType.additional,
@@ -63,7 +90,7 @@ export class AddServiceComponent {
       );
 
       this.selectedAdditional.set(
-        services.selectedAdditionalList.map(s => ({
+        services.selectedAdditionalList.map((s) => ({
           ...s,
           currency,
           type: ServiceType.additional,
@@ -99,7 +126,7 @@ export class AddServiceComponent {
 
     const prices: IServicePrice[] = [];
 
-    this.selectedAdditional().forEach(service => {
+    this.selectedAdditional().forEach((service) => {
       prices.push(
         new ServicePrice(service.id, service.price, ServiceType.additional),
       );
@@ -111,10 +138,8 @@ export class AddServiceComponent {
     }
 
     for (const [, group] of groups) {
-      group.selectedTreatments.forEach(t => {
-        prices.push(
-          new ServicePrice(t.id, t.price, ServiceType.treatment),
-        );
+      group.selectedTreatments.forEach((t) => {
+        prices.push(new ServicePrice(t.id, t.price, ServiceType.treatment));
       });
     }
 
@@ -130,15 +155,15 @@ export class AddServiceComponent {
       },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (!result) {
         return;
       }
 
       if (result.type === ServiceType.additional) {
-        this.selectedAdditional.update(list => {
+        this.selectedAdditional.update((list) => {
           const copy = [...list];
-          const i = copy.findIndex(s => s.id === service.id);
+          const i = copy.findIndex((s) => s.id === service.id);
           if (i > -1) {
             copy[i] = { ...service, price: result.price };
           }
@@ -147,7 +172,7 @@ export class AddServiceComponent {
       }
 
       if (result.type === ServiceType.treatment) {
-        this.groups.update(groups => {
+        this.groups.update((groups) => {
           if (!groups) {
             return groups;
           }
@@ -156,7 +181,7 @@ export class AddServiceComponent {
 
           for (const [key, group] of newGroups) {
             const i = group.selectedTreatments.findIndex(
-              t => t.id === service.id,
+              (t) => t.id === service.id,
             );
             if (i > -1) {
               const treatments = [...group.selectedTreatments];
@@ -176,16 +201,13 @@ export class AddServiceComponent {
     });
   }
 
-  dropAdditional(
-    event: CdkDragDrop<IService[]>,
-    showDialog: boolean,
-  ): void {
+  dropAdditional(event: CdkDragDrop<IService[]>, showDialog: boolean): void {
     const fromAdditional = event.previousContainer.data === this.additional();
     const toSelected = event.container.data === this.selectedAdditional();
 
     if (event.previousContainer === event.container) {
       const signal = toSelected ? this.selectedAdditional : this.additional;
-      signal.update(list => {
+      signal.update((list) => {
         const copy = [...list];
         moveItemInArray(copy, event.previousIndex, event.currentIndex);
         return copy;
@@ -193,14 +215,19 @@ export class AddServiceComponent {
       return;
     }
 
-    const item = fromAdditional ? this.additional()[event.previousIndex] :
-      this.selectedAdditional()[event.previousIndex];
+    const item = fromAdditional
+      ? this.additional()[event.previousIndex]
+      : this.selectedAdditional()[event.previousIndex];
 
     const commit = (price?: number) => {
-      const sourceSignal = fromAdditional ? this.additional : this.selectedAdditional;
-      const targetSignal = fromAdditional ? this.selectedAdditional : this.additional;
+      const sourceSignal = fromAdditional
+        ? this.additional
+        : this.selectedAdditional;
+      const targetSignal = fromAdditional
+        ? this.selectedAdditional
+        : this.additional;
 
-      sourceSignal.update(src => {
+      sourceSignal.update((src) => {
         const source = [...src];
         const target = [...targetSignal()];
 
@@ -221,22 +248,22 @@ export class AddServiceComponent {
     };
 
     if (showDialog) {
-      executeDialogNoWidth(this.dialog, PriceDialogComponent, { name: item.name, type: item.type },
-        result => commit(result?.price),
+      executeDialogNoWidth(
+        this.dialog,
+        PriceDialogComponent,
+        { name: item.name, type: item.type },
+        (result) => commit(result?.price),
       );
     } else {
       commit();
     }
   }
 
-  dropTreatment(
-    event: CdkDragDrop<IService[]>,
-    showDialog: boolean,
-  ): void {
+  dropTreatment(event: CdkDragDrop<IService[]>, showDialog: boolean): void {
     const selectedItem = event.previousContainer.data[event.previousIndex];
 
     const commit = (price?: number) => {
-      this.groups.update(groups => {
+      this.groups.update((groups) => {
         if (!groups) {
           return groups;
         }
@@ -244,15 +271,23 @@ export class AddServiceComponent {
         const newGroups = new Map(groups);
 
         for (const [key, group] of newGroups) {
-          const fromTreatments = group.treatments.some(t => t.id === selectedItem.id);
-          const fromSelected = group.selectedTreatments.some(t => t.id === selectedItem.id);
+          const fromTreatments = group.treatments.some(
+            (t) => t.id === selectedItem.id,
+          );
+          const fromSelected = group.selectedTreatments.some(
+            (t) => t.id === selectedItem.id,
+          );
 
           if (!fromTreatments && !fromSelected) {
             continue;
           }
 
-          const source = fromTreatments ? [...group.treatments] : [...group.selectedTreatments];
-          const target = fromTreatments ? [...group.selectedTreatments] : [...group.treatments];
+          const source = fromTreatments
+            ? [...group.treatments]
+            : [...group.selectedTreatments];
+          const target = fromTreatments
+            ? [...group.selectedTreatments]
+            : [...group.treatments];
 
           if (price !== undefined) {
             source[event.previousIndex] = { ...selectedItem, price };
@@ -261,7 +296,12 @@ export class AddServiceComponent {
           if (event.previousContainer === event.container) {
             moveItemInArray(source, event.previousIndex, event.currentIndex);
           } else {
-            transferArrayItem(source, target, event.previousIndex, event.currentIndex);
+            transferArrayItem(
+              source,
+              target,
+              event.previousIndex,
+              event.currentIndex,
+            );
           }
 
           newGroups.set(key, {
@@ -277,10 +317,12 @@ export class AddServiceComponent {
       });
     };
 
-
     if (showDialog) {
-      executeDialogNoWidth(this.dialog, PriceDialogComponent, { name: selectedItem.name, type: selectedItem.type },
-        result => result && commit(result.price),
+      executeDialogNoWidth(
+        this.dialog,
+        PriceDialogComponent,
+        { name: selectedItem.name, type: selectedItem.type },
+        (result) => result && commit(result.price),
       );
     } else {
       commit();

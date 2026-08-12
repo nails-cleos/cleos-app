@@ -1,49 +1,57 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { PaymentComponent } from './payment.component';
 import { ActivatedRoute } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 import { signal } from '@angular/core';
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;
   let fixture: ComponentFixture<PaymentComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let paymentStoreSpy: {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    getPaymentByResourceId: jasmine.Spy;
-    notify: jasmine.Spy;
-    clean: jasmine.Spy;
-    clearResponse: jasmine.Spy;
+    getPaymentByResourceId: Mock;
+    notify: Mock;
+    clean: Mock;
+    clearResponse: Mock;
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     paymentStoreSpy = {
       data: signal(undefined),
       response: signal(undefined),
       subErrors: signal(undefined),
       isLoading: signal(false),
-      getPaymentByResourceId: jasmine.createSpy('getPaymentByResourceId'),
-      notify: jasmine.createSpy('notify'),
-      clean: jasmine.createSpy('clean'),
-      clearResponse: jasmine.createSpy('clearResponse'),
+      getPaymentByResourceId: vi.fn().mockName('getPaymentByResourceId'),
+      notify: vi.fn().mockName('notify'),
+      clean: vi.fn().mockName('clean'),
+      clearResponse: vi.fn().mockName('clearResponse'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [PaymentComponent, TranslateModule.forRoot()],
+      imports: [PaymentComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
-        { provide: ActivatedRoute, useValue: { snapshot: { paramMap: { get: () => null } } } },
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => null } } },
+        },
       ],
     }).compileComponents();
 
@@ -64,7 +72,10 @@ describe('PaymentComponent', () => {
     fixture.componentRef.setInput('path', 'reservation');
     fixture.detectChanges();
 
-    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith('123', 'reservation');
+    expect(paymentStoreSpy.getPaymentByResourceId).toHaveBeenCalledWith(
+      '123',
+      'reservation',
+    );
   });
 
   it('should keep accountId from currentPath for back navigation', () => {
@@ -75,7 +86,12 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['accounts', 'account-1', 'transactions', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'accounts',
+      'account-1',
+      'transactions',
+      '123',
+    ]);
   });
 
   it('should navigate back to the resource page when accountId is missing', () => {
@@ -85,7 +101,10 @@ describe('PaymentComponent', () => {
 
     component.goBack();
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['reservation', '123']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'reservation',
+      '123',
+    ]);
   });
 
   it('should hide footer when paymentList has items', () => {
@@ -93,7 +112,7 @@ describe('PaymentComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.hiddenSignal()).toBeTrue();
+    expect(component.hiddenSignal()).toBe(true);
     expect(component.dataSourceSignal()).toEqual([{ id: '1' } as any]);
   });
 
@@ -102,7 +121,7 @@ describe('PaymentComponent', () => {
 
     fixture.detectChanges();
 
-    expect(component.hiddenSignal()).toBeFalse();
+    expect(component.hiddenSignal()).toBe(false);
   });
 
   it('should set errorMessage and showError when subErrors are emitted', () => {
@@ -111,7 +130,7 @@ describe('PaymentComponent', () => {
     fixture.detectChanges();
 
     expect(component.errorMessage).toBe('Payment failed');
-    expect(component.showError).toBeTrue();
+    expect(component.showError).toBe(true);
   });
 
   it('should clean and navigate when response has a path', () => {
@@ -135,7 +154,13 @@ describe('PaymentComponent', () => {
 
     component.notify(payment);
 
-    expect(paymentStoreSpy.notify).toHaveBeenCalledWith('p1', 'reservation', '123', 'pref1', 'paypal');
+    expect(paymentStoreSpy.notify).toHaveBeenCalledWith(
+      'p1',
+      'reservation',
+      '123',
+      'pref1',
+      'paypal',
+    );
   });
 
   it('should return reservation currency icon', () => {
@@ -148,7 +173,10 @@ describe('PaymentComponent', () => {
       preferenceId: '',
       status: '',
       type: 'CASH',
-      reservation: { id: 'reservation-1', room: { currency: { icon: '$' } } } as any,
+      reservation: {
+        id: 'reservation-1',
+        room: { currency: { icon: '$' } },
+      } as any,
     });
 
     expect(icon).toBe('$');
@@ -164,7 +192,10 @@ describe('PaymentComponent', () => {
       preferenceId: '',
       status: '',
       type: 'CASH',
-      transaction: { id: 'transaction-1', account: { currency: { icon: '£' } } } as any,
+      transaction: {
+        id: 'transaction-1',
+        account: { currency: { icon: '£' } },
+      } as any,
     });
 
     expect(icon).toBe('£');
@@ -194,11 +225,11 @@ describe('PaymentComponent', () => {
   it('close() should hide error', () => {
     component.showError = true;
     component.close();
-    expect(component.showError).toBeFalse();
+    expect(component.showError).toBe(false);
   });
 
   it('should open payment URL in same tab when pay is called with paymentURL', () => {
-    const openSpy = spyOn(window, 'open');
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
     const payment = { paymentURL: 'https://pay.example.com/123' } as any;
 
@@ -211,7 +242,7 @@ describe('PaymentComponent', () => {
   });
 
   it('should open payment URL in same tab when pay is called with link', () => {
-    const openSpy = spyOn(window, 'open');
+    const openSpy = vi.spyOn(window, 'open').mockReturnValue(undefined as any);
 
     const payment = { link: 'https://pay.example.com/123' } as any;
 

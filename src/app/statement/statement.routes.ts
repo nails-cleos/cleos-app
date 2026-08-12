@@ -6,14 +6,27 @@ import { StatementCreatePageComponent } from './statement-create-page.component'
 import { StatementDetailsPageComponent } from './statement-details-page.component';
 import { StatementListComponent } from './list/statement-list.component';
 
-const providers = [
-  provideFeatureTranslations('document'),
-];
+const providers = [provideFeatureTranslations('document')];
 
 const children: Routes = [
-  { path: '', component: StatementListComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: 'add', component: StatementCreatePageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
-  { path: ':id', component: StatementDetailsPageComponent, canActivate: [authGuard], data: { roles: [Role.admin] } },
+  {
+    path: '',
+    component: StatementListComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: 'add',
+    component: StatementCreatePageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
+  {
+    path: ':id',
+    component: StatementDetailsPageComponent,
+    canActivate: [authGuard],
+    data: { roles: [Role.admin] },
+  },
 ];
 
 export const STATEMENT_ROUTES: Routes = [{ path: '', providers, children }];

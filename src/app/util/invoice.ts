@@ -35,22 +35,26 @@ const createHeader = (
           { text: titleDate, style: 'header' },
           { text: date, style: 'field' },
         ],
-      }, {
+      },
+      {
         columns: [
           { text: titleSubject, style: 'header' },
           { text: subject, style: 'field' },
         ],
-      }, {
+      },
+      {
         columns: [
           { text: titleKVK, style: 'header' },
           { text: kvkNr, style: 'field' },
         ],
-      }, {
+      },
+      {
         columns: [
           { text: titleAccount, style: 'header' },
           { text: accountNr, style: 'field' },
         ],
-      }, {
+      },
+      {
         columns: [
           { text: titleBTW, style: 'header' },
           { text: btwNr, style: 'field' },
@@ -79,50 +83,90 @@ const companyName = (
   const phone = room.phone || '';
   const email = room.email || '';
   const address = billAddress || room.addressName;
-  return [{
-    columns: [
-      { text: titleAddress, style: 'header' },
-      { text: address, style: ['field', 'fieldMargin'] },
-    ],
-  }, {
-    columns: [
-      { text: titlePhone, style: 'header' },
-      { text: phone, style: ['field', 'fieldMargin'] },
-    ],
-  }, {
-    columns: [
-      { text: titleEmail, style: 'header' },
-      { text: email, style: ['field', 'fieldMargin'] },
-    ],
-  }];
+  return [
+    {
+      columns: [
+        { text: titleAddress, style: 'header' },
+        { text: address, style: ['field', 'fieldMargin'] },
+      ],
+    },
+    {
+      columns: [
+        { text: titlePhone, style: 'header' },
+        { text: phone, style: ['field', 'fieldMargin'] },
+      ],
+    },
+    {
+      columns: [
+        { text: titleEmail, style: 'header' },
+        { text: email, style: ['field', 'fieldMargin'] },
+      ],
+    },
+  ];
 };
 
-const clientName = (customer: IUserAll, titleClient: string, titleContact: string): any => {
+const clientName = (
+  customer: IUserAll,
+  titleClient: string,
+  titleContact: string,
+): any => {
   const client = customer.displayName;
   const contact = customer.phone || customer.email;
-  return [{
-    columns: [
-      { text: titleClient, style: 'header' },
-      { text: client, style: 'field' },
-    ],
-  }, {
-    columns: [
-      { text: titleContact, style: 'header' },
-      { text: contact, style: 'field' },
-    ],
-  }];
+  return [
+    {
+      columns: [
+        { text: titleClient, style: 'header' },
+        { text: client, style: 'field' },
+      ],
+    },
+    {
+      columns: [
+        { text: titleContact, style: 'header' },
+        { text: contact, style: 'field' },
+      ],
+    },
+  ];
 };
 
-const createInvoiceNro = (receiptNro: string): any => ({ text: receiptNro, style: 'invoiceNro' });
+const createInvoiceNro = (receiptNro: string): any => ({
+  text: receiptNro,
+  style: 'invoiceNro',
+});
 
-const createItemTitle = (titleDescription: string, titleItem: string, titleBTW: string, titleTotal: string): any => [
-  { text: titleDescription, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
-  { text: titleItem, style: ['itemTitle', 'item'], border: [false, true, false, true] },
-  { text: titleBTW, style: ['itemTitle', 'itemMargin'], border: [false, true, false, true] },
-  { text: titleTotal, style: ['itemTitle', 'item'], border: [false, true, false, true] },
+const createItemTitle = (
+  titleDescription: string,
+  titleItem: string,
+  titleBTW: string,
+  titleTotal: string,
+): any => [
+  {
+    text: titleDescription,
+    style: ['itemTitle', 'itemMargin'],
+    border: [false, true, false, true],
+  },
+  {
+    text: titleItem,
+    style: ['itemTitle', 'item'],
+    border: [false, true, false, true],
+  },
+  {
+    text: titleBTW,
+    style: ['itemTitle', 'itemMargin'],
+    border: [false, true, false, true],
+  },
+  {
+    text: titleTotal,
+    style: ['itemTitle', 'item'],
+    border: [false, true, false, true],
+  },
 ];
 
-const itemBody = (name: string, neto: number, bruto: number, symbol: string): any => [
+const itemBody = (
+  name: string,
+  neto: number,
+  bruto: number,
+  symbol: string,
+): any => [
   { text: name, style: 'item', border: [false, false, false, true] },
   {
     text: `${symbol} ${neto.toFixed(2)}`,
@@ -141,18 +185,22 @@ const itemBody = (name: string, neto: number, bruto: number, symbol: string): an
   },
 ];
 
-const createItems = (itemTitle: any, itemList: IItem[], currency: string): any => {
+const createItems = (
+  itemTitle: any,
+  itemList: IItem[],
+  currency: string,
+): any => {
   let body = [itemTitle];
-  itemList.forEach(item => {
+  itemList.forEach((item) => {
     const add = itemBody(item.name, item.netPrice, item.grossPrice, currency);
     body = [...body, add];
   });
   return {
     layout: {
       defaultBorder: false,
-      hLineWidth: (i: number) => i === 1 || i === 0 ? 2 : 1,
+      hLineWidth: (i: number) => (i === 1 || i === 0 ? 2 : 1),
       vLineWidth: () => 0,
-      hLineColor: (i: number) => i === 1 || i === 0 ? '#9d9282' : '#dcc8c2',
+      hLineColor: (i: number) => (i === 1 || i === 0 ? '#9d9282' : '#dcc8c2'),
       vLineColor: () => '#9d9282',
       hLineStyle: () => null,
       // vLineStyle: function (i, node) { return {dash: { length: 10, space: 4 }}; },
@@ -180,7 +228,11 @@ const createTotals = (
   titleDiscount: string,
 ): any => {
   const subTotal = [
-    { text: titleSubTotal, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: titleSubTotal,
+      style: ['item', 'amountKey'],
+      border: [false, false, false, true],
+    },
     {
       text: `${currency} ${totals.subTotal.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
@@ -189,7 +241,11 @@ const createTotals = (
   ];
 
   const excBTW = [
-    { text: titleExclBTW, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: titleExclBTW,
+      style: ['item', 'amountKey'],
+      border: [false, false, false, true],
+    },
     {
       text: `${currency} ${totals.excBTW.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
@@ -198,7 +254,11 @@ const createTotals = (
   ];
 
   const btw = [
-    { text: titleBTW21, style: ['item', 'amountKey'], border: [false, false, false, true] },
+    {
+      text: titleBTW21,
+      style: ['item', 'amountKey'],
+      border: [false, false, false, true],
+    },
     {
       text: `${currency} ${totals.btw.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
@@ -207,7 +267,12 @@ const createTotals = (
   ];
 
   const total = [
-    { text: titleTotal, style: ['item', 'amountKey'], border: [false, true, false, true], fontSize: 20 },
+    {
+      text: titleTotal,
+      style: ['item', 'amountKey'],
+      border: [false, true, false, true],
+      fontSize: 20,
+    },
     {
       text: `${currency} ${totals.totalPaid.toFixed(2)}`,
       style: ['item', 'amountKey', 'amount'],
@@ -220,7 +285,11 @@ const createTotals = (
 
   if (totals.discount) {
     const discount = [
-      { text: titleDiscount, style: ['item', 'amountKey'], border: [false, false, false, true] },
+      {
+        text: titleDiscount,
+        style: ['item', 'amountKey'],
+        border: [false, false, false, true],
+      },
       {
         text: `(${currency} ${totals.discount.toFixed(2)})`,
         style: ['item', 'amountKey', 'amount', 'discount'],
@@ -233,7 +302,7 @@ const createTotals = (
   return {
     layout: {
       defaultBorder: false,
-      hLineWidth: (i: number) => i === 0 ? 2 : 1,
+      hLineWidth: (i: number) => (i === 0 ? 2 : 1),
       vLineWidth: () => 0,
       hLineColor: () => '#dcc8c2',
       vLineColor: () => '#dcc8c2',
@@ -264,14 +333,28 @@ export const pdf = (
   invoices.map((invoice, index) => {
     const next = start + invoice.position;
     const receiptNro = `${next}`.padStart(5, '0');
-    const date = dayViewTitle(newDateTimestamp(invoice.timestamp, invoice.room.timeZone), DEFAULT_LOCALE);
+    const date = dayViewTitle(
+      newDateTimestamp(invoice.timestamp, invoice.room.timeZone),
+      DEFAULT_LOCALE,
+    );
     const titleDate = 'Date';
     const titleSubject = 'Subject';
     const titleKVK = 'KvK nr';
     const titleAccount = 'Account nr';
     const titleBTWNr = 'BTW nr';
-    const header = createHeader(index, titleDate, date, titleSubject, office.subject, titleKVK, office.kvk,
-      titleAccount, office.account, titleBTWNr, office.btw);
+    const header = createHeader(
+      index,
+      titleDate,
+      date,
+      titleSubject,
+      office.subject,
+      titleKVK,
+      office.kvk,
+      titleAccount,
+      office.account,
+      titleBTWNr,
+      office.btw,
+    );
     const currency = currencySymbol(invoice.room.currencyCode);
 
     const titleDescription = 'ITEM DESCRIPTION';
@@ -279,11 +362,20 @@ export const pdf = (
     const titleBTW = 'BTW';
     const titleItemTotal = 'ITEM TOTAL \n (incl. btw)';
 
-    const itemTitle = createItemTitle(titleDescription, titleItem, titleBTW, titleItemTotal);
+    const itemTitle = createItemTitle(
+      titleDescription,
+      titleItem,
+      titleBTW,
+      titleItemTotal,
+    );
 
     const text = `Invoice No. ${receiptNro}`;
     const invoiceNro = createInvoiceNro(text);
-    const items = createItems(itemTitle, invoice.items.slice().sort((a, b) => a.order - b.order), currency);
+    const items = createItems(
+      itemTitle,
+      invoice.items.slice().sort((a, b) => a.order - b.order),
+      currency,
+    );
 
     const titleSubTotal = 'Subtotal:';
     const titleExclBTW = 'Excl. BTW:';
@@ -291,8 +383,15 @@ export const pdf = (
     const titleTotal = 'Total:';
     const titleDiscount = 'Discount:';
 
-    const totals = createTotals(invoice.totals, currency, titleSubTotal, titleExclBTW, titleBTW21, titleTotal,
-      titleDiscount);
+    const totals = createTotals(
+      invoice.totals,
+      currency,
+      titleSubTotal,
+      titleExclBTW,
+      titleBTW21,
+      titleTotal,
+      titleDiscount,
+    );
 
     const titleAddress = 'Address';
     const titlePhone = 'Phone';
@@ -300,10 +399,26 @@ export const pdf = (
     const titleClient = 'Client';
     const titleContact = 'Contact';
 
-    content = [...content, header, {
-      columns: [clientName(invoice.customer, titleClient, titleContact),
-        companyName(invoice.room, titleAddress, titlePhone, titleEmail, office.billingAddress)],
-    }, '\n\n', invoiceNro, items, totals];
+    content = [
+      ...content,
+      header,
+      {
+        columns: [
+          clientName(invoice.customer, titleClient, titleContact),
+          companyName(
+            invoice.room,
+            titleAddress,
+            titlePhone,
+            titleEmail,
+            office.billingAddress,
+          ),
+        ],
+      },
+      '\n\n',
+      invoiceNro,
+      items,
+      totals,
+    ];
   });
 
   return {

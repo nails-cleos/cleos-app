@@ -1,29 +1,51 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatChip, MatChipListbox } from '@angular/material/chips';
 import { MatIcon } from '@angular/material/icon';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { DurationTimePipe } from '../../pipes/durationTime.pipe';
-import { TreatmentStore } from '../../store/treatment.store';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
-import { TableSkeletonColumn, TableSkeletonComponent } from '../../shared/skeleton/table-skeleton.component';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { DurationTimePipe } from '@app/pipes/durationTime.pipe';
+import { TreatmentStore } from '@app/store/treatment.store';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
+import {
+  TableSkeletonColumn,
+  TableSkeletonComponent,
+} from '@app/shared/skeleton/table-skeleton.component';
 import { TreatmentTableComponent } from '../table/treatment-table.component';
-import { NavigationService } from '../../services/navigation.service';
+import { NavigationService } from '@app/services/navigation.service';
 
 @Component({
   selector: 'app-treatment-view',
   templateUrl: './treatment-view.component.html',
   styleUrls: ['./treatment-view.component.scss'],
-  imports: [TranslatePipe, BackButtonDirective, MatButton, MatIcon, MatChipListbox, MatChip, DurationTimePipe,
-    TreatmentTableComponent, SkeletonComponent, TableSkeletonComponent],
+  imports: [
+    TranslatePipe,
+    BackButtonDirective,
+    MatButton,
+    MatIcon,
+    MatChipListbox,
+    MatChip,
+    DurationTimePipe,
+    TreatmentTableComponent,
+    SkeletonComponent,
+    TableSkeletonComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TreatmentViewComponent {
   id = input.required<string>();
 
   private readonly treatmentStore = inject(TreatmentStore);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private selectedHistoryTreatmentId = signal<string | undefined>(undefined);
   readonly historyTableColumns: TableSkeletonColumn[] = [
@@ -32,7 +54,10 @@ export class TreatmentViewComponent {
     { key: 'duration', hideOnMobile: true },
   ];
 
-  historyLoading = computed(() => !!this.selectedHistoryTreatmentId() && this.treatmentStore.isLoading());
+  historyLoading = computed(
+    () =>
+      !!this.selectedHistoryTreatmentId() && this.treatmentStore.isLoading(),
+  );
 
   treatment = computed(() => {
     const group = this.treatmentStore.selected();
@@ -45,7 +70,7 @@ export class TreatmentViewComponent {
 
     return {
       ...group,
-      treatments: group.treatments?.map(treatment => {
+      treatments: group.treatments?.map((treatment) => {
         if (treatment.id === selectedHistoryTreatmentId) {
           return { ...treatment, showHistory: true, history: histories };
         }

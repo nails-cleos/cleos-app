@@ -1,10 +1,31 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, viewChild } from '@angular/core';
-import { ControlContainer, FormControl, FormGroup, NgForm, ReactiveFormsModule } from '@angular/forms';
-import { GeocodeService, MapStatus } from '../../services/geocode.service';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
+import {
+  ControlContainer,
+  FormControl,
+  FormGroup,
+  NgForm,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { GeocodeService, MapStatus } from '@app/services/geocode.service';
 import { GoogleMap, MapInfoWindow, MapMarker } from '@angular/google-maps';
-import { AuthUserService } from '../../services/auth-user.service';
-import { EnvService } from '../../services/env.service';
-import { MatError, MatFormField, MatHint, MatInput, MatLabel } from '@angular/material/input';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { EnvService } from '@app/services/env.service';
+import {
+  MatError,
+  MatFormField,
+  MatHint,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
 import { TranslatePipe } from '@ngx-translate/core';
 import PlaceResult = google.maps.places.PlaceResult;
 import MapMouseEvent = google.maps.MapMouseEvent;
@@ -12,15 +33,25 @@ import MapMouseEvent = google.maps.MapMouseEvent;
 export type GoogleMapForm = {
   address: FormControl<string | undefined>;
   addressDescription: FormControl<string | undefined>;
-}
+};
 
 @Component({
   selector: 'app-google-map',
   templateUrl: './google-map.component.html',
   styleUrls: ['./google-map.component.scss'],
   viewProviders: [{ provide: ControlContainer, useExisting: NgForm }],
-  imports: [MatFormField, MatLabel, MatInput, ReactiveFormsModule, TranslatePipe, MatError, GoogleMap, MapInfoWindow,
-    MapMarker, MatHint],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatError,
+    GoogleMap,
+    MapInfoWindow,
+    MapMarker,
+    MatHint,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoogleMapComponent {
@@ -41,10 +72,13 @@ export class GoogleMapComponent {
 
   private readonly authUserService: AuthUserService = inject(AuthUserService);
   private readonly env: EnvService = inject(EnvService);
+  private readonly geocodeService: GeocodeService = inject(GeocodeService);
 
   private authUserSignal = this.authUserService.authUser;
 
-  private isDarkMode = computed(() => this.authUserSignal().isDarkMode ?? false);
+  private isDarkMode = computed(
+    () => this.authUserSignal().isDarkMode ?? false,
+  );
 
   public markerOptions: google.maps.marker.AdvancedMarkerElementOptions;
   public markerPosition?: google.maps.LatLngLiteral;
@@ -58,7 +92,7 @@ export class GoogleMapComponent {
   public zoom: number;
   public options: any = {};
 
-  constructor(private geocodeService: GeocodeService) {
+  constructor() {
     this.latitude = 51.926517;
     this.longitude = 4.462456;
     this.isDraggable = false;
@@ -80,7 +114,10 @@ export class GoogleMapComponent {
       if (this.isDarkMode()) {
         this.options.styles = [
           { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
-          { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+          {
+            elementType: 'labels.text.stroke',
+            stylers: [{ color: '#242f3e' }],
+          },
           { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] },
           {
             featureType: 'administrative.locality',
@@ -177,7 +214,12 @@ export class GoogleMapComponent {
       const latitudeMarker = this.latitudeMarker();
       const longitudeMarker = this.longitudeMarker();
 
-      if (latitudeMarker === null || longitudeMarker === null || typeof google === 'undefined' || !google?.maps) {
+      if (
+        latitudeMarker === null ||
+        longitudeMarker === null ||
+        typeof google === 'undefined' ||
+        !google?.maps
+      ) {
         return;
       }
 
@@ -191,8 +233,13 @@ export class GoogleMapComponent {
 
   markerDragEnd = ($event: MapMouseEvent): void => {
     if ($event.latLng) {
-      this.geocodeService.geocodeAddress($event.latLng.lat(), $event.latLng.lng(), this.showDistance())
-        .subscribe(value => {
+      this.geocodeService
+        .geocodeAddress(
+          $event.latLng.lat(),
+          $event.latLng.lng(),
+          this.showDistance(),
+        )
+        .subscribe((value) => {
           if (value.address) {
             this.addressEmitter.emit(value.address);
             this.getForm?.address?.setValue(value.address.formatted_address);
@@ -208,14 +255,25 @@ export class GoogleMapComponent {
     if (addressText?.nativeElement) {
       const options = {
         componentRestrictions: { country: 'nl' },
-        fields: ['address_components', 'formatted_address', 'geometry', 'icon', 'name'],
+        fields: [
+          'address_components',
+          'formatted_address',
+          'geometry',
+          'icon',
+          'name',
+        ],
         strictBounds: false,
         types: this.types(),
       };
 
-      const autocomplete = new google.maps.places.Autocomplete(addressText.nativeElement, options);
+      const autocomplete = new google.maps.places.Autocomplete(
+        addressText.nativeElement,
+        options,
+      );
 
-      google.maps.event.addListener(autocomplete, 'place_changed', () => this.setAddress(autocomplete.getPlace()));
+      google.maps.event.addListener(autocomplete, 'place_changed', () =>
+        this.setAddress(autocomplete.getPlace()),
+      );
     }
   };
 
@@ -232,8 +290,9 @@ export class GoogleMapComponent {
       const showDistance = this.showDistance();
 
       if (showDistance) {
-        this.geocodeService.geocodeAddress(latitudeMarker, longitudeMarker, showDistance)
-          .subscribe(value => {
+        this.geocodeService
+          .geocodeAddress(latitudeMarker, longitudeMarker, showDistance)
+          .subscribe((value) => {
             if (value.distance) {
               this.distanceEmitter.emit(value.distance);
             }
@@ -249,7 +308,10 @@ export class GoogleMapComponent {
         navigator.geolocation.getCurrentPosition((position) => {
           this.latitude = position.coords.latitude;
           this.longitude = position.coords.longitude;
-          this.center = { lat: position.coords.latitude, lng: position.coords.longitude };
+          this.center = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
         });
       }
     }
@@ -262,14 +324,16 @@ export class GoogleMapComponent {
       this.markerPosition = place.geometry.location.toJSON();
       this.center = place.geometry.location.toJSON();
 
-      const address = place.formatted_address ? place.formatted_address : 'link';
+      const address = place.formatted_address
+        ? place.formatted_address
+        : 'link';
 
-      this.info = `<b>${ place.name ? place.name : this.env.title }</b>
+      this.info = `<b>${place.name ? place.name : this.env.title}</b>
         <div>
-            <a href="https://www.google.com/maps/dir/?api=1&z=15&destination=${ place.formatted_address }"
-                rel="noreferrer" target="_blank">${ address }</a>
+            <a href="https://www.google.com/maps/dir/?api=1&z=15&destination=${place.formatted_address}"
+                rel="noreferrer" target="_blank">${address}</a>
         </div>
-        <div>${ this.getForm?.addressDescription?.value || '' }</div>`;
+        <div>${this.getForm?.addressDescription?.value || ''}</div>`;
 
       this.zoom = 15;
       this.markerOptions = { gmpDraggable: this.isDraggable };
@@ -283,7 +347,7 @@ export class GoogleMapComponent {
         // eslint-disable-next-line camelcase
         address_components: [],
         // eslint-disable-next-line camelcase
-        formatted_address: `Mock address - ${ new Date().getTime() }`,
+        formatted_address: `Mock address - ${new Date().getTime()}`,
         geometry: {
           location: {
             lat: () => this.getRandomInRange(-90, 90),

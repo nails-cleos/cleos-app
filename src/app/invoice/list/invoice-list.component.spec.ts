@@ -1,54 +1,86 @@
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { TranslateModule } from '@ngx-translate/core';
 import { InvoiceListComponent } from './invoice-list.component';
 import { IInvoice, IRoomInvoice } from '../invoice';
-import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '../../interfaces/pagination';
+import { MOBILE_PAGE_SIZE, PAGE_SIZE } from '@app/interfaces/pagination';
 import { ActivatedRoute } from '@angular/router';
-import { IOfficeAll } from '../../office/office';
-import { backendFormatDate, DEFAULT_LOCALE, getNowTimeZone } from '../../util/dates';
-import { IUserAll } from '../../user/user';
+import { IOfficeAll } from '@app/office/office';
+import {
+  backendFormatDate,
+  DEFAULT_LOCALE,
+  getNowTimeZone,
+} from '@app/util/dates';
+import { IUserAll } from '@app/user/user';
 import { addDays } from 'date-fns';
-import { IPaymentOption } from '../../interfaces/payment';
+import { IPaymentOption } from '@app/interfaces/payment';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { DriveAccessService } from '../../services/drive-access.service';
+import { DriveAccessService } from '@app/services/drive-access.service';
 import pdfMake from 'pdfmake/build/pdfmake';
 import { SelectionModel } from '@angular/cdk/collections';
-import { PaymentService } from '../../services/payment.service';
-import { provideAppDateAdapter } from '../../util/adapter/app-date.provider';
-import { NavigationService } from '../../services/navigation.service';
+import { PaymentService } from '@app/services/payment.service';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
-import { OfficeStore } from '../../store/office.store';
-import { InvoiceStore } from '../../store/invoice.store';
-import { PaymentStore } from '../../store/payment.store';
-
+import { OfficeStore } from '@app/store/office.store';
+import { InvoiceStore } from '@app/store/invoice.store';
+import { PaymentStore } from '@app/store/payment.store';
+import { provideTranslateService } from '@ngx-translate/core';
 describe('InvoiceListComponent', () => {
   let component: InvoiceListComponent;
   let fixture: ComponentFixture<InvoiceListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<
+    NavigationService,
+    'back' | 'navigate' | 'language'
+  > & {
+    back: ReturnType<typeof vi.fn>;
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let breakpointObserverSpy: jasmine.SpyObj<BreakpointObserver>;
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let driveAccessServiceSpy: jasmine.SpyObj<DriveAccessService>;
-  let paymentServiceSpy: jasmine.SpyObj<PaymentService>;
+  let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
+    observe: ReturnType<typeof vi.fn>;
+  };
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let driveAccessServiceSpy: {
+    requestAccessIfNeeded: Mock;
+  };
+  let paymentServiceSpy: {
+    getPaymentOptions: Mock;
+  };
   let officeStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
-    loadMyOffices: jasmine.Spy;
-    update: jasmine.Spy;
+    loadMyOffices: Mock;
+    update: Mock;
   };
   let invoiceStoreSpy: {
     isLoading: ReturnType<typeof signal<boolean>>;
     data: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadOfficeToInvoice: jasmine.Spy;
-    uploadInvoices: jasmine.Spy;
+    clean: Mock;
+    loadOfficeToInvoice: Mock;
+    uploadInvoices: Mock;
   };
   let paymentStoreSpy: {
     options: ReturnType<typeof signal>;
-    getOptions: jasmine.Spy;
+    getOptions: Mock;
   };
+
+  let createPdfSpy: ReturnType<typeof vi.spyOn>;
 
   const mockOffice: IOfficeAll = {
     id: '1',
@@ -79,12 +111,14 @@ describe('InvoiceListComponent', () => {
       paths: ['invoice', '1'],
       customer,
       room,
-      items: [{
-        name: 'item 1',
-        netPrice: 100,
-        grossPrice: 121,
-        order: 0,
-      }],
+      items: [
+        {
+          name: 'item 1',
+          netPrice: 100,
+          grossPrice: 121,
+          order: 0,
+        },
+      ],
       timestamp: getNowTimeZone().getTime() / 1000,
       totals: {
         subTotal: 121,
@@ -102,12 +136,14 @@ describe('InvoiceListComponent', () => {
       paths: ['invoice', '2'],
       customer,
       room,
-      items: [{
-        name: 'item 2',
-        netPrice: 100,
-        grossPrice: 121,
-        order: 0,
-      }],
+      items: [
+        {
+          name: 'item 2',
+          netPrice: 100,
+          grossPrice: 121,
+          order: 0,
+        },
+      ],
       timestamp: getNowTimeZone().getTime() / 1000,
       totals: {
         subTotal: 121,
@@ -170,12 +206,14 @@ describe('InvoiceListComponent', () => {
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back', 'navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     paymentStoreSpy = {
       options: signal(paymentOptions),
-      getOptions: jasmine.createSpy('getOptions'),
+      getOptions: vi.fn().mockName('getOptions'),
     };
     breakpoint$ = new BehaviorSubject<any>({
       matches: false,
@@ -185,35 +223,47 @@ describe('InvoiceListComponent', () => {
       },
     });
 
-    breakpointObserverSpy = jasmine.createSpyObj('BreakpointObserver', ['observe']);
-    driveAccessServiceSpy = jasmine.createSpyObj('DriveAccessService', ['requestAccessIfNeeded']);
-    paymentServiceSpy = jasmine.createSpyObj('PaymentService', ['getPaymentOptions']);
-    paymentServiceSpy.getPaymentOptions.and.returnValue(new BehaviorSubject(paymentOptions).asObservable());
+    breakpointObserverSpy = {
+      observe: vi.fn().mockName('BreakpointObserver.observe'),
+    };
+    driveAccessServiceSpy = {
+      requestAccessIfNeeded: vi
+        .fn()
+        .mockName('DriveAccessService.requestAccessIfNeeded'),
+    };
+    paymentServiceSpy = {
+      getPaymentOptions: vi.fn().mockName('PaymentService.getPaymentOptions'),
+    };
+    paymentServiceSpy.getPaymentOptions.mockReturnValue(
+      new BehaviorSubject(paymentOptions).asObservable(),
+    );
     officeStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(undefined),
-      loadMyOffices: jasmine.createSpy('loadMyOffices'),
-      update: jasmine.createSpy('update'),
+      loadMyOffices: vi.fn().mockName('loadMyOffices'),
+      update: vi.fn().mockName('update'),
     };
     invoiceStoreSpy = {
       isLoading: signal(false),
       data: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadOfficeToInvoice: jasmine.createSpy('loadOfficeToInvoice'),
-      uploadInvoices: jasmine.createSpy('uploadInvoices'),
+      clean: vi.fn().mockName('clean'),
+      loadOfficeToInvoice: vi.fn().mockName('loadOfficeToInvoice'),
+      uploadInvoices: vi.fn().mockName('uploadInvoices'),
     };
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
-
-    breakpointObserverSpy.observe.and.returnValue(breakpoint$.asObservable());
+    breakpointObserverSpy.observe.mockReturnValue(breakpoint$.asObservable());
 
     await TestBed.configureTestingModule({
-      imports: [InvoiceListComponent, TranslateModule.forRoot()],
+      imports: [InvoiceListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
@@ -229,28 +279,32 @@ describe('InvoiceListComponent', () => {
     fixture = TestBed.createComponent(InvoiceListComponent);
     component = fixture.componentInstance;
 
-    spyOn(globalThis, 'fetch').and.callFake(() =>
+    vi.spyOn(globalThis, 'fetch').mockImplementation(() =>
       Promise.resolve({
         arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)),
-      } as Response));
+      } as Response),
+    );
 
-    spyOn(pdfMake, 'createPdf').and.returnValue({
-      getBlob: () => Promise.resolve(fakeBlob),
+    createPdfSpy = vi.spyOn(pdfMake, 'createPdf').mockReturnValue({
+      getBlob: vi.fn().mockResolvedValue(fakeBlob),
     } as any);
 
     fixture.detectChanges();
-    paymentStoreSpy.getOptions.calls.reset();
+    paymentStoreSpy.getOptions.mockClear();
   });
 
   it('should filter payment types by label or type', () => {
     const byLabel = component['filterTypes']('cash', paymentOptions);
     const byType = component['filterTypes']('moll', paymentOptions);
 
-    expect(byLabel?.map(option => option.type)).toEqual(['CASH']);
-    expect(byType?.map(option => option.type)).toEqual(['MOLLIE']);
+    expect(byLabel?.map((option) => option.type)).toEqual(['CASH']);
+    expect(byType?.map((option) => option.type)).toEqual(['MOLLIE']);
   });
 
-  afterEach(() => breakpoint$.complete());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    breakpoint$.complete();
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -339,7 +393,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should add payment type to selected when selected is called', () => {
-    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
+    const cashOption = paymentOptions.find((option) => option.type === 'CASH')!;
     const event = {
       option: { value: cashOption.type },
     } as MatAutocompleteSelectedEvent;
@@ -350,7 +404,7 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should remove payment type from available types when selected', () => {
-    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
+    const cashOption = paymentOptions.find((option) => option.type === 'CASH')!;
     component.allPaymentOptionsWritableSignal.set(paymentOptions.slice(0, 2));
     const event = {
       option: { value: cashOption.type },
@@ -359,12 +413,16 @@ describe('InvoiceListComponent', () => {
     component.selected(event);
     fixture.detectChanges();
 
-    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).not.toContain('CASH');
+    expect(
+      component.allPaymentOptionsWritableSignal()?.map((option) => option.type),
+    ).not.toContain('CASH');
   });
 
   it('should remove payment type from selected when remove is called', () => {
-    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
-    const transferOption = paymentOptions.find(option => option.type === 'TRANSFER')!;
+    const cashOption = paymentOptions.find((option) => option.type === 'CASH')!;
+    const transferOption = paymentOptions.find(
+      (option) => option.type === 'TRANSFER',
+    )!;
     component.selectedPaymentOptionsSignal.set([cashOption, transferOption]);
 
     component.remove(cashOption);
@@ -373,23 +431,29 @@ describe('InvoiceListComponent', () => {
   });
 
   it('should add payment type back to available types when removed', () => {
-    const cashOption = paymentOptions.find(option => option.type === 'CASH')!;
-    const transferOption = paymentOptions.find(option => option.type === 'TRANSFER')!;
+    const cashOption = paymentOptions.find((option) => option.type === 'CASH')!;
+    const transferOption = paymentOptions.find(
+      (option) => option.type === 'TRANSFER',
+    )!;
     component.allPaymentOptionsWritableSignal.set(
-      paymentOptions.filter(option => option.type === 'TRANSFER'));
+      paymentOptions.filter((option) => option.type === 'TRANSFER'),
+    );
     component.selectedPaymentOptionsSignal.set([cashOption, transferOption]);
 
     component.remove(cashOption);
 
-    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).toContain('CASH');
+    expect(
+      component.allPaymentOptionsWritableSignal()?.map((option) => option.type),
+    ).toContain('CASH');
   });
 
   it('should initialize selected invoice filters from defaultFilter options only', () => {
-    expect(component.selectedPaymentOptionsSignal().map(option => option.type)).toEqual([
-      'TRANSFER',
-      'MOLLIE',
-    ]);
-    expect(component.allPaymentOptionsWritableSignal()?.map(option => option.type)).toEqual(['CASH']);
+    expect(
+      component.selectedPaymentOptionsSignal().map((option) => option.type),
+    ).toEqual(['TRANSFER', 'MOLLIE']);
+    expect(
+      component.allPaymentOptionsWritableSignal()?.map((option) => option.type),
+    ).toEqual(['CASH']);
   });
 
   it('should return true when all rows are selected', () => {
@@ -483,7 +547,10 @@ describe('InvoiceListComponent', () => {
   it('should navigate to invoice path when goToPath is called', () => {
     component.goToPath(mockInvoice[0]);
 
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['invoice', '1']);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'invoice',
+      '1',
+    ]);
   });
 
   it('should auto-select office when only one office is available', () => {
@@ -505,7 +572,14 @@ describe('InvoiceListComponent', () => {
   it('should filter office correctly using filteredOfficeSignal', () => {
     officeStoreSpy.data.set({
       kind: 'list',
-      value: [mockOffice, { id: '2', name: 'Another Office', manager: { id: '1', displayName: 'Officer' } }],
+      value: [
+        mockOffice,
+        {
+          id: '2',
+          name: 'Another Office',
+          manager: { id: '1', displayName: 'Officer' },
+        },
+      ],
     });
     (component.getForm.office as any).setValue('A');
     fixture.detectChanges();
@@ -544,14 +618,16 @@ describe('InvoiceListComponent', () => {
     component.getDateRangeForm.startDate.setValue(startDate);
     fixture.detectChanges();
 
-    component.selectionSignal.set(new SelectionModel<IInvoice>(true, [...mockInvoice]));
+    component.selectionSignal.set(
+      new SelectionModel<IInvoice>(true, [...mockInvoice]),
+    );
 
     // Act
     await component.print();
 
     expect(officeStoreSpy.update).toHaveBeenCalledWith(
       mockOffice.id,
-      jasmine.objectContaining({
+      expect.objectContaining({
         lastInvoiceNumber: 12,
       }),
     );
@@ -559,12 +635,11 @@ describe('InvoiceListComponent', () => {
     expect(invoiceStoreSpy.uploadInvoices).toHaveBeenCalledWith(
       mockOffice.id,
       fakeBlob,
-      jasmine.stringMatching(/Sales .*\.pdf/),
+      expect.stringMatching(/Sales .*\.pdf/),
       true,
     );
 
-    // Assert: pdfMake used
-    expect(pdfMake.createPdf).toHaveBeenCalled();
+    expect(createPdfSpy).toHaveBeenCalled();
   });
 
   it('should NOT print when no office is selected', async () => {
@@ -572,7 +647,7 @@ describe('InvoiceListComponent', () => {
 
     await component.print();
 
-    expect(pdfMake.createPdf).not.toHaveBeenCalled();
+    expect(createPdfSpy).not.toHaveBeenCalled();
     expect(officeStoreSpy.update).not.toHaveBeenCalled();
     expect(invoiceStoreSpy.uploadInvoices).not.toHaveBeenCalled();
   });
@@ -584,7 +659,9 @@ describe('InvoiceListComponent', () => {
 
     component.getForm.office.setValue(mockOffice);
     component.getDateRangeForm.startDate.setValue(startDate);
-    component.selectionSignal.set(new SelectionModel<IInvoice>(true, [mockInvoice[0]]));
+    component.selectionSignal.set(
+      new SelectionModel<IInvoice>(true, [mockInvoice[0]]),
+    );
     fixture.detectChanges();
 
     await component.print();
@@ -593,7 +670,7 @@ describe('InvoiceListComponent', () => {
     expect(invoiceStoreSpy.uploadInvoices).toHaveBeenCalledWith(
       mockOffice.id,
       fakeBlob,
-      jasmine.stringMatching(/Sales .*\.pdf/),
+      expect.stringMatching(/Sales .*\.pdf/),
       false,
     );
   });

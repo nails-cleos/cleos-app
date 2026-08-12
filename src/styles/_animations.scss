@@ -64,7 +64,7 @@
   margin-top: -10px;
   margin-left: -10px;
   border-radius: 50%;
-  animation: spinner .8s linear infinite;
+  animation: spinner 0.8s linear infinite;
 }
 
 .enter-slide-x,
@@ -110,9 +110,11 @@
 .reveal-y {
   opacity: 0;
   transition-property: opacity, transform;
-  transition-duration: var(--reveal-duration, 500ms), var(--reveal-duration, 500ms);
+  transition-duration:
+    var(--reveal-duration, 500ms), var(--reveal-duration, 500ms);
   transition-timing-function: ease-in-out, ease-in-out;
-  transition-delay: var(--reveal-exit-delay, 0ms), var(--reveal-exit-delay, 0ms);
+  transition-delay:
+    var(--reveal-exit-delay, 0ms), var(--reveal-exit-delay, 0ms);
   will-change: opacity, transform;
 }
 
@@ -127,20 +129,23 @@
 .reveal-x.reveal-visible {
   opacity: 1;
   transform: translateX(0);
-  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+  transition-delay:
+    var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
 }
 
 .reveal-y.reveal-visible {
   opacity: 1;
   transform: translateY(0);
-  transition-delay: var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
+  transition-delay:
+    var(--reveal-enter-delay, 0ms), var(--reveal-enter-delay, 0ms);
 }
 
 .fade-up-reveal {
   opacity: 0;
   transform: translateY(var(--fade-up-distance, 20px));
-  transition: opacity var(--fade-up-duration, 700ms) ease-in-out,
-  transform var(--fade-up-duration, 700ms) ease-in-out;
+  transition:
+    opacity var(--fade-up-duration, 700ms) ease-in-out,
+    transform var(--fade-up-duration, 700ms) ease-in-out;
   will-change: opacity, transform;
 }
 
@@ -270,9 +275,16 @@ $height: 500;
 $box-shadow: ();
 $box-shadow2: ();
 @for $i from 0 through $particles {
-  $box-shadow: $box-shadow,
-  math.random($width) - math.div($width, 2) + px math.random($height)- math.div($height, 1.2) + px hsl(math.random(360), 100%, 50%);
-  $box-shadow2: $box-shadow2, 0 0 #000;
+  $box-shadow:
+    $box-shadow,
+    math.random($width) - math.div($width, 2) +
+      px
+      math.random($height)- math.div($height, 1.2) +
+      px
+      hsl(math.random(360), 100%, 50%);
+  $box-shadow2:
+    $box-shadow2,
+    0 0 #000;
 }
 
 @mixin keyframes($animationName) {
@@ -313,14 +325,21 @@ $box-shadow2: ();
   -ms-transform: $settings;
 }
 
-.pyro > .before, .pyro > .after {
+.pyro > .before,
+.pyro > .after {
   position: absolute;
   width: 5px;
   height: 5px;
   border-radius: 50%;
   box-shadow: $box-shadow2;
   z-index: 9999;
-  @include animation((1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards));
+  @include animation(
+    (
+      1s bang ease-out infinite backwards,
+      1s gravity ease-in infinite backwards,
+      5s position linear infinite backwards
+    )
+  );
 }
 
 .pyro > .after {
@@ -342,23 +361,28 @@ $box-shadow2: ();
 }
 
 @include keyframes(position) {
-  0%, 19.9% {
+  0%,
+  19.9% {
     margin-top: 10%;
     margin-left: 40%;
   }
-  20%, 39.9% {
+  20%,
+  39.9% {
     margin-top: 40%;
     margin-left: 30%;
   }
-  40%, 59.9% {
+  40%,
+  59.9% {
     margin-top: 20%;
     margin-left: 70%;
   }
-  60%, 79.9% {
+  60%,
+  79.9% {
     margin-top: 30%;
     margin-left: 20%;
   }
-  80%, 99.9% {
+  80%,
+  99.9% {
     margin-top: 30%;
     margin-left: 80%;
   }

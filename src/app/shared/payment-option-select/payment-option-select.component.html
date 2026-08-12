@@ -15,7 +15,9 @@
         @if (currentOption?.label || currentOption?.name) {
           {{ currentOption?.label || currentOption?.name }}
         } @else {
-          {{ 'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE') | translate }}
+          {{
+            'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE') | translate
+          }}
         }
       </div>
     </div>
@@ -31,7 +33,10 @@
             @if (currentOption.icon) {
               <mat-icon>{{ currentOption.icon }}</mat-icon>
             } @else {
-              <mat-icon [svgIcon]="currentOption.type" class="svg-icon"></mat-icon>
+              <mat-icon
+                [svgIcon]="currentOption.type"
+                class="svg-icon"
+              ></mat-icon>
             }
           } @else {
             <mat-icon>{{ defaultIcon() }}</mat-icon>
@@ -40,7 +45,10 @@
             @if (getSelectedLabel()) {
               {{ getSelectedLabel() }}
             } @else {
-              {{ 'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE') | translate }}
+              {{
+                'COMMON.PAYMENT.TYPE.' + (getSelectedType() || 'NONE')
+                  | translate
+              }}
             }
           </span>
         </span>
@@ -55,12 +63,18 @@
           } @else {
             <mat-icon [svgIcon]="option.type" class="svg-icon"></mat-icon>
           }
-          {{ option.label || option.name || ('COMMON.PAYMENT.TYPE.' + option.type | translate) }}
+          {{
+            option.label ||
+              option.name ||
+              ('COMMON.PAYMENT.TYPE.' + option.type | translate)
+          }}
         </mat-option>
       }
     </mat-select>
     @if (control().hasError('required')) {
-      <mat-error [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"></mat-error>
+      <mat-error
+        [innerHTML]="'COMMON.PAYMENT.TYPE.FIELD.REQUIRED' | translate"
+      ></mat-error>
     }
   </mat-form-field>
 }

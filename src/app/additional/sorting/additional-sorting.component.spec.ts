@@ -1,13 +1,14 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TranslateModule } from '@ngx-translate/core';
 
 import { IAdditionalAll } from '../additional';
-import { ServiceType } from '../../room/room';
-import { NavigationService } from '../../services/navigation.service';
-import { AdditionalStore } from '../../store/additional.store';
-import { ItemSorting } from '../../util/drag-drop-sorting/drag-drop-sorting.component';
+import { ServiceType } from '@app/room/room';
+import { NavigationService } from '@app/services/navigation.service';
+import { AdditionalStore } from '@app/store/additional.store';
+import { ItemSorting } from '@app/util/drag-drop-sorting/drag-drop-sorting.component';
 import { AdditionalSortingComponent } from './additional-sorting.component';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('AdditionalSortingComponent', () => {
   let component: AdditionalSortingComponent;
@@ -17,10 +18,10 @@ describe('AdditionalSortingComponent', () => {
     data: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadList: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    sort: jasmine.Spy;
+    clean: Mock;
+    loadList: Mock;
+    clearResponse: Mock;
+    sort: Mock;
   };
 
   const mockAdditionalList: IAdditionalAll[] = [
@@ -51,17 +52,23 @@ describe('AdditionalSortingComponent', () => {
       data: signal<any>(undefined),
       response: signal<any>(undefined),
       isLoading: signal(false),
-      clean: jasmine.createSpy('clean'),
-      loadList: jasmine.createSpy('loadList'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      sort: jasmine.createSpy('sort'),
+      clean: vi.fn().mockName('clean'),
+      loadList: vi.fn().mockName('loadList'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      sort: vi.fn().mockName('sort'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [AdditionalSortingComponent, TranslateModule.forRoot()],
+      imports: [AdditionalSortingComponent],
       providers: [
+        provideTranslateService(),
         { provide: AdditionalStore, useValue: additionalStoreSpy },
-        { provide: NavigationService, useValue: jasmine.createSpyObj('NavigationService', ['back']) },
+        {
+          provide: NavigationService,
+          useValue: {
+            back: vi.fn().mockName('NavigationService.back'),
+          },
+        },
       ],
     }).compileComponents();
 
@@ -98,8 +105,8 @@ describe('AdditionalSortingComponent', () => {
   });
 
   it('should clear response and reload list when responseSignal emits', () => {
-    additionalStoreSpy.clearResponse.calls.reset();
-    additionalStoreSpy.loadList.calls.reset();
+    additionalStoreSpy.clearResponse.mockClear();
+    additionalStoreSpy.loadList.mockClear();
 
     additionalStoreSpy.response.set({ success: true } as any);
     fixture.detectChanges();

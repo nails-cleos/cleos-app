@@ -6,7 +6,10 @@ import { isExternalUrl } from './index';
 import { LoadingOverlayService } from '../services/loading-overlay.service';
 import { SKIP_LOADING_OVERLAY } from '../interfaces/pagination';
 
-export const loadingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> => {
+export const loadingInterceptor = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn,
+): Observable<HttpEvent<unknown>> => {
   if (isExternalUrl(req.url) || req.context.get(SKIP_LOADING_OVERLAY)) {
     return next(req);
   }
@@ -14,7 +17,5 @@ export const loadingInterceptor = (req: HttpRequest<unknown>, next: HttpHandlerF
   const loadingOverlayService = inject(LoadingOverlayService);
   loadingOverlayService.show();
 
-  return next(req).pipe(
-    finalize(() => loadingOverlayService.hide()),
-  );
+  return next(req).pipe(finalize(() => loadingOverlayService.hide()));
 };

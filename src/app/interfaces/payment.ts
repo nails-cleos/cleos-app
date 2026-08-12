@@ -20,7 +20,7 @@ export interface IPaymentOption {
 
 export enum PaymentPercentage {
   deposit_50 = 'DEPOSIT_50',
-  total = 'TOTAL'
+  total = 'TOTAL',
 }
 
 export interface IPaymentStatus {
@@ -44,7 +44,7 @@ export interface IPaymentRequest {
 }
 
 export interface IPaymentResource {
-  remainingAmount: number,
+  remainingAmount: number;
   payments: IPaymentAll[];
 }
 
@@ -88,7 +88,12 @@ export class PaymentStatus implements IPaymentStatus {
   preferenceId: string;
   reason?: string;
 
-  constructor(paymentId: string, type: string, referenceId: string, reason?: string) {
+  constructor(
+    paymentId: string,
+    type: string,
+    referenceId: string,
+    reason?: string,
+  ) {
     this.paymentId = paymentId;
     this.paymentType = type;
     this.preferenceId = referenceId;

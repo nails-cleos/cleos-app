@@ -4,7 +4,9 @@
       <div class="app-surface-dialog-badge" aria-hidden="true">
         <mat-icon>palette</mat-icon>
       </div>
-      <h1 mat-dialog-title class="app-surface-dialog-title">{{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}</h1>
+      <h1 mat-dialog-title class="app-surface-dialog-title">
+        {{ 'RESERVATION.TREATMENT.COLOR.CHANGE' | translate }}
+      </h1>
     </div>
   </div>
 
@@ -14,21 +16,37 @@
     <form [formGroup]="form" (keydown.enter)="$event.preventDefault()">
       @if (colorsSignal()) {
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'RESERVATION.TREATMENT.COLOR.FIELD' | translate }}</mat-label>
+          <mat-label>{{
+            'RESERVATION.TREATMENT.COLOR.FIELD' | translate
+          }}</mat-label>
           <label>
-            <input (keydown)="keyDownHandler($event)" [formControl]="getForm.color" [matAutocomplete]="autoColor"
-                   autocomplete="off" matInput required type="text">
+            <input
+              (keydown)="keyDownHandler($event)"
+              [formControl]="getForm.color"
+              [matAutocomplete]="autoColor"
+              autocomplete="off"
+              matInput
+              required
+              type="text"
+            />
           </label>
-          <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+          <mat-autocomplete
+            #autoColor="matAutocomplete"
+            [displayWith]="displayFnColor"
+          >
             @for (color of filteredColorSignal(); track color) {
               <mat-option [value]="color">{{ color.name }}</mat-option>
             }
           </mat-autocomplete>
           @if (getForm.color.hasError('required')) {
-            <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.REQUIRED' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'RESERVATION.TREATMENT.COLOR.REQUIRED' | translate"
+            ></mat-error>
           }
           @if (getForm.color.hasError('requireMatch')) {
-            <mat-error [innerHTML]="'RESERVATION.TREATMENT.COLOR.INVALID' | translate"></mat-error>
+            <mat-error
+              [innerHTML]="'RESERVATION.TREATMENT.COLOR.INVALID' | translate"
+            ></mat-error>
           }
         </mat-form-field>
       } @else {
@@ -41,8 +59,16 @@
 
   <div mat-dialog-actions class="app-surface-dialog-actions">
     <div class="app-surface-dialog-spacer"></div>
-    <button (click)="onNoClick()" mat-stroked-button type="button">{{ 'COMMON.BUTTON.CANCEL' | translate }}</button>
-    <button (click)="doAction()" color="primary" [disabled]="form.invalid" mat-flat-button type="button">
+    <button (click)="onNoClick()" mat-stroked-button type="button">
+      {{ 'COMMON.BUTTON.CANCEL' | translate }}
+    </button>
+    <button
+      (click)="doAction()"
+      color="primary"
+      [disabled]="form.invalid"
+      mat-flat-button
+      type="button"
+    >
       {{ 'RESERVATION.TREATMENT.COLOR.UPDATE' | translate }}
     </button>
   </div>

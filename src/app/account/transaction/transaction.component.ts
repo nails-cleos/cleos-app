@@ -1,20 +1,40 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal } from '@angular/core';
-import { FormControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthUserService } from '../../services/auth-user.service';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import {
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { AuthUserService } from '@app/services/auth-user.service';
 import { ITransaction } from '../account';
-import { currencySymbol } from '../../util/helper';
+import { currencySymbol } from '@app/util/helper';
 import { TranslatePipe } from '@ngx-translate/core';
 import { BalanceComponent } from '../balance/balance.component';
-import { BackButtonDirective } from '../../directives/back-button.directive';
-import { BankComponent, BankForm } from '../../shared/bank/bank.component';
-import { IError } from '../../interfaces/common';
-import { AccountStore } from '../../store/account.store';
-import { PaymentOptionSelectComponent } from '../../shared/payment-option-select/payment-option-select.component';
-import { MatError, MatFormField, MatInput, MatLabel, MatPrefix } from '@angular/material/input';
+import { BackButtonDirective } from '@app/directives/back-button.directive';
+import { BankComponent, BankForm } from '@app/shared/bank/bank.component';
+import { IError } from '@app/interfaces/common';
+import { AccountStore } from '@app/store/account.store';
+import { PaymentOptionSelectComponent } from '@app/shared/payment-option-select/payment-option-select.component';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+  MatPrefix,
+} from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { NavigationService } from '../../services/navigation.service';
-import { PaymentStore } from '../../store/payment.store';
+import { NavigationService } from '@app/services/navigation.service';
+import { PaymentStore } from '@app/store/payment.store';
 
 export type TransactionForm = {
   amount: FormControl<number>;
@@ -26,9 +46,23 @@ export type TransactionForm = {
   selector: 'app-transaction',
   templateUrl: './transaction.component.html',
   styleUrls: ['./transaction.component.scss'],
-  imports: [MatFormField, MatLabel, MatInput, MatIcon, MatButton, ReactiveFormsModule, TranslatePipe, MatError,
-    MatPrefix, BankComponent, BackButtonDirective, BalanceComponent, BackButtonDirective, BankComponent,
-    PaymentOptionSelectComponent],
+  imports: [
+    MatFormField,
+    MatLabel,
+    MatInput,
+    MatIcon,
+    MatButton,
+    ReactiveFormsModule,
+    TranslatePipe,
+    MatError,
+    MatPrefix,
+    BankComponent,
+    BackButtonDirective,
+    BalanceComponent,
+    BackButtonDirective,
+    BankComponent,
+    PaymentOptionSelectComponent,
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TransactionComponent {
@@ -36,9 +70,12 @@ export class TransactionComponent {
 
   private readonly accountStore = inject(AccountStore);
   private readonly paymentStore = inject(PaymentStore);
-  private readonly formBuilder: NonNullableFormBuilder = inject(NonNullableFormBuilder);
+  private readonly formBuilder: NonNullableFormBuilder = inject(
+    NonNullableFormBuilder,
+  );
   private readonly authUserService: AuthUserService = inject(AuthUserService);
-  private readonly navigationService: NavigationService = inject(NavigationService);
+  private readonly navigationService: NavigationService =
+    inject(NavigationService);
 
   private readonly authUserSignal = this.authUserService.authUser;
   private readonly accountId = computed(() => this.id());
@@ -46,14 +83,18 @@ export class TransactionComponent {
 
   errors = signal<Record<string, unknown>>({});
   accountSignal = computed(() => this.accountStore.selected());
-  types = computed(() => this.paymentOptionsSignal()
-    .filter(option => option.enabled)
-    .filter(option => ['cash', 'transfer'].includes(option.type.toLowerCase())));
+  types = computed(() =>
+    this.paymentOptionsSignal()
+      .filter((option) => option.enabled)
+      .filter((option) =>
+        ['cash', 'transfer'].includes(option.type.toLowerCase()),
+      ),
+  );
   optionsSignal = computed(() => {
     if (!this.hasAdminRole()) {
       return this.paymentOptionsSignal()
-        .filter(option => option.enabled)
-        .map(option => ({ ...option, hidePercentage: true }));
+        .filter((option) => option.enabled)
+        .map((option) => ({ ...option, hidePercentage: true }));
     }
     return this.types();
   });
@@ -102,7 +143,11 @@ export class TransactionComponent {
     effect(() => {
       if (this.accountStore.response()) {
         if (this.hasAdminRole()) {
-          this.navigationService.navigate(['users', this.accountSignal()?.customer?.id, 'overview']);
+          this.navigationService.navigate([
+            'users',
+            this.accountSignal()?.customer?.id,
+            'overview',
+          ]);
         } else {
           this.navigationService.navigate(['me', 'overview']);
         }

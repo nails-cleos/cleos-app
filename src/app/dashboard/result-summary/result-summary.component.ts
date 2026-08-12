@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { ICurrencyAll } from '../../currency/currency';
+import { ICurrencyAll } from '@app/currency/currency';
 import { TotalSummaryItemComponent } from '../total-summary-item/total-summary-item.component';
 import { ISummaryTotals } from '../dashboard';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -17,11 +17,11 @@ export class ResultSummaryComponent {
   summaryType = input<'totals' | 'income' | 'expense' | 'cash'>();
   currency = input<ICurrencyAll>();
 
-  calculateAmount = (
-    type: 'gross' | 'btw' | 'net',
-  ): number => {
+  calculateAmount = (type: 'gross' | 'btw' | 'net'): number => {
     const summaryTotals = this.summaryTotals();
     const summaryType = this.summaryType();
-    return summaryType ? summaryTotals[summaryType][type] : summaryTotals.income[type] - summaryTotals.expense[type];
+    return summaryType
+      ? summaryTotals[summaryType][type]
+      : summaryTotals.income[type] - summaryTotals.expense[type];
   };
 }

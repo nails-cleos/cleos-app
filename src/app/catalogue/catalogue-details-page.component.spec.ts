@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueDetailsPageComponent } from './catalogue-details-page.component';
 import { CatalogueStore } from '../store/catalogue.store';
@@ -5,6 +6,9 @@ import { ICatalogueAll } from './catalogue';
 import { signal } from '@angular/core';
 import { CatalogueComponent } from './catalogue.component';
 import { TreatmentStore } from '../store/treatment.store';
+import { DateAdapter } from '@angular/material/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
 
 describe('CatalogueDetailsPageComponent', () => {
   let component: CatalogueDetailsPageComponent;
@@ -13,14 +17,14 @@ describe('CatalogueDetailsPageComponent', () => {
   let catalogueStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   let treatmentStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllGroups: jasmine.Spy;
+    loadAllGroups: Mock;
   };
 
   const id = '1';
@@ -41,28 +45,25 @@ describe('CatalogueDetailsPageComponent', () => {
     catalogueStoreSpy = {
       selected: signal<ICatalogueAll | undefined>(undefined),
       subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
     treatmentStoreSpy = {
       data: signal<any>([]),
-      loadAllGroups: jasmine.createSpy('loadAllGroups'),
+      loadAllGroups: vi.fn().mockName('loadAllGroups'),
     };
 
     await TestBed.configureTestingModule({
       imports: [CatalogueDetailsPageComponent],
       providers: [
+        provideTranslateService(),
+        provideRouter([]),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
+        { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
-    }).overrideTemplate(CatalogueComponent, '')
-      .overrideTemplate(CatalogueDetailsPageComponent, `
-        @if (catalogue(); as catalogue) {
-          <app-catalogue [undoImage]="true" [catalogue]="catalogue" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueDetailsPageComponent);
     fixture.componentRef.setInput('id', id);
@@ -85,15 +86,18 @@ describe('CatalogueDetailsPageComponent', () => {
     catalogueStoreSpy.selected.set(mockCatalogue);
     fixture.detectChanges();
 
-    const catalogueComponent = fixture.debugElement.children[0].componentInstance as CatalogueComponent;
+    const catalogueComponent = fixture.debugElement.children[0]
+      .componentInstance as CatalogueComponent;
 
-    expect(catalogueComponent.catalogue()).toEqual(jasmine.objectContaining({
-      id,
-      name: 'Test Catalogue',
-      description: 'Test Description',
-      home: true,
-      catalog: true,
-    }));
+    expect(catalogueComponent.catalogue()).toEqual(
+      expect.objectContaining({
+        id,
+        name: 'Test Catalogue',
+        description: 'Test Description',
+        home: true,
+        catalog: true,
+      }),
+    );
   });
 
   it('should call update when catalogue is received', () => {
@@ -105,11 +109,12 @@ describe('CatalogueDetailsPageComponent', () => {
 
     expect(catalogueStoreSpy.update).toHaveBeenCalledWith(
       id,
-      jasmine.objectContaining({
+      expect.objectContaining({
         name: 'Test Catalogue',
         home: true,
         catalog: true,
       }),
-      resizedImageDataUrl);
+      resizedImageDataUrl,
+    );
   });
 });

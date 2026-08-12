@@ -58,3 +58,4 @@ cypress/results/**
 cypress/downloads/**
 
 **/junit-report.xml
+unit-test.log

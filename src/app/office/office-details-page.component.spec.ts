@@ -1,24 +1,28 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OfficeDetailsPageComponent } from './office-details-page.component';
 import { OfficeStore } from '../store/office.store';
 import { IOfficeAll } from './office';
 import { OfficeComponent } from './office.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { NavigationService } from '../services/navigation.service';
 import { DEFAULT_LOCALE } from '../util/dates';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('OfficeDetailsPageComponent', () => {
   let component: OfficeDetailsPageComponent;
   let fixture: ComponentFixture<OfficeDetailsPageComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
   let officeStoreSpy: {
     selected: ReturnType<typeof signal>;
     subErrors: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    loadById: jasmine.Spy;
-    update: jasmine.Spy;
+    isLoading: ReturnType<typeof signal>;
+    clean: Mock;
+    loadById: Mock;
+    update: Mock;
   };
 
   const id = '123';
@@ -29,30 +33,27 @@ describe('OfficeDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     officeStoreSpy = {
-      selected: signal<any>(undefined),
-      subErrors: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      loadById: jasmine.createSpy('loadById'),
-      update: jasmine.createSpy('update'),
+      selected: signal(undefined),
+      subErrors: signal(undefined),
+      isLoading: signal(false),
+      clean: vi.fn().mockName('clean'),
+      loadById: vi.fn().mockName('loadById'),
+      update: vi.fn().mockName('update'),
     };
 
     await TestBed.configureTestingModule({
-      imports: [OfficeDetailsPageComponent, TranslateModule.forRoot()],
+      imports: [OfficeDetailsPageComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
       ],
-    }).overrideTemplate(OfficeComponent, '')
-      .overrideTemplate(OfficeDetailsPageComponent, `
-        @if (office(); as office) {
-          <app-office [office]="office" [config]="config" />
-        }
-      `)
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(OfficeDetailsPageComponent);
 
@@ -76,12 +77,15 @@ describe('OfficeDetailsPageComponent', () => {
     officeStoreSpy.selected.set(mockOffice);
     fixture.detectChanges();
 
-    const officeComponent = fixture.debugElement.children[0].componentInstance as OfficeComponent;
+    const officeComponent = fixture.debugElement.children[0]
+      .componentInstance as OfficeComponent;
 
-    expect(officeComponent.office()).toEqual(jasmine.objectContaining({
-      id,
-      name: 'Test Office',
-    }));
+    expect(officeComponent.office()).toEqual(
+      expect.objectContaining({
+        id,
+        name: 'Test Office',
+      }),
+    );
   });
 
   it('should call update when office is received', () => {
@@ -89,8 +93,11 @@ describe('OfficeDetailsPageComponent', () => {
 
     component.submit(mockOffice);
 
-    expect(officeStoreSpy.update).toHaveBeenCalledWith(id, jasmine.objectContaining({
-      name: 'Test Office',
-    }));
+    expect(officeStoreSpy.update).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        name: 'Test Office',
+      }),
+    );
   });
 });

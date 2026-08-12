@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -6,39 +7,53 @@ import { Router } from '@angular/router';
 import { DashboardStore } from './dashboard.store';
 import { DashboardService } from '../services/dashboard.service';
 import { NavigationService } from '../services/navigation.service';
+import { backendFormatDate } from '@app/util/dates';
 
 describe('DashboardStore', () => {
   let store: InstanceType<typeof DashboardStore>;
 
-  let dashboardService: jasmine.SpyObj<DashboardService>;
-  let navigationService: jasmine.SpyObj<NavigationService>;
-  let router: jasmine.SpyObj<Router>;
+  let dashboardService: {
+    getEvents: Mock;
+    getCards: Mock;
+    getMyEvent: Mock;
+    updateEvent: Mock;
+    getMonthlySummary: Mock;
+    updateMonthlySummary: Mock;
+    getYearSummary: Mock;
+    exportYearSummary: Mock;
+    getQuarterSummary: Mock;
+  };
+
+  let navigationService: {
+    reload: Mock;
+  };
+
+  let router: {
+    url: '/dashboard/month/summary';
+  };
 
   beforeEach(() => {
-    dashboardService = jasmine.createSpyObj('DashboardService', [
-      'getEvents',
-      'getCards',
-      'getMyEvent',
-      'updateEvent',
-      'getMonthlySummary',
-      'updateMonthlySummary',
-      'getYearSummary',
-      'exportYearSummary',
-      'getQuarterSummary',
-    ]);
+    dashboardService = {
+      getEvents: vi.fn().mockName('DashboardService.getEvents'),
+      getCards: vi.fn().mockName('DashboardService.getCards'),
+      getMyEvent: vi.fn().mockName('DashboardService.getMyEvent'),
+      updateEvent: vi.fn().mockName('DashboardService.updateEvent'),
+      getMonthlySummary: vi.fn().mockName('DashboardService.getMonthlySummary'),
+      updateMonthlySummary: vi
+        .fn()
+        .mockName('DashboardService.updateMonthlySummary'),
+      getYearSummary: vi.fn().mockName('DashboardService.getYearSummary'),
+      exportYearSummary: vi.fn().mockName('DashboardService.exportYearSummary'),
+      getQuarterSummary: vi.fn().mockName('DashboardService.getQuarterSummary'),
+    };
 
-    navigationService = jasmine.createSpyObj(
-      'NavigationService',
-      ['reload'],
-    );
+    navigationService = {
+      reload: vi.fn().mockName('NavigationService.reload'),
+    };
 
-    router = jasmine.createSpyObj(
-      'Router',
-      [],
-      {
-        url: '/dashboard/month/summary',
-      },
-    );
+    router = {
+      url: '/dashboard/month/summary',
+    };
 
     TestBed.configureTestingModule({
       providers: [
@@ -63,18 +78,9 @@ describe('DashboardStore', () => {
 
   describe('clearResponse', () => {
     it('should clear response', () => {
-      dashboardService.updateMonthlySummary.and.returnValue(
-        of(void 0),
-      );
+      dashboardService.updateMonthlySummary.mockReturnValue(of(void 0));
 
-      store.updateMonthlySummary(
-        '2025-01',
-        'INCOME',
-        [],
-        [],
-        undefined,
-        1,
-      );
+      store.updateMonthlySummary('2025-01', 'INCOME', [], [], undefined, 1);
 
       expect(store.response()).toEqual({
         message: 'SUMMARY.UPDATED',
@@ -88,15 +94,16 @@ describe('DashboardStore', () => {
 
   describe('clearError', () => {
     it('should clear error', () => {
-      dashboardService.getEvents.and.returnValue(
-        throwError(() =>
-          new HttpErrorResponse({
-            status: 500,
-          }),
+      dashboardService.getEvents.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 500,
+            }),
         ),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(store.error()).toBeTruthy();
 
@@ -109,7 +116,7 @@ describe('DashboardStore', () => {
 
   describe('getEvents', () => {
     it('should load events', () => {
-      dashboardService.getEvents.and.returnValue(
+      dashboardService.getEvents.mockReturnValue(
         of([
           {
             roomName: 'Room A',
@@ -118,29 +125,30 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(dashboardService.getEvents).toHaveBeenCalled();
 
-      expect(store.isLoading()).toBeFalse();
+      expect(store.isLoading()).toBe(false);
 
       expect(store.data()?.['Room A']).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           roomName: 'Room A',
         }),
       );
     });
 
     it('should handle errors', () => {
-      dashboardService.getEvents.and.returnValue(
-        throwError(() =>
-          new HttpErrorResponse({
-            status: 500,
-          }),
+      dashboardService.getEvents.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 500,
+            }),
         ),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(store.error()).toBeTruthy();
     });
@@ -148,7 +156,7 @@ describe('DashboardStore', () => {
 
   describe('getCards', () => {
     it('should load cards', () => {
-      dashboardService.getCards.and.returnValue(
+      dashboardService.getCards.mockReturnValue(
         of([
           {
             roomName: 'Room A',
@@ -157,14 +165,14 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.getCards(new Date());
+      store.getCards(backendFormatDate(new Date()));
 
       expect(dashboardService.getCards).toHaveBeenCalled();
 
-      expect(store.isLoading()).toBeFalse();
+      expect(store.isLoading()).toBe(false);
 
       expect(store.data()?.['Room A']).toEqual(
-        jasmine.objectContaining({
+        expect.objectContaining({
           roomName: 'Room A',
         }),
       );
@@ -177,11 +185,9 @@ describe('DashboardStore', () => {
         reservations: [],
       };
 
-      dashboardService.getMyEvent.and.returnValue(
-        of(dashboard as any),
-      );
+      dashboardService.getMyEvent.mockReturnValue(of(dashboard as any));
 
-      store.getMyEvent(new Date());
+      store.getMyEvent(backendFormatDate(new Date()));
 
       expect(store.dashboard()).toEqual(dashboard as any);
     });
@@ -189,29 +195,22 @@ describe('DashboardStore', () => {
 
   describe('updateEvent', () => {
     it('should update event', () => {
-      dashboardService.updateEvent.and.returnValue(
-        of(void 0),
-      );
+      dashboardService.updateEvent.mockReturnValue(of(void 0));
 
-      store.updateEvent(
+      store.updateEvent('reservation-1', {} as any);
+
+      expect(dashboardService.updateEvent).toHaveBeenCalledWith(
         'reservation-1',
-        {} as any,
+        expect.any(Object),
       );
 
-      expect(
-        dashboardService.updateEvent,
-      ).toHaveBeenCalledWith(
-        'reservation-1',
-        jasmine.any(Object),
-      );
-
-      expect(store.isLoading()).toBeFalse();
+      expect(store.isLoading()).toBe(false);
     });
   });
 
   describe('getMonthlySummary', () => {
     it('should load monthly summary', () => {
-      dashboardService.getMonthlySummary.and.returnValue(
+      dashboardService.getMonthlySummary.mockReturnValue(
         of([
           {
             roomId: '1',
@@ -228,59 +227,38 @@ describe('DashboardStore', () => {
 
       store.getMonthlySummary('2025-01');
 
-      expect(
-        store.monthlySummaryMap(),
-      ).toBeTruthy();
+      expect(store.monthlySummaryMap()).toBeTruthy();
 
-      expect(store.isLoading()).toBeFalse();
+      expect(store.isLoading()).toBe(false);
     });
   });
 
   describe('updateMonthlySummary', () => {
     it('should update summary and navigate', () => {
-      dashboardService.updateMonthlySummary.and.returnValue(
-        of(void 0),
-      );
+      dashboardService.updateMonthlySummary.mockReturnValue(of(void 0));
 
-      store.updateMonthlySummary(
-        '2025-01',
-        'INCOME',
-        [],
-        [],
-        'room-1',
-        2,
-      );
+      store.updateMonthlySummary('2025-01', 'INCOME', [], [], 'room-1', 2);
 
-      expect(
-        dashboardService.updateMonthlySummary,
-      ).toHaveBeenCalled();
+      expect(dashboardService.updateMonthlySummary).toHaveBeenCalled();
 
       expect(store.response()).toEqual({
         message: 'SUMMARY.UPDATED',
       });
 
-      expect(
-        navigationService.reload,
-      ).toHaveBeenCalled();
+      expect(navigationService.reload).toHaveBeenCalled();
     });
 
     it('should handle update error', () => {
-      dashboardService.updateMonthlySummary.and.returnValue(
-        throwError(() =>
-          new HttpErrorResponse({
-            status: 500,
-          }),
+      dashboardService.updateMonthlySummary.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 500,
+            }),
         ),
       );
 
-      store.updateMonthlySummary(
-        '2025-01',
-        'INCOME',
-        [],
-        [],
-        undefined,
-        1,
-      );
+      store.updateMonthlySummary('2025-01', 'INCOME', [], [], undefined, 1);
 
       expect(store.error()).toBeTruthy();
     });
@@ -288,7 +266,7 @@ describe('DashboardStore', () => {
 
   describe('getYearSummary', () => {
     it('should load year summary', () => {
-      dashboardService.getYearSummary.and.returnValue(
+      dashboardService.getYearSummary.mockReturnValue(
         of([
           {
             roomId: '1',
@@ -303,19 +281,15 @@ describe('DashboardStore', () => {
 
       store.getYearSummary(2025);
 
-      expect(
-        dashboardService.getYearSummary,
-      ).toHaveBeenCalledWith(2025);
+      expect(dashboardService.getYearSummary).toHaveBeenCalledWith(2025);
 
-      expect(
-        store.yearSummaryMap(),
-      ).toBeTruthy();
+      expect(store.yearSummaryMap()).toBeTruthy();
     });
   });
 
   describe('exportYearSummary', () => {
     it('should export year summary', () => {
-      dashboardService.exportYearSummary.and.returnValue(
+      dashboardService.exportYearSummary.mockReturnValue(
         of([
           {
             roomId: '1',
@@ -330,19 +304,15 @@ describe('DashboardStore', () => {
 
       store.exportYearSummary(2025);
 
-      expect(
-        dashboardService.exportYearSummary,
-      ).toHaveBeenCalledWith(2025);
+      expect(dashboardService.exportYearSummary).toHaveBeenCalledWith(2025);
 
-      expect(
-        store.yearExport(),
-      ).toBeTruthy();
+      expect(store.yearExport()).toBeTruthy();
     });
   });
 
   describe('getQuarterSummary', () => {
     it('should load quarter summary', () => {
-      dashboardService.getQuarterSummary.and.returnValue(
+      dashboardService.getQuarterSummary.mockReturnValue(
         of([
           {
             roomId: '1',
@@ -356,33 +326,23 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.getQuarterSummary(
-        2025,
-        1,
-      );
+      store.getQuarterSummary(2025, 1);
 
-      expect(
-        dashboardService.getQuarterSummary,
-      ).toHaveBeenCalledWith(
-        2025,
-        1,
-      );
+      expect(dashboardService.getQuarterSummary).toHaveBeenCalledWith(2025, 1);
 
-      expect(
-        store.quarterSummaryMap(),
-      ).toBeTruthy();
+      expect(store.quarterSummaryMap()).toBeTruthy();
     });
   });
 
   describe('clean', () => {
     it('should reset state', () => {
-      dashboardService.getMyEvent.and.returnValue(
+      dashboardService.getMyEvent.mockReturnValue(
         of({
           reservations: [],
         } as any),
       );
 
-      store.getMyEvent(new Date());
+      store.getMyEvent(backendFormatDate(new Date()));
 
       expect(store.dashboard()).toBeTruthy();
 
@@ -391,7 +351,7 @@ describe('DashboardStore', () => {
       expect(store.dashboard()).toBeUndefined();
       expect(store.response()).toBeUndefined();
       expect(store.error()).toBeUndefined();
-      expect(store.isLoading()).toBeFalse();
+      expect(store.isLoading()).toBe(false);
     });
   });
 });

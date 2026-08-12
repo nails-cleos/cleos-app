@@ -1,10 +1,12 @@
 import { TwoDigitsDirective } from './two-digits.directive';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 @Component({
   template: '<input appTwoDigits [allowNegatives]="allowNegatives" />',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [TwoDigitsDirective],
 })
 class HostComponent {
@@ -26,7 +28,9 @@ describe('TwoDigitsDirective', () => {
     hostComp = fixture.componentInstance;
     fixture.detectChanges();
 
-    const debugEl = fixture.debugElement.query(By.directive(TwoDigitsDirective));
+    const debugEl = fixture.debugElement.query(
+      By.directive(TwoDigitsDirective),
+    );
     directive = debugEl.injector.get(TwoDigitsDirective);
     inputElement = debugEl.nativeElement as HTMLInputElement;
   });
@@ -36,15 +40,24 @@ describe('TwoDigitsDirective', () => {
   });
 
   it('should initialize with default values', () => {
-    expect(directive.allowNegatives()).toBeFalse();
+    expect(directive.allowNegatives()).toBe(false);
   });
 
   it('should allow special keys', () => {
-    const specialKeys = ['Backspace', 'Tab', 'End', 'Home', 'ArrowLeft', 'ArrowRight', 'Del', 'Delete'];
+    const specialKeys = [
+      'Backspace',
+      'Tab',
+      'End',
+      'Home',
+      'ArrowLeft',
+      'ArrowRight',
+      'Del',
+      'Delete',
+    ];
 
-    specialKeys.forEach(key => {
+    specialKeys.forEach((key) => {
       const event = new KeyboardEvent('keydown', { key });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 
@@ -55,12 +68,12 @@ describe('TwoDigitsDirective', () => {
   it('should allow valid numeric input', () => {
     const validInputs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
-    validInputs.forEach(key => {
+    validInputs.forEach((key) => {
       inputElement.value = '';
       inputElement.selectionStart = 0;
 
       const event = new KeyboardEvent('keydown', { key });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 
@@ -73,7 +86,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 2;
 
     const event = new KeyboardEvent('keydown', { key: '.' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -85,7 +98,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 2;
 
     const event = new KeyboardEvent('keydown', { key: 'Decimal' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -97,7 +110,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 4;
 
     const event = new KeyboardEvent('keydown', { key: '4' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -109,7 +122,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 5;
 
     const event = new KeyboardEvent('keydown', { key: '5' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -121,7 +134,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 5;
 
     const event = new KeyboardEvent('keydown', { key: '.' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -133,7 +146,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 1;
 
     const event = new KeyboardEvent('keydown', { key: '1' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -145,7 +158,7 @@ describe('TwoDigitsDirective', () => {
     inputElement.selectionStart = 1;
 
     const event = new KeyboardEvent('keydown', { key: '.' });
-    spyOn(event, 'preventDefault');
+    vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
     directive.onKeyDown(event);
 
@@ -155,12 +168,12 @@ describe('TwoDigitsDirective', () => {
   it('should prevent non-numeric characters', () => {
     const invalidKeys = ['a', 'b', 'c', '!', '@', '#', '$', '%'];
 
-    invalidKeys.forEach(key => {
+    invalidKeys.forEach((key) => {
       inputElement.value = '12';
       inputElement.selectionStart = 2;
 
       const event = new KeyboardEvent('keydown', { key });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 
@@ -178,7 +191,9 @@ describe('TwoDigitsDirective', () => {
       fixture.detectChanges();
 
       // re-query directive and input element
-      const debugEl = fixture.debugElement.query(By.directive(TwoDigitsDirective));
+      const debugEl = fixture.debugElement.query(
+        By.directive(TwoDigitsDirective),
+      );
       directive = debugEl.injector.get(TwoDigitsDirective);
       inputElement = debugEl.nativeElement as HTMLInputElement;
     });
@@ -188,7 +203,7 @@ describe('TwoDigitsDirective', () => {
       inputElement.selectionStart = 0;
 
       const event = new KeyboardEvent('keydown', { key: '-' });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 
@@ -200,7 +215,7 @@ describe('TwoDigitsDirective', () => {
       inputElement.selectionStart = 1;
 
       const event = new KeyboardEvent('keydown', { key: '5' });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 
@@ -212,7 +227,7 @@ describe('TwoDigitsDirective', () => {
       inputElement.selectionStart = 3;
 
       const event = new KeyboardEvent('keydown', { key: '.' });
-      spyOn(event, 'preventDefault');
+      vi.spyOn(event, 'preventDefault').mockReturnValue(undefined);
 
       directive.onKeyDown(event);
 

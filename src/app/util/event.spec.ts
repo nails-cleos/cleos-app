@@ -1,11 +1,11 @@
 import { CalendarEvent } from 'angular-calendar';
 import { DataEvent } from './event';
+import { describe, expect, it } from 'vitest';
 
 describe('Event Utils', () => {
   describe('CalendarEvents', () => {
-
     const makeEvent = (id: string, start: Date, end: Date, meta: any = {}) =>
-      ({ id, start, end, meta } as CalendarEvent);
+      ({ id, start, end, meta }) as CalendarEvent;
 
     const today = new Date();
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
@@ -34,14 +34,18 @@ describe('Event Utils', () => {
       start.setHours(0, 0);
       const end = new Date(today);
       end.setHours(11, 0);
-      const outOfWork = makeEvent('OUT_OF_WORK', start, end, { isReservation: false });
+      const outOfWork = makeEvent('OUT_OF_WORK', start, end, {
+        isReservation: false,
+      });
       const dataEvent = new DataEvent([outOfWork], 0, today, 0);
 
       const lunchStart = new Date(today);
       lunchStart.setHours(10, 0);
       const lunchEnd = new Date(today);
       lunchEnd.setHours(12, 0);
-      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, { isReservation: false });
+      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, {
+        isReservation: false,
+      });
 
       dataEvent.addEvent(lunch);
 
@@ -56,14 +60,18 @@ describe('Event Utils', () => {
       start.setHours(14, 0);
       const end = new Date(today);
       end.setHours(23, 59);
-      const outOfWork = makeEvent('OUT_OF_WORK', start, end, { isReservation: false });
+      const outOfWork = makeEvent('OUT_OF_WORK', start, end, {
+        isReservation: false,
+      });
       const dataEvent = new DataEvent([outOfWork], 0, start, 0);
 
       const lunchStart = new Date(today);
       lunchStart.setHours(13, 0);
       const lunchEnd = new Date(today);
       lunchEnd.setHours(15, 0);
-      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, { isReservation: false });
+      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, {
+        isReservation: false,
+      });
 
       dataEvent.addEvent(lunch);
 
@@ -78,14 +86,18 @@ describe('Event Utils', () => {
       start.setHours(0, 0);
       const end = new Date(today);
       end.setHours(13, 0);
-      const outOfWork = makeEvent('OUT_OF_WORK', start, end, { isReservation: false });
+      const outOfWork = makeEvent('OUT_OF_WORK', start, end, {
+        isReservation: false,
+      });
       const dataEvent = new DataEvent([outOfWork], 0, start, 0);
 
       const lunchStart = new Date(today);
       lunchStart.setHours(11, 0);
       const lunchEnd = new Date(today);
       lunchEnd.setHours(12, 0);
-      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, { isReservation: false });
+      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, {
+        isReservation: false,
+      });
 
       dataEvent.addEvent(lunch);
 
@@ -100,13 +112,17 @@ describe('Event Utils', () => {
       lunchStart.setHours(12, 0);
       const lunchEnd = new Date(today);
       lunchEnd.setHours(13, 0);
-      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, { isReservation: false });
+      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, {
+        isReservation: false,
+      });
       const dataEvent = new DataEvent([lunch], 0, today, 0);
       const start = new Date(today);
       start.setHours(0, 0);
       const end = new Date(today);
       end.setHours(15, 0);
-      const outOfWork = makeEvent('OUT_OF_WORK', start, end, { isReservation: false });
+      const outOfWork = makeEvent('OUT_OF_WORK', start, end, {
+        isReservation: false,
+      });
 
       dataEvent.addEvent(outOfWork);
 
@@ -119,14 +135,18 @@ describe('Event Utils', () => {
       start.setHours(12, 30);
       const end = new Date(today);
       end.setHours(13, 0);
-      const outOfWork = makeEvent('reservation-id', start, end, { isReservation: true });
+      const outOfWork = makeEvent('reservation-id', start, end, {
+        isReservation: true,
+      });
       const dataEvent = new DataEvent([outOfWork], 0, today, 0);
 
       const lunchStart = new Date(today);
       lunchStart.setHours(12, 0);
       const lunchEnd = new Date(today);
       lunchEnd.setHours(13, 0);
-      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, { isReservation: false });
+      const lunch = makeEvent('LUNCH', lunchStart, lunchEnd, {
+        isReservation: false,
+      });
 
       dataEvent.addEvent(lunch);
 

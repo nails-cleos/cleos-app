@@ -2,16 +2,29 @@
   <section class="app-surface-section">
     <div class="app-detail-section-header">
       <div>
-        <span class="app-surface-eyebrow">{{ 'SUMMARY.YEAR.RESULT' | translate }}</span>
+        <span class="app-surface-eyebrow">{{
+          'SUMMARY.YEAR.RESULT' | translate
+        }}</span>
       </div>
     </div>
 
     <div class="year-summary-toolbar">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'SUMMARY.YEAR.SELECT.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="dp" [formControl]="getForm.date" readonly (click)="dp.open()">
+        <input
+          matInput
+          [matDatepicker]="dp"
+          [formControl]="getForm.date"
+          readonly
+          (click)="dp.open()"
+        />
         <mat-datepicker-toggle matSuffix [for]="dp"></mat-datepicker-toggle>
-        <mat-datepicker #dp startView="multi-year" (yearSelected)="setYear($event, dp)" touchUi>
+        <mat-datepicker
+          #dp
+          startView="multi-year"
+          (yearSelected)="setYear($event, dp)"
+          touchUi
+        >
         </mat-datepicker>
       </mat-form-field>
 
@@ -23,30 +36,48 @@
               <mat-option [value]="'All'">All</mat-option>
             }
             @for (yearSummary of yearSummaryMap | keyvalue; track yearSummary) {
-              <mat-option [value]="yearSummary.key">{{ yearSummary.key.roomName }}</mat-option>
+              <mat-option [value]="yearSummary.key">{{
+                yearSummary.key.roomName
+              }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
       }
 
       <div class="app-detail-actions year-summary-actions">
-        <button mat-stroked-button
-                [routerLink]="['/', language, 'dashboard', 'quarter', 'summary']"
-                [state]="{year: getForm.date.value.getFullYear()}">
+        <button
+          mat-stroked-button
+          [routerLink]="['/', language, 'dashboard', 'quarter', 'summary']"
+          [state]="{ year: getForm.date.value.getFullYear() }"
+        >
           <mat-icon>calendar_view_week</mat-icon>
           <span>{{ 'SUMMARY.QUARTER.RESULT' | translate }}</span>
         </button>
 
         @if (getForm.date.value) {
-          <button [class.spinner]="isExportLoading()" [class.loading]="isExportLoading()" (click)="exportAction()"
-                  [disabled]="isExportLoading() || (export && (!yearExport || sheetData.length === 0))"
-                  mat-stroked-button type="button">
-            <mat-icon>{{ export ? 'file_download' : 'cloud_download' }}</mat-icon>
+          <button
+            [class.spinner]="isExportLoading()"
+            [class.loading]="isExportLoading()"
+            (click)="exportAction()"
+            [disabled]="
+              isExportLoading() ||
+              (export && (!yearExport || sheetData.length === 0))
+            "
+            mat-stroked-button
+            type="button"
+          >
+            <mat-icon>{{
+              export ? 'file_download' : 'cloud_download'
+            }}</mat-icon>
             @if (export) {
               <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
             } @else {
               <span
-                [innerHTML]="'COMMON.BUTTON.GET_DATA' | translate: {year: getForm.date.value.getFullYear() }"></span>
+                [innerHTML]="
+                  'COMMON.BUTTON.GET_DATA'
+                    | translate: { year: getForm.date.value.getFullYear() }
+                "
+              ></span>
             }
           </button>
         }
@@ -56,23 +87,37 @@
 
   @if (getForm.date.value) {
     @if (yearSummaryMap?.size) {
-      <app-year [quarterSummaries]="quarterSummaries" [year]="getForm.date.value.getFullYear()"
-                [measure]="isHandset() ? 'short' : 'long'" [currency]="currencySignal()"
-                [showCash]="showCash()"></app-year>
+      <app-year
+        [quarterSummaries]="quarterSummaries"
+        [year]="getForm.date.value.getFullYear()"
+        [measure]="isHandset() ? 'short' : 'long'"
+        [currency]="currencySignal()"
+        [showCash]="showCash()"
+      ></app-year>
 
       <section class="app-surface-section">
         <div class="app-detail-section-header">
           <div>
-            <span class="app-surface-eyebrow">{{ 'SUMMARY.YEAR.RESULT' | translate }}</span>
+            <span class="app-surface-eyebrow">{{
+              'SUMMARY.YEAR.RESULT' | translate
+            }}</span>
           </div>
         </div>
-        <app-total-summary [summaryTotals]="yearSummaryTotalsSignal()" [currency]="currencySignal()"
-                           [showCash]="showCash()"></app-total-summary>
+        <app-total-summary
+          [summaryTotals]="yearSummaryTotalsSignal()"
+          [currency]="currencySignal()"
+          [showCash]="showCash()"
+        ></app-total-summary>
       </section>
     } @else {
       <section class="app-surface-section year-summary-empty">
-        <div class="app-detail-body"
-             [innerHTML]="'SUMMARY.YEAR.ERROR.NO_CONTENT' | translate:{year: getForm.date.value.getFullYear()}"></div>
+        <div
+          class="app-detail-body"
+          [innerHTML]="
+            'SUMMARY.YEAR.ERROR.NO_CONTENT'
+              | translate: { year: getForm.date.value.getFullYear() }
+          "
+        ></div>
       </section>
     }
   }

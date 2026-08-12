@@ -1,32 +1,43 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { provideTranslateService, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { ICatalogueAll } from '../catalogue';
 import { CatalogueListComponent } from './catalogue-list.component';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { signal } from '@angular/core';
-import { CatalogueStore } from '../../store/catalogue.store';
-import { DEFAULT_LOCALE } from '../../util/dates';
-import { NavigationService } from '../../services/navigation.service';
+import { CatalogueStore } from '@app/store/catalogue.store';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { NavigationService } from '@app/services/navigation.service';
 
 describe('CatalogueListComponent', () => {
   let component: CatalogueListComponent;
   let fixture: ComponentFixture<CatalogueListComponent>;
-  let navigationServiceSpy: jasmine.SpyObj<NavigationService>;
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
 
-  let activatedRouteSpy: jasmine.SpyObj<ActivatedRoute>;
-  let dialogSpy: jasmine.SpyObj<MatDialog>;
+  let activatedRouteSpy: {
+    snapshot: {
+      paramMap: {
+        get: ReturnType<typeof vi.fn>;
+      };
+    };
+  };
+  let dialogSpy: Pick<MatDialog, 'open'> & {
+    open: ReturnType<typeof vi.fn>;
+  };
   let catalogueStoreSpy: {
     data: ReturnType<typeof signal>;
     isLoading: ReturnType<typeof signal>;
     response: ReturnType<typeof signal>;
-    clean: jasmine.Spy;
-    clearResponse: jasmine.Spy;
-    loadAllCatalogues: jasmine.Spy;
-    sort: jasmine.Spy;
-    delete: jasmine.Spy;
+    clean: Mock;
+    clearResponse: Mock;
+    loadAllCatalogues: Mock;
+    sort: Mock;
+    delete: Mock;
   };
 
   const mockCatalogues: ICatalogueAll[] = [
@@ -55,29 +66,35 @@ describe('CatalogueListComponent', () => {
   ];
 
   beforeEach(async () => {
-    navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['navigate'],
-      { language: DEFAULT_LOCALE },
-    );
-    dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
+    dialogSpy = {
+      open: vi.fn().mockName('MatDialog.open'),
+    };
     catalogueStoreSpy = {
       data: signal<any>(undefined),
       isLoading: signal(false),
       response: signal<any>(undefined),
-      clean: jasmine.createSpy('clean'),
-      clearResponse: jasmine.createSpy('clearResponse'),
-      loadAllCatalogues: jasmine.createSpy('loadAllCatalogues'),
-      sort: jasmine.createSpy('sort'),
-      delete: jasmine.createSpy('delete'),
+      clean: vi.fn().mockName('clean'),
+      clearResponse: vi.fn().mockName('clearResponse'),
+      loadAllCatalogues: vi.fn().mockName('loadAllCatalogues'),
+      sort: vi.fn().mockName('sort'),
+      delete: vi.fn().mockName('delete'),
     };
-    activatedRouteSpy = jasmine.createSpyObj('ActivatedRoute', [], {
+    activatedRouteSpy = {
       snapshot: {
-        paramMap: jasmine.createSpyObj('ParamMap', ['get']),
+        paramMap: {
+          get: vi.fn().mockName('ParamMap.get'),
+        },
       },
-    });
+    };
 
     await TestBed.configureTestingModule({
-      imports: [CatalogueListComponent, TranslateModule.forRoot()],
+      imports: [CatalogueListComponent],
       providers: [
+        provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -106,8 +123,8 @@ describe('CatalogueListComponent', () => {
   });
 
   it('should clear response and reload catalogues on response', () => {
-    catalogueStoreSpy.clearResponse.calls.reset();
-    catalogueStoreSpy.loadAllCatalogues.calls.reset();
+    catalogueStoreSpy.clearResponse.mockClear();
+    catalogueStoreSpy.loadAllCatalogues.mockClear();
     catalogueStoreSpy.response.set(true);
     fixture.detectChanges();
 
@@ -118,7 +135,10 @@ describe('CatalogueListComponent', () => {
   it('should navigate when edit is called', () => {
     const catalogue = mockCatalogues[0];
     component.edit(catalogue);
-    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith(['catalogues', catalogue.id]);
+    expect(navigationServiceSpy.navigate).toHaveBeenCalledWith([
+      'catalogues',
+      catalogue.id,
+    ]);
   });
 
   it('should update catalogue order when finish is called', () => {
@@ -133,7 +153,10 @@ describe('CatalogueListComponent', () => {
     catalogueStoreSpy.data.set(mockCatalogues);
     fixture.detectChanges();
 
-    const event: CdkDragDrop<ICatalogueAll[]> = { previousIndex: 0, currentIndex: 1 } as any;
+    const event: CdkDragDrop<ICatalogueAll[]> = {
+      previousIndex: 0,
+      currentIndex: 1,
+    } as any;
     const listBefore = [...component.catalogues()];
     component.drop(event);
     const listAfter = component.catalogues();
@@ -144,21 +167,27 @@ describe('CatalogueListComponent', () => {
   it('should call delete method without errors', () => {
     const testCatalogue = mockCatalogues[0];
 
-    dialogSpy.open.and.returnValue({ afterClosed: () => of(testCatalogue) } as any);
+    dialogSpy.open.mockReturnValue({
+      afterClosed: () => of(testCatalogue),
+    } as any);
 
     component.delete(testCatalogue);
 
     expect(dialogSpy.open).toHaveBeenCalledWith(
-      jasmine.any(Function),
-      jasmine.objectContaining({
+      expect.any(Function),
+      expect.objectContaining({
         data: {
           title: 'CATALOGUE.DELETED.TITLE',
           content: 'CATALOGUE.DELETED.CONTENT',
           value: testCatalogue,
           variant: 'warning',
         },
-      }));
+      }),
+    );
 
-    expect(catalogueStoreSpy.delete).toHaveBeenCalledWith(testCatalogue.id!, testCatalogue.name!);
+    expect(catalogueStoreSpy.delete).toHaveBeenCalledWith(
+      testCatalogue.id!,
+      testCatalogue.name!,
+    );
   });
 });

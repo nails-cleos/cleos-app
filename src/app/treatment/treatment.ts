@@ -131,7 +131,8 @@ export class Price implements IPrice {
     priceWithAdditional = 0,
     percentageToPaid = 100,
     balance = 0,
-    penalty?: number) {
+    penalty?: number,
+  ) {
     this.amount = price;
     this.discount = discount;
     this.extra = extra;
@@ -161,30 +162,36 @@ export class Price implements IPrice {
     this.penalty = penalty;
   };
 
-  private clone = ({ totalPaid = this.totalPaid, balance = this.balance }: {
+  private clone = ({
+    totalPaid = this.totalPaid,
+    balance = this.balance,
+  }: {
     totalPaid?: number;
     balance?: number;
-  }): IPrice => new Price(
-    this.amount,
-    this.discount,
-    this.extra,
-    this.additional,
-    this.total,
-    totalPaid,
-    this.totalWithoutDiscount,
-    this.priceWithDiscount,
-    this.priceWithExtras,
-    this.priceWithAdditional,
-    this.percentageToPaid,
-    balance,
-    this.penalty,
-  );
+  }): IPrice =>
+    new Price(
+      this.amount,
+      this.discount,
+      this.extra,
+      this.additional,
+      this.total,
+      totalPaid,
+      this.totalWithoutDiscount,
+      this.priceWithDiscount,
+      this.priceWithExtras,
+      this.priceWithAdditional,
+      this.percentageToPaid,
+      balance,
+      this.penalty,
+    );
 
-  private calculateIsPaid = (): boolean => this.amount > 0 && this.totalPaid + this.balance >= this.total;
+  private calculateIsPaid = (): boolean =>
+    this.amount > 0 && this.totalPaid + this.balance >= this.total;
 
-  private calculateToPaid = (): number => (this.total * this.percentageToPaid / 100) - this.totalPaid - this.balance;
+  private calculateToPaid = (): number =>
+    (this.total * this.percentageToPaid) / 100 - this.totalPaid - this.balance;
 
-  private calculatePenalty = (): number => (this.total * PENALTY / 100);
+  private calculatePenalty = (): number => (this.total * PENALTY) / 100;
 }
 
 export class Treatment implements ITreatment {
@@ -211,7 +218,10 @@ export class TreatmentGroup {
   ): ITreatmentGroup {
     return {
       name: fieldChange(treatmentForm.name, currentGroup?.name),
-      description: fieldChange(treatmentForm.description, currentGroup?.description),
+      description: fieldChange(
+        treatmentForm.description,
+        currentGroup?.description,
+      ),
       priceFrom: fieldChange(treatmentForm.priceFrom, currentGroup?.priceFrom),
       treatments,
       ...(!areEquals(newColorIds, currentColorIds) && {

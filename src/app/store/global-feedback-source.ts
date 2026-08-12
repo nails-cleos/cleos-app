@@ -8,11 +8,13 @@ export interface GlobalFeedbackSource {
   clearError(): void;
 }
 
-export const GLOBAL_FEEDBACK_SOURCE = new InjectionToken<GlobalFeedbackSource[]>(
-  'GLOBAL_FEEDBACK_SOURCE',
-);
+export const GLOBAL_FEEDBACK_SOURCE = new InjectionToken<
+  GlobalFeedbackSource[]
+>('GLOBAL_FEEDBACK_SOURCE');
 
-export const provideGlobalFeedbackSource = (token: Type<GlobalFeedbackSource>): Provider => ({
+export const provideGlobalFeedbackSource = (
+  token: Type<GlobalFeedbackSource>,
+): Provider => ({
   provide: GLOBAL_FEEDBACK_SOURCE,
   multi: true,
   useExisting: token,

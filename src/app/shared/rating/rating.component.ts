@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, effect, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { ThemePalette } from '@angular/material/core';
 import { NgClass } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -46,12 +53,13 @@ export class RatingComponent {
     this.ratingHover.emit(this.hoverSignal());
   };
 
-  fontSet = (
-    i: number,
-  ): 'material-icons' | 'material-symbols-outlined' => this.hoverSignal() >= i + 1 || this.ratingSignal() >= i + 1 ?
-    'material-icons' :
-    'material-symbols-outlined';
+  fontSet = (i: number): 'material-icons' | 'material-symbols-outlined' =>
+    this.hoverSignal() >= i + 1 || this.ratingSignal() >= i + 1
+      ? 'material-icons'
+      : 'material-symbols-outlined';
 
-  setColor = (i: number): ThemePalette => this.hoverSignal() >= i + 1 || this.ratingSignal() >= i + 1 ? this.color() :
-    undefined;
+  setColor = (i: number): ThemePalette =>
+    this.hoverSignal() >= i + 1 || this.ratingSignal() >= i + 1
+      ? this.color()
+      : undefined;
 }

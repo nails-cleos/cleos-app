@@ -1,6 +1,6 @@
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CatalogueComponent } from './catalogue.component';
-import { TranslateModule } from '@ngx-translate/core';
 import { signal } from '@angular/core';
 import { ICatalogueAll } from './catalogue';
 import { ICommon } from '../interfaces/common';
@@ -8,6 +8,7 @@ import { ITreatmentGroup, ITreatmentGroupAll } from '../treatment/treatment';
 import { NavigationService } from '../services/navigation.service';
 import { CatalogueStore } from '../store/catalogue.store';
 import { TreatmentStore } from '../store/treatment.store';
+import { provideTranslateService } from '@ngx-translate/core';
 
 describe('CatalogueComponent', () => {
   let component: CatalogueComponent;
@@ -19,7 +20,7 @@ describe('CatalogueComponent', () => {
 
   let treatmentStoreSpy: {
     data: ReturnType<typeof signal>;
-    loadAllGroups: jasmine.Spy;
+    loadAllGroups: Mock;
   };
 
   const mockCatalogue: ICatalogueAll = {
@@ -46,14 +47,17 @@ describe('CatalogueComponent', () => {
     };
     treatmentStoreSpy = {
       data: signal<any>([]),
-      loadAllGroups: jasmine.createSpy('loadGroups'),
+      loadAllGroups: vi.fn().mockName('loadGroups'),
     };
 
-    const navigationServiceSpy = jasmine.createSpyObj('NavigationService', ['back']);
+    const navigationServiceSpy = {
+      back: vi.fn().mockName('NavigationService.back'),
+    };
 
     await TestBed.configureTestingModule({
-      imports: [CatalogueComponent, TranslateModule.forRoot()],
+      imports: [CatalogueComponent],
       providers: [
+        provideTranslateService(),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
@@ -87,8 +91,8 @@ describe('CatalogueComponent', () => {
     catalogueStoreSpy.subErrors.set(errors);
     fixture.detectChanges();
 
-    expect(component.getForm.name.hasError('incorrect')).toBeTrue();
-    expect(component.getForm.group.hasError('incorrect')).toBeTrue();
+    expect(component.getForm.name.hasError('incorrect')).toBe(true);
+    expect(component.getForm.group.hasError('incorrect')).toBe(true);
     expect(component.errors()['name']).toBe('Name required');
     expect(component.errors()['group']).toBe('Group invalid');
   });
@@ -107,7 +111,7 @@ describe('CatalogueComponent', () => {
   });
 
   it('should update form values correctly on submit', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
@@ -123,36 +127,39 @@ describe('CatalogueComponent', () => {
     groupControl.markAsDirty();
     fixture.detectChanges();
 
-    component.file.set({ name: 'test', size: 100, progress: 100, image: 'data:image/jpeg;base64,AAA' });
+    component.file.set({
+      name: 'test',
+      size: 100,
+      progress: 100,
+      image: 'data:image/jpeg;base64,AAA',
+    });
 
-    expect(component.form.valid).toBeTrue();
+    expect(component.form.valid).toBe(true);
     component.submit();
 
-    expect(emitSpy).toHaveBeenCalledWith(
-      {
-        catalogue: jasmine.objectContaining({
-          name: 'New Name',
-          home: true,
-          catalog: true,
-        }),
-        resizedImageDataUrl: 'data:image/jpeg;base64,AAA',
-      },
-    );
+    expect(emitSpy).toHaveBeenCalledWith({
+      catalogue: expect.objectContaining({
+        name: 'New Name',
+        home: true,
+        catalog: true,
+      }),
+      resizedImageDataUrl: 'data:image/jpeg;base64,AAA',
+    });
   });
 
   it('should not submit when form is invalid', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
-    expect(component.form.valid).toBeFalse();
+    expect(component.form.valid).toBe(false);
     component.submit();
 
     expect(emitSpy).not.toHaveBeenCalled();
   });
 
   it('should not submit when image is missing', () => {
-    const emitSpy = jasmine.createSpy('emit');
+    const emitSpy = vi.fn().mockName('emit');
     component.submitData.subscribe(emitSpy);
-    expect(component.form.valid).toBeFalse();
+    expect(component.form.valid).toBe(false);
 
     const nameControl = component.getForm.name;
     nameControl.setValue('New Name');
@@ -168,7 +175,7 @@ describe('CatalogueComponent', () => {
     groupControl.markAsDirty();
     fixture.detectChanges();
 
-    expect(component.form.valid).toBeTrue();
+    expect(component.form.valid).toBe(true);
     component.submit();
 
     expect(emitSpy).not.toHaveBeenCalled();

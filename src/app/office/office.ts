@@ -6,12 +6,12 @@ import { fieldChange } from '../util/validators';
 export type OfficeForm = {
   name: FormControl<string>;
   manager: FormControl<IUser | undefined>;
-  subject: FormControl<string | undefined>,
-  kvk: FormControl<string | undefined>,
-  account: FormControl<string | undefined>,
-  btw: FormControl<string | undefined>,
-  billingAddress: FormControl<string | undefined>,
-  driveFolder: FormControl<string | undefined>,
+  subject: FormControl<string | undefined>;
+  kvk: FormControl<string | undefined>;
+  account: FormControl<string | undefined>;
+  btw: FormControl<string | undefined>;
+  billingAddress: FormControl<string | undefined>;
+  driveFolder: FormControl<string | undefined>;
 };
 
 export interface IOffice {
@@ -46,18 +46,21 @@ export interface IOfficeAll {
 }
 
 export class Office implements IOffice {
-  static fromForm(
-    officeForm: OfficeForm,
-    currentOffice?: IOfficeAll,
-  ): IOffice {
+  static fromForm(officeForm: OfficeForm, currentOffice?: IOfficeAll): IOffice {
     return {
       name: fieldChange(officeForm.name, currentOffice?.name),
       subject: fieldChange(officeForm.subject, currentOffice?.subject),
       kvk: fieldChange(officeForm.kvk, currentOffice?.kvk),
       account: fieldChange(officeForm.account, currentOffice?.account),
       btw: fieldChange(officeForm.btw, currentOffice?.btw),
-      billingAddress: fieldChange(officeForm.billingAddress, currentOffice?.billingAddress),
-      driveFolder: fieldChange(officeForm.driveFolder, currentOffice?.driveFolder),
+      billingAddress: fieldChange(
+        officeForm.billingAddress,
+        currentOffice?.billingAddress,
+      ),
+      driveFolder: fieldChange(
+        officeForm.driveFolder,
+        currentOffice?.driveFolder,
+      ),
       managerId: officeForm.manager.value?.id,
     };
   }

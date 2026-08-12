@@ -11,11 +11,17 @@
           } @else {
             <mat-card-header>
               <mat-card-title>{{ catalogue.name }}</mat-card-title>
-              <mat-card-subtitle>{{ 'MAIN.CATALOGUE.NO_DETAIL' | translate }}</mat-card-subtitle>
+              <mat-card-subtitle>{{
+                'MAIN.CATALOGUE.NO_DETAIL' | translate
+              }}</mat-card-subtitle>
             </mat-card-header>
           }
           <mat-card-content class="text-center">
-            <img mat-card-md-image [alt]="catalogue.name" [src]="catalogue.image"/>
+            <img
+              mat-card-md-image
+              [alt]="catalogue.name"
+              [src]="catalogue.image"
+            />
           </mat-card-content>
           <mat-card-actions class="app-surface-actions">
             <div class="app-surface-spacer"></div>

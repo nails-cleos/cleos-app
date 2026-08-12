@@ -9,7 +9,11 @@
 .cal-month-view .cal-cell-top:hover,
 .cal-month-view .cal-day-cell:hover,
 .cal-month-view .cal-day-cell.cal-in-month.cal-has-events:hover {
-  background: color-mix(in srgb, var(--app-surface-section-accent) 56%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--app-surface-section-accent) 56%,
+    transparent
+  ) !important;
 }
 
 .cal-month-view .cal-day-cell:not(:last-child) {
@@ -41,7 +45,11 @@
 }
 
 .cal-month-view .cal-day-cell.cal-out-month .cal-day-number {
-  color: color-mix(in srgb, var(--app-surface-text) 62%, var(--app-surface-card-bg) 38%);
+  color: color-mix(
+    in srgb,
+    var(--app-surface-text) 62%,
+    var(--app-surface-card-bg) 38%
+  );
   opacity: 0.4;
 }
 
@@ -52,7 +60,11 @@
 }
 
 .cal-month-view .cal-cell.cal-has-events.cal-open {
-  background: color-mix(in srgb, var(--app-surface-section-accent) 56%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--app-surface-section-accent) 56%,
+    transparent
+  );
   color: var(--primary-lighter-color);
 }
 
@@ -61,7 +73,11 @@
 }
 
 .cal-month-view .cal-cell.cal-event-highlight {
-  background: color-mix(in srgb, var(--primary-color) 72%, transparent) !important;
+  background: color-mix(
+    in srgb,
+    var(--primary-color) 72%,
+    transparent
+  ) !important;
 }
 
 .cal-month-view .cal-day-cell.cal-today.cal-open,
@@ -105,7 +121,8 @@
 .cal-week-view .cal-header [mat-card-avatar] {
   width: 48px;
   height: 48px;
-  border: 2px solid color-mix(in srgb, #ffffff 72%, var(--app-surface-card-border));
+  border: 2px solid
+    color-mix(in srgb, #ffffff 72%, var(--app-surface-card-border));
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
 }
 
@@ -131,7 +148,12 @@
   @include mixin.flex-center(inline-flex, center, 6px);
   min-height: 28px;
   padding: 5px 10px;
-  @include mixin.chip(var(--app-surface-text), 12%, var(--app-surface-card-bg), 84%);
+  @include mixin.chip(
+    var(--app-surface-text),
+    12%,
+    var(--app-surface-card-bg),
+    84%
+  );
   color: var(--app-surface-text);
   box-shadow: inset 0 1px 0 color-mix(in srgb, #ffffff 52%, transparent);
   font-size: 0.8rem;
@@ -176,8 +198,13 @@
 }
 
 .cal-week-view .cal-time-events {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--app-table-header) 34%, transparent), transparent 92px),
-  color-mix(in srgb, var(--app-surface-card-bg) 88%, transparent);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--app-table-header) 34%, transparent),
+      transparent 92px
+    ),
+    color-mix(in srgb, var(--app-surface-card-bg) 88%, transparent);
 }
 
 .cal-week-view .cal-time-label-column {
@@ -192,7 +219,11 @@
 
 .cal-week-view .cal-hour-segment:hover,
 .cal-week-view .cal-drag-over .cal-hour-segment {
-  background: color-mix(in srgb, var(--app-surface-section-accent) 72%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--app-surface-section-accent) 72%,
+    transparent
+  );
 }
 
 :host ::ng-deep .cal-week-view .cal-hour-segment {
@@ -262,7 +293,11 @@
 }
 
 :host ::ng-deep .cal-week-view .cal-event-container:hover .cal-event-title,
-:host ::ng-deep .cal-week-view .cal-event-container:focus-within .cal-event-title {
+:host
+  ::ng-deep
+  .cal-week-view
+  .cal-event-container:focus-within
+  .cal-event-title {
   height: auto;
   min-height: 100%;
   overflow: visible;
@@ -368,7 +403,11 @@
   line-height: 1;
 }
 
-:host ::ng-deep .cal-week-view .dashboard-reservation-badge .custom-material-icons {
+:host
+  ::ng-deep
+  .cal-week-view
+  .dashboard-reservation-badge
+  .custom-material-icons {
   flex: 0 0 auto;
   width: 13px;
   height: 13px;
@@ -404,7 +443,8 @@
 }
 
 .cal-custom-event:hover {
-  box-shadow: -10px 15px 25px 1px color-mix(in srgb, var(--app-surface-text) 12%, transparent) !important;
+  box-shadow: -10px 15px 25px 1px
+    color-mix(in srgb, var(--app-surface-text) 12%, transparent) !important;
 }
 
 .cal-custom-event::after {
@@ -427,11 +467,21 @@
   opacity: 0;
   pointer-events: none;
   transform: translateY(6px);
-  transition: opacity 160ms ease, transform 160ms ease;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 
-:host ::ng-deep .cal-week-view .cal-event-container:hover span.cal-event-actions,
-:host ::ng-deep .cal-week-view .cal-event-container:focus-within span.cal-event-actions {
+:host
+  ::ng-deep
+  .cal-week-view
+  .cal-event-container:hover
+  span.cal-event-actions,
+:host
+  ::ng-deep
+  .cal-week-view
+  .cal-event-container:focus-within
+  span.cal-event-actions {
   top: auto;
   opacity: 1;
   pointer-events: auto;
@@ -442,8 +492,17 @@
   overflow: hidden;
   border: 1px solid var(--app-surface-shell-border);
   border-radius: 24px;
-  background: radial-gradient(circle at top right, var(--app-surface-section-glow), transparent 26%),
-  linear-gradient(180deg, var(--app-surface-card-bg), color-mix(in srgb, var(--app-surface-section-bottom) 72%, transparent));
+  background:
+    radial-gradient(
+      circle at top right,
+      var(--app-surface-section-glow),
+      transparent 26%
+    ),
+    linear-gradient(
+      180deg,
+      var(--app-surface-card-bg),
+      color-mix(in srgb, var(--app-surface-section-bottom) 72%, transparent)
+    );
   color: var(--app-surface-text);
   box-shadow: var(--app-surface-shadow);
 }

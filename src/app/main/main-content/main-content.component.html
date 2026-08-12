@@ -4,35 +4,65 @@
   <div class="container slider">
     <div class="slider-track" [style.transform]="sliderTransform()">
       @for (slide of slides; track slide.id) {
-        <div class="slider-img" [ngStyle]="{'background-image': 'url(' + slide.image + ')'}"></div>
+        <div
+          class="slider-img"
+          [ngStyle]="{ 'background-image': 'url(' + slide.image + ')' }"
+        ></div>
       }
     </div>
   </div>
 
   <div class="carousel-caption fade-in-background">
     <h2 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'">
-      {{ 'MAIN.SLIDER.SUB_TITLE' | translate }}</h2>
-    <h1 class="enter-slide-y" [style.--enter-translate-y]="'-2000px'"
-        [innerHTML]="'MAIN.SLIDER.TITLE' | translate"></h1>
-    <h3 class="enter-slide-x" [style.--enter-translate-x]="'-2000px'">{{ 'MAIN.SLIDER.SUB_1' | translate }}</h3>
-    <p class="enter-slide-x" [style.--enter-translate-x]="'2000px'">{{ 'MAIN.SLIDER.SUB_2' | translate }}
+      {{ 'MAIN.SLIDER.SUB_TITLE' | translate }}
+    </h2>
+    <h1
+      class="enter-slide-y"
+      [style.--enter-translate-y]="'-2000px'"
+      [innerHTML]="'MAIN.SLIDER.TITLE' | translate"
+    ></h1>
+    <h3 class="enter-slide-x" [style.--enter-translate-x]="'-2000px'">
+      {{ 'MAIN.SLIDER.SUB_1' | translate }}
+    </h3>
+    <p class="enter-slide-x" [style.--enter-translate-x]="'2000px'">
+      {{ 'MAIN.SLIDER.SUB_2' | translate }}
     </p>
 
     <ul class="social-links text-center">
       @for (social of socialLinks; track social) {
-        <li class="enter-slide-y"
-            [style.--enter-translate-y]="'100px'"
-            [style.--enter-duration]="'500ms'"
-            [style.--enter-delay]="social.delay">
+        <li
+          class="enter-slide-y"
+          [style.--enter-translate-y]="'100px'"
+          [style.--enter-duration]="'500ms'"
+          [style.--enter-delay]="social.delay"
+        >
           @if (social.phone && social.phoneKey && social.phoneText) {
-            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-               (mouseleave)="onHover(social, false)" aria-label="social icon"
-               [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+            <a
+              mat-icon-button
+              rel="noreferrer"
+              target="_blank"
+              (mouseenter)="onHover(social, true)"
+              (mouseleave)="onHover(social, false)"
+              aria-label="social icon"
+              [href]="
+                social.href +
+                (social.phone | translate) +
+                social.phoneKey +
+                (social.phoneText | translate)
+              "
+            >
               <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
             </a>
           } @else {
-            <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-               (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="social icon">
+            <a
+              mat-icon-button
+              rel="noreferrer"
+              target="_blank"
+              (mouseenter)="onHover(social, true)"
+              (mouseleave)="onHover(social, false)"
+              [href]="social.href"
+              aria-label="social icon"
+            >
               <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
             </a>
           }
@@ -46,11 +76,13 @@
 <!-- Story -->
 <section id="story" class="story">
   <div class="section-container">
-    <div #storyTitle
-         class="section-title text-center fade-up-reveal"
-         [class.fade-up-reveal-visible]="storyTitleState() === 'close'"
-         [style.--fade-up-distance]="'20px'"
-         [style.--fade-up-duration]="'700ms'">
+    <div
+      #storyTitle
+      class="section-title text-center fade-up-reveal"
+      [class.fade-up-reveal-visible]="storyTitleState() === 'close'"
+      [style.--fade-up-distance]="'20px'"
+      [style.--fade-up-duration]="'700ms'"
+    >
       <h2>{{ 'MAIN.SECTION.STORY' | translate }}</h2>
       <div class="home-divider">
         <mat-icon color="warn" class="material-icons">favorite</mat-icon>
@@ -59,44 +91,59 @@
 
     <div class="story-container">
       <div class="section-sub-title story-item">
-        <h3 class="text-center reveal-x"
-            #storyDescription
-            [class.reveal-visible]="storyDescriptionState() === 'close'"
-            [style.--reveal-x]="'-20px'">
+        <h3
+          class="text-center reveal-x"
+          #storyDescription
+          [class.reveal-visible]="storyDescriptionState() === 'close'"
+          [style.--reveal-x]="'-20px'"
+        >
           {{ 'MAIN.STORY.DESCRIPTION' | translate }}
         </h3>
 
         @for (story of stories; track story) {
-          <h4 class="text-justify reveal-x"
-              [id]="story.id"
-              [innerHTML]="story.text | translate"
-              [class.reveal-visible]="story.state() === 'close'"
-              [style.--reveal-x]="'-20px'"
-              [style.--reveal-enter-delay]="story.delay">
-          </h4>
+          <h4
+            class="text-justify reveal-x"
+            [id]="story.id"
+            [innerHTML]="story.text | translate"
+            [class.reveal-visible]="story.state() === 'close'"
+            [style.--reveal-x]="'-20px'"
+            [style.--reveal-enter-delay]="story.delay"
+          ></h4>
         }
       </div>
 
       <div class="story-member-item" #storyMember>
         <figure class="team-member text-center">
-          <div class="member-thumb reveal-y"
-               [class.reveal-visible]="storyMemberState() === 'close'"
-               [style.--reveal-y]="'40vh'"
-               [style.--reveal-enter-delay]="'0ms'"
-               [style.--reveal-exit-delay]="'600ms'">
-            <img src="assets/home_page/img/team/member-1.webp" alt="Team Member" class="img-responsive">
+          <div
+            class="member-thumb reveal-y"
+            [class.reveal-visible]="storyMemberState() === 'close'"
+            [style.--reveal-y]="'40vh'"
+            [style.--reveal-enter-delay]="'0ms'"
+            [style.--reveal-exit-delay]="'600ms'"
+          >
+            <img
+              src="assets/home_page/img/team/member-1.webp"
+              alt="Team Member"
+              class="img-responsive"
+            />
           </div>
-          <h4 class="reveal-y"
-              [class.reveal-visible]="storyMemberState() === 'close'"
-              [style.--reveal-y]="'20px'"
-              [style.--reveal-enter-delay]="'300ms'"
-              [style.--reveal-exit-delay]="'300ms'">
-            Carla Luján Bonadero</h4>
-          <span class="reveal-y"
-                [class.reveal-visible]="storyMemberState() === 'close'"
-                [style.--reveal-y]="'20px'"
-                [style.--reveal-enter-delay]="'600ms'"
-                [style.--reveal-exit-delay]="'0ms'">{{ 'MAIN.STORY.MEMBER' | translate }}</span>
+          <h4
+            class="reveal-y"
+            [class.reveal-visible]="storyMemberState() === 'close'"
+            [style.--reveal-y]="'20px'"
+            [style.--reveal-enter-delay]="'300ms'"
+            [style.--reveal-exit-delay]="'300ms'"
+          >
+            Carla Luján Bonadero
+          </h4>
+          <span
+            class="reveal-y"
+            [class.reveal-visible]="storyMemberState() === 'close'"
+            [style.--reveal-y]="'20px'"
+            [style.--reveal-enter-delay]="'600ms'"
+            [style.--reveal-exit-delay]="'0ms'"
+            >{{ 'MAIN.STORY.MEMBER' | translate }}</span
+          >
         </figure>
       </div>
     </div>
@@ -115,7 +162,11 @@
         </div>
       </div>
 
-      <app-card-list-skeleton [badgeCount]="0" [actionCount]="0" [descriptionLines]="1"></app-card-list-skeleton>
+      <app-card-list-skeleton
+        [badgeCount]="0"
+        [actionCount]="0"
+        [descriptionLines]="1"
+      ></app-card-list-skeleton>
     </div>
   </section>
 } @else if (allWorks().length) {
@@ -128,23 +179,38 @@
         </div>
       </div>
 
-      <div #workSubTitle
-           class="work-sub-title text-center gelatine-reveal"
-           [class.gelatine-reveal-visible]="workSubTitleState() === 'close'">
+      <div
+        #workSubTitle
+        class="work-sub-title text-center gelatine-reveal"
+        [class.gelatine-reveal-visible]="workSubTitleState() === 'close'"
+      >
         <h4>{{ 'MAIN.WORK.TEXT_1' | translate }}</h4>
       </div>
 
       <div class="work-filter fadeInRight animated" data-wow-duration="500ms">
         <ul class="text-center">
           <li>
-            <button mat-raised-button (click)="filterBy()" class="work-filter" type="button" aria-label="Filter All"
-                    [ngClass]="{'active': filter() === undefined}">{{ 'MAIN.WORK.FILTER.ALL' | translate }}
+            <button
+              mat-raised-button
+              (click)="filterBy()"
+              class="work-filter"
+              type="button"
+              aria-label="Filter All"
+              [ngClass]="{ active: filter() === undefined }"
+            >
+              {{ 'MAIN.WORK.FILTER.ALL' | translate }}
             </button>
           </li>
           @for (group of groups(); track group) {
             <li>
-              <button (click)="filterBy(group)" class="work-filter" mat-raised-button aria-label="Filter by"
-                      [ngClass]="{'active': filter() === group}">{{ group.name }}
+              <button
+                (click)="filterBy(group)"
+                class="work-filter"
+                mat-raised-button
+                aria-label="Filter by"
+                [ngClass]="{ active: filter() === group }"
+              >
+                {{ group.name }}
               </button>
             </li>
           }
@@ -153,10 +219,19 @@
 
       <div class="work-inner-container">
         @for (work of works(); track work; let i = $index) {
-          <div class="text-center work-flex-item work-fade-in" [style.--work-fade-delay]="(i * 60) + 'ms'">
-            <a class="work-link" [href]="work.image" target="_blank" [title]="work.title" aria-label="Open work image">
+          <div
+            class="text-center work-flex-item work-fade-in"
+            [style.--work-fade-delay]="i * 60 + 'ms'"
+          >
+            <a
+              class="work-link"
+              [href]="work.image"
+              target="_blank"
+              [title]="work.title"
+              aria-label="Open work image"
+            >
               <figure class="work-item">
-                <img class="work-img" [src]="work.image" [alt]="work.title">
+                <img class="work-img" [src]="work.image" [alt]="work.title" />
                 <figcaption class="overlay">
                   <h4>{{ work.title }}</h4>
                   <p>{{ work.detail }}</p>
@@ -175,11 +250,14 @@
 @if (groups().length) {
   <section id="treatments" class="treatments">
     <div class="section-container">
-
-      <div #treatmentTitle
-           class="section-title text-center mb-50 bounce-down-reveal"
-           [class.bounce-down-reveal-visible]="treatmentTitleState() === 'close'">
-        <h2 style="margin-top: 6%;">{{ 'MAIN.SECTION.TREATMENT' | translate }}</h2>
+      <div
+        #treatmentTitle
+        class="section-title text-center mb-50 bounce-down-reveal"
+        [class.bounce-down-reveal-visible]="treatmentTitleState() === 'close'"
+      >
+        <h2 style="margin-top: 6%">
+          {{ 'MAIN.SECTION.TREATMENT' | translate }}
+        </h2>
         <div class="home-divider">
           <mat-icon color="warn" class="material-icons">favorite</mat-icon>
         </div>
@@ -189,10 +267,12 @@
       <div class="treatment-container">
         @for (group of groups(); track group; let i = $index) {
           <div class="work-flex-item">
-            <div class="treatment-item pointer-only scale-in-reveal"
-                 [class.scale-in-reveal-visible]="treatmentItemState() === 'close'"
-                 [style.--scale-in-delay]="(i * (currentIsSmall ? 0 : 300)) + 'ms'"
-                 (click)="goToTreatment(group.id)">
+            <div
+              class="treatment-item pointer-only scale-in-reveal"
+              [class.scale-in-reveal-visible]="treatmentItemState() === 'close'"
+              [style.--scale-in-delay]="i * (currentIsSmall ? 0 : 300) + 'ms'"
+              (click)="goToTreatment(group.id)"
+            >
               <div class="treatment-icon">
                 <mat-icon [svgIcon]="'CLEOS-COLOR'"></mat-icon>
               </div>
@@ -213,10 +293,14 @@
 <section id="experiences" class="experiences">
   <div class="parallax-overlay">
     <div class="section-container">
-      <div #experienceTitle
-           class="section-title text-center mb-50 rubber-band-reveal"
-           [class.rubber-band-reveal-visible]="experienceTitleState() === 'close'">
-        <h2 class="experience-title">{{ 'MAIN.SECTION.EXPERIENCE' | translate }}</h2>
+      <div
+        #experienceTitle
+        class="section-title text-center mb-50 rubber-band-reveal"
+        [class.rubber-band-reveal-visible]="experienceTitleState() === 'close'"
+      >
+        <h2 class="experience-title">
+          {{ 'MAIN.SECTION.EXPERIENCE' | translate }}
+        </h2>
         <div class="home-divider">
           <mat-icon color="warn" class="material-icons">favorite</mat-icon>
         </div>
@@ -224,10 +308,12 @@
 
       <div class="treatment-container experience-grid">
         @for (experience of experiences; track experience) {
-          <div class="text-center fade-up-reveal"
-               [id]="experience.id"
-               [class.fade-up-reveal-visible]="experienceTitleState() === 'close'"
-               [style.transition-delay]="experience.delay">
+          <div
+            class="text-center fade-up-reveal"
+            [id]="experience.id"
+            [class.fade-up-reveal-visible]="experienceTitleState() === 'close'"
+            [style.transition-delay]="experience.delay"
+          >
             <div class="counters-item experience-card">
               <mat-icon>{{ experience.icon }}</mat-icon>
               <strong>{{ experience.position }}</strong>
@@ -244,48 +330,68 @@
 <!-- Contact Us -->
 <section id="contact" class="contact">
   <div class="section-container mb-50">
-
-    <div #contactTitle
-         class="section-title text-center mb-50 fade-up-reveal"
-         [class.fade-up-reveal-visible]="contactTitleState() === 'close'"
-         [style.--fade-up-distance]="'20px'"
-         [style.--fade-up-duration]="'500ms'">
+    <div
+      #contactTitle
+      class="section-title text-center mb-50 fade-up-reveal"
+      [class.fade-up-reveal-visible]="contactTitleState() === 'close'"
+      [style.--fade-up-distance]="'20px'"
+      [style.--fade-up-duration]="'500ms'"
+    >
       <h2>{{ 'MAIN.SECTION.CONTACTS' | translate }}</h2>
       <div class="home-divider">
         <mat-icon color="warn" class="material-icons">favorite</mat-icon>
       </div>
     </div>
 
-    <div #contactText
-         class="section-sub-title text-center rubber-band-reveal"
-         [class.rubber-band-reveal-visible]="contactTextState() === 'close'">
+    <div
+      #contactText
+      class="section-sub-title text-center rubber-band-reveal"
+      [class.rubber-band-reveal-visible]="contactTextState() === 'close'"
+    >
       <p [innerHTML]="'MAIN.CONTACT.DETAIL' | translate"></p>
     </div>
 
     <div class="contact-container" style="width: 80%">
-
       <!-- contact address -->
       <div class="flex-item" #contactItem1>
-        <div class="contact-address reveal-x"
-             [class.reveal-visible]="contactItem1State() === 'close'"
-             [style.--reveal-x]="'-100%'">
+        <div
+          class="contact-address reveal-x"
+          [class.reveal-visible]="contactItem1State() === 'close'"
+          [style.--reveal-x]="'-100%'"
+        >
           <h3>{{ 'MAIN.CONTACT.TITLE' | translate }}</h3>
           <p>
             <mat-icon matPrefix>room</mat-icon>&nbsp;
-            <a class="link" rel="noreferrer" target="_blank" aria-label="Address"
-               [href]="'https://www.google.com/maps/dir/?api=1&z=15&destination=' + ('MAIN.CONTACT.ADDRESS' | translate)">
+            <a
+              class="link"
+              rel="noreferrer"
+              target="_blank"
+              aria-label="Address"
+              [href]="
+                'https://www.google.com/maps/dir/?api=1&z=15&destination=' +
+                ('MAIN.CONTACT.ADDRESS' | translate)
+              "
+            >
               {{ 'MAIN.CONTACT.ADDRESS' | translate }}
             </a>
           </p>
           <p>
             <mat-icon matPrefix>phone</mat-icon>&nbsp;
-            <a class="link" aria-label="Phone"
-               [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)">{{ 'MAIN.CONTACT.PHONE' | translate }}</a>
+            <a
+              class="link"
+              aria-label="Phone"
+              [href]="'tel:' + ('MAIN.CONTACT.PHONE' | translate)"
+              >{{ 'MAIN.CONTACT.PHONE' | translate }}</a
+            >
           </p>
           <p>
             <mat-icon matPrefix>mail</mat-icon>&nbsp;
-            <a class="link" aria-label="Mail"
-               [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)">{{ 'MAIN.CONTACT.MAIL' | translate }}</a>
+            <a
+              class="link"
+              aria-label="Mail"
+              [href]="'mailto:' + ('MAIN.CONTACT.MAIL' | translate)"
+              >{{ 'MAIN.CONTACT.MAIL' | translate }}</a
+            >
           </p>
         </div>
       </div>
@@ -293,54 +399,110 @@
 
       <!-- contact form -->
       <div class="contact--item" #contactItem2>
-        <div class="contact-form reveal-y"
-             [class.reveal-visible]="contactItem2State() === 'close'"
-             [style.--reveal-y]="'100%'"
-             [style.--reveal-enter-delay]="currentIsSmall ? '0ms' : '500ms'"
-             [style.--reveal-exit-delay]="'0ms'">
-          <h3 class="bold no-content">{{ 'MAIN.CONTACT.SEND.TITLE' | translate }}</h3>
+        <div
+          class="contact-form reveal-y"
+          [class.reveal-visible]="contactItem2State() === 'close'"
+          [style.--reveal-y]="'100%'"
+          [style.--reveal-enter-delay]="currentIsSmall ? '0ms' : '500ms'"
+          [style.--reveal-exit-delay]="'0ms'"
+        >
+          <h3 class="bold no-content">
+            {{ 'MAIN.CONTACT.SEND.TITLE' | translate }}
+          </h3>
 
-          <form (ngSubmit)="sendEmail()" [formGroup]="form" novalidate (keydown.enter)="$event.preventDefault()">
+          <form
+            (ngSubmit)="sendEmail()"
+            [formGroup]="form"
+            novalidate
+            (keydown.enter)="$event.preventDefault()"
+          >
             <div class="home-page-form inner-container">
               <div class="contact-inner-container">
                 <mat-form-field class="full full-margin" appearance="outline">
-                  <mat-label>{{ 'MAIN.CONTACT.NAME.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.name" autocomplete="name" matInput required>
+                  <mat-label>{{
+                    'MAIN.CONTACT.NAME.FIELD' | translate
+                  }}</mat-label>
+                  <input
+                    [formControl]="getForm.name"
+                    autocomplete="name"
+                    matInput
+                    required
+                  />
                   @if (getForm.name.hasError('required')) {
-                    <mat-error [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"></mat-error>
+                    <mat-error
+                      [innerHTML]="'MAIN.CONTACT.NAME.REQUIRED' | translate"
+                    ></mat-error>
                   }
                 </mat-form-field>
                 <mat-form-field class="full" appearance="outline">
-                  <mat-label>{{ 'MAIN.CONTACT.EMAIL.FIELD' | translate }}</mat-label>
-                  <input [formControl]="getForm.email" autocomplete="email" matInput required>
+                  <mat-label>{{
+                    'MAIN.CONTACT.EMAIL.FIELD' | translate
+                  }}</mat-label>
+                  <input
+                    [formControl]="getForm.email"
+                    autocomplete="email"
+                    matInput
+                    required
+                  />
                   @if (getForm.email.hasError('email')) {
-                    <mat-error>{{ 'MAIN.CONTACT.EMAIL.INVALID' | translate }}</mat-error>
+                    <mat-error>{{
+                      'MAIN.CONTACT.EMAIL.INVALID' | translate
+                    }}</mat-error>
                   }
                   @if (getForm.email.hasError('required')) {
-                    <mat-error [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"></mat-error>
+                    <mat-error
+                      [innerHTML]="'MAIN.CONTACT.EMAIL.REQUIRED' | translate"
+                    ></mat-error>
                   }
                 </mat-form-field>
               </div>
 
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'MAIN.CONTACT.SUBJECT.FIELD' | translate }}</mat-label>
-                <input [formControl]="getForm.subject" autocomplete="subject" matInput required>
+                <mat-label>{{
+                  'MAIN.CONTACT.SUBJECT.FIELD' | translate
+                }}</mat-label>
+                <input
+                  [formControl]="getForm.subject"
+                  autocomplete="subject"
+                  matInput
+                  required
+                />
                 @if (getForm.subject.hasError('required')) {
-                  <mat-error [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'MAIN.CONTACT.SUBJECT.REQUIRED' | translate"
+                  ></mat-error>
                 }
               </mat-form-field>
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'MAIN.CONTACT.BODY.FIELD' | translate }}</mat-label>
-                <textarea #message [formControl]="getForm.body" matInput maxlength="256" required></textarea>
-                <mat-hint align="end">{{ message.value.length }} / 256</mat-hint>
+                <mat-label>{{
+                  'MAIN.CONTACT.BODY.FIELD' | translate
+                }}</mat-label>
+                <textarea
+                  #message
+                  [formControl]="getForm.body"
+                  matInput
+                  maxlength="256"
+                  required
+                ></textarea>
+                <mat-hint align="end"
+                  >{{ message.value.length }} / 256</mat-hint
+                >
                 @if (getForm.body.hasError('required')) {
-                  <mat-error [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"></mat-error>
+                  <mat-error
+                    [innerHTML]="'MAIN.CONTACT.BODY.REQUIRED' | translate"
+                  ></mat-error>
                 }
               </mat-form-field>
               <div class="app-surface-actions">
                 <div class="app-surface-spacer"></div>
-                <button [disabled]="form.invalid" color="primary" mat-fab extended type="submit"
-                        aria-label="Submit contact form">
+                <button
+                  [disabled]="form.invalid"
+                  color="primary"
+                  mat-fab
+                  extended
+                  type="submit"
+                  aria-label="Submit contact form"
+                >
                   <mat-icon>mail</mat-icon>
                   {{ 'COMMON.BUTTON.SEND' | translate }}
                 </button>
@@ -355,19 +517,41 @@
       <div class="flex-item" #contactItem3>
         <ul class="social-inner-container">
           @for (social of socialLinks; track social) {
-            <li class="reveal-x"
-                [class.reveal-visible]="contactItem3State() === 'close'"
-                [style.--reveal-x]="'100%'"
-                [style.--reveal-enter-delay]="currentIsSmall ? '0ms' : social.delay">
+            <li
+              class="reveal-x"
+              [class.reveal-visible]="contactItem3State() === 'close'"
+              [style.--reveal-x]="'100%'"
+              [style.--reveal-enter-delay]="
+                currentIsSmall ? '0ms' : social.delay
+              "
+            >
               @if (social.phone && social.phoneKey && social.phoneText) {
-                <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                   (mouseleave)="onHover(social, false)" aria-label="Social icon"
-                   [href]="social.href + (social.phone | translate) + social.phoneKey + (social.phoneText | translate)">
+                <a
+                  mat-icon-button
+                  rel="noreferrer"
+                  target="_blank"
+                  (mouseenter)="onHover(social, true)"
+                  (mouseleave)="onHover(social, false)"
+                  aria-label="Social icon"
+                  [href]="
+                    social.href +
+                    (social.phone | translate) +
+                    social.phoneKey +
+                    (social.phoneText | translate)
+                  "
+                >
                   <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
                 </a>
               } @else {
-                <a mat-icon-button rel="noreferrer" target="_blank" (mouseenter)="onHover(social, true)"
-                   (mouseleave)="onHover(social, false)" [href]="social.href" aria-label="Social icon">
+                <a
+                  mat-icon-button
+                  rel="noreferrer"
+                  target="_blank"
+                  (mouseenter)="onHover(social, true)"
+                  (mouseleave)="onHover(social, false)"
+                  [href]="social.href"
+                  aria-label="Social icon"
+                >
                   <mat-icon [svgIcon]="social.svgIcon"></mat-icon>
                 </a>
               }
@@ -380,25 +564,50 @@
   </div>
 
   <!-- Google map -->
-  <div #contactMap class="bounce-down-reveal" [class.bounce-down-reveal-visible]="contactMapState() === 'close'">
-    <iframe [title]="`${title} map`" width="100%" height="300" class="map" allowfullscreen="" loading="lazy"
-            [ngClass]="{'dark-map': isDarkMode()}" referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl">
+  <div
+    #contactMap
+    class="bounce-down-reveal"
+    [class.bounce-down-reveal-visible]="contactMapState() === 'close'"
+  >
+    <iframe
+      [title]="`${title} map`"
+      width="100%"
+      height="300"
+      class="map"
+      allowfullscreen=""
+      loading="lazy"
+      [ngClass]="{ 'dark-map': isDarkMode() }"
+      referrerpolicy="no-referrer-when-downgrade"
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2459.8286698251877!2d4.476945576894232!3d51.937078579223154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c5cbae073735b3%3A0xc150afbfa3aeaf88!2sNails%20Cleos!5e0!3m2!1sen!2snl!4v1701072269943!5m2!1sen!2snl"
+    >
     </iframe>
   </div>
   <!-- End Google map -->
-
 </section>
 <!-- End Contact Us-->
 
-<button color="primary" class="app-surface-hide-mobile book-button fab-book-button" (click)="openBottomSheet()" mat-fab
-        extended type="button" aria-label="Book your appointment">
+<button
+  color="primary"
+  class="app-surface-hide-mobile book-button fab-book-button"
+  (click)="openBottomSheet()"
+  mat-fab
+  extended
+  type="button"
+  aria-label="Book your appointment"
+>
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>
 
-<button color="primary" class="app-surface-hide-desktop book-button raised-book-button" style="height: 64px"
-        (click)="openBottomSheet()" mat-raised-button type="button" aria-label="Book your appointment">
+<button
+  color="primary"
+  class="app-surface-hide-desktop book-button raised-book-button"
+  style="height: 64px"
+  (click)="openBottomSheet()"
+  mat-raised-button
+  type="button"
+  aria-label="Book your appointment"
+>
   <mat-icon matPrefix>book_online</mat-icon>
   <span>{{ 'MAIN.BOOK.APPOINTMENT' | translate }}</span>
 </button>

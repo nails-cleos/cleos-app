@@ -1,12 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input } from '@angular/core';
-import { AuthUserService } from '../../services/auth-user.service';
-import { ICommon } from '../../interfaces/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
+import { AuthUserService } from '@app/services/auth-user.service';
+import { ICommon } from '@app/interfaces/common';
 import { IUnavailable } from '../unavailable';
-import { UnavailableStore } from '../../store/unavailable.store';
-import { SkeletonComponent } from '../../shared/skeleton/skeleton.component';
+import { UnavailableStore } from '@app/store/unavailable.store';
+import { SkeletonComponent } from '@app/shared/skeleton/skeleton.component';
 import { BlockAgendaComponent } from './block-agenda.component';
-import { executeDialogNoWidth } from '../../util/helper';
-import { DialogComponent } from '../../shared/dialog/generic/dialog.component';
+import { executeDialogNoWidth } from '@app/util/helper';
+import { DialogComponent } from '@app/shared/dialog/generic/dialog.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -21,7 +28,7 @@ import { MatDialog } from '@angular/material/dialog';
         (deleteData)="delete()"
       />
     } @else {
-      <app-skeleton/>
+      <app-skeleton />
     }
   `,
   imports: [BlockAgendaComponent, SkeletonComponent],
@@ -32,12 +39,17 @@ export class BlockAgendaDetailsPageComponent {
 
   private readonly unavailableStore = inject(UnavailableStore);
   private readonly authUserService = inject(AuthUserService);
-  private readonly translateService: TranslateService = inject(TranslateService);
+  private readonly translateService: TranslateService =
+    inject(TranslateService);
   private readonly dialog: MatDialog = inject(MatDialog);
 
   config: ICommon = {
     title: 'UNAVAILABLE.BLOCK_AGENDA.DETAIL',
-    button: { icon: 'published_with_changes', label: 'COMMON.BUTTON.UPDATE', showDelete: true },
+    button: {
+      icon: 'published_with_changes',
+      label: 'COMMON.BUTTON.UPDATE',
+      showDelete: true,
+    },
   };
 
   unavailable = computed(() => this.unavailableStore.selected());
@@ -53,7 +65,9 @@ export class BlockAgendaDetailsPageComponent {
     this.unavailableStore.update(
       this.id(),
       unavailable,
-      this.authUserService.authUser()?.isRoomAdmin ? 'dashboard/events' : 'unavailable/block-agenda',
+      this.authUserService.authUser()?.isRoomAdmin
+        ? 'dashboard/events'
+        : 'unavailable/block-agenda',
     );
   }
 
@@ -64,13 +78,24 @@ export class BlockAgendaDetailsPageComponent {
     }
     const title = this.translateService.instant('UNAVAILABLE.DELETED.TITLE');
     const date = unavailable?.start;
-    const content = this.translateService.instant('UNAVAILABLE.DELETED.CONTENT', { date });
+    const content = this.translateService.instant(
+      'UNAVAILABLE.DELETED.CONTENT',
+      { date },
+    );
 
-    executeDialogNoWidth(this.dialog, DialogComponent, { title, content, value: unavailable, variant: 'warning' },
-      result => {
+    executeDialogNoWidth(
+      this.dialog,
+      DialogComponent,
+      { title, content, value: unavailable, variant: 'warning' },
+      (result) => {
         if (result) {
-          this.unavailableStore.delete(result.id, result.timestamp, result.timeZone);
+          this.unavailableStore.delete(
+            result.id,
+            result.timestamp,
+            result.timeZone,
+          );
         }
-      });
+      },
+    );
   }
 }

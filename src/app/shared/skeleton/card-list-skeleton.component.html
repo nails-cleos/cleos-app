@@ -13,21 +13,29 @@
             <div class="app-card-list-skeleton-card__top">
               <div class="app-card-list-skeleton-card__text">
                 <div class="ssc-line app-card-list-skeleton-card__title"></div>
-                <div class="ssc-line app-card-list-skeleton-card__subtitle"></div>
+                <div
+                  class="ssc-line app-card-list-skeleton-card__subtitle"
+                ></div>
               </div>
 
               @if (badgeCount()) {
                 <div class="app-card-list-skeleton-card__badges">
                   @for (badge of badges(); track badge) {
-                    <div class="ssc-head-line app-card-list-skeleton-card__badge"></div>
+                    <div
+                      class="ssc-head-line app-card-list-skeleton-card__badge"
+                    ></div>
                   }
                 </div>
               }
             </div>
 
             @for (line of lines(); track line) {
-              <div class="ssc-line app-card-list-skeleton-card__description"
-                   [class.app-card-list-skeleton-card__description--short]="line === descriptionLines() - 1"></div>
+              <div
+                class="ssc-line app-card-list-skeleton-card__description"
+                [class.app-card-list-skeleton-card__description--short]="
+                  line === descriptionLines() - 1
+                "
+              ></div>
             }
           </div>
         </div>

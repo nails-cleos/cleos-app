@@ -1,17 +1,39 @@
-<span class="app-surface-item__label">{{ 'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate }}</span>
+<span class="app-surface-item__label">{{
+  'COMMON.PAYMENT.TYPE.FIELD.TITLE' | translate
+}}</span>
 <form [formGroup]="form()" novalidate (keydown.enter)="$event.preventDefault()">
   @let isFirstTime = firstTime();
   <div class="link-container">
     @if (!isFirstTime && showPaymentMessage()) {
-      <div class="no-content bold"
-           [innerHTML]="'COMMON.RESERVATION.PAYMENT_MESSAGE' | translate: {professional: professionalName()}">
-      </div>
+      <div
+        class="no-content bold"
+        [innerHTML]="
+          'COMMON.RESERVATION.PAYMENT_MESSAGE'
+            | translate: { professional: professionalName() }
+        "
+      ></div>
     }
-    <app-payment-option-select [control]="getForm.option" [options]="options()" [required]="isFirstTime"></app-payment-option-select>
-    @if (getForm.percentage && getForm.option.value && !getForm.option.value.hidePercentage) {
-      <mat-radio-group [formControl]="getForm.percentage" aria-label="Select an option" required>
-        <mat-radio-button value="DEPOSIT_50">{{ 'COMMON.PAYMENT.DEPOSIT_50' | translate }}</mat-radio-button>
-        <mat-radio-button value="TOTAL">{{ 'COMMON.PAYMENT.TOTAL' | translate }}</mat-radio-button>
+    <app-payment-option-select
+      [control]="getForm.option"
+      [options]="options()"
+      [required]="isFirstTime"
+    ></app-payment-option-select>
+    @if (
+      getForm.percentage &&
+      getForm.option.value &&
+      !getForm.option.value.hidePercentage
+    ) {
+      <mat-radio-group
+        [formControl]="getForm.percentage"
+        aria-label="Select an option"
+        required
+      >
+        <mat-radio-button value="DEPOSIT_50">{{
+          'COMMON.PAYMENT.DEPOSIT_50' | translate
+        }}</mat-radio-button>
+        <mat-radio-button value="TOTAL">{{
+          'COMMON.PAYMENT.TOTAL' | translate
+        }}</mat-radio-button>
       </mat-radio-group>
     }
   </div>

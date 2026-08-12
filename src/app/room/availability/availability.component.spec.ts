@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AvailabilityComponent } from './availability.component';
-import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateService } from '@ngx-translate/core';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('AvailabilityComponent', () => {
   let component: AvailabilityComponent;
@@ -9,7 +10,8 @@ describe('AvailabilityComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AvailabilityComponent, TranslateModule.forRoot()],
+      imports: [AvailabilityComponent],
+      providers: [provideTranslateService()],
     }).compileComponents();
   });
 

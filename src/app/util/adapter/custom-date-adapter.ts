@@ -2,9 +2,8 @@ import { NativeDateAdapter } from '@angular/material/core';
 import { DEFAULT_LOCALE } from '../dates';
 
 export abstract class CustomDateAdapter extends NativeDateAdapter {
-
-  protected constructor(matDateLocale: string) {
-    super(matDateLocale);
+  protected constructor() {
+    super();
   }
 
   parse = (value: any): Date | null => {
@@ -23,13 +22,22 @@ export abstract class CustomDateAdapter extends NativeDateAdapter {
   };
 
   formatDate(date: Date, displayFormat: any): string {
-    date = new Date(Date.UTC(
-      date.getFullYear(), date.getMonth(), date.getDate(),
-      date.getHours(), date.getMinutes(), date.getSeconds(),
-      date.getMilliseconds(),
-    ));
+    date = new Date(
+      Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
+        date.getMilliseconds(),
+      ),
+    );
 
-    const dtf = new Intl.DateTimeFormat(this.locale || DEFAULT_LOCALE, displayFormat);
+    const dtf = new Intl.DateTimeFormat(
+      this.locale || DEFAULT_LOCALE,
+      displayFormat,
+    );
     return dtf.format(date);
   }
 }
