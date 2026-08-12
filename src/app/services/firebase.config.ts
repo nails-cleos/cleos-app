@@ -10,24 +10,16 @@ import {
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import {
+  type Analytics,
   getAnalytics,
   isSupported,
   logEvent,
-  type Analytics,
 } from 'firebase/analytics';
 import { environment } from '../../environments/environment';
 
 const app = initializeApp(environment.firebase);
 const auth = getAuth(app);
 const database = getDatabase(app);
-const messaging = getMessaging(app);
-
-let analytics: Analytics | undefined;
-
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
-  isTokenAutoRefreshEnabled: true,
-});
 
 if (environment.useEmulators) {
   connectAuthEmulator(auth, 'http://127.0.0.1:9099');
@@ -38,13 +30,29 @@ if (environment.useEmulators) {
   providedIn: 'root',
 })
 export class FirebaseSdkService {
-  auth = auth;
-  messaging = messaging;
-  database = database;
-  appCheck = appCheck;
+  private readonly app = initializeApp(environment.firebase);
+
+  readonly auth = getAuth(this.app);
+  readonly database = getDatabase(this.app);
+  readonly messaging = getMessaging(this.app);
+
+  readonly appCheck = initializeAppCheck(this.app, {
+    provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
+    isTokenAutoRefreshEnabled: true,
+  });
+
+  private analyticsInstance?: Analytics;
+
+  constructor() {
+    isSupported().then((supported) => {
+      if (supported) {
+        this.analyticsInstance = getAnalytics(this.app);
+      }
+    });
+  }
 
   get analytics(): Analytics | undefined {
-    return analytics;
+    return this.analyticsInstance;
   }
 
   getToken = getToken;
@@ -53,12 +61,4 @@ export class FirebaseSdkService {
   ref = ref;
   update = update;
   onIdTokenChanged = onIdTokenChanged;
-
-  constructor() {
-    isSupported().then((supported) => {
-      if (supported) {
-        analytics = getAnalytics(app);
-      }
-    });
-  }
 }

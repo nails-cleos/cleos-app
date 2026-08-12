@@ -1,6 +1,6 @@
 {
   "name": "nails-cleos",
-  "version": "1.4.2",
+  "version": "1.4.3-rc",
   "engines": {
     "node": "v24.19.0",
     "npm": "11.17.0"
@@ -31,6 +31,7 @@
     "cypress:run": "TZ=Europe/Amsterdam cypress run"
   },
   "private": true,
+  "type": "module",
   "dependencies": {
     "@angular/cdk": "^22.1.1",
     "@angular/common": "^22.1.0",

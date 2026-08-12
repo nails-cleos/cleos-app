@@ -1,9 +1,4 @@
-import {
-  MissingTranslationHandler,
-  MissingTranslationHandlerParams,
-  TranslateLoader,
-  TranslationObject,
-} from '@ngx-translate/core';
+import { TranslateLoader, TranslationObject } from '@ngx-translate/core';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { getLocale } from '../util/helper';
@@ -27,42 +22,16 @@ export class TranslateLoaderFactory {
     );
   }
 
-  static forModule = (module: string): any =>
-    class LazyTranslateLoader implements TranslateLoader {
-      getTranslation(lang: string): Observable<TranslationObject> {
-        return TranslateLoaderFactory.loadJson<TranslationObject>(module, lang);
-      }
-    };
+  static forModule = (module: string) => () => new LazyTranslateLoader(module);
 }
 
-export class MissingTranslateHandler implements MissingTranslationHandler {
-  handle(params: MissingTranslationHandlerParams): string {
-    return params.key;
+class LazyTranslateLoader implements TranslateLoader {
+  constructor(private readonly module: string) {}
+
+  getTranslation(lang: string): Observable<TranslationObject> {
+    return TranslateLoaderFactory.loadJson<TranslationObject>(
+      this.module,
+      lang,
+    );
   }
-
-  getValue = (lang: string, key: string): void => {
-    from(import(`../../assets/i18n/me/${lang}.json`)).subscribe((t) => {
-      const file = JSON.parse(JSON.stringify(t));
-      this.byString(file, key);
-    });
-  };
-
-  byString = (o: any, s: string): any => {
-    s = s.replace(/[(\w+)]/g, '.$1');
-    s = s.replace(/^./, '');
-
-    const a = s.split('.');
-
-    for (let i = 0, n = a.length; i < n; ++i) {
-      const k = a[i];
-
-      if (k in o) {
-        o = o[k];
-      } else {
-        return undefined;
-      }
-    }
-
-    return o;
-  };
 }

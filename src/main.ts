@@ -27,7 +27,6 @@ import { PaginatorI18n } from './app/util/paginator';
 import {
   provideTranslateLoader,
   provideTranslateService,
-  TranslateService,
 } from '@ngx-translate/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import localeEnGB from '@angular/common/locales/en-GB';
@@ -122,7 +121,6 @@ const providers = [
   }),
   {
     provide: MatPaginatorIntl,
-    deps: [TranslateService],
     useFactory: () => new PaginatorI18n().getPaginatorIntl(),
   },
   PermissionsService,
@@ -130,7 +128,6 @@ const providers = [
   NavigationService,
   AsyncPipe,
   CookieService,
-  TranslateService,
   AuthUserService,
   {
     provide: LOCALE_ID,
