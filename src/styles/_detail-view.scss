@@ -122,25 +122,34 @@
   );
   color: var(--app-detail-action-text);
   box-shadow: none;
+
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.app-detail-action-button:is(
-    .mat-mdc-stroked-button,
-    .mat-mdc-outlined-button,
-    .mat-mdc-unelevated-button
-  ):hover,
-.app-detail-actions
-  :is(
-    .mat-mdc-stroked-button,
-    .mat-mdc-outlined-button,
-    .mat-mdc-unelevated-button
-  ):hover {
-  border-color: var(--app-detail-action-border-hover);
-  background: linear-gradient(
-    180deg,
-    var(--app-detail-action-hover-top),
-    var(--app-detail-action-hover-bottom)
-  );
+@media (hover: hover) and (pointer: fine) {
+  .app-detail-action-button:is(
+      .mat-mdc-stroked-button,
+      .mat-mdc-outlined-button,
+      .mat-mdc-unelevated-button
+    ):hover,
+  .app-detail-actions
+    :is(
+      .mat-mdc-stroked-button,
+      .mat-mdc-outlined-button,
+      .mat-mdc-unelevated-button
+    ):hover {
+    border-color: var(--app-detail-action-border-hover);
+    background: linear-gradient(
+      180deg,
+      var(--app-detail-action-hover-top),
+      var(--app-detail-action-hover-bottom)
+    );
+  }
+
+  .app-detail-link:hover {
+    text-decoration: underline;
+  }
 }
 
 .app-detail-action-button:is(
@@ -369,15 +378,14 @@
   text-decoration: none;
 }
 
-.app-detail-link:hover {
-  text-decoration: underline;
-}
-
 @media (max-width: 720px) {
   .app-detail-actions {
-    justify-content: flex-start;
     flex-direction: column;
-    align-items: stretch;
     width: 100%;
+  }
+
+  .app-detail-actions > .app-detail-action-button {
+    width: 100%;
+    min-width: 0;
   }
 }

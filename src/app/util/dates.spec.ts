@@ -461,11 +461,6 @@ describe('dates utility', () => {
       const formatted = backendFormatDate(date);
       expect(formatted).toBe('2024-01-05');
     });
-
-    it('should return undefined for undefined date', () => {
-      const formatted = backendFormatDate(undefined);
-      expect(formatted).toBeUndefined();
-    });
   });
 
   describe('formatDuration', () => {

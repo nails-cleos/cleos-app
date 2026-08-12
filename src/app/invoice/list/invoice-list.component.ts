@@ -361,8 +361,13 @@ export class InvoiceListComponent {
         this.getForm.startNumber.setValue(office.lastInvoiceNumber + 1);
       }
       const officeId = office.id;
-      const start = backendFormatDate(this.startDateSignal());
-      const end = backendFormatDate(this.endDateSignal());
+      const startDate = this.startDateSignal();
+      const endDate = this.endDateSignal();
+      if (!startDate || !endDate) {
+        return;
+      }
+      const start = backendFormatDate(startDate);
+      const end = backendFormatDate(endDate);
       if (start && end) {
         const types = this.selectedPaymentOptionsSignal().map(
           (option: IPaymentOption) => option.type,

@@ -758,14 +758,45 @@
   color: var(--app-detail-action-text) !important;
 }
 
-.app-surface-dialog-actions
-  :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button):hover {
-  border-color: var(--app-detail-action-border-hover);
-  background: linear-gradient(
-    180deg,
-    var(--app-detail-action-hover-top),
-    var(--app-detail-action-hover-bottom)
-  );
+@media (hover: hover) and (pointer: fine) {
+  .app-surface-dialog-actions
+    :is(.mat-mdc-stroked-button, .mat-mdc-outlined-button):hover {
+    border-color: var(--app-detail-action-border-hover);
+    background: linear-gradient(
+      180deg,
+      var(--app-detail-action-hover-top),
+      var(--app-detail-action-hover-bottom)
+    );
+  }
+
+  .app-surface-dialog-actions .mat-mdc-unelevated-button:hover {
+    transform: translateY(-1px);
+    filter: saturate(1.05) brightness(0.98);
+    box-shadow: 0 14px 24px
+      color-mix(in srgb, var(--primary-color) 24%, transparent);
+  }
+
+  .app-surface-dialog-actions
+    .mat-mdc-unelevated-button.app-surface-dialog-action-secondary:hover {
+    filter: none;
+    box-shadow: none;
+    border-color: var(--app-detail-action-border-hover);
+    background: linear-gradient(
+      180deg,
+      var(--app-detail-action-hover-top),
+      var(--app-detail-action-hover-bottom)
+    );
+  }
+
+  .app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn:hover {
+    border-color: color-mix(in srgb, var(--warn-color) 32%, transparent);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--warn-color) 14%, white 86%),
+      color-mix(in srgb, var(--warn-color) 22%, white 78%)
+    );
+    box-shadow: none;
+  }
 }
 
 .app-surface-dialog-actions .mat-mdc-unelevated-button,
@@ -791,35 +822,6 @@
   .mdc-button__label,
 .app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn .mat-icon {
   color: color-mix(in srgb, var(--warn-color) 88%, black 12%) !important;
-}
-
-.app-surface-dialog-actions .mat-mdc-unelevated-button:hover {
-  transform: translateY(-1px);
-  filter: saturate(1.05) brightness(0.98);
-  box-shadow: 0 14px 24px
-    color-mix(in srgb, var(--primary-color) 24%, transparent);
-}
-
-.app-surface-dialog-actions
-  .mat-mdc-unelevated-button.app-surface-dialog-action-secondary:hover {
-  filter: none;
-  box-shadow: none;
-  border-color: var(--app-detail-action-border-hover);
-  background: linear-gradient(
-    180deg,
-    var(--app-detail-action-hover-top),
-    var(--app-detail-action-hover-bottom)
-  );
-}
-
-.app-surface-dialog-actions .mat-mdc-unelevated-button.mat-warn:hover {
-  border-color: color-mix(in srgb, var(--warn-color) 32%, transparent);
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--warn-color) 14%, white 86%),
-    color-mix(in srgb, var(--warn-color) 22%, white 78%)
-  );
-  box-shadow: none;
 }
 
 .app-surface-dialog-actions :is(button, a).mat-mdc-button-disabled,

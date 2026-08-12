@@ -445,15 +445,15 @@
   },
   "WHATSAPP": {
     "SEND": {
-      "APPROVE": "♡ Afspraak ♡%0A{{date}}%0A{{treatment}}%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten. Bedankt voor je begrip!%0A%0A♡ Tot snel ♡",
-      "TODAY": "♡ Herinnering ♡%0AHallo! Vandaag is je afspraak bij Cleos.%0A{{treatment}}%0A%0A⚠️ Bij annulering binnen 24 uur kan 50% van de behandeling in rekening worden gebracht.%0A♡ Tot snel ♡",
+      "APPROVE": "♡ Volgende afspraak ♡%0A%0A📅 {{date}} %0A💅🏻 {{treatment}}%0A%0A⚠️ Afspraken die binnen 24 uur worden geannuleerd, worden voor 50% van de behandeling in rekening gebracht.%0A%0A♡ Tot snel! ♡",
+      "TODAY": "♡ Herinnering ♡%0AHallo! Vandaag is je afspraak bij Cleos.%0A{{treatment}}%0A%0A⚠️ Afspraken die binnen 24 uur worden geannuleerd, worden voor 50% van de behandeling in rekening gebracht.%0A%0A♡ Tot snel! ♡",
       "COFFEE": "Jouw koffie staat al klaar! ☕%0A♡ Tot zo, lieve klant ♡",
-      "TOMORROW": "♡ Herinnering ♡%0A%0AMorgen, {{date}}, is je afspraak bij Cleos!%0A{{treatment}}%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten.%0A%0A♡ Tot snel ♡",
+      "TOMORROW": "♡ Herinnering ♡%0A%0AMorgen, {{date}}, is je afspraak bij Cleos!%0A{{treatment}}%0A%0A⚠️ Afspraken die binnen 24 uur worden geannuleerd, worden voor 50% van de behandeling in rekening gebracht.%0A%0A♡ Tot snel! ♡",
       "FOLLOWINGS": {
         "TITLE": "Jouw afspraken%0A",
         "VALUE": "%0A♡ {{date}}"
       },
-      "ATTENTION": "%0A%0A⚠️ Afspraken die minder dan 24 uur van tevoren worden geannuleerd, vereisen betaling van 50% van de behandelingskosten. Bedankt voor je begrip!%0A%0A♡ Tot snel ♡"
+      "ATTENTION": "%0A%0A⚠️ Afspraken die binnen 24 uur worden geannuleerd, worden voor 50% van de behandeling in rekening gebracht.%0A%0A♡ Tot snel! ♡"
     }
   },
   "APP": {

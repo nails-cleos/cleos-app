@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { DashboardStore } from './dashboard.store';
 import { DashboardService } from '../services/dashboard.service';
 import { NavigationService } from '../services/navigation.service';
+import { backendFormatDate } from '@app/util/dates';
 
 describe('DashboardStore', () => {
   let store: InstanceType<typeof DashboardStore>;
@@ -102,7 +103,7 @@ describe('DashboardStore', () => {
         ),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(store.error()).toBeTruthy();
 
@@ -124,7 +125,7 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(dashboardService.getEvents).toHaveBeenCalled();
 
@@ -147,7 +148,7 @@ describe('DashboardStore', () => {
         ),
       );
 
-      store.getEvents(new Date());
+      store.getEvents(backendFormatDate(new Date()));
 
       expect(store.error()).toBeTruthy();
     });
@@ -164,7 +165,7 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.getCards(new Date());
+      store.getCards(backendFormatDate(new Date()));
 
       expect(dashboardService.getCards).toHaveBeenCalled();
 
@@ -186,7 +187,7 @@ describe('DashboardStore', () => {
 
       dashboardService.getMyEvent.mockReturnValue(of(dashboard as any));
 
-      store.getMyEvent(new Date());
+      store.getMyEvent(backendFormatDate(new Date()));
 
       expect(store.dashboard()).toEqual(dashboard as any);
     });
@@ -341,7 +342,7 @@ describe('DashboardStore', () => {
         } as any),
       );
 
-      store.getMyEvent(new Date());
+      store.getMyEvent(backendFormatDate(new Date()));
 
       expect(store.dashboard()).toBeTruthy();
 
