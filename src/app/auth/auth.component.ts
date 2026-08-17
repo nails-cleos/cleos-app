@@ -248,7 +248,7 @@ export class AuthComponent {
     const displayName = this.getForm.displayName.value;
 
     if (displayName) {
-      this.firebaseService.updateProfile({ displayName }).catch(console.error);
+      this.firebaseService.updateProfile({ displayName });
     }
 
     if (!user.emailVerified && !this.cookieService.get(VERIFICATION_EMAIL)) {
