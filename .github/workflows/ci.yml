@@ -33,9 +33,13 @@ jobs:
           echo "TYPE_CHECK_STATUS=$?" >> $GITHUB_ENV
 
       - name: Build production app
+        shell: bash
         run: |
+          set +e
           npm run build
-          echo "BUILD_STATUS=$?" >> $GITHUB_ENV
+          BUILD_STATUS=$?
+          echo "BUILD_STATUS=$BUILD_STATUS" >> "$GITHUB_ENV"
+          exit "$BUILD_STATUS"
 
       - name: Run lint
         run: |

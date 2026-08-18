@@ -1,10 +1,96 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { vi } from 'vitest';
 
-vi.mock('firebase/messaging', () => ({
-  getMessaging: vi.fn(),
-  onMessage: vi.fn(),
-  getToken: vi.fn(),
+vi.mock('firebase/app', () => ({
+  initializeApp: vi.fn(() => ({
+    name: '[DEFAULT]',
+  })),
+}));
+
+vi.mock('firebase/auth', () => {
+  const auth = {
+    currentUser: null,
+    authStateReady: vi.fn().mockResolvedValue(undefined),
+    signOut: vi.fn().mockResolvedValue(undefined),
+  };
+
+  class GoogleAuthProvider {
+    addScope = vi.fn();
+  }
+
+  return {
+    browserLocalPersistence: {},
+
+    getAuth: vi.fn(() => auth),
+
+    GoogleAuthProvider,
+
+    signInWithPopup: vi.fn().mockResolvedValue({
+      user: null,
+    }),
+
+    signInWithRedirect: vi.fn().mockResolvedValue(undefined),
+
+    setPersistence: vi.fn().mockResolvedValue(undefined),
+
+    onIdTokenChanged: vi.fn(() => () => {}),
+
+    connectAuthEmulator: vi.fn(),
+
+    createUserWithEmailAndPassword: vi.fn(),
+
+    signInWithEmailAndPassword: vi.fn(),
+
+    sendEmailVerification: vi.fn(),
+
+    updateProfile: vi.fn(),
+
+    fetchSignInMethodsForEmail: vi.fn(),
+
+    sendPasswordResetEmail: vi.fn(),
+  };
+});
+
+vi.mock('firebase/database', () => {
+  const database = {};
+
+  return {
+    getDatabase: vi.fn(() => database),
+    connectDatabaseEmulator: vi.fn(),
+    ref: vi.fn(),
+    update: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
+vi.mock('firebase/messaging', () => {
+  const messaging = {};
+
+  return {
+    getMessaging: vi.fn(() => messaging),
+    onMessage: vi.fn(() => () => {}),
+    getToken: vi.fn().mockResolvedValue('mock-messaging-token'),
+    isSupported: vi.fn().mockResolvedValue(false),
+  };
+});
+
+vi.mock('firebase/app-check', () => {
+  const appCheck = {};
+
+  class ReCaptchaV3Provider {
+    constructor(public siteKey: string) {}
+  }
+
+  return {
+    initializeAppCheck: vi.fn(() => appCheck),
+    ReCaptchaV3Provider,
+    getToken: vi.fn().mockResolvedValue('mock-app-check-token'),
+  };
+});
+
+vi.mock('firebase/analytics', () => ({
+  getAnalytics: vi.fn(),
+  isSupported: vi.fn().mockResolvedValue(false),
+  logEvent: vi.fn(),
 }));
 
 vi.mock('ngx-material-intl-tel-input', async () => {

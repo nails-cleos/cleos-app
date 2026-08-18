@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "nails-cleos-dev"
-  }
+    "default": "nails-cleos"
+  },
+  "etags": {}
 }

@@ -302,7 +302,7 @@ describe('InvoiceListComponent', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    vi.clearAllMocks();
     breakpoint$.complete();
   });
 

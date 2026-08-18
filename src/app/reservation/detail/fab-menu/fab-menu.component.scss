@@ -62,8 +62,8 @@
 
 .menu-item-enter {
   opacity: 0;
-  transform: translateY(-15px);
-  animation: fab-menu-item-in 500ms ease-in forwards;
+  transform: translateY(-6px);
+  animation: fab-menu-item-in 140ms ease-out forwards;
   animation-delay: var(--fab-item-delay, 0ms);
 }
 

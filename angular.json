@@ -102,66 +102,6 @@
               ],
               "serviceWorker": "ngsw-config.json"
             },
-            "staging": {
-              "index": {
-                "input": "src/index.staging.html",
-                "output": "index.html"
-              },
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.staging.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "4mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "8kb"
-                }
-              ],
-              "serviceWorker": "ngsw-config.json"
-            },
-            "pwa": {
-              "index": {
-                "input": "src/index.pwa.html",
-                "output": "index.html"
-              },
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.pwa.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "4mb",
-                  "maximumError": "5mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "8kb"
-                }
-              ],
-              "serviceWorker": "ngsw-config.json"
-            },
             "development": {
               "sourceMap": true,
               "optimization": false,

@@ -299,7 +299,8 @@ describe('ReservationComponent', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    fixture?.destroy();
+    vi.clearAllMocks();
   });
 
   it('should create', () => {
@@ -833,31 +834,37 @@ describe('ReservationComponent', () => {
 
       const originalQuerySelector = document.querySelector.bind(document);
 
-      vi.spyOn(document, 'querySelector').mockImplementation((selector) => {
-        if (selector === 'input[formControlName="customer"]') {
-          return inputSpy as any;
-        }
+      const querySelectorSpy = vi
+        .spyOn(document, 'querySelector')
+        .mockImplementation((selector) => {
+          if (selector === 'input[formControlName="customer"]') {
+            return inputSpy as any;
+          }
 
-        return originalQuerySelector(selector);
-      });
+          return originalQuerySelector(selector);
+        });
 
       component['applySubErrors']([
         { field: 'customer', message: 'Customer is invalid' },
         { field: 'note', message: 'Note is invalid' },
       ] as any);
 
-      expect(component.errors().customer).toBe('Customer is invalid');
-      expect(component.errors().note).toBe('Note is invalid');
+      try {
+        expect(component.errors().customer).toBe('Customer is invalid');
+        expect(component.errors().note).toBe('Note is invalid');
 
-      expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
-        true,
-      );
-      expect(component.getConfigurationForm.note.hasError('incorrect')).toBe(
-        true,
-      );
+        expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
+          true,
+        );
+        expect(component.getConfigurationForm.note.hasError('incorrect')).toBe(
+          true,
+        );
 
-      expect(inputSpy.focus).toHaveBeenCalled();
-      expect(inputSpy.blur).toHaveBeenCalled();
+        expect(inputSpy.focus).toHaveBeenCalled();
+        expect(inputSpy.blur).toHaveBeenCalled();
+      } finally {
+        querySelectorSpy.mockRestore();
+      }
     });
 
     it('should move the stepper to the mapped step when applying shared sub errors', () => {
@@ -888,16 +895,22 @@ describe('ReservationComponent', () => {
       component.currentStepIndex.set(0);
       fixture.componentRef.setInput('isEditing', true);
       fixture.componentRef.setInput('isAdmin', true);
-      vi.spyOn(document, 'querySelector').mockReturnValue(null);
+      const querySelectorSpy = vi
+        .spyOn(document, 'querySelector')
+        .mockReturnValue(null);
 
       component['applySubErrors']([
         { field: 'customer', message: 'Customer is invalid' },
       ] as any);
 
-      expect(component.currentStepIndex()).toBe(1);
-      expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
-        true,
-      );
+      try {
+        expect(component.currentStepIndex()).toBe(1);
+        expect(component.getCustomerForm.customer.hasError('incorrect')).toBe(
+          true,
+        );
+      } finally {
+        querySelectorSpy.mockRestore();
+      }
     });
 
     it('should still map shared sub errors without throwing', () => {

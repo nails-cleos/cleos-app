@@ -1,19 +1,5 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
-import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  IdTokenResult,
-  sendEmailVerification,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  updateProfile,
-  User,
-  UserCredential,
-} from 'firebase/auth';
-import {
-  fetchSignInMethodsForEmail,
-  sendPasswordResetEmail,
-} from '@firebase/auth';
+import { IdTokenResult, User, UserCredential } from 'firebase/auth';
 import { Observable } from 'rxjs';
 import { GetTokenOptions } from '@firebase/messaging';
 import { FirebaseSdkService } from './firebase.config';
@@ -29,7 +15,7 @@ export class FirebaseService {
   readonly user: Signal<User | null> = this._user;
 
   constructor() {
-    this.sdk.onIdTokenChanged(this.sdk.auth, (user) => {
+    this.sdk.getIdTokenChanged((user) => {
       this._user.set(user);
     });
   }
@@ -46,7 +32,7 @@ export class FirebaseService {
   }
 
   get appCheckToken(): Promise<string | null> {
-    return this.sdk.getToken(this.sdk.appCheck);
+    return this.sdk.appCheckToken();
   }
 
   getIdToken(forceRefresh?: boolean): Promise<string | null> {
@@ -55,25 +41,23 @@ export class FirebaseService {
   }
 
   authStateReady(): Promise<void> {
-    return this.sdk.auth.authStateReady();
+    return this.sdk.authStateReady();
   }
 
-  signUp(email: string, password: string): Promise<User> {
-    return createUserWithEmailAndPassword(this.sdk.auth, email, password).then(
-      (cred) => cred.user,
-    );
+  async signUp(email: string, password: string): Promise<User> {
+    return this.sdk.signUp(email, password);
   }
 
   signIn(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(this.sdk.auth, email, password);
+    return this.sdk.signIn(email, password);
   }
 
-  signInWithGoogle(scope?: string): Promise<UserCredential> {
-    const provider = new GoogleAuthProvider();
-    if (scope) {
-      provider.addScope(scope);
-    }
-    return signInWithPopup(this.sdk.auth, provider);
+  async signInWithGoogle(scope?: string): Promise<void> {
+    await this.sdk.signInWithGoogle(scope);
+  }
+
+  async signInWithGooglePopup(scope?: string): Promise<UserCredential> {
+    return this.sdk.signInWithGooglePopup(scope);
   }
 
   updateProfile({
@@ -82,56 +66,46 @@ export class FirebaseService {
   }: {
     displayName?: string | null;
     photoURL?: string | null;
-  }): Promise<void> {
-    const user = this.currentUser;
-    if (!user) {
-      return Promise.reject(new Error('No current user'));
-    }
-    return updateProfile(user, { displayName, photoURL });
+  }) {
+    this.sdk
+      .updateUserProfile({ displayName, photoURL }, this.currentUser)
+      .catch(console.error);
   }
 
   sendVerificationEmail(): Promise<void> {
-    const user = this.currentUser;
-    if (!user) {
-      return Promise.reject(new Error('No current user'));
-    }
-    return sendEmailVerification(user);
+    return this.sdk.sendVerificationEmail(this.currentUser);
   }
 
   fetchSignInMethods(email: string): Promise<string[]> {
-    return fetchSignInMethodsForEmail(this.sdk.auth, email);
+    return this.sdk.fetchSignInMethods(email);
   }
 
   sendPasswordResetEmail(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.sdk.auth, email);
+    return this.sdk.sendPasswordReset(email);
   }
 
   signOut(): Promise<void> {
-    return this.sdk.auth.signOut();
+    return this.sdk.signOut();
   }
 
-  updateToken(userId: string, token: string): Promise<void> {
-    const collectionRef = this.sdk.ref(this.sdk.database, 'fcmTokens/');
-    const data: Record<string, string> = { [userId]: token };
-    return this.sdk.update(collectionRef, data);
+  updateToken(userId: string, token: string) {
+    this.sdk
+      .updateToken(userId, token)
+      .then(() => console.warn('DB updated'))
+      .catch(console.error);
   }
 
   getMessagingToken(options: GetTokenOptions): Promise<string> {
-    return this.sdk.getToken(this.sdk.messaging, options);
+    return this.sdk.getAuthToken(options);
   }
 
   onMessageReceived(): Observable<any> {
     return new Observable((subscriber) =>
-      this.sdk.onMessage(this.sdk.messaging, (payload) =>
-        subscriber.next(payload),
-      ),
+      this.sdk.getMessage((payload) => subscriber.next(payload)),
     );
   }
 
   logEvent(name: string, params?: Record<string, any>): void {
-    const analytics = this.sdk.analytics;
-    if (analytics) {
-      this.sdk.logEvent(analytics, name, params);
-    }
+    this.sdk.logNewEvent(name, params);
   }
 }
