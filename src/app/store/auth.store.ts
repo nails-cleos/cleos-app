@@ -129,7 +129,7 @@ export const AuthStore = signalStore(
 
         getDriveToken(): void {
           firebaseService
-            .signInWithGoogle('https://www.googleapis.com/auth/drive')
+            .signInWithGooglePopup('https://www.googleapis.com/auth/drive')
             .then((result) => {
               const credential =
                 GoogleAuthProvider.credentialFromResult(result);

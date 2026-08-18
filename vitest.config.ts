@@ -5,10 +5,20 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test-setup.ts'],
     fileParallelism: true,
-    reporters: ['dot'],
+    reporters:
+      process.env.GITHUB_ACTIONS === 'true'
+        ? ['dot', 'github-actions', 'junit']
+        : ['default', 'html'],
+    outputFile: {
+      junit: 'test-results/junit-report.xml',
+      html: 'test-results/html-report.html',
+    },
     coverage: {
       provider: 'v8',
-      reporter: ['html', 'lcov', 'text', 'json-summary'],
+      reporter:
+        process.env.GITHUB_ACTIONS === 'true'
+          ? ['lcov', 'text', 'json-summary']
+          : ['html', 'lcov', 'text', 'json-summary'],
       reportsDirectory: './coverage/cleos',
       thresholds: {
         statements: 70,

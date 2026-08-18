@@ -57,5 +57,8 @@ cypress/screenshots/**
 cypress/results/**
 cypress/downloads/**
 
-**/junit-report.xml
+test-results/
 unit-test.log
+
+# Firebase
+.firebase/

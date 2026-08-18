@@ -149,7 +149,7 @@ describe('DocumentListComponent', () => {
 
   afterEach(() => {
     breakpoint$.complete();
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should create', () => {
