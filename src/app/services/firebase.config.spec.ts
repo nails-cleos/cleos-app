@@ -3,28 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { FirebaseSdkService } from './firebase.config';
 
-vi.mock('firebase/auth', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('firebase/auth')>();
-
-  const auth = {
-    currentUser: null,
-    authStateReady: vi.fn().mockResolvedValue(undefined),
-    signOut: vi.fn().mockResolvedValue(undefined),
-  };
-
-  return {
-    ...actual,
-
-    getAuth: vi.fn(() => auth),
-
-    setPersistence: vi.fn().mockResolvedValue(undefined),
-
-    onIdTokenChanged: vi.fn(),
-
-    connectAuthEmulator: vi.fn(),
-  };
-});
-
 describe('FirebaseSdkService', () => {
   let service: FirebaseSdkService;
 
@@ -43,10 +21,9 @@ describe('FirebaseSdkService', () => {
   });
 
   it('should expose the Firebase SDK services', () => {
-    expect(service.auth).toBeDefined();
-    expect(service.database).toBeDefined();
-    expect(service.messaging).toBeDefined();
-    expect(service.appCheck).toBeDefined();
+    expect(service['auth']).toBeDefined();
+    expect(service['database']).toBeDefined();
+    expect(service['appCheck']).toBeDefined();
   });
 
   it('should expose the FirebaseSdkService API', () => {
@@ -55,6 +32,7 @@ describe('FirebaseSdkService', () => {
     expect(service.getAuthToken).toEqual(expect.any(Function));
     expect(service.getMessage).toEqual(expect.any(Function));
     expect(service.getIdTokenChanged).toEqual(expect.any(Function));
+    expect(service.onRedirectResult).toEqual(expect.any(Function));
     expect(service.updateToken).toEqual(expect.any(Function));
     expect(service.logNewEvent).toEqual(expect.any(Function));
     expect(service.signInWithGoogle).toEqual(expect.any(Function));
@@ -68,8 +46,22 @@ describe('FirebaseSdkService', () => {
     expect(service.signOut).toEqual(expect.any(Function));
   });
 
-  it('should expose analytics as undefined when analytics is not supported', () => {
+  it('should expose analytics as undefined when analytics is not supported', async () => {
+    await Promise.resolve();
+
     expect(service['analytics']).toBeUndefined();
+  });
+
+  it('should expose messaging as undefined when messaging is not supported', async () => {
+    await Promise.resolve();
+
+    expect(service['messaging']).toBeUndefined();
+  });
+
+  it('should expose redirect result API', async () => {
+    const result = await service.onRedirectResult();
+
+    expect(result).toBeNull();
   });
 
   it('should reject updateProfile if no user', async () => {

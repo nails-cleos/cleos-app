@@ -22,6 +22,7 @@ interface FirebaseSdkMock {
   getAuthToken: ReturnType<typeof vi.fn>;
   getMessage: ReturnType<typeof vi.fn>;
   getIdTokenChanged: ReturnType<typeof vi.fn>;
+  onRedirectResult: ReturnType<typeof vi.fn>;
   updateToken: ReturnType<typeof vi.fn>;
 
   signInWithGoogle: ReturnType<typeof vi.fn>;
@@ -79,6 +80,7 @@ describe('FirebaseService', () => {
       getAuthToken: vi.fn(),
       getMessage: vi.fn(),
       getIdTokenChanged: vi.fn(),
+      onRedirectResult: vi.fn(),
       updateToken: vi.fn().mockResolvedValue(undefined),
 
       signInWithGoogle: vi.fn().mockResolvedValue(undefined),
@@ -100,6 +102,10 @@ describe('FirebaseService', () => {
         return () => {};
       },
     );
+
+    sdkSpy.onRedirectResult.mockResolvedValue({
+      user: mockUser,
+    } as unknown as UserCredential);
 
     sdkSpy.signInWithGooglePopup.mockResolvedValue({
       user: mockUser,
@@ -170,7 +176,7 @@ describe('FirebaseService', () => {
     sdkSpy.getMessage.mockImplementation((callback) => {
       callback({ data: 'msg' });
 
-      return () => {};
+      return Promise.resolve(() => {});
     });
 
     service.onMessageReceived().subscribe((message) => {
