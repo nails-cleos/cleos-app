@@ -59,7 +59,9 @@ export class MessagingService {
         vapidKey: this.env.firebase.vapidKey,
       });
 
-      this.updateToken(user, token);
+      if (token) {
+        this.updateToken(user, token);
+      }
     } catch (err: any) {
       if (err?.code === 'messaging/permission-blocked') {
         console.warn('Notifications are blocked by the browser settings.');

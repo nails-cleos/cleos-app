@@ -636,7 +636,7 @@ describe('ReservationComponent', () => {
       expect(emitSpy).toHaveBeenCalled();
     });
 
-    it('should dispatch UpdateReservationById when editing existing reservation', () => {
+    it('should dispatch UpdateReservationById when editing existing reservation', async () => {
       fixture.componentRef.setInput('isEditing', true);
       fixture.componentRef.setInput('reservation', {
         id: 'reservation-1',
@@ -651,7 +651,9 @@ describe('ReservationComponent', () => {
       const emitSpy = vi.fn().mockName('emit');
       component.submitData.subscribe(emitSpy);
       component.create();
-      expect(emitSpy).toHaveBeenCalled();
+      await vi.waitFor(() => {
+        expect(emitSpy).toHaveBeenCalled();
+      });
     });
 
     it('should not dispatch action if no dates are provided', () => {

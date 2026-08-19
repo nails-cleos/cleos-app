@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, Signal, signal } from '@angular/core';
 import { IdTokenResult, User, UserCredential } from 'firebase/auth';
 import { Observable } from 'rxjs';
-import { GetTokenOptions } from '@firebase/messaging';
+import { GetTokenOptions } from 'firebase/messaging';
 import { FirebaseSdkService } from './firebase.config';
 
 @Injectable({
@@ -18,6 +18,17 @@ export class FirebaseService {
     this.sdk.getIdTokenChanged((user) => {
       this._user.set(user);
     });
+
+    this.sdk
+      .onRedirectResult()
+      .then((result) => {
+        if (result) {
+          this._user.set(result.user);
+        }
+      })
+      .catch((error) => {
+        console.error('Redirect sign-in failed:', error);
+      });
   }
 
   private get currentUser(): User | null {
@@ -95,14 +106,27 @@ export class FirebaseService {
       .catch(console.error);
   }
 
-  getMessagingToken(options: GetTokenOptions): Promise<string> {
+  getMessagingToken(options: GetTokenOptions): Promise<string | null> {
     return this.sdk.getAuthToken(options);
   }
 
   onMessageReceived(): Observable<any> {
-    return new Observable((subscriber) =>
-      this.sdk.getMessage((payload) => subscriber.next(payload)),
-    );
+    return new Observable((subscriber) => {
+      let unsubscribe: (() => void) | undefined;
+
+      this.sdk
+        .getMessage((payload) => subscriber.next(payload))
+        .then((unsubscribeFn) => {
+          unsubscribe = unsubscribeFn;
+        })
+        .catch((error) => {
+          subscriber.error(error);
+        });
+
+      return () => {
+        unsubscribe?.();
+      };
+    });
   }
 
   logEvent(name: string, params?: Record<string, any>): void {
