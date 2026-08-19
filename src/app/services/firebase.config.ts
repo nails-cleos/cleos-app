@@ -5,6 +5,7 @@ import {
   connectAuthEmulator,
   createUserWithEmailAndPassword,
   getAuth,
+  getRedirectResult,
   GoogleAuthProvider,
   onIdTokenChanged,
   sendEmailVerification,
@@ -22,39 +23,51 @@ import {
   ref,
   update,
 } from 'firebase/database';
-import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
+import {
+  getMessaging,
+  getToken as getMessagingToken,
+  isSupported as isMessagingSupported,
+  onMessage,
+  type Messaging,
+  GetTokenOptions,
+} from 'firebase/messaging';
+import {
+  initializeAppCheck,
+  ReCaptchaV3Provider,
+  getToken as getAppCheckToken,
+  type AppCheck,
+} from 'firebase/app-check';
 import {
   type Analytics,
   getAnalytics,
-  isSupported,
+  isSupported as isAnalyticsSupported,
   logEvent,
 } from 'firebase/analytics';
 import { environment } from '../../environments/environment';
 import {
   fetchSignInMethodsForEmail,
   sendPasswordResetEmail,
-} from '@firebase/auth';
-import { GetTokenOptions } from '@firebase/messaging';
+} from 'firebase/auth';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FirebaseSdkService {
-  private readonly persistenceReady: Promise<void>;
-
   private readonly app = initializeApp(environment.firebase);
 
-  readonly auth = getAuth(this.app);
-  readonly database = getDatabase(this.app);
-  readonly messaging = getMessaging(this.app);
+  private readonly auth = getAuth(this.app);
+  private readonly database = getDatabase(this.app);
 
-  readonly appCheck = initializeAppCheck(this.app, {
+  private readonly appCheck: AppCheck = initializeAppCheck(this.app, {
     provider: new ReCaptchaV3Provider(environment.recaptcha.siteKey),
     isTokenAutoRefreshEnabled: true,
   });
 
-  private analyticsInstance?: Analytics;
+  private readonly persistenceReady: Promise<void>;
+  private readonly messagingReady: Promise<void>;
+
+  private analytics?: Analytics;
+  private messaging?: Messaging;
 
   constructor() {
     this.persistenceReady = setPersistence(
@@ -63,20 +76,31 @@ export class FirebaseSdkService {
     ).catch((error) => {
       console.error('Failed to configure Firebase Auth persistence', error);
     });
+
     if (environment.useEmulators) {
       connectAuthEmulator(this.auth, 'http://127.0.0.1:9099');
       connectDatabaseEmulator(this.database, 'localhost', 9000);
     }
 
-    isSupported().then((supported) => {
-      if (supported) {
-        this.analyticsInstance = getAnalytics(this.app);
-      }
-    });
-  }
+    this.messagingReady = isMessagingSupported()
+      .then((supported) => {
+        if (supported) {
+          this.messaging = getMessaging(this.app);
+        }
+      })
+      .catch((error) =>
+        console.error('Failed to check Firebase Messaging support:', error),
+      );
 
-  private get analytics(): Analytics | undefined {
-    return this.analyticsInstance;
+    isAnalyticsSupported()
+      .then((supported) => {
+        if (supported) {
+          this.analytics = getAnalytics(this.app);
+        }
+      })
+      .catch((error) =>
+        console.error('Failed to check Firebase Analytics support:', error),
+      );
   }
 
   logNewEvent(name: string, params?: Record<string, any>): void {
@@ -86,31 +110,13 @@ export class FirebaseSdkService {
     }
   }
 
-  authStateReady(): Promise<void> {
-    return this.auth.authStateReady();
-  }
+  authStateReady = (): Promise<void> => this.auth.authStateReady();
 
-  appCheckToken(): Promise<string | null> {
-    return getToken(this.appCheck);
-  }
+  getIdTokenChanged = (callback: (user: User | null) => void): (() => void) =>
+    onIdTokenChanged(this.auth, callback);
 
-  getAuthToken(options?: GetTokenOptions): Promise<string> {
-    return getToken(this.messaging, options);
-  }
-
-  getMessage(callback: (payload: any) => void): () => void {
-    return onMessage(this.messaging, callback);
-  }
-
-  getIdTokenChanged(callback: (user: User | null) => void): () => void {
-    return onIdTokenChanged(this.auth, callback);
-  }
-
-  updateToken(userId: string, token: string): Promise<void> {
-    const collectionRef = ref(this.database, 'fcmTokens/');
-    const data: Record<string, string> = { [userId]: token };
-    return update(collectionRef, data);
-  }
+  onRedirectResult = (): Promise<UserCredential | null> =>
+    getRedirectResult(this.auth);
 
   async signInWithGoogle(scope?: string): Promise<void> {
     await this.persistenceReady;
@@ -141,26 +147,22 @@ export class FirebaseSdkService {
   }
 
   async signUp(email: string, password: string): Promise<User> {
-    const cred = await createUserWithEmailAndPassword(
+    const userCredential = await createUserWithEmailAndPassword(
       this.auth,
       email,
       password,
     );
-    return cred.user;
+    return userCredential.user;
   }
 
-  signIn(email: string, password: string): Promise<UserCredential> {
-    return signInWithEmailAndPassword(this.auth, email, password);
-  }
+  signIn = (email: string, password: string): Promise<UserCredential> =>
+    signInWithEmailAndPassword(this.auth, email, password);
 
   updateUserProfile(
     {
       displayName,
       photoURL,
-    }: {
-      displayName?: string | null;
-      photoURL?: string | null;
-    },
+    }: { displayName?: string | null; photoURL?: string | null },
     user: User | null,
   ): Promise<void> {
     if (!user) {
@@ -176,15 +178,55 @@ export class FirebaseSdkService {
     return sendEmailVerification(user);
   }
 
-  fetchSignInMethods(email: string): Promise<string[]> {
-    return fetchSignInMethodsForEmail(this.auth, email);
+  fetchSignInMethods = (email: string): Promise<string[]> =>
+    fetchSignInMethodsForEmail(this.auth, email);
+
+  sendPasswordReset = (email: string): Promise<void> =>
+    sendPasswordResetEmail(this.auth, email);
+
+  signOut = (): Promise<void> => this.auth.signOut();
+
+  async appCheckToken(): Promise<string | null> {
+    try {
+      const result = await getAppCheckToken(this.appCheck);
+      return result.token;
+    } catch (error) {
+      console.error('Failed to get App Check token:', error);
+      return null;
+    }
   }
 
-  sendPasswordReset(email: string): Promise<void> {
-    return sendPasswordResetEmail(this.auth, email);
+  async getAuthToken(options?: GetTokenOptions): Promise<string | null> {
+    await this.messagingReady;
+
+    const messaging = this.messaging;
+
+    if (!messaging) {
+      return null;
+    }
+
+    return getMessagingToken(messaging, options);
   }
 
-  signOut(): Promise<void> {
-    return this.auth.signOut();
+  async getMessage(callback: (payload: any) => void): Promise<() => void> {
+    await this.messagingReady;
+
+    const messaging = this.messaging;
+
+    if (!messaging) {
+      return () => {};
+    }
+
+    return onMessage(messaging, callback);
+  }
+
+  updateToken(userId: string, token: string): Promise<void> {
+    const collectionRef = ref(this.database, 'fcmTokens/');
+
+    const data: Record<string, string> = {
+      [userId]: token,
+    };
+
+    return update(collectionRef, data);
   }
 }

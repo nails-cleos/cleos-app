@@ -243,7 +243,9 @@
     "LABEL": {
       "FILTER": "Filter",
       "PRICE": "Prijs",
+      "SUBTOTAL": "Subtotaal",
       "TOTAL": "Totaal",
+      "DISCOUNT": "Korting",
       "MONTHLY": {
         "DATE": "Maand en jaar"
       }

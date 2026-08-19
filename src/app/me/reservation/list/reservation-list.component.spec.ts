@@ -1,4 +1,12 @@
-import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  type Mock,
+  vi,
+} from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 
@@ -13,6 +21,7 @@ import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
 import { signal } from '@angular/core';
 import { ReservationStore } from '@app/store/reservation.store';
+
 describe('ReservationListComponent', () => {
   let component: ReservationListComponent;
   let fixture: ComponentFixture<ReservationListComponent>;
@@ -97,6 +106,9 @@ describe('ReservationListComponent', () => {
         { provide: DiscountStore, useValue: discountStoreSpy },
         provideRouter([]),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
@@ -105,6 +117,10 @@ describe('ReservationListComponent', () => {
     fixture = TestBed.createComponent(ReservationListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    breakpoints$?.complete();
   });
 
   it('should create', () => {

@@ -309,8 +309,8 @@ describe('Helper Utils', () => {
       const result = getPrice(reservation, payments);
 
       expect(result.totalWithoutDiscount).toBe(35);
-      expect(result.discount).toBeCloseTo(7, 1);
-      expect(result.total).toBeCloseTo(28, 1);
+      expect(result.discount).toBeCloseTo(6, 1);
+      expect(result.total).toBeCloseTo(29, 1);
       expect(result.totalPaid).toBe(10);
       expect(result.extra).toBe(5);
       expect(result.additional).toBe(10);
@@ -532,10 +532,13 @@ describe('Helper Utils', () => {
       } as any;
       const result = newPrice(basePrice, 100, discount);
 
-      // base total = 115; discount = 11.5 (10%)
-      expect(result.discount).toBeCloseTo(11.5, 2);
-      expect(result.total).toBeCloseTo(103.5, 2);
-      expect(result.priceWithDiscount).toBeCloseTo(88.5, 2); // amount - discount
+      // discountable amount = 100 + 5 = 105
+      // extra = 10 is excluded from the discount
+      // discount = 10% of 105 = 10.5
+      // total = 115 - 10.5 = 104.5
+      expect(result.discount).toBeCloseTo(10.5, 2);
+      expect(result.total).toBeCloseTo(104.5, 2);
+      expect(result.priceWithDiscount).toBeCloseTo(89.5, 2);
     });
 
     it('should handle no extras/additional gracefully', () => {
@@ -589,10 +592,13 @@ describe('Helper Utils', () => {
       } as any;
       const result = newExtra(basePrice, 20, discount);
 
-      // total before discount = 125, discount = 12.5
-      expect(result.discount).toBeCloseTo(12.5, 2);
-      expect(result.total).toBeCloseTo(112.5, 2);
-      expect(result.priceWithDiscount).toBeCloseTo(87.5, 2);
+      // total before discount = 100 + 20 + 5 = 125
+      // discountable amount = 100 + 5 = 105
+      // extra = 20 is excluded from the discount
+      // discount = 10% of 105 = 10.5
+      expect(result.discount).toBeCloseTo(10.5, 2);
+      expect(result.total).toBeCloseTo(114.5, 2);
+      expect(result.priceWithDiscount).toBeCloseTo(89.5, 2);
     });
 
     it('should handle when no discount is provided', () => {
@@ -658,10 +664,13 @@ describe('Helper Utils', () => {
       } as any;
       const result = newDiscount(basePrice, discount);
 
-      // discount = 10% of 100 = 10
-      expect(result.discount).toBe(10);
-      expect(result.total).toBe(105); // 115 - 10
-      expect(result.priceWithDiscount).toBe(90); // 100 - 10
+      // discountable amount = 100 + 5 = 105
+      // extra = 10 is excluded from the discount
+      // discount = 10% of 105 = 10.5
+      expect(result.discount).toBeCloseTo(10.5, 2);
+      expect(result.total).toBeCloseTo(104.5, 2);
+      expect(result.totalWithoutDiscount).toBe(115);
+      expect(result.priceWithDiscount).toBeCloseTo(89.5, 2);
     });
 
     it('should handle a 0 discount amount', () => {
@@ -742,10 +751,13 @@ describe('Helper Utils', () => {
       } as any;
       const result = newAdditional(basePrice, additionalList, discount);
 
-      // total = 135; discount = 13.5
-      expect(result.discount).toBeCloseTo(13.5, 2);
-      expect(result.total).toBeCloseTo(121.5, 2);
-      expect(result.priceWithDiscount).toBeCloseTo(86.5, 2);
+      // total before discount = 100 + 10 + 25 = 135
+      // discountable amount = 100 + 25 = 125
+      // extra = 10 is excluded from the discount
+      // discount = 10% of 125 = 12.5
+      expect(result.discount).toBeCloseTo(12.5, 2);
+      expect(result.total).toBeCloseTo(122.5, 2);
+      expect(result.priceWithDiscount).toBeCloseTo(87.5, 2);
     });
 
     it('should not apply discount if not provided', () => {

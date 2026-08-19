@@ -66,6 +66,9 @@ describe('RoomDetailsPageComponent', () => {
     await TestBed.configureTestingModule({
       imports: [RoomDetailsPageComponent],
       providers: [{ provide: RoomStore, useValue: roomStoreSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     })
       .overrideComponent(RoomDetailsPageComponent, {
         remove: { imports: [RoomComponent] },

@@ -283,18 +283,18 @@
 
               <div class="info-grid app-surface-grid app-surface-grid--auto">
                 <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{
-                    'RESERVATION.TREATMENT.NAME.FIELD' | translate
-                  }}</span>
-                  <strong class="app-surface-item__value app-detail-value">{{
-                    reservation.treatment.name
-                  }}</strong>
+                  <span class="app-surface-item__label">
+                    {{ 'RESERVATION.TREATMENT.NAME.FIELD' | translate }}
+                  </span>
+                  <strong class="app-surface-item__value app-detail-value">
+                    {{ reservation.treatment.name }}
+                  </strong>
                 </div>
 
                 <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{
-                    'RESERVATION.TREATMENT.PRICE.FIELD' | translate
-                  }}</span>
+                  <span class="app-surface-item__label">
+                    {{ 'RESERVATION.TREATMENT.PRICE.FIELD' | translate }}
+                  </span>
                   <strong
                     class="app-surface-item__value app-detail-value app-detail-value--rich"
                   >
@@ -304,9 +304,9 @@
                 </div>
 
                 <div class="info-item app-surface-item">
-                  <span class="app-surface-item__label">{{
-                    'RESERVATION.TREATMENT.DURATION.FIELD' | translate
-                  }}</span>
+                  <span class="app-surface-item__label">
+                    {{ 'RESERVATION.TREATMENT.DURATION.FIELD' | translate }}
+                  </span>
                   <strong
                     class="app-surface-item__value app-detail-value app-detail-value--rich"
                   >
@@ -317,12 +317,12 @@
 
                 @if (!customerId() && reservation.treatment.color) {
                   <div class="info-item app-surface-item">
-                    <span class="app-surface-item__label">{{
-                      'COMMON.TREATMENT.COLOR.FIELD' | translate
-                    }}</span>
-                    <strong class="app-surface-item__value app-detail-value">{{
-                      reservation.treatment.color.name
-                    }}</strong>
+                    <span class="app-surface-item__label">
+                      {{ 'COMMON.TREATMENT.COLOR.FIELD' | translate }}
+                    </span>
+                    <strong class="app-surface-item__value app-detail-value">
+                      {{ reservation.treatment.color.name }}
+                    </strong>
                   </div>
                 }
               </div>
@@ -352,6 +352,7 @@
                         ></app-price-extras>
                       </div>
                     }
+
                     @if (reservation.extras && reservation.extras.length) {
                       <div
                         class="extras-panel__section app-surface-item app-surface-item--section"
@@ -372,31 +373,61 @@
                   </div>
                 }
 
-                <div
-                  class="detail-totals-grid app-surface-grid app-surface-grid--auto"
-                >
-                  <div class="info-item app-surface-item">
-                    <span class="app-surface-item__label">Total price</span>
-                    <strong
-                      class="app-surface-item__value app-detail-value app-detail-value--rich"
-                    >
-                      <mat-icon>{{ reservation.room.currency.icon }}</mat-icon>
-                      {{ price.total | number: '1.2-2' }}
-                    </strong>
-                  </div>
+                @if (price.discount) {
+                  <div
+                    class="detail-totals-grid app-surface-grid app-surface-grid--auto"
+                  >
+                    <!-- Total before discount -->
+                    <div class="info-item app-surface-item">
+                      <span class="app-surface-item__label">
+                        {{ 'COMMON.LABEL.SUBTOTAL' | translate }}
+                      </span>
 
-                  <div class="info-item app-surface-item">
-                    <span class="app-surface-item__label">Total duration</span>
-                    <strong
-                      class="app-surface-item__value app-detail-value app-detail-value--rich"
-                    >
-                      <mat-icon>schedule</mat-icon>
-                      {{ duration.hour | number: '2.0-0' }}:{{
-                        duration.minute | number: '2.0-0'
-                      }}
-                    </strong>
+                      <strong
+                        class="app-surface-item__value app-detail-value app-detail-value--rich"
+                      >
+                        <mat-icon>{{
+                          reservation.room.currency.icon
+                        }}</mat-icon>
+                        {{ price.totalWithoutDiscount | number: '1.2-2' }}
+                      </strong>
+                    </div>
+
+                    <!-- Discount -->
+                    @if (price.discount) {
+                      <div class="info-item app-surface-item">
+                        <span class="app-surface-item__label">
+                          {{ 'COMMON.LABEL.DISCOUNT' | translate }}
+                        </span>
+
+                        <strong
+                          class="app-surface-item__value app-detail-value app-detail-value--rich"
+                        >
+                          <mat-icon>{{
+                            reservation.room.currency.icon
+                          }}</mat-icon>
+                          -{{ price.discount | number: '1.2-2' }}
+                        </strong>
+                      </div>
+                    }
+
+                    <!-- Final total -->
+                    <div class="info-item app-surface-item">
+                      <span class="app-surface-item__label">
+                        {{ 'COMMON.LABEL.TOTAL' | translate }}
+                      </span>
+
+                      <strong
+                        class="app-surface-item__value app-detail-value app-detail-value--rich"
+                      >
+                        <mat-icon>{{
+                          reservation.room.currency.icon
+                        }}</mat-icon>
+                        {{ price.total | number: '1.2-2' }}
+                      </strong>
+                    </div>
                   </div>
-                </div>
+                }
               </div>
             </mat-card-content>
           </mat-card>
