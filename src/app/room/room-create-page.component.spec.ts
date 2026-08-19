@@ -41,6 +41,9 @@ describe('RoomCreatePageComponent', () => {
         provideNativeDateAdapter(),
         { provide: RoomStore, useValue: roomStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(RoomCreatePageComponent);

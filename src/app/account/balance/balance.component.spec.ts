@@ -10,6 +10,9 @@ describe('BalanceComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [BalanceComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(BalanceComponent);

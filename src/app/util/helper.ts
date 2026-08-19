@@ -118,33 +118,30 @@ export const getPrice = (
   payments?: IPayment[],
 ): IPrice => {
   const treatment = reservation.treatment;
-  let total = treatment.price;
-  let priceWithDiscount;
-  let priceWithExtras = treatment.price;
-  let priceWithAdditional = treatment.price;
-  let discount;
-  let extras;
-  let additional;
-  if (reservation.extras && reservation.extras.length) {
-    extras = reservation.extras.map((a) => a.price).reduce((p, c) => p + c);
-    total += extras;
-    priceWithExtras += extras;
-  }
 
-  if (reservation.additional && reservation.additional.length) {
-    additional = reservation.additional
-      .map((a) => a.price)
-      .reduce((p, c) => p + c);
-    total += additional;
-    priceWithAdditional += additional;
-  }
+  const extras =
+    reservation.extras?.reduce((total, extra) => total + extra.price, 0) ?? 0;
 
-  const totalWithoutDiscount = total;
-  if (treatment.discountCustomer) {
-    discount = getDiscount(treatment.discountCustomer, total);
-    priceWithDiscount = treatment.price - discount;
-    total = total - discount;
-  }
+  const additional =
+    reservation.additional?.reduce(
+      (total, additional) => total + additional.price,
+      0,
+    ) ?? 0;
+
+  const totalWithoutDiscount = treatment.price + extras + additional;
+
+  // Discount applies to treatment + additional, NOT extras.
+  const discountableAmount = treatment.price + additional;
+
+  const discount = treatment.discountCustomer
+    ? getDiscount(treatment.discountCustomer, discountableAmount)
+    : 0;
+
+  const total = totalWithoutDiscount - discount;
+
+  const priceWithDiscount = treatment.price - discount;
+  const priceWithExtras = treatment.price + extras;
+  const priceWithAdditional = treatment.price + additional;
 
   return new Price(
     treatment.price,
@@ -170,29 +167,23 @@ export const newPrice = (
   amount: number,
   discount?: IDiscount,
 ): IPrice => {
-  let total = amount;
-  let priceWithDiscount = price.priceWithDiscount;
   const extras = price.extra;
   const additional = price.additional;
-  const priceWithExtras = amount + extras;
-  const priceWithAdditional = amount + additional;
-  if (extras) {
-    total += extras;
-  }
 
-  if (additional) {
-    total += additional;
-  }
+  const totalWithoutDiscount = amount + extras + additional;
+
+  // Discount applies to treatment + additional, NOT extras.
+  const discountableAmount = amount + additional;
 
   const priceDiscount = discount
-    ? getDiscount(discount, total)
+    ? getDiscount(discount, discountableAmount)
     : price.discount;
 
-  const totalWithoutDiscount = total;
-  if (priceDiscount) {
-    priceWithDiscount = amount - priceDiscount;
-    total = total - priceDiscount;
-  }
+  const total = totalWithoutDiscount - priceDiscount;
+
+  const priceWithDiscount = amount - priceDiscount;
+  const priceWithExtras = amount + extras;
+  const priceWithAdditional = amount + additional;
 
   return new Price(
     amount,
@@ -215,46 +206,52 @@ export const newExtra = (
   extras: number,
   discount?: IDiscount,
 ): IPrice => {
-  let total = price.amount + extras + price.additional;
-  let priceWithDiscount = price.priceWithDiscount;
-  const priceWithExtras = price.amount + extras;
+  const additional = price.additional;
+
+  const totalWithoutDiscount = price.amount + extras + additional;
+
+  // Extras are NOT part of the discountable amount.
+  const discountableAmount = price.amount + additional;
 
   const priceDiscount = discount
-    ? getDiscount(discount, total)
+    ? getDiscount(discount, discountableAmount)
     : price.discount;
 
-  const totalWithoutDiscount = total;
-  if (priceDiscount) {
-    priceWithDiscount = price.amount - priceDiscount;
-    total = total - priceDiscount;
-  }
+  const total = totalWithoutDiscount - priceDiscount;
+
+  const priceWithDiscount = price.amount - priceDiscount;
+
+  const priceWithExtras = price.amount + extras;
+
+  const priceWithAdditional = price.amount + additional;
 
   return new Price(
     price.amount,
     priceDiscount,
     extras,
-    price.additional,
+    additional,
     total,
     price.totalPaid,
     totalWithoutDiscount,
     priceWithDiscount,
     priceWithExtras,
-    price.priceWithAdditional,
+    priceWithAdditional,
     price.percentageToPaid,
     price.balance,
   );
 };
 
 export const removeDiscount = (price: IPrice): IPrice => {
-  const total = price.amount + price.extra + price.additional;
+  const totalWithoutDiscount = price.amount + price.extra + price.additional;
+
   return new Price(
     price.amount,
     0,
     price.extra,
     price.additional,
-    total,
+    totalWithoutDiscount,
     price.totalPaid,
-    total,
+    totalWithoutDiscount,
     0,
     price.priceWithExtras,
     price.priceWithAdditional,
@@ -267,9 +264,15 @@ export const newDiscount = (
   price: IPrice,
   treatmentDiscount: IDiscount,
 ): IPrice => {
-  const discount = getDiscount(treatmentDiscount, price.amount);
+  // Discount applies to treatment + additional, NOT extras.
+  const discountableAmount = price.amount + price.additional;
+
+  const discount = getDiscount(treatmentDiscount, discountableAmount);
+
   const totalWithoutDiscount = price.amount + price.extra + price.additional;
+
   const priceWithDiscount = price.amount - discount;
+
   const total = totalWithoutDiscount - discount;
 
   return new Price(
@@ -293,24 +296,25 @@ export const newAdditional = (
   additionalList: IAdditionalAll[],
   discount?: IDiscount,
 ): IPrice => {
-  let total = price.amount + price.extra;
-  let additional;
-  let priceWithDiscount = price.priceWithDiscount;
-  let priceWithAdditional = price.amount; // Added after
-  if (additionalList && additionalList.length) {
-    additional = additionalList.map((a) => a.price).reduce((p, c) => p + c);
-    total += additional;
-    priceWithAdditional += additional;
-  }
+  const additional =
+    additionalList?.reduce((total, item) => total + item.price, 0) ?? 0;
 
-  const totalWithoutDiscount = total;
+  const totalWithoutDiscount = price.amount + price.extra + additional;
+
+  // Discount applies to treatment + additional, NOT extras.
+  const discountableAmount = price.amount + additional;
+
   const priceDiscount = discount
-    ? getDiscount(discount, total)
+    ? getDiscount(discount, discountableAmount)
     : price.discount;
-  if (priceDiscount) {
-    priceWithDiscount = price.amount - priceDiscount;
-    total = total - priceDiscount;
-  }
+
+  const total = totalWithoutDiscount - priceDiscount;
+
+  const priceWithDiscount = price.amount - priceDiscount;
+
+  const priceWithExtras = price.amount + price.extra;
+
+  const priceWithAdditional = price.amount + additional;
 
   return new Price(
     price.amount,
@@ -321,7 +325,7 @@ export const newAdditional = (
     price.totalPaid,
     totalWithoutDiscount,
     priceWithDiscount,
-    price.priceWithExtras,
+    priceWithExtras,
     priceWithAdditional,
     price.percentageToPaid,
     price.balance,
