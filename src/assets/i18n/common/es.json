@@ -242,7 +242,9 @@
     "LABEL": {
       "FILTER": "Filtrar",
       "PRICE": "Precio",
+      "SUBTOTAL": "Subtotal",
       "TOTAL": "Total",
+      "DISCOUNT": "Descuento",
       "MONTHLY": {
         "DATE": "Mes y año"
       }
