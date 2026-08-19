@@ -1,6 +1,6 @@
 {
   "name": "nails-cleos",
-  "version": "1.4.5",
+  "version": "1.4.5-rc",
   "engines": {
     "node": "v24.19.0",
     "npm": "11.17.0"
