@@ -97,6 +97,9 @@ describe('ReviewDialogComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: MAT_DIALOG_DATA, useValue: reservation },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewDialogComponent);

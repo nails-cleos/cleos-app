@@ -42,6 +42,9 @@ describe('DiscountStore', () => {
         DiscountStore,
         { provide: DiscountService, useValue: discountServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(DiscountStore);

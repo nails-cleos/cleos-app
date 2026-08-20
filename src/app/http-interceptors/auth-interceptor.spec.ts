@@ -52,6 +52,9 @@ describe('authInterceptor', () => {
         { provide: TokenService, useValue: tokenServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
   });
 

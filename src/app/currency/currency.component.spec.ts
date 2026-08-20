@@ -47,6 +47,9 @@ describe('CurrencyComponent', () => {
         { provide: CurrencyStore, useValue: currencyStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CurrencyComponent);

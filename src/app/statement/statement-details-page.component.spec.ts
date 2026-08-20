@@ -77,6 +77,9 @@ describe('StatementDetailsPageComponent', () => {
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(StatementDetailsPageComponent);

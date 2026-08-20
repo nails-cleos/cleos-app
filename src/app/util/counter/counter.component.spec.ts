@@ -10,6 +10,9 @@ describe('CounterComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [CounterComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CounterComponent);

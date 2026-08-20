@@ -31,6 +31,9 @@ describe('PriceDialogComponent', () => {
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: MAT_DIALOG_DATA, useValue: mockData },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PriceDialogComponent);
@@ -73,6 +76,9 @@ describe('PriceDialogComponent', () => {
           useValue: { name: 'Test', type: ServiceType.additional },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const defaultFixture = TestBed.createComponent(PriceDialogComponent);

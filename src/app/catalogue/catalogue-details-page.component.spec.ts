@@ -63,6 +63,9 @@ describe('CatalogueDetailsPageComponent', () => {
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueDetailsPageComponent);

@@ -13,6 +13,9 @@ describe('app-date.provider', () => {
         provideAppDateAdapter(),
         provideAppCalendar(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
   });
 

@@ -44,6 +44,9 @@ describe('requestOptionInterceptor', () => {
           useValue: tokenServiceMock as unknown as TokenService,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
   });
 

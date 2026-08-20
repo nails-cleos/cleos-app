@@ -74,6 +74,9 @@ describe('UserComponent', () => {
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     })
       .overrideComponent(UserComponent, {
         remove: { imports: [GoogleMapComponent] },

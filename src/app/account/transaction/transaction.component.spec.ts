@@ -140,6 +140,9 @@ describe('TransactionComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TransactionComponent);

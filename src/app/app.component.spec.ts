@@ -43,6 +43,9 @@ describe('AppComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: AuthUserService, useValue: authUserServiceMock },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);

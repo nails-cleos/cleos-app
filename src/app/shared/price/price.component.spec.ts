@@ -27,6 +27,9 @@ describe('PriceComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PriceComponent],
       providers: [provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PriceComponent);

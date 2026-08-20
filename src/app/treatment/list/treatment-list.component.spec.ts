@@ -92,6 +92,9 @@ describe('TreatmentListComponent', () => {
         { provide: MatDialog, useValue: dialogSpy },
         { provide: ActivatedRoute, useValue: {} },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentListComponent);

@@ -126,6 +126,9 @@ describe('MeDiscountComponent', () => {
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

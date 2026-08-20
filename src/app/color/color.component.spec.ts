@@ -45,6 +45,9 @@ describe('ColorComponent', () => {
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ColorComponent);

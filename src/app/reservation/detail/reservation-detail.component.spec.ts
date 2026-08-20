@@ -228,6 +228,9 @@ describe('ReservationDetailComponent', () => {
           useValue: { snapshot: { paramMap: { get: () => null } } },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

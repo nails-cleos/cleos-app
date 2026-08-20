@@ -167,6 +167,9 @@ describe('UnavailableComponent', () => {
         },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

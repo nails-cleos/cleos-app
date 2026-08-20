@@ -24,7 +24,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { requireMatch, valueChange } from '@app/util/validators';
+import { requireMatch } from '@app/util/validators';
 import { IPaymentOption } from '@app/interfaces/payment';
 import {
   addPayment,
@@ -575,13 +575,17 @@ export class ReservationCompleteComponent {
         ...this.currentSplitData,
       ];
     }
+    const treatment = this.getForm.treatment.value;
+    const treatmentId =
+      typeof treatment?.key === 'string'
+        ? treatment.key
+        : typeof treatment?.id === 'string'
+          ? treatment.id
+          : undefined;
     this.reservationStore.complete(
       reservation.id,
       {
-        treatmentId: valueChange(
-          this.getForm.treatment.value?.key,
-          reservation?.treatment.key,
-        ),
+        treatmentId,
         paymentType: splitData ? undefined : this.getForm.type.value,
         additionalIds: this.additionalSelected().map(
           (additional) => additional.id,

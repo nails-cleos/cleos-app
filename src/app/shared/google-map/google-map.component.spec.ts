@@ -33,6 +33,9 @@ describe('GoogleMapComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideHttpClient(withXhr(), withJsonpSupport()),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(GoogleMapComponent);

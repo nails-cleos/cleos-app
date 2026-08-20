@@ -58,6 +58,9 @@ describe('ReservationCloneDialogComponent', () => {
         { provide: MatDialogRef, useValue: dialogRef },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReservationCloneDialogComponent);

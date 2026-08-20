@@ -110,6 +110,9 @@ describe('StatementComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: DriveAccessService, useValue: driveAccessServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(StatementComponent);

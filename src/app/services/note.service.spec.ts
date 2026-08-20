@@ -22,6 +22,9 @@ describe('NoteService', () => {
     };
     TestBed.configureTestingModule({
       providers: [NoteService, { provide: HttpClient, useValue: httpSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     service = TestBed.inject(NoteService);
   });

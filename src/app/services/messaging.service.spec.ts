@@ -69,6 +69,9 @@ describe('MessagingService', () => {
         { provide: FirebaseService, useValue: firebaseSpy },
         { provide: EnvService, useValue: envSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     service = TestBed.inject(MessagingService);

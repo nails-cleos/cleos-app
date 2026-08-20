@@ -132,6 +132,9 @@ describe('NavigationService', () => {
           useValue: new ElementRef(document.createElement('div')),
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     const translateService = TestBed.inject(TranslateService);

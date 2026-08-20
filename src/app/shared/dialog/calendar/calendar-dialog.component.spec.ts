@@ -22,6 +22,9 @@ describe('CalendarDialogComponent', () => {
         provideTranslateService(),
         { provide: MatDialogRef, useValue: dialogRefSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
   });
 

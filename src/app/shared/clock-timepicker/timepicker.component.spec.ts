@@ -10,6 +10,9 @@ describe('TimepickerComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TimepickerComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TimepickerComponent);

@@ -66,6 +66,9 @@ describe('ExpenseCreatePageComponent', () => {
         { provide: TokenService, useValue: { token: signal('token') } },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ExpenseCreatePageComponent);

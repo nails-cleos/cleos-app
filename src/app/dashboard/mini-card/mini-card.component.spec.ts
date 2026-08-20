@@ -25,6 +25,9 @@ describe('MiniCardComponent', () => {
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(MiniCardComponent);

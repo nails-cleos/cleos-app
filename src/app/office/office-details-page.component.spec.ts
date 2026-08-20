@@ -53,6 +53,9 @@ describe('OfficeDetailsPageComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: OfficeStore, useValue: officeStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(OfficeDetailsPageComponent);

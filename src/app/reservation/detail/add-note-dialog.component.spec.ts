@@ -30,6 +30,9 @@ describe('AddNoteDialogComponent', () => {
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddNoteDialogComponent);

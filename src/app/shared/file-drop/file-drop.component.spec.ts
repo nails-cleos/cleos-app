@@ -34,6 +34,9 @@ describe('FileDropComponent', () => {
         provideTranslateService(),
         { provide: ToastService, useValue: toastServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

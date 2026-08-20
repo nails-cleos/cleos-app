@@ -60,6 +60,9 @@ describe('PwaService', () => {
         { provide: CookieService, useValue: cookieServiceSpy },
         { provide: SwUpdate, useValue: swUpdateSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     service = TestBed.inject(PwaService);
   });

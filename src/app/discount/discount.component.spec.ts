@@ -72,6 +72,9 @@ describe('DiscountComponent', () => {
         { provide: DiscountStore, useValue: discountStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountComponent);

@@ -16,12 +16,14 @@ export class FirebaseService {
 
   constructor() {
     this.sdk.getIdTokenChanged((user) => {
+      console.info('Auth state changed:', user);
       this._user.set(user);
     });
 
     this.sdk
       .onRedirectResult()
       .then((result) => {
+        console.info('Redirect sign-in result:', result);
         if (result) {
           this._user.set(result.user);
         }

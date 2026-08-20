@@ -69,6 +69,9 @@ describe('CustomersComponent', () => {
         },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CustomersComponent);

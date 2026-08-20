@@ -35,6 +35,9 @@ describe('ColorCreatePageComponent', () => {
         { provide: ColorStore, useValue: colorStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ColorCreatePageComponent);

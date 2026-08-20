@@ -50,6 +50,9 @@ describe('TokenService', () => {
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     service = TestBed.inject(TokenService);

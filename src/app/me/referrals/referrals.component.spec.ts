@@ -65,6 +65,9 @@ describe('ReferralsComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideHttpClient(withXhr()),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     TestBed.overrideProvider(MatBottomSheet, { useValue: bottomSheetSpy });

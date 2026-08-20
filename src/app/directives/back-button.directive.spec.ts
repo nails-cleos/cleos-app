@@ -46,6 +46,9 @@ describe('BackButtonDirective', () => {
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     fixture = TestBed.createComponent(HostComponent);

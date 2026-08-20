@@ -31,6 +31,9 @@ describe('DialogComponent', () => {
         { provide: MatDialogRef, useValue: mockDialogRef },
         { provide: MAT_DIALOG_DATA, useValue: { ...mockData } }, // Create fresh copy each time
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(DialogComponent);

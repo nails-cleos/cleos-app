@@ -22,6 +22,9 @@ describe('TwoDigitsDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HostComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     fixture = TestBed.createComponent(HostComponent);

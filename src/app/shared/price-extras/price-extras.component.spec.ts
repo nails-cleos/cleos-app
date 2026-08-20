@@ -10,6 +10,9 @@ describe('PriceExtrasComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [PriceExtrasComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PriceExtrasComponent);

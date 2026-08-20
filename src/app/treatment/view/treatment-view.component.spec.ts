@@ -44,6 +44,9 @@ describe('TreatmentViewComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentViewComponent);

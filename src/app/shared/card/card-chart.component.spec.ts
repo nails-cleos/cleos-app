@@ -54,6 +54,9 @@ describe('CardChartComponent', () => {
           useValue: { authUser: signal(initialAuthUser).asReadonly() },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CardChartComponent);

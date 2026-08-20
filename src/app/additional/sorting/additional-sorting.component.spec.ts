@@ -70,6 +70,9 @@ describe('AdditionalSortingComponent', () => {
           },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalSortingComponent);

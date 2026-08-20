@@ -71,6 +71,9 @@ describe('PrivacyComponent', () => {
         provideHttpClient(withXhr()),
         provideHttpClientTesting(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     httpMock = TestBed.inject(HttpTestingController);
