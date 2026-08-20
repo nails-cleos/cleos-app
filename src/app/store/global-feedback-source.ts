@@ -5,6 +5,7 @@ export interface GlobalFeedbackSource {
   response(): IResponseSuccess | undefined;
   error(): IError | undefined;
   clearResponse(): void;
+  clearBlob?(): void;
   clearError(): void;
 }
 

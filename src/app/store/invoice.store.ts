@@ -39,6 +39,17 @@ export const InvoiceStore = signalStore(
         patchState(store, { response: undefined });
       },
 
+      clearBlob(): void {
+        const response = store.response();
+        patchState(store, {
+          response: {
+            ...response,
+            blob: undefined,
+            fileName: undefined,
+          } as IResponseSuccess,
+        });
+      },
+
       clearError(): void {
         patchState(store, { error: undefined, subErrors: undefined });
       },
