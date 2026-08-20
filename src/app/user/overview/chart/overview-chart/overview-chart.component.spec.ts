@@ -11,6 +11,9 @@ describe('OverviewChartComponent (with real createChart)', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [OverviewChartComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(OverviewChartComponent);

@@ -28,6 +28,9 @@ describe('I18NStore', () => {
         I18NStore,
         { provide: TranslateService, useValue: translateSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(I18NStore);

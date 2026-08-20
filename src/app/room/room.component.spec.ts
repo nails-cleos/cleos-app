@@ -183,6 +183,9 @@ describe('RoomComponent', () => {
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     })
       .overrideComponent(RoomComponent, {
         remove: { imports: [GoogleMapComponent] },

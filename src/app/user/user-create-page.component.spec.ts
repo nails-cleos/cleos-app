@@ -45,6 +45,9 @@ describe('UserCreatePageComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(UserCreatePageComponent);

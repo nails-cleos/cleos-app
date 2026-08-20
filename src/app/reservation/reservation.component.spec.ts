@@ -289,6 +289,9 @@ describe('ReservationComponent', () => {
         provideHttpClient(withXhr()),
         provideHttpClientTesting(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

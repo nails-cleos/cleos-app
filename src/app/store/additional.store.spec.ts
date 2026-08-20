@@ -42,6 +42,9 @@ describe('AdditionalStore', () => {
         AdditionalStore,
         { provide: AdditionalService, useValue: additionalServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(AdditionalStore);

@@ -171,6 +171,9 @@ describe('MainTreatmentComponent', () => {
       providers: [
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
   });
 

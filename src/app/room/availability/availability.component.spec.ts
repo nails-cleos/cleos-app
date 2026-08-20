@@ -12,6 +12,9 @@ describe('AvailabilityComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AvailabilityComponent],
       providers: [provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
   });
 

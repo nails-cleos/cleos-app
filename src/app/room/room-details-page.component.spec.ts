@@ -1,33 +1,30 @@
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
-import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RoomComponent } from './room.component';
 import { RoomDetailsPageComponent } from './room-details-page.component';
 import { IRoomAll } from './room';
-import { ICommon } from '../interfaces/common';
 import { RoomStore } from '../store/room.store';
-import { signal } from '@angular/core';
-
-@Component({
-  selector: 'app-room',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: '',
-})
-class RoomComponentStub {
-  room = input<Partial<IRoomAll> | undefined>();
-  config = input<ICommon | undefined>();
-  currencies = input<any>();
-  offices = input<any>();
-}
+import { provideTranslateService } from '@ngx-translate/core';
+import { NavigationService } from '@app/services/navigation.service';
+import { DEFAULT_LOCALE } from '@app/util/dates';
+import { provideAppDateAdapter } from '@app/util/adapter/app-date.provider';
+import { GoogleMapComponent } from '@app/shared/google-map/google-map.component';
+import { GoogleMapStubComponent } from '@app/util/stub/google-map-stub.component';
+import { NgcCookieConsentService } from 'ngx-cookieconsent';
 
 describe('RoomDetailsPageComponent', () => {
   let component: RoomDetailsPageComponent;
   let fixture: ComponentFixture<RoomDetailsPageComponent>;
 
+  let navigationServiceSpy: Pick<NavigationService, 'navigate' | 'language'> & {
+    navigate: ReturnType<typeof vi.fn>;
+  };
   let roomStoreSpy: {
     selected: ReturnType<typeof signal<any>>;
     currencies: ReturnType<typeof signal<any>>;
     offices: ReturnType<typeof signal<any>>;
+    professionals: ReturnType<typeof signal<any>>;
+    subErrors: ReturnType<typeof signal<any>>;
     clean: Mock;
     loadInfo: Mock;
     loadById: Mock;
@@ -53,26 +50,44 @@ describe('RoomDetailsPageComponent', () => {
   };
 
   beforeEach(async () => {
+    navigationServiceSpy = {
+      navigate: vi.fn().mockName('NavigationService.navigate'),
+      language: DEFAULT_LOCALE,
+    };
     roomStoreSpy = {
       selected: signal(undefined),
       currencies: signal(undefined),
       offices: signal(undefined),
+      professionals: signal(undefined),
+      subErrors: signal(undefined),
       clean: vi.fn().mockName('clean'),
       loadInfo: vi.fn().mockName('loadInfo'),
       loadById: vi.fn().mockName('loadById'),
       update: vi.fn().mockName('update'),
     };
 
+    const cookieConsentService = {
+      getConfig: vi.fn().mockName('NgcCookieConsentService.getConfig'),
+      destroy: vi.fn().mockName('NgcCookieConsentService.destroy'),
+      init: vi.fn().mockName('NgcCookieConsentService.init'),
+    };
+
     await TestBed.configureTestingModule({
       imports: [RoomDetailsPageComponent],
-      providers: [{ provide: RoomStore, useValue: roomStoreSpy }],
+      providers: [
+        provideTranslateService(),
+        { provide: NavigationService, useValue: navigationServiceSpy },
+        { provide: RoomStore, useValue: roomStoreSpy },
+        { provide: NgcCookieConsentService, useValue: cookieConsentService },
+        provideAppDateAdapter(),
+      ],
       teardown: {
         destroyAfterEach: true,
       },
     })
       .overrideComponent(RoomDetailsPageComponent, {
-        remove: { imports: [RoomComponent] },
-        add: { imports: [RoomComponentStub] },
+        remove: { imports: [GoogleMapComponent] },
+        add: { imports: [GoogleMapStubComponent] },
       })
       .compileComponents();
 
@@ -96,8 +111,7 @@ describe('RoomDetailsPageComponent', () => {
     roomStoreSpy.selected.set(mockRoom);
     fixture.detectChanges();
 
-    const roomComponent = fixture.debugElement.children[0]
-      .componentInstance as RoomComponentStub;
+    const roomComponent = fixture.debugElement.children[0].componentInstance;
 
     expect(roomComponent.room()).toEqual(
       expect.objectContaining({

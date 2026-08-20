@@ -53,6 +53,9 @@ describe('TreatmentGroupSortingComponent', () => {
           useValue: { back: vi.fn().mockName('back') },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TreatmentGroupSortingComponent);

@@ -22,6 +22,9 @@ describe('CurrencyService', () => {
     };
     TestBed.configureTestingModule({
       providers: [CurrencyService, { provide: HttpClient, useValue: httpSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     service = TestBed.inject(CurrencyService);
   });

@@ -42,6 +42,9 @@ describe('ClockTimepickerDialogComponent', () => {
           useValue: dialogRefSpy,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
   });
 

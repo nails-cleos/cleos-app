@@ -24,6 +24,9 @@ describe('ShareButtonsComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ShareButtonsComponent],
       providers: [provideHttpClient(withXhr()), provideAppIcons()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ShareButtonsComponent);

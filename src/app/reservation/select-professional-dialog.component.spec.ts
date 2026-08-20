@@ -41,6 +41,9 @@ describe('SelectProfessionalDialogComponent', () => {
         },
         { provide: MatDialogRef, useValue: dialogRefSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(SelectProfessionalDialogComponent);

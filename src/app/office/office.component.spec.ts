@@ -61,6 +61,9 @@ describe('OfficeComponent', () => {
         { provide: OfficeStore, useValue: officeStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

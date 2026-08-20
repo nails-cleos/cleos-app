@@ -20,6 +20,9 @@ describe('AwsLambdaService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [AwsLambdaService],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     service = TestBed.inject(AwsLambdaService);

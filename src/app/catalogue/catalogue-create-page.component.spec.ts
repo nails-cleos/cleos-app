@@ -42,6 +42,9 @@ describe('CatalogueCreatePageComponent', () => {
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueCreatePageComponent);

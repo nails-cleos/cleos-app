@@ -120,6 +120,9 @@ describe('DashboardComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideAppCalendar(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);

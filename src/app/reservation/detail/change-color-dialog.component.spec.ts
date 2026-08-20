@@ -50,6 +50,9 @@ describe('ChangeColorDialogComponent', () => {
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: ColorStore, useValue: colorStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChangeColorDialogComponent);

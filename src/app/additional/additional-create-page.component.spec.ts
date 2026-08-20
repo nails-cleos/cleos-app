@@ -34,6 +34,9 @@ describe('AdditionalCreatePageComponent', () => {
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AdditionalCreatePageComponent);

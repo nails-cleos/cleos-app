@@ -43,6 +43,9 @@ describe('StatementCreatePageComponent', () => {
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
         { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(StatementCreatePageComponent);

@@ -39,6 +39,9 @@ describe('AuthRedirectEffect', () => {
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     const translateService = TestBed.inject(TranslateService);

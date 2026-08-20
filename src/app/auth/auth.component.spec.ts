@@ -125,6 +125,9 @@ describe('AuthComponent', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AuthComponent);

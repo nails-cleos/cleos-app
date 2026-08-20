@@ -248,6 +248,9 @@ describe('MeReservationComponent', () => {
         { provide: FirebaseService, useValue: firebaseServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(MeReservationComponent);

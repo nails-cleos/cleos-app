@@ -39,6 +39,9 @@ describe('CatalogueService', () => {
     };
     TestBed.configureTestingModule({
       providers: [CatalogueService, { provide: HttpClient, useValue: httpSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     service = TestBed.inject(CatalogueService);
   });

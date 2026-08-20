@@ -76,6 +76,9 @@ describe('TransactionDetailComponent', () => {
           useValue: { snapshot: { paramMap: { get: () => null } } },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TransactionDetailComponent);

@@ -27,6 +27,9 @@ describe('CardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CardComponent],
       providers: [{ provide: AuthUserService, useValue: authUserServiceSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 

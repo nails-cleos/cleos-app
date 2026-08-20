@@ -29,6 +29,9 @@ describe('TotalSummaryComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TotalSummaryComponent],
       providers: [provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryComponent);

@@ -46,6 +46,9 @@ describe('AddDiscountDialogComponent', () => {
           useValue: dialogRef,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AddDiscountDialogComponent);

@@ -64,6 +64,9 @@ describe('SelectUserDialogComponent', () => {
         { provide: MatDialogRef, useValue: dialogRefSpy },
         { provide: UserStore, useValue: userStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(SelectUserDialogComponent);

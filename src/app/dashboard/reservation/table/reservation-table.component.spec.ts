@@ -131,6 +131,9 @@ describe('ReservationTableComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ReservationTableComponent);

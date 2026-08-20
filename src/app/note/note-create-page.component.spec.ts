@@ -58,6 +58,9 @@ describe('NoteCreatePageComponent', () => {
         { provide: NoteStore, useValue: noteStoreSpy },
         { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(NoteCreatePageComponent);

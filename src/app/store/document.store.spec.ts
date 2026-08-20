@@ -35,6 +35,9 @@ describe('DocumentStore', () => {
         DocumentStore,
         { provide: DocumentService, useValue: documentServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     documentStore = TestBed.inject(DocumentStore);

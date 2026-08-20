@@ -52,6 +52,9 @@ describe('DiscountDetailsPageComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DiscountStore, useValue: discountStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(DiscountDetailsPageComponent);

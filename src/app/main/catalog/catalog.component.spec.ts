@@ -28,6 +28,9 @@ describe('CatalogComponent', () => {
         provideTranslateService(),
         { provide: CatalogueStore, useValue: catalogueStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogComponent);

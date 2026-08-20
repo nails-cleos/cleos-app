@@ -32,6 +32,9 @@ describe('TrackingStore', () => {
         TrackingStore,
         { provide: TrackingService, useValue: serviceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(TrackingStore);

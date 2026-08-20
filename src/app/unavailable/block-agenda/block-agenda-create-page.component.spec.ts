@@ -41,6 +41,9 @@ describe('BlockAgendaCreatePageComponent', () => {
         },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(BlockAgendaCreatePageComponent);

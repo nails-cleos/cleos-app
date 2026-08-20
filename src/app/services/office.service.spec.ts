@@ -43,6 +43,9 @@ describe('OfficeService', () => {
     };
     TestBed.configureTestingModule({
       providers: [OfficeService, { provide: HttpClient, useValue: httpSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     service = TestBed.inject(OfficeService);
   });

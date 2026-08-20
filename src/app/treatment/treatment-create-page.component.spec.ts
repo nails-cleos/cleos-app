@@ -42,6 +42,9 @@ describe('TreatmentCreatePageComponent', () => {
           useValue: { back: vi.fn().mockName('back') },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
 

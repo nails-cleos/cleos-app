@@ -230,6 +230,9 @@ describe('NavComponent', () => {
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
         { provide: GLOBAL_FEEDBACK_SOURCE, useValue: [feedbackSourceMock] },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const router = TestBed.inject(Router);

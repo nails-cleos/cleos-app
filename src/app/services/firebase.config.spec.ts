@@ -11,6 +11,9 @@ describe('FirebaseSdkService', () => {
 
     TestBed.configureTestingModule({
       providers: [FirebaseSdkService],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     service = TestBed.inject(FirebaseSdkService);
