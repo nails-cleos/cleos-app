@@ -71,6 +71,10 @@ export const DocumentStore = signalStore(
         patchState(store, { response: undefined });
       },
 
+      clearBlob(): void {
+        this.clearResponse();
+      },
+
       clearError(): void {
         patchState(store, { error: undefined, subErrors: undefined });
       },

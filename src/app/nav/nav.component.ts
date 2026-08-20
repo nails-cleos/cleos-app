@@ -272,6 +272,7 @@ export class NavComponent {
         a.click();
 
         URL.revokeObjectURL(url);
+        this.feedbackResponse()?.source?.clearBlob?.();
       }
 
       const message = response.messageKey
@@ -283,7 +284,15 @@ export class NavComponent {
 
       if (message) {
         const options = this.getToastOptions(response);
-        this.toastService.show(message, response.toastType, 5000, options);
+        const toast = this.toastService.show(
+          message,
+          response.toastType,
+          5000,
+          options,
+        );
+        toast.onDismiss().subscribe(() => {
+          this.feedbackResponse()?.source.clearResponse();
+        });
         if (response.reload) {
           this.navigationService.reload();
         }
