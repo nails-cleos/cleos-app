@@ -102,6 +102,9 @@ describe('ToastService', () => {
           useValue: breakpointObserverSpy,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     service = TestBed.inject(ToastService);

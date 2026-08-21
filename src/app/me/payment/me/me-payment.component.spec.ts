@@ -74,6 +74,9 @@ describe('MePaymentComponent', () => {
         provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(MePaymentComponent);

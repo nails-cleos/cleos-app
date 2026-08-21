@@ -171,6 +171,9 @@ describe('ReservationCompleteComponent', () => {
         { provide: AdditionalStore, useValue: additionalStoreSpy },
         { provide: PaymentStore, useValue: paymentStoreSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);
@@ -451,20 +454,19 @@ describe('ReservationCompleteComponent', () => {
 
     it('should not complete reservation when dialog cancels', () => {
       component.isValid = false;
+
       const mockDialogRef = {
         afterClosed: () => of(false),
       };
+
       const dialogSpyInstance = vi
         .spyOn(component['dialog'], 'open')
-        .mockReturnValue(undefined as any);
-      dialogSpyInstance.mockReturnValue(mockDialogRef as any);
+        .mockReturnValue(mockDialogRef as any);
 
       component.complete();
 
-      setTimeout(
-        () => expect(reservationStoreSpy.complete).not.toHaveBeenCalled(),
-        100,
-      );
+      expect(dialogSpyInstance).toHaveBeenCalled();
+      expect(reservationStoreSpy.complete).not.toHaveBeenCalled();
     });
 
     it('should complete reservation directly when isValid is true', () => {
@@ -648,5 +650,68 @@ describe('ReservationCompleteComponent', () => {
     component.totalTime.set('-01:00');
     fixture.detectChanges();
     expect(component.isValidTime()).toBe(false);
+  });
+
+  it('should use treatment key when key is a string', () => {
+    reservationStoreSpy.selected.set(mockReservation);
+    fixture.detectChanges();
+
+    component.getForm.treatment.setValue({
+      key: 'treatment-key',
+      id: 123,
+    } as any);
+
+    component.complete();
+
+    expect(reservationStoreSpy.complete).toHaveBeenCalledWith(
+      mockReservation.id,
+      expect.objectContaining({
+        treatmentId: 'treatment-key',
+      }),
+      false,
+      expect.any(Date),
+    );
+  });
+
+  it('should use treatment id when key is not a string and id is a string', () => {
+    reservationStoreSpy.selected.set(mockReservation);
+    fixture.detectChanges();
+
+    component.getForm.treatment.setValue({
+      key: 123,
+      id: 'treatment-id',
+    } as any);
+
+    component.complete();
+
+    expect(reservationStoreSpy.complete).toHaveBeenCalledWith(
+      mockReservation.id,
+      expect.objectContaining({
+        treatmentId: 'treatment-id',
+      }),
+      false,
+      expect.any(Date),
+    );
+  });
+
+  it('should set treatmentId to undefined when key and id are not strings', () => {
+    reservationStoreSpy.selected.set(mockReservation);
+    fixture.detectChanges();
+
+    component.getForm.treatment.setValue({
+      key: 123,
+      id: 456,
+    } as any);
+
+    component.complete();
+
+    expect(reservationStoreSpy.complete).toHaveBeenCalledWith(
+      mockReservation.id,
+      expect.objectContaining({
+        treatmentId: undefined,
+      }),
+      false,
+      expect.any(Date),
+    );
   });
 });

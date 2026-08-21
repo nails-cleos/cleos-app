@@ -89,6 +89,9 @@ describe('ProfileComponent', () => {
         provideHttpClientTesting(),
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     })
       .overrideComponent(ProfileComponent, {
         remove: { imports: [GoogleMapComponent] },

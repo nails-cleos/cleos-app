@@ -154,6 +154,9 @@ describe('ExpenseComponent', () => {
         { provide: AwsStore, useValue: awsStoreSpy },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

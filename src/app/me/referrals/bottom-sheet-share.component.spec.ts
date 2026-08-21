@@ -26,6 +26,9 @@ describe('BottomSheetShareComponent', () => {
         provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

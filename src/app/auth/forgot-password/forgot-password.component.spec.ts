@@ -80,6 +80,9 @@ describe('ForgotPasswordComponent', () => {
         { provide: ToastService, useValue: toastServiceSpy },
         { provide: FirebaseService, useValue: firebaseServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

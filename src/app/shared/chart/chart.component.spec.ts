@@ -41,6 +41,9 @@ describe('ChartComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ChartComponent);

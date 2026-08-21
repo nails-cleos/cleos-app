@@ -274,6 +274,9 @@ describe('InvoiceListComponent', () => {
         { provide: PaymentService, useValue: paymentServiceSpy },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(InvoiceListComponent);

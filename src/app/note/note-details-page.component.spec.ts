@@ -83,6 +83,9 @@ describe('NoteDetailsPageComponent', () => {
         { provide: UserStore, useValue: userStoreSpy },
         { provide: MatDialog, useValue: dialogSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(NoteDetailsPageComponent);

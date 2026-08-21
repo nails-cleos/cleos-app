@@ -33,6 +33,9 @@ describe('BottomSheetBookAppointmentComponent', () => {
         provideHttpClient(withXhr()),
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

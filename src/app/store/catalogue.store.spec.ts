@@ -46,6 +46,9 @@ describe('CatalogueStore', () => {
         { provide: CatalogueService, useValue: catalogueServiceSpy },
         { provide: TreatmentService, useValue: treatmentServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(CatalogueStore);

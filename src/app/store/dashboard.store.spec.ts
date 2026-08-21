@@ -71,6 +71,9 @@ describe('DashboardStore', () => {
           useValue: router,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(DashboardStore);

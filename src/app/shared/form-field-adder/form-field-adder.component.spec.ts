@@ -36,6 +36,9 @@ describe('FormFieldAdderComponent', () => {
     await TestBed.configureTestingModule({
       imports: [FormFieldAdderComponent],
       providers: [provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(FormFieldAdderComponent);

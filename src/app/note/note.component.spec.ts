@@ -88,6 +88,9 @@ describe('NoteComponent', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const translateService = TestBed.inject(TranslateService);

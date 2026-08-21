@@ -97,6 +97,9 @@ describe('AccountComponent', () => {
         { provide: AuthUserService, useValue: authUserServiceSpy },
         provideRouter([]),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(AccountComponent);

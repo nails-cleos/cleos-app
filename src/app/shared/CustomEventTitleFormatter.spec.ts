@@ -9,6 +9,9 @@ describe('CustomEventTitleFormatter', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     formatter = TestBed.runInInjectionContext(

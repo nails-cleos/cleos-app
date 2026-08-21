@@ -67,6 +67,9 @@ describe('TimepickerDirective', () => {
     await TestBed.configureTestingModule({
       imports: [HostComponent],
       providers: [{ provide: MatDialog, useValue: matDialogSpy }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(HostComponent);

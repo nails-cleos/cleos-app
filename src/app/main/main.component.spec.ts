@@ -126,6 +126,9 @@ describe('MainComponent', () => {
         provideHttpClientTesting(),
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     translateService = TestBed.inject(TranslateService);

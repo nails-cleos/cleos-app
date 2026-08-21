@@ -37,6 +37,9 @@ describe('MonthPeriodAdapter', () => {
           useValue: dateAdapterMock,
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     adapter = TestBed.inject(MonthPeriodAdapter);

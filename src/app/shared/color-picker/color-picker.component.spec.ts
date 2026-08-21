@@ -17,6 +17,9 @@ describe('ColorPickerComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ColorPickerComponent],
       providers: [{ provide: MatIconRegistry, useValue: matIconRegistryStub }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ColorPickerComponent);

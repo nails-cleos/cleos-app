@@ -62,6 +62,9 @@ describe('CatalogueComponent', () => {
         { provide: TreatmentStore, useValue: treatmentStoreSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CatalogueComponent);

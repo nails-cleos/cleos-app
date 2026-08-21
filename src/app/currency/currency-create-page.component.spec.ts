@@ -34,6 +34,9 @@ describe('CurrencyCreatePageComponent', () => {
         { provide: CurrencyStore, useValue: currencyStoreSpy },
         { provide: DateAdapter, useValue: { setLocale: vi.fn() } },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CurrencyCreatePageComponent);

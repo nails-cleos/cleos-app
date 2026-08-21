@@ -31,6 +31,9 @@ describe('PromptComponentComponent', () => {
           useValue: { data: { mobileType: 'iOS' } },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PromptComponent);

@@ -17,6 +17,9 @@ describe('FabMenuComponent', () => {
     await TestBed.configureTestingModule({
       imports: [FabMenuComponent],
       providers: [{ provide: ElementRef, useValue: mockElementRef }],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(FabMenuComponent);

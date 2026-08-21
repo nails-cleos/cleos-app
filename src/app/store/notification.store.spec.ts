@@ -45,6 +45,9 @@ describe('NotificationStore', () => {
         { provide: NotificationService, useValue: notificationServiceSpy },
         { provide: Router, useValue: routerSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(NotificationStore);

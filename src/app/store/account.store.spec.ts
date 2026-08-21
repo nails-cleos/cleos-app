@@ -36,6 +36,9 @@ describe('AccountStore', () => {
         AccountStore,
         { provide: AccountService, useValue: accountServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(AccountStore);

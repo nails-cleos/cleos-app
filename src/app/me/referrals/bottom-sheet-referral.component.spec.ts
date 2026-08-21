@@ -24,6 +24,9 @@ describe('BottomSheetReferralComponent', () => {
         provideTranslateService(),
         { provide: MAT_BOTTOM_SHEET_DATA, useValue: mockData },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(BottomSheetReferralComponent);

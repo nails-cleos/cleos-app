@@ -35,6 +35,9 @@ describe('UpdateTrackingDialogComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: mockTimestamps },
         provideAppDateAdapter(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     fixture = TestBed.createComponent(UpdateTrackingDialogComponent);

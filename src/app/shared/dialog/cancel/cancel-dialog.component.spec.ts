@@ -26,6 +26,9 @@ describe('CancelDialogComponent', () => {
         { provide: MAT_DIALOG_DATA, useValue: { options: [] } },
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(CancelDialogComponent);
@@ -85,6 +88,9 @@ describe('CancelDialogComponent', () => {
           },
         },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const singleFixture = TestBed.createComponent(CancelDialogComponent);
@@ -114,6 +120,9 @@ describe('CancelDialogComponent', () => {
         },
         provideAppIcons(),
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     const optionsFixture = TestBed.createComponent(CancelDialogComponent);

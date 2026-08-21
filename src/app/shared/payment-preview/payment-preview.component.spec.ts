@@ -30,6 +30,9 @@ describe('PaymentPreviewComponent', () => {
         provideTranslateService(),
         { provide: MatIconRegistry, useValue: matIconRegistryStub },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentPreviewComponent);

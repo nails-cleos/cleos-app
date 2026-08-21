@@ -53,6 +53,9 @@ describe('PaymentStore', () => {
         { provide: PaymentService, useValue: paymentService },
         { provide: TranslateService, useValue: translateSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
     store = TestBed.inject(PaymentStore);
   });

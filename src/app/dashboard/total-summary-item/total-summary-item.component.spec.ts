@@ -17,6 +17,9 @@ describe('TotalSummaryItemComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TotalSummaryItemComponent],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryItemComponent);

@@ -30,6 +30,9 @@ describe('NoteStore', () => {
         NoteStore,
         { provide: NoteService, useValue: noteServiceSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     });
 
     store = TestBed.inject(NoteStore);

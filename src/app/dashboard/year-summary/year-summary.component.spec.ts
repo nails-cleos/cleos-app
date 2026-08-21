@@ -109,6 +109,9 @@ describe('YearSummaryComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
       ],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(YearSummaryComponent);

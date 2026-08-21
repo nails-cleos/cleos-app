@@ -41,6 +41,9 @@ describe('BankComponent', () => {
     await TestBed.configureTestingModule({
       imports: [BankComponent],
       providers: [provideAppIcons(), provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(BankComponent);

@@ -49,6 +49,9 @@ describe('PaymentOptionSelectComponent', () => {
     await TestBed.configureTestingModule({
       imports: [PaymentOptionSelectComponent],
       providers: [provideAppIcons(), provideTranslateService()],
+      teardown: {
+        destroyAfterEach: true,
+      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(PaymentOptionSelectComponent);
