@@ -89,9 +89,6 @@ describe('PaymentService', () => {
     };
     TestBed.configureTestingModule({
       providers: [PaymentService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(PaymentService);
   });

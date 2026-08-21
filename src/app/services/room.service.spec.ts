@@ -22,9 +22,6 @@ describe('RoomService', () => {
     };
     TestBed.configureTestingModule({
       providers: [RoomService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(RoomService);
   });

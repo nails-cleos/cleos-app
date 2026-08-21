@@ -40,7 +40,6 @@ import { NavigationService } from '@app/services/navigation.service';
     MatButton,
     TranslatePipe,
     CurrencyPipe,
-    BackButtonDirective,
     MatCard,
     MatCardContent,
     ErrorComponent,

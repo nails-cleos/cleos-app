@@ -116,8 +116,18 @@
         "ADD": "Prijs toevoegen",
         "ALL": "Alles",
         "SELECTED": "Geselecteerd",
+        "PRICE_LIST": {
+          "TITLE": "Prijslijst",
+          "CURRENCY": "Valuta",
+          "ORDER": "Volgorde",
+          "NAME": "Naam",
+          "PRICE": "Prijs",
+          "ROOM": "Ruimte",
+          "TREATMENT_LIST": "Behandelingen",
+          "ADDITIONAL_LIST": "Aanvullende Diensten"
+        },
         "ADDITIONAL": {
-          "TITLE": "Extra"
+          "TITLE": "Aanvullende dienst"
         },
         "TREATMENT": {
           "TITLE": "Behandeling"

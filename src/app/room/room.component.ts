@@ -130,7 +130,6 @@ export interface IIcon {
     MatError,
     MatAutocompleteTrigger,
     MatPrefix,
-    BackButtonDirective,
     AvailabilityComponent,
     GoogleMapComponent,
     BackButtonDirective,

@@ -109,9 +109,6 @@ describe('ReservationStore', () => {
         { provide: DashboardStore, useValue: dashboardSpy },
         { provide: TranslateService, useValue: translateSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(ReservationStore);

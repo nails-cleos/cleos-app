@@ -75,9 +75,6 @@ describe('AuthUserService', () => {
         AuthUserService,
         { provide: NgcCookieConsentService, useValue: cookieConsentService },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(AuthUserService);

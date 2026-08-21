@@ -1,5 +1,6 @@
 /* eslint-disable @angular-eslint/component-selector */
 import { vi } from 'vitest';
+import { Pipe, PipeTransform } from '@angular/core';
 
 vi.mock('firebase/app', () => ({
   initializeApp: vi.fn(() => ({
@@ -144,3 +145,13 @@ vi.mock('ngx-material-intl-tel-input', async () => {
     NgxMaterialIntlTelInputComponent: MockNgxMaterialIntlTelInputComponent,
   };
 });
+
+@Pipe({
+  name: 'translate',
+  standalone: true,
+})
+export class MockTranslatePipe implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}

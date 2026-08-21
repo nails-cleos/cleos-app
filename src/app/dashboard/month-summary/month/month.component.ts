@@ -15,7 +15,7 @@ import { NavigationService } from '@app/services/navigation.service';
   selector: 'app-month',
   templateUrl: './month.component.html',
   styleUrls: ['./month.component.scss'],
-  imports: [TranslatePipe, CurrencyPipe, TranslatePipe, CurrencyPipe],
+  imports: [TranslatePipe, CurrencyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonthComponent {

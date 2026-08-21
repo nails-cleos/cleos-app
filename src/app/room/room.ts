@@ -32,6 +32,7 @@ export interface IRoom {
 }
 
 export interface IRoomService {
+  roomName: string;
   currency: ICurrencyAll;
   treatments: ITreatmentAll[];
   selectedTreatments: ITreatmentAll[];
@@ -240,4 +241,15 @@ export class ServicePrice implements IServicePrice {
     this.value = value;
     this.type = type;
   }
+}
+
+export interface PriceListTranslations {
+  TITLE: string;
+  CURRENCY: string;
+  ORDER: string;
+  NAME: string;
+  PRICE: string;
+  ROOM: string;
+  TREATMENT_LIST: string;
+  ADDITIONAL_LIST: string;
 }

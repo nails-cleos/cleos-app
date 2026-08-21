@@ -16,20 +16,30 @@ import {
 } from '@angular/cdk/drag-drop';
 import { MatDialog } from '@angular/material/dialog';
 
-import { IService, IServicePrice, ServicePrice, ServiceType } from '../../room';
+import {
+  IService,
+  IServicePrice,
+  PriceListTranslations,
+  ServicePrice,
+  ServiceType,
+} from '../../room';
 import { IGroupService } from '@app/treatment/treatment';
 import {
   createTreatmentGroupService,
   executeDialogNoWidth,
+  toTitleCaseUnderscore,
 } from '@app/util/helper';
 import { CurrencySymbolPipe } from '@app/pipes/currency-symbol.pipe';
 import { BackButtonDirective } from '@app/directives/back-button.directive';
 import { PriceDialogComponent } from './price-dialog.component';
 import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { KeyValuePipe } from '@angular/common';
 import { RoomStore } from '@app/store/room.store';
+import { DocumentStore } from '@app/store/document.store';
+import { createPriceWorkbook } from '@app/util/report';
+import { invoiceTitle } from '@app/util/dates';
 
 @Component({
   selector: 'app-add-service',
@@ -40,8 +50,6 @@ import { RoomStore } from '@app/store/room.store';
     MatButton,
     TranslatePipe,
     KeyValuePipe,
-    BackButtonDirective,
-    CurrencySymbolPipe,
     CurrencySymbolPipe,
     BackButtonDirective,
     CdkDropList,
@@ -53,7 +61,9 @@ export class AddServiceComponent {
   id = input<string>();
 
   private readonly roomStore = inject(RoomStore);
+  private readonly documentStore = inject(DocumentStore);
   private readonly dialog = inject(MatDialog);
+  private readonly translateService = inject(TranslateService);
 
   private servicesSignal = this.roomStore.services;
   private responseSignal = this.roomStore.response;
@@ -327,5 +337,26 @@ export class AddServiceComponent {
     } else {
       commit();
     }
+  }
+
+  exportExcel() {
+    const services = this.servicesSignal();
+    if (!services?.currency) {
+      return;
+    }
+    const priceListTranslate: PriceListTranslations =
+      this.translateService.instant('ROOM.ME.SERVICES.PRICE_LIST');
+    const workbook = createPriceWorkbook(
+      services.roomName,
+      services.currency,
+      services.selectedTreatments,
+      services.selectedAdditionalList,
+      priceListTranslate,
+    );
+
+    this.documentStore.exportExcel(
+      workbook,
+      toTitleCaseUnderscore(`${priceListTranslate.TITLE}_${invoiceTitle()}`),
+    );
   }
 }

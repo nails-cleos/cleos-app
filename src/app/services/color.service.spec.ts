@@ -22,9 +22,6 @@ describe('ColorService', () => {
     };
     TestBed.configureTestingModule({
       providers: [ColorService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(ColorService);
   });

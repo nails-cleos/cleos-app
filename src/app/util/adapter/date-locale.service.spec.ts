@@ -17,9 +17,6 @@ describe('DateLocaleService', () => {
         DateLocaleService,
         { provide: DateAdapter, useValue: dateAdapterMock },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(DateLocaleService);

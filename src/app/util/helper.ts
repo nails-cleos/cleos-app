@@ -739,3 +739,11 @@ export const getTimeZoneFromRoom = (
 export const getList = <T extends { id: string }>(list?: T[], id?: string) => {
   return list?.length === 1 ? list[0] : list?.find((o: T) => o.id === id);
 };
+
+export const toTitleCaseUnderscore = (value: string): string => {
+  return value
+    .trim()
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join('_');
+};

@@ -86,7 +86,6 @@ import { NavigationService } from '@app/services/navigation.service';
     BackButtonDirective,
     NgxMaterialIntlTelInputComponent,
     GoogleMapComponent,
-    BackButtonDirective,
     NgIcon,
     ColorPickerComponent,
     UpperCasePipe,

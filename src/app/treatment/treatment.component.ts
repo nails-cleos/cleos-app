@@ -91,7 +91,6 @@ import { NavigationService } from '../services/navigation.service';
     MatAutocompleteTrigger,
     MatPrefix,
     BackButtonDirective,
-    BackButtonDirective,
     MatHint,
     MatChipGrid,
     MatChipRow,

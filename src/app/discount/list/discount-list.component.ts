@@ -68,7 +68,6 @@ import { NavigationService } from '@app/services/navigation.service';
     TranslatePipe,
     DecimalPipe,
     RouterLink,
-    MatIcon,
     MatTooltip,
     MatTable,
     MatSort,

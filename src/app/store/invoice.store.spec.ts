@@ -24,9 +24,6 @@ describe('InvoiceStore', () => {
         InvoiceStore,
         { provide: InvoiceService, useValue: invoiceServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(InvoiceStore);

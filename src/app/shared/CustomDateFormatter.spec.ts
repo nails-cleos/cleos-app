@@ -14,9 +14,6 @@ describe('CustomDateFormatter', () => {
         CustomDateFormatter,
         { provide: DateAdapter, useClass: NativeDateAdapter },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     formatter = TestBed.inject(CustomDateFormatter);

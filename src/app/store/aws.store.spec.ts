@@ -25,9 +25,6 @@ describe('AwsStore', () => {
           useValue: awsLambdaServiceSpy,
         },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(AwsStore);

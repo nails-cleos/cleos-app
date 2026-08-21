@@ -74,7 +74,6 @@ import PlaceGeometry = google.maps.places.PlaceGeometry;
     TranslatePipe,
     MatError,
     MatPrefix,
-    BackButtonDirective,
     NgxMaterialIntlTelInputComponent,
     GoogleMapComponent,
     BackButtonDirective,

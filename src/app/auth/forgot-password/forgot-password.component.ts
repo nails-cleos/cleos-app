@@ -44,7 +44,6 @@ type ForgotPasswordForm = {
     TranslatePipe,
     MatError,
     BackButtonDirective,
-    BackButtonDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

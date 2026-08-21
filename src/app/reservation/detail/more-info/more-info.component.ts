@@ -51,7 +51,6 @@ import { ReservationStore } from '@app/store/reservation.store';
   templateUrl: './more-info.component.html',
   styleUrls: ['./more-info.component.scss'],
   imports: [
-    TimeDetailPipe,
     MatIcon,
     MatIconButton,
     MatButton,
@@ -74,7 +73,6 @@ import { ReservationStore } from '@app/store/reservation.store';
     MatRow,
     MatFooterRow,
     MatFooterRowDef,
-    BackButtonDirective,
     TimeDetailPipe,
     RatingComponent,
     BackButtonDirective,

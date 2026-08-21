@@ -38,7 +38,6 @@ import {
   getTimeZoneFromRoom,
 } from '@app/util/helper';
 import { createYearlyWorkbook } from '@app/util/report';
-import fs from 'file-saver';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { YearComponent } from './year/year.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
@@ -55,6 +54,7 @@ import { KeyValuePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { DashboardStore } from '@app/store/dashboard.store';
 import { NavigationService } from '@app/services/navigation.service';
+import { DocumentStore } from '@app/store/document.store';
 
 type YearSummaryForm = {
   date: FormControl<Date>;
@@ -91,6 +91,7 @@ export class YearSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly translateService: TranslateService =
     inject(TranslateService);
+  private readonly documentStore = inject(DocumentStore);
   private readonly dashboardStore = inject(DashboardStore);
   private readonly navigationService: NavigationService =
     inject(NavigationService);
@@ -421,28 +422,21 @@ export class YearSummaryComponent {
       ),
     }));
     if (sortedSheetData.length) {
+      const now = getNowTimeZone(this.timeZone());
       const workbook = createYearlyWorkbook(
         sortedSheetData,
-        this.getForm.date.value || getNowTimeZone(this.timeZone()),
+        this.getForm.date.value || now,
         currencySymbol(this.currencySignal()),
         this.timeZone(),
         this.translateService,
         this.env,
       );
-
-      workbook.creator = this.userName() || '';
-      workbook.created = getNowTimeZone(this.timeZone());
-
-      // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content: any) => {
-        const blob = new Blob([content], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        });
-        fs.saveAs(
-          blob,
-          `Report_${this.getForm.date.value?.getFullYear()}.xlsx`,
-        );
-      });
+      this.documentStore.exportExcel(
+        workbook,
+        `Report_${this.getForm.date.value?.getFullYear()}`,
+        this.userName() || '',
+        now,
+      );
     }
   };
 
@@ -455,6 +449,6 @@ export class YearSummaryComponent {
 
   private getExportData = (year: number): void => {
     this.isExportLoading.set(true);
-    this.dashboardStore.exportYearSummary(year);
+    this.dashboardStore.getExportDataYearSummary(year);
   };
 }

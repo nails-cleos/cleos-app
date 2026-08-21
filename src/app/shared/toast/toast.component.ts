@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { NgClass, TitleCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -17,7 +17,13 @@ export const TOAST_ACTION = new InjectionToken<Subject<void>>('TOAST_ACTION');
 
 @Component({
   selector: 'app-toast',
-  imports: [CommonModule, MatIconModule, MatButtonModule, TranslatePipe],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    TranslatePipe,
+    TitleCasePipe,
+    NgClass,
+  ],
   templateUrl: './toast.component.html',
   styleUrl: './toast.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

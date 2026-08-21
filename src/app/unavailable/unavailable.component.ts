@@ -96,7 +96,6 @@ import { UserStore } from '../store/user.store';
     MatAutocompleteTrigger,
     MatPrefix,
     BackButtonDirective,
-    BackButtonDirective,
     MatHint,
     MatCheckbox,
     TimepickerDirective,

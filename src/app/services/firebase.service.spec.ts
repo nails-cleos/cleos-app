@@ -119,9 +119,6 @@ describe('FirebaseService', () => {
           useValue: sdkSpy,
         },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(FirebaseService);

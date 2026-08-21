@@ -22,9 +22,6 @@ describe('TrackingService', () => {
     };
     TestBed.configureTestingModule({
       providers: [TrackingService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(TrackingService);
   });

@@ -88,7 +88,6 @@ import { UserStore } from '@app/store/user.store';
     MatAutocompleteTrigger,
     MatPrefix,
     BackButtonDirective,
-    BackButtonDirective,
     TimepickerDirective,
     TimepickerComponent,
   ],
