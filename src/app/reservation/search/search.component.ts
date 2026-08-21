@@ -105,7 +105,6 @@ type SearchForm = {
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
   imports: [
-    TimeDetailPipe,
     MatFormField,
     MatLabel,
     MatInput,

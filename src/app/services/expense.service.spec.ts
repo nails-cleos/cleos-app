@@ -28,9 +28,6 @@ describe('ExpenseService', () => {
 
     TestBed.configureTestingModule({
       providers: [ExpenseService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(ExpenseService);

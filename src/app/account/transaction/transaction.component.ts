@@ -59,8 +59,6 @@ export type TransactionForm = {
     BankComponent,
     BackButtonDirective,
     BalanceComponent,
-    BackButtonDirective,
-    BankComponent,
     PaymentOptionSelectComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

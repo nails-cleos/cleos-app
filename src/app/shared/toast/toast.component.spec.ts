@@ -34,9 +34,6 @@ describe('ToastComponent', () => {
         { provide: TOAST_DISMISS, useValue: dismiss$ },
         { provide: TOAST_ACTION, useValue: action$ },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(ToastComponent);

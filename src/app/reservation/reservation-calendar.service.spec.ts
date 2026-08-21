@@ -41,9 +41,6 @@ describe('ReservationCalendarService', () => {
         ReservationCalendarService,
         { provide: TranslateService, useValue: translateSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(ReservationCalendarService);

@@ -532,7 +532,7 @@ export const monthTitle = (
     })
     .replace(/^\w/, (c) => c.toUpperCase());
 
-export const invoiceTitle = (date: Date): string =>
+export const invoiceTitle = (date: Date = getNowTimeZone()): string =>
   date.toLocaleDateString(DEFAULT_LOCALE, {
     year: 'numeric',
     month: '2-digit',

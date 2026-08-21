@@ -14,7 +14,7 @@ export type BottomSheetReferralData = {
   selector: 'app-bottom-sheet-referral',
   templateUrl: 'bottom-sheet-referral.component.html',
   styleUrls: ['./bottom-sheet-referral.component.scss'],
-  imports: [TranslatePipe, TranslatePipe, MatProgressBar, MatHint],
+  imports: [TranslatePipe, MatProgressBar, MatHint],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BottomSheetReferralComponent {

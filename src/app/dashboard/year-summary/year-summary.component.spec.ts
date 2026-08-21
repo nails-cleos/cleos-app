@@ -22,7 +22,6 @@ import {
   IMonthlySummarySale,
   ISummaryTotal,
 } from '../dashboard';
-import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { By } from '@angular/platform-browser';
@@ -31,6 +30,7 @@ import { DashboardStore } from '@app/store/dashboard.store';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { NavigationService } from '@app/services/navigation.service';
 import { provideTranslateService } from '@ngx-translate/core';
+import { DocumentStore } from '@app/store/document.store';
 
 describe('YearSummaryComponent', () => {
   let component: YearSummaryComponent;
@@ -45,9 +45,13 @@ describe('YearSummaryComponent', () => {
     yearSummaryMap: ReturnType<typeof signal>;
     yearExport: ReturnType<typeof signal>;
     getYearSummary: Mock;
-    exportYearSummary: Mock;
+    getExportDataYearSummary: Mock;
     clean: Mock;
   };
+  let documentStoreSpy: {
+    exportExcel: Mock;
+  };
+
   let authUserServiceSpy: Pick<AuthUserService, 'authUser'>;
   let activatedRouteSpy: {
     snapshot: {
@@ -59,7 +63,7 @@ describe('YearSummaryComponent', () => {
   let breakpointObserverSpy: Pick<BreakpointObserver, 'observe'> & {
     observe: ReturnType<typeof vi.fn>;
   };
-  let saveAsSpy: ReturnType<typeof vi.spyOn>;
+
   let breakpoint$: BehaviorSubject<any>;
 
   beforeEach(async () => {
@@ -71,9 +75,13 @@ describe('YearSummaryComponent', () => {
       yearSummaryMap: signal<any>(undefined),
       yearExport: signal<any>(undefined),
       getYearSummary: vi.fn().mockName('getYearSummary'),
-      exportYearSummary: vi.fn().mockName('exportYearSummary'),
+      getExportDataYearSummary: vi.fn().mockName('getExportDataYearSummary'),
       clean: vi.fn().mockName('clean'),
     };
+    documentStoreSpy = {
+      exportExcel: vi.fn().mockName('exportExcel'),
+    };
+
     breakpoint$ = new BehaviorSubject({
       matches: false,
       breakpoints: {
@@ -105,6 +113,7 @@ describe('YearSummaryComponent', () => {
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
+        { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
@@ -116,8 +125,6 @@ describe('YearSummaryComponent', () => {
 
     fixture = TestBed.createComponent(YearSummaryComponent);
     component = fixture.componentInstance;
-
-    saveAsSpy = vi.spyOn(fs, 'saveAs').mockImplementation(() => {});
   });
 
   afterEach(() => breakpoint$.complete());
@@ -138,11 +145,9 @@ describe('YearSummaryComponent', () => {
       component['sheetDataSignal'].set([mockMonthlyExport]);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component['exportToExcel']();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).toHaveBeenCalledTimes(1);
-      });
+      expect(documentStoreSpy.exportExcel).toHaveBeenCalledTimes(1);
 
       expect(component.sheetData.length).toBeGreaterThan(0);
     });
@@ -210,11 +215,9 @@ describe('YearSummaryComponent', () => {
       component.getForm.date.setValue(new Date(2024, 0, 1));
       fixture.detectChanges();
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component['exportToExcel']();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).toHaveBeenCalledTimes(1);
-      });
+      expect(documentStoreSpy.exportExcel).toHaveBeenCalledTimes(1);
 
       const sheetData = component.sheetData;
       expect(sheetData[0].saleSummary[0].timestamp).toBe(200);
@@ -227,16 +230,14 @@ describe('YearSummaryComponent', () => {
       component['sheetDataSignal'].set([]);
       component.getForm.date.setValue(new Date(2024, 0, 1));
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component['exportToExcel']();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).not.toHaveBeenCalled();
-      });
+      expect(documentStoreSpy.exportExcel).not.toHaveBeenCalled();
 
       expect(component.sheetData.length).toBe(0);
     });
 
-    it('should call saveAs when exporting to excel', async () => {
+    it('should call documentStoreSpy when exporting to excel', async () => {
       const mockMonthlyExport = {
         month: 1,
         saleSummary: [],
@@ -248,21 +249,14 @@ describe('YearSummaryComponent', () => {
       const date = new Date(2024, 0, 1);
       component.getForm.date.setValue(date);
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component['exportToExcel']();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).toHaveBeenCalledTimes(1);
-      });
+      expect(documentStoreSpy.exportExcel).toHaveBeenCalledTimes(1);
 
-      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall;
+      const lastCallArgs = vi.mocked(documentStoreSpy.exportExcel).mock
+        .lastCall;
       const fileName = lastCallArgs?.[1];
-      expect(fileName).toBe('Report_2024.xlsx');
-
-      const blob = lastCallArgs?.[0];
-      expect(blob instanceof Blob).toBe(true);
-      expect(blob.type).toBe(
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      );
+      expect(fileName).toBe('Report_2024');
     });
   });
 

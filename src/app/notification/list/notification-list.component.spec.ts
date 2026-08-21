@@ -88,9 +88,6 @@ describe('NotificationListComponent', () => {
         { provide: Router, useValue: routerSpy },
         { provide: NavigationService, useValue: navigationServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     }).compileComponents();
 
     fixture = TestBed.createComponent(NotificationListComponent);

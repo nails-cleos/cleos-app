@@ -64,7 +64,6 @@ import { NavigationService } from '@app/services/navigation.service';
   templateUrl: './unavailable-list.component.html',
   styleUrls: ['./unavailable-list.component.scss'],
   imports: [
-    TimeDetailPipe,
     MatIcon,
     MatList,
     MatListItem,

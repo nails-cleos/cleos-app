@@ -3,7 +3,7 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { DocumentTypeEnum, IDocument } from '../document/document';
 import { Pagination } from '../interfaces/pagination';
 import { DocumentService } from '../services/document.service';
-import { getDateFormat } from '../util/dates';
+import { getDateFormat, getNowTimeZone } from '../util/dates';
 import {
   cleanCrudCreate,
   cleanCrudDelete,
@@ -14,6 +14,7 @@ import {
 import { HttpErrorResponse } from '@angular/common/http';
 import { PageRequest } from '../interfaces/common';
 import type { Subscription } from 'rxjs';
+import { Workbook } from 'exceljs';
 
 type DocumentStoreState = StoreState<Pagination<IDocument>, IDocument>;
 
@@ -193,6 +194,28 @@ export const DocumentStore = signalStore(
               }),
             error: patchError,
           });
+      },
+
+      async exportExcel(
+        workbook: Workbook,
+        name: string,
+        creator?: string,
+        date?: Date,
+      ): Promise<void> {
+        patchState(store, { isLoading: true, response: undefined });
+
+        workbook.creator = creator || '';
+        workbook.created = date || getNowTimeZone();
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        const fileName = `${name}.xlsx`;
+        patchState(store, {
+          response: { blob, fileName },
+          isLoading: false,
+        });
       },
     };
   }),

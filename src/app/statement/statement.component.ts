@@ -78,7 +78,6 @@ type StatementForm = {
     MatError,
     MatAutocompleteTrigger,
     BackButtonDirective,
-    BackButtonDirective,
     FileDropComponent,
   ],
   providers: [...provideYearMonthDateAdapter()],

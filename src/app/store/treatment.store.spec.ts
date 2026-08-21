@@ -55,9 +55,6 @@ describe('TreatmentStore', () => {
         { provide: TreatmentService, useValue: treatmentServiceSpy },
         { provide: ColorService, useValue: colorServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(TreatmentStore);

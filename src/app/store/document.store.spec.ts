@@ -6,6 +6,7 @@ import { of, throwError } from 'rxjs';
 import { DocumentStore } from './document.store';
 import { DocumentService } from '../services/document.service';
 import { DocumentTypeEnum, IDocument } from '../document/document';
+import { Workbook } from 'exceljs';
 
 describe('DocumentStore', () => {
   let documentStore: InstanceType<typeof DocumentStore>;
@@ -35,9 +36,6 @@ describe('DocumentStore', () => {
         DocumentStore,
         { provide: DocumentService, useValue: documentServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     documentStore = TestBed.inject(DocumentStore);
@@ -255,5 +253,51 @@ describe('DocumentStore', () => {
 
     documentStore.clearError();
     expect(documentStore.error()).toBeUndefined();
+  });
+
+  it('should generate an excel blob and set the response', async () => {
+    const now = new Date();
+    const fileName = `Report_${now.getFullYear()}`;
+    const workbook = new Workbook();
+
+    documentStore.exportExcel(workbook, fileName, 'creator', now);
+
+    await vi.waitFor(() => {
+      expect(documentStore.response()).toBeDefined();
+    });
+
+    const response = documentStore.response();
+
+    expect(response?.fileName).toBe(`${fileName}.xlsx`);
+    expect(response?.blob).toBeInstanceOf(Blob);
+    expect(response?.blob?.type).toBe(
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+  });
+
+  it('should set workbook creator and created date', async () => {
+    const now = new Date();
+    const workbook = new Workbook();
+
+    documentStore.exportExcel(workbook, 'Report', 'creator', now);
+
+    expect(workbook.creator).toBe('creator');
+    expect(workbook.created).toBe(now);
+
+    await vi.waitFor(() => {
+      expect(documentStore.response()).toBeDefined();
+    });
+  });
+
+  it('should set loading state while exporting and clear it afterwards', async () => {
+    const workbook = new Workbook();
+
+    documentStore.exportExcel(workbook, 'Report', 'creator', new Date());
+
+    expect(documentStore.isLoading()).toBe(true);
+
+    await vi.waitFor(() => {
+      expect(documentStore.isLoading()).toBe(false);
+    });
   });
 });

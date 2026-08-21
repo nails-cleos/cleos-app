@@ -57,7 +57,6 @@ import { NavigationService } from '../services/navigation.service';
     MatError,
     MatAutocompleteTrigger,
     BackButtonDirective,
-    BackButtonDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

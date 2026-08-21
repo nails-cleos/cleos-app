@@ -91,7 +91,6 @@ import { ReservationStore } from '@app/store/reservation.store';
     MatPaginator,
     MatPrefix,
     UpcomingComponent,
-    TimeDetailPipe,
     ReservationIconPipe,
     ErrorComponent,
     TableSkeletonComponent,

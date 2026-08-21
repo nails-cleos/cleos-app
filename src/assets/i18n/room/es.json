@@ -116,6 +116,16 @@
         "ADD": "Agregar precio",
         "ALL": "Todos",
         "SELECTED": "Seleccionados",
+        "PRICE_LIST": {
+          "TITLE": "Lista de Precios",
+          "CURRENCY": "Moneda",
+          "ORDER": "Orden",
+          "NAME": "Nombre",
+          "PRICE": "Precio",
+          "ROOM": "Sala",
+          "TREATMENT_LIST": "Lista de Tratamientos",
+          "ADDITIONAL_LIST": "Lista de Adicionales"
+        },
         "ADDITIONAL": {
           "TITLE": "Adicionales"
         },

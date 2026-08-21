@@ -26,9 +26,6 @@ describe('DocumentService', () => {
     };
     TestBed.configureTestingModule({
       providers: [DocumentService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(DocumentService);
   });

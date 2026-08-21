@@ -29,7 +29,6 @@ import { PaymentStore } from '@app/store/payment.store';
     RouterLink,
     DatePipe,
     BackButtonDirective,
-    BackButtonDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

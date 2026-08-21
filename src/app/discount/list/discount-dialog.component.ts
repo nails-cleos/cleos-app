@@ -59,7 +59,6 @@ type DiscountDialogForm = {
     MatOption,
     MatIcon,
     MatButton,
-    TranslatePipe,
     MatAutocomplete,
     MatAutocompleteTrigger,
     TranslatePipe,

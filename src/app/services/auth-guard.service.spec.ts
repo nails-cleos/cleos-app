@@ -50,9 +50,6 @@ describe('authGuard', () => {
         { provide: AuthStore, useValue: authStoreSpy },
         { provide: ToastService, useValue: toastServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(PermissionsService);

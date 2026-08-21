@@ -31,9 +31,6 @@ describe('noopInterceptor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [{ provide: EnvService, useValue: envMock }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
   });
 

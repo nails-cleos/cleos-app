@@ -26,9 +26,6 @@ describe('loadingInterceptor', () => {
       providers: [
         { provide: LoadingOverlayService, useValue: loadingOverlayServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
   });
 

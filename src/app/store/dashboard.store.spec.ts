@@ -20,7 +20,7 @@ describe('DashboardStore', () => {
     getMonthlySummary: Mock;
     updateMonthlySummary: Mock;
     getYearSummary: Mock;
-    exportYearSummary: Mock;
+    getExportDataYearSummary: Mock;
     getQuarterSummary: Mock;
   };
 
@@ -43,7 +43,9 @@ describe('DashboardStore', () => {
         .fn()
         .mockName('DashboardService.updateMonthlySummary'),
       getYearSummary: vi.fn().mockName('DashboardService.getYearSummary'),
-      exportYearSummary: vi.fn().mockName('DashboardService.exportYearSummary'),
+      getExportDataYearSummary: vi
+        .fn()
+        .mockName('DashboardService.getExportDataYearSummary'),
       getQuarterSummary: vi.fn().mockName('DashboardService.getQuarterSummary'),
     };
 
@@ -71,9 +73,6 @@ describe('DashboardStore', () => {
           useValue: router,
         },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(DashboardStore);
@@ -290,9 +289,9 @@ describe('DashboardStore', () => {
     });
   });
 
-  describe('exportYearSummary', () => {
+  describe('getExportDataYearSummary', () => {
     it('should export year summary', () => {
-      dashboardService.exportYearSummary.mockReturnValue(
+      dashboardService.getExportDataYearSummary.mockReturnValue(
         of([
           {
             roomId: '1',
@@ -305,9 +304,11 @@ describe('DashboardStore', () => {
         ] as any),
       );
 
-      store.exportYearSummary(2025);
+      store.getExportDataYearSummary(2025);
 
-      expect(dashboardService.exportYearSummary).toHaveBeenCalledWith(2025);
+      expect(dashboardService.getExportDataYearSummary).toHaveBeenCalledWith(
+        2025,
+      );
 
       expect(store.yearExport()).toBeTruthy();
     });

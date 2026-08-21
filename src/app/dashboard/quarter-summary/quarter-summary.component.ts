@@ -38,7 +38,6 @@ import {
 } from '@app/util/helper';
 import { ICurrencyAll } from '@app/currency/currency';
 import { createQuarterSummary } from '@app/util/report';
-import fs from 'file-saver';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { QuarterComponent } from './quarter/quarter.component';
 import { TotalSummaryComponent } from '../total-summary/total-summary.component';
@@ -53,6 +52,7 @@ import { MatIcon } from '@angular/material/icon';
 import { KeyValuePipe } from '@angular/common';
 import { DashboardStore } from '@app/store/dashboard.store';
 import { NavigationService } from '@app/services/navigation.service';
+import { DocumentStore } from '@app/store/document.store';
 
 type QuarterSummaryForm = {
   selectedRoom: FormControl<ISummaryRoom | 'All' | undefined>;
@@ -89,6 +89,7 @@ type QuarterSummaryForm = {
 export class QuarterSummaryComponent {
   private readonly translateService: TranslateService =
     inject(TranslateService);
+  private readonly documentStore = inject(DocumentStore);
   private readonly dashboardStore = inject(DashboardStore);
   private readonly navigationService: NavigationService =
     inject(NavigationService);
@@ -325,16 +326,12 @@ export class QuarterSummaryComponent {
         this.translateService,
       );
 
-      workbook.creator = this.userName() || '';
-      workbook.created = getNowTimeZone();
-
-      // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content: any) => {
-        const blob = new Blob([content], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        });
-        fs.saveAs(blob, `Report_Q${quarter}_${year}.xlsx`);
-      });
+      this.documentStore.exportExcel(
+        workbook,
+        `Report_Q${quarter}_${year}`,
+        this.userName() || '',
+        now,
+      );
     }
   };
 

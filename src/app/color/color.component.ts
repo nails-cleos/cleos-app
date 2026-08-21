@@ -42,7 +42,6 @@ import { ColorStore } from '../store/color.store';
     TranslatePipe,
     MatError,
     BackButtonDirective,
-    BackButtonDirective,
     MatHint,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

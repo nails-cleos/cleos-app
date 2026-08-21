@@ -100,7 +100,6 @@ type ReservationCompleteForm = {
   templateUrl: './reservation-complete.component.html',
   styleUrls: ['./reservation-complete.component.scss'],
   imports: [
-    TimeDetailPipe,
     MatFormField,
     MatLabel,
     MatInput,
@@ -116,8 +115,6 @@ type ReservationCompleteForm = {
     MatError,
     MatAutocompleteTrigger,
     MatPrefix,
-    BackButtonDirective,
-    CurrencySymbolPipe,
     TimeDetailPipe,
     CurrencySymbolPipe,
     DurationTimePipe,
