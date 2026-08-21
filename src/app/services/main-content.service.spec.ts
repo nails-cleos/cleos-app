@@ -7,11 +7,7 @@ describe('MainContentService', () => {
   let service: MainContentService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      teardown: {
-        destroyAfterEach: true,
-      },
-    });
+    TestBed.configureTestingModule({});
     service = TestBed.inject(MainContentService);
   });
 

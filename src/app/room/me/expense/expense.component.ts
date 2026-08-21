@@ -85,7 +85,6 @@ type TotalsForm = {
   templateUrl: './expense.component.html',
   styleUrls: ['./expense.component.scss'],
   imports: [
-    TwoDigitsDirective,
     MatFormField,
     MatLabel,
     MatInput,
@@ -106,7 +105,6 @@ type TotalsForm = {
     MatAutocompleteTrigger,
     MatPrefix,
     MatSuffix,
-    BackButtonDirective,
     TwoDigitsDirective,
     BackButtonDirective,
     FileDropComponent,

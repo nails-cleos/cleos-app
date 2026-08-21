@@ -88,7 +88,6 @@ type ExpensesForm = {
   templateUrl: './expense-list.component.html',
   styleUrls: ['./expense-list.component.scss'],
   imports: [
-    TimeDetailPipe,
     MatFormField,
     MatLabel,
     MatInput,
@@ -124,7 +123,6 @@ type ExpensesForm = {
     MatFooterRow,
     MatFooterRowDef,
     MatPaginator,
-    CurrencySymbolPipe,
     TimeDetailPipe,
     MatSuffix,
     CurrencySymbolPipe,

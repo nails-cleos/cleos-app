@@ -36,7 +36,6 @@ import { NavigationService } from '@app/services/navigation.service';
     RouterLink,
     DatePipe,
     CurrencySymbolPipe,
-    CurrencySymbolPipe,
     PaymentPreviewComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

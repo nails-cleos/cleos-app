@@ -116,6 +116,16 @@
         "ADD": "Add price",
         "ALL": "All",
         "SELECTED": "Selected",
+        "PRICE_LIST": {
+          "TITLE": "Price List",
+          "CURRENCY": "Currency",
+          "ORDER": "Order",
+          "NAME": "Name",
+          "PRICE": "Price",
+          "ROOM": "Room",
+          "TREATMENT_LIST": "Treatment List",
+          "ADDITIONAL_LIST": "Additional List"
+        },
         "ADDITIONAL": {
           "TITLE": "Additional"
         },

@@ -89,9 +89,6 @@ describe('crud-signal-store', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [TestCrudApi, TestCrudStore],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(TestCrudStore);

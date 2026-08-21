@@ -47,9 +47,6 @@ describe('NotificationService', () => {
         NotificationService,
         { provide: HttpClient, useValue: httpSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(NotificationService);
   });

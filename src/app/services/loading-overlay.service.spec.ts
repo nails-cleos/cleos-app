@@ -8,9 +8,6 @@ describe('LoadingOverlayService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [LoadingOverlayService],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(LoadingOverlayService);

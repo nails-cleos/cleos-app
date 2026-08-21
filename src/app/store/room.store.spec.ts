@@ -47,9 +47,6 @@ describe('RoomStore', () => {
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: RoomService, useValue: roomServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(RoomStore);

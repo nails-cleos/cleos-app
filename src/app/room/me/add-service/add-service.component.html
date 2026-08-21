@@ -3,6 +3,21 @@
     <div class="app-detail-section-header">
       <div>
         <span class="app-surface-eyebrow">{{
+          'ROOM.ME.SERVICES.PRICE_LIST.TITLE' | translate
+        }}</span>
+      </div>
+    </div>
+    <div class="app-detail-actions">
+      <button mat-stroked-button type="button" (click)="exportExcel()">
+        <mat-icon>file_download</mat-icon>
+        <span>{{ 'COMMON.BUTTON.EXPORT' | translate }}</span>
+      </button>
+    </div>
+  </section>
+  <section class="app-surface-section">
+    <div class="app-detail-section-header">
+      <div>
+        <span class="app-surface-eyebrow">{{
           'ROOM.ME.SERVICES.ADDITIONAL.TITLE' | translate
         }}</span>
       </div>

@@ -74,7 +74,6 @@ import { TreatmentStore } from '../store/treatment.store';
     MatButton,
     MatIcon,
     SkeletonComponent,
-    SkeletonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -85,7 +85,7 @@ export const DashboardStore = signalStore(
       let getMonthlySummarySubscription: Subscription | undefined;
       let updateMonthlySummarySubscription: Subscription | undefined;
       let getYearSummarySubscription: Subscription | undefined;
-      let exportYearSummarySubscription: Subscription | undefined;
+      let getExportDataYearSummarySubscription: Subscription | undefined;
       let getQuarterSummarySubscription: Subscription | undefined;
 
       const cancelAll = (): void => {
@@ -96,7 +96,7 @@ export const DashboardStore = signalStore(
         getMonthlySummarySubscription?.unsubscribe();
         updateMonthlySummarySubscription?.unsubscribe();
         getYearSummarySubscription?.unsubscribe();
-        exportYearSummarySubscription?.unsubscribe();
+        getExportDataYearSummarySubscription?.unsubscribe();
         getQuarterSummarySubscription?.unsubscribe();
       };
 
@@ -235,12 +235,12 @@ export const DashboardStore = signalStore(
             });
         },
 
-        exportYearSummary(year: number): void {
-          exportYearSummarySubscription?.unsubscribe();
+        getExportDataYearSummary(year: number): void {
+          getExportDataYearSummarySubscription?.unsubscribe();
           patchState(store, { yearExport: undefined, isLoading: true });
 
-          exportYearSummarySubscription = dashboardService
-            .exportYearSummary(year)
+          getExportDataYearSummarySubscription = dashboardService
+            .getExportDataYearSummary(year)
             .subscribe({
               next: (yearExports) =>
                 patchState(store, {

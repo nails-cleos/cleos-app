@@ -32,9 +32,6 @@ describe('ExpenseStore', () => {
         ExpenseStore,
         { provide: ExpenseService, useValue: expenseServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(ExpenseStore);

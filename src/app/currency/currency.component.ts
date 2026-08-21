@@ -45,7 +45,6 @@ import { CurrencyStore } from '../store/currency.store';
     TranslatePipe,
     MatError,
     BackButtonDirective,
-    BackButtonDirective,
     MatSelectTrigger,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

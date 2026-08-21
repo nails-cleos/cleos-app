@@ -55,9 +55,6 @@ describe('errorInterceptor', () => {
         },
         { provide: AuthStore, useValue: authStoreSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
   });
 

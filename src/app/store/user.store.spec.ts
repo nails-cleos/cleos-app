@@ -104,9 +104,6 @@ describe('UserStore', () => {
         { provide: TranslateService, useValue: translateSpy },
         { provide: AuthStore, useValue: authStoreSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(UserStore);

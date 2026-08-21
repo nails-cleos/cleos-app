@@ -26,9 +26,6 @@ describe('SeoService', () => {
         { provide: Meta, useValue: metaSpy },
         { provide: Title, useValue: titleServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(SeoService);
   });

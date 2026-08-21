@@ -62,7 +62,6 @@ import { ReservationStore } from '@app/store/reservation.store';
     TimeDetailPipe,
     ReservationIconPipe,
     ErrorComponent,
-    TimeDetailPipe,
     MatIcon,
     MatList,
     MatListItem,

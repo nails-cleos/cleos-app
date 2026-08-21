@@ -59,7 +59,6 @@ export class ItemSorting implements ISorting {
     MatButton,
     TranslatePipe,
     BackButtonDirective,
-    BackButtonDirective,
     CdkDropList,
     CdkDrag,
     CdkDragPlaceholder,

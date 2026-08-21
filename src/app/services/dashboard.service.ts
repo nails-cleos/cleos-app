@@ -62,7 +62,7 @@ export class DashboardService {
   getYearSummary = (year: number): Observable<IYearRoomSummary[]> =>
     this.http.get<IYearRoomSummary[]>(toUrl(this.urlV1, 'years', `${year}`));
 
-  exportYearSummary = (year: number): Observable<IYearRoomExport[]> =>
+  getExportDataYearSummary = (year: number): Observable<IYearRoomExport[]> =>
     this.http.get<IYearRoomExport[]>(
       toUrl(this.urlV1, 'years', `${year}`, 'export'),
     );

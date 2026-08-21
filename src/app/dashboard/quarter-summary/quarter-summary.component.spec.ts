@@ -19,11 +19,11 @@ import {
   Total,
 } from '../dashboard';
 import { ICurrencyAll } from '@app/currency/currency';
-import fs from 'file-saver';
 import { signal } from '@angular/core';
 import { DEFAULT_LOCALE } from '@app/util/dates';
 import { DashboardStore } from '@app/store/dashboard.store';
 import { NavigationService } from '@app/services/navigation.service';
+import { DocumentStore } from '@app/store/document.store';
 
 describe('QuarterSummaryComponent', () => {
   let component: QuarterSummaryComponent;
@@ -36,6 +36,9 @@ describe('QuarterSummaryComponent', () => {
     quarterSummaryMap: ReturnType<typeof signal>;
     getQuarterSummary: Mock;
     clean: Mock;
+  };
+  let documentStoreSpy: {
+    exportExcel: Mock;
   };
 
   const authUserSignal = signal<IAuthUser>(initialAuthUser);
@@ -51,7 +54,6 @@ describe('QuarterSummaryComponent', () => {
       };
     };
   };
-  let saveAsSpy: ReturnType<typeof vi.spyOn>;
 
   const mockCurrency: ICurrencyAll = {
     id: 'USD',
@@ -139,6 +141,9 @@ describe('QuarterSummaryComponent', () => {
       getQuarterSummary: vi.fn().mockName('getQuarterSummary'),
       clean: vi.fn().mockName('clean'),
     };
+    documentStoreSpy = {
+      exportExcel: vi.fn().mockName('exportExcel'),
+    };
 
     const paramMapSpy = {
       get: vi.fn().mockName('ParamMap.get'),
@@ -167,6 +172,7 @@ describe('QuarterSummaryComponent', () => {
         provideTranslateService(),
         { provide: NavigationService, useValue: navigationServiceSpy },
         { provide: DashboardStore, useValue: dashboardStoreSpy },
+        { provide: DocumentStore, useValue: documentStoreSpy },
         { provide: AuthUserService, useValue: authUserServiceSpy },
         { provide: BreakpointObserver, useValue: breakpointObserverSpy },
         { provide: ActivatedRoute, useValue: activatedRouteSpy },
@@ -181,8 +187,6 @@ describe('QuarterSummaryComponent', () => {
     const translateService = TestBed.inject(TranslateService);
     translateService.use(DEFAULT_LOCALE);
     component = fixture.componentInstance;
-
-    saveAsSpy = vi.spyOn(fs, 'saveAs').mockImplementation(() => {});
   });
 
   it('should create', () => {
@@ -566,41 +570,30 @@ describe('QuarterSummaryComponent', () => {
     it('should not export when monthSummaries is empty', async () => {
       component.monthSummaries.set([]);
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component.exportQuarterSummary();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).not.toHaveBeenCalled();
-      });
+      expect(documentStoreSpy.exportExcel).not.toHaveBeenCalled();
     });
 
     it('should not export when monthSummaries is []', async () => {
       component.monthSummaries.set([]);
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component.exportQuarterSummary();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).not.toHaveBeenCalled();
-      });
+      expect(documentStoreSpy.exportExcel).not.toHaveBeenCalled();
     });
 
     it('should use current date when year is not set', async () => {
       component.year.set(2025);
 
-      saveAsSpy.mockClear();
+      documentStoreSpy.exportExcel.mockClear();
       component.exportQuarterSummary();
-      await vi.waitFor(() => {
-        expect(saveAsSpy).toHaveBeenCalledTimes(1);
-      });
+      expect(documentStoreSpy.exportExcel).toHaveBeenCalledTimes(1);
 
-      const lastCallArgs = vi.mocked(saveAsSpy).mock.lastCall;
+      const lastCallArgs = vi.mocked(documentStoreSpy.exportExcel).mock
+        .lastCall;
       const fileName = lastCallArgs?.[1];
-      expect(fileName).toBe('Report_Q2_2025.xlsx');
-
-      const blob = lastCallArgs?.[0];
-      expect(blob instanceof Blob).toBe(true);
-      expect(blob.type).toBe(
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      );
+      expect(fileName).toBe('Report_Q2_2025');
     });
   });
 

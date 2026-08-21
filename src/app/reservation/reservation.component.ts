@@ -226,8 +226,6 @@ const RESERVATION_ERROR_FIELDS = [
     MatAutocompleteTrigger,
     MatPrefix,
     MatFabButton,
-    BackButtonDirective,
-    CurrencySymbolPipe,
     MatCard,
     MatCardContent,
     RoomNamePipe,

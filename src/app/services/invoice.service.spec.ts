@@ -64,9 +64,6 @@ describe('InvoiceService', () => {
     };
     TestBed.configureTestingModule({
       providers: [InvoiceService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(InvoiceService);
   });

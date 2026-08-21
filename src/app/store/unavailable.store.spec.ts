@@ -43,9 +43,6 @@ describe('UnavailableStore', () => {
         UnavailableStore,
         { provide: UnavailableService, useValue: serviceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(UnavailableStore);

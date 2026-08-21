@@ -84,7 +84,6 @@ import { NavigationService } from '@app/services/navigation.service';
     MatFooterRowDef,
     MatPaginator,
     CurrencySymbolPipe,
-    CurrencySymbolPipe,
     TableSkeletonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -22,6 +22,7 @@ import {
   roomDetail,
   round,
   snakeToCamel,
+  toTitleCaseUnderscore,
 } from './helper';
 import { Role } from '../interfaces/token';
 import { IUser, IUserAll } from '../user/user';
@@ -1176,6 +1177,34 @@ describe('Helper Utils', () => {
     it('should return false when professionals list is undefined', () => {
       const id = 'professional-123';
       expect(isProfessional(id)).toBe(false);
+    });
+  });
+
+  describe('toTitleCaseUnderscore', () => {
+    it('should convert text to title case with underscores', () => {
+      expect(toTitleCaseUnderscore('price list')).toBe('Price_List');
+    });
+
+    it('should handle multiple spaces between words', () => {
+      expect(toTitleCaseUnderscore('price   list   title')).toBe(
+        'Price_List_Title',
+      );
+    });
+
+    it('should trim leading and trailing spaces', () => {
+      expect(toTitleCaseUnderscore('  price list  ')).toBe('Price_List');
+    });
+
+    it('should normalize the casing', () => {
+      expect(toTitleCaseUnderscore('pRiCe LiSt')).toBe('Price_List');
+    });
+
+    it('should return an empty string for an empty value', () => {
+      expect(toTitleCaseUnderscore('')).toBe('');
+    });
+
+    it('should handle a single word', () => {
+      expect(toTitleCaseUnderscore('price')).toBe('Price');
     });
   });
 });

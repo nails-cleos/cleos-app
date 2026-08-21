@@ -63,7 +63,6 @@ import { NavigationService } from '@app/services/navigation.service';
     MatError,
     MatAutocompleteTrigger,
     MatPrefix,
-    BackButtonDirective,
     BalanceComponent,
     BackButtonDirective,
     SkeletonComponent,

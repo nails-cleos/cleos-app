@@ -23,9 +23,6 @@ describe('StatementService', () => {
     };
     TestBed.configureTestingModule({
       providers: [StatementService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(StatementService);
   });

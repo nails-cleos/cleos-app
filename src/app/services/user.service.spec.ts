@@ -138,9 +138,6 @@ describe('UserService', () => {
     };
     TestBed.configureTestingModule({
       providers: [UserService, { provide: HttpClient, useValue: httpSpy }],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
     service = TestBed.inject(UserService);
   });

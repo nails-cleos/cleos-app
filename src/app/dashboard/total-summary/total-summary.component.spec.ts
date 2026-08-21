@@ -3,8 +3,9 @@ import { TotalSummaryComponent } from './total-summary.component';
 import { By } from '@angular/platform-browser';
 import { ISummaryTotals, Total } from '../dashboard';
 import { ICurrencyAll } from '@app/currency/currency';
-import { provideTranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { MockTranslatePipe } from '../../../test-setup';
 
 describe('TotalSummaryComponent', () => {
   let component: TotalSummaryComponent;
@@ -28,11 +29,19 @@ describe('TotalSummaryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TotalSummaryComponent],
-      providers: [provideTranslateService()],
       teardown: {
         destroyAfterEach: true,
       },
-    }).compileComponents();
+    })
+      .overrideComponent(TotalSummaryComponent, {
+        remove: {
+          imports: [TranslatePipe],
+        },
+        add: {
+          imports: [MockTranslatePipe],
+        },
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(TotalSummaryComponent);
     component = fixture.componentInstance;

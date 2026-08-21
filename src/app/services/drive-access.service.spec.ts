@@ -22,9 +22,6 @@ describe('DriveAccessService', () => {
         DriveAccessService,
         { provide: AuthStore, useValue: authStoreSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     service = TestBed.inject(DriveAccessService);

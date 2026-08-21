@@ -51,7 +51,6 @@ import {
 } from '@app/util/helper';
 import { RouterLink } from '@angular/router';
 import { AuthUserService } from '@app/services/auth-user.service';
-import fs from 'file-saver';
 import {
   createMonthlyExpenseWorkbook,
   createMonthlyIncomeWorkbook,
@@ -92,6 +91,7 @@ import {
 } from '@angular/common';
 import { DashboardStore } from '@app/store/dashboard.store';
 import { NavigationService } from '@app/services/navigation.service';
+import { DocumentStore } from '@app/store/document.store';
 
 type MonthlySummaryForm = {
   date: FormControl<Date>;
@@ -146,6 +146,7 @@ export class MonthSummaryComponent {
   private readonly env: EnvService = inject(EnvService);
   private readonly translateService: TranslateService =
     inject(TranslateService);
+  private readonly documentStore = inject(DocumentStore);
   private readonly dashboardStore = inject(DashboardStore);
   private readonly navigationService: NavigationService =
     inject(NavigationService);
@@ -667,9 +668,8 @@ export class MonthSummaryComponent {
   };
 
   exportMonthlySummary = (): void => {
-    const title = monthViewTitle(
-      this.getForm.date.value || getNowTimeZone(this.timeZone()),
-    );
+    const now = getNowTimeZone(this.timeZone());
+    const title = monthViewTitle(this.getForm.date.value || now);
     const workbook = createMonthlySummary(
       title,
       this.weeks,
@@ -681,16 +681,12 @@ export class MonthSummaryComponent {
       this.summaryExpenses as IMonthlySummaryExpense[],
     );
 
-    workbook.creator = this.userName() || '';
-    workbook.created = getNowTimeZone(this.timeZone());
-
-    // Generate & Save Excel File
-    workbook.xlsx.writeBuffer().then((content: any) => {
-      const blob = new Blob([content], {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      });
-      fs.saveAs(blob, `Report_${title.replace(' ', '_')}.xlsx`);
-    });
+    this.documentStore.exportExcel(
+      workbook,
+      `Report_${title.replace(' ', '_')}`,
+      this.userName() || '',
+      now,
+    );
   };
 
   exportToExcel = (
@@ -702,11 +698,10 @@ export class MonthSummaryComponent {
     if (data?.length) {
       const workbookName = `${titleCase(totalTypes.type)}-${getDateFormat(this.getForm.date.value)}`;
       const name = this.translateService.instant(`SUMMARY.${title}`);
+      const now = getNowTimeZone(this.timeZone());
 
       let workbook;
-      const header = monthViewTitle(
-        this.getForm.date.value || getNowTimeZone(this.timeZone()),
-      );
+      const header = monthViewTitle(this.getForm.date.value || now);
 
       switch (totalTypes.type) {
         case SummaryType.payment:
@@ -752,17 +747,12 @@ export class MonthSummaryComponent {
           break;
       }
 
-      workbook.creator = this.userName() || '';
-      workbook.created = getNowTimeZone(this.timeZone());
-
-      // Generate & Save Excel File
-      workbook.xlsx.writeBuffer().then((content: any) => {
-        const blob = new Blob([content], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        });
-        fs.saveAs(blob, `${workbookName}.xlsx`);
-      });
-
+      this.documentStore.exportExcel(
+        workbook,
+        workbookName,
+        this.userName() || '',
+        now,
+      );
       this.updateMonthlySummary(totalTypes, values);
     }
   };

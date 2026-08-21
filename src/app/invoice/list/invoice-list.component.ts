@@ -158,7 +158,6 @@ type DateRangeForm = {
     MatFooterRow,
     MatFooterRowDef,
     MatAutocompleteTrigger,
-    TimeDetailPipe,
     BackButtonDirective,
     MatCheckbox,
     MatChipGrid,

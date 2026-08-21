@@ -32,9 +32,6 @@ describe('OfficeStore', () => {
         OfficeStore,
         { provide: OfficeService, useValue: officeServiceSpy },
       ],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     store = TestBed.inject(OfficeStore);

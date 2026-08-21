@@ -19,9 +19,6 @@ describe('HideMissingDirective', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HostComponent],
-      teardown: {
-        destroyAfterEach: true,
-      },
     });
 
     fixture = TestBed.createComponent(HostComponent);
